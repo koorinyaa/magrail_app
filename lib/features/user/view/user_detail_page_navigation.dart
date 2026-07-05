@@ -3,7 +3,13 @@ part of 'user_detail_page.dart';
 extension _UserDetailPageNavigation on _UserDetailPageState {
   /// 打开用户设置二级页面
   void _openSettingsPage() {
-    context.pushNamed('userSettings', extra: widget.onSignedOut);
+    context.pushNamed(
+      'userSettings',
+      extra: UserSettingsRouteExtra(
+        onSignedOut: widget.onSignedOut,
+        onLiquidGlassChanged: widget.onLiquidGlassChanged,
+      ),
+    );
   }
 
   /// 打开刮刮乐购买弹层

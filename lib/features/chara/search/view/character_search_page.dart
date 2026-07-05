@@ -340,7 +340,7 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
             onSubmitted: (_) => _searchNow(),
             height: searchFieldHeight,
             useOwnLayer: true,
-            quality: GlassQuality.standard,
+            quality: GlassQuality.minimal,
             interactionBehavior: GlassInteractionBehavior.glowOnly,
             textStyle: TextStyle(
               color: colorScheme.onSurface,

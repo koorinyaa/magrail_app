@@ -29,6 +29,24 @@ const _donateWechatPayAsset = 'assets/images/donate/wechatpay.jpg';
 const _projectGithubLabel = '项目地址';
 final _projectGithubUrl = Uri.parse('https://github.com/koorinyaa/magrail_app');
 
+/// 用户设置页路由附加数据
+class UserSettingsRouteExtra {
+  /// 创建用户设置页路由附加数据
+  ///
+  /// [onSignedOut] 退出登录后的回调
+  /// [onLiquidGlassChanged] 液态玻璃开关变化回调
+  const UserSettingsRouteExtra({
+    this.onSignedOut,
+    this.onLiquidGlassChanged,
+  });
+
+  /// 退出登录后的回调
+  final VoidCallback? onSignedOut;
+
+  /// 液态玻璃开关变化回调
+  final ValueChanged<bool>? onLiquidGlassChanged;
+}
+
 /// 用户设置二级页面
 class UserSettingsPage extends StatefulWidget {
   /// 创建用户设置二级页面
@@ -39,6 +57,7 @@ class UserSettingsPage extends StatefulWidget {
   /// [updateController] 应用更新控制器
   /// [userRepository] 用户仓库
   /// [onSignedOut] 退出登录后的回调
+  /// [onLiquidGlassChanged] 液态玻璃开关变化回调
   const UserSettingsPage({
     super.key,
     required this.authRepository,
@@ -46,6 +65,7 @@ class UserSettingsPage extends StatefulWidget {
     required this.updateController,
     required this.userRepository,
     this.onSignedOut,
+    this.onLiquidGlassChanged,
   });
 
   /// Tinygrail 授权仓库
@@ -63,6 +83,9 @@ class UserSettingsPage extends StatefulWidget {
   /// 退出登录后的回调
   final VoidCallback? onSignedOut;
 
+  /// 液态玻璃开关变化回调
+  final ValueChanged<bool>? onLiquidGlassChanged;
+
   /// 创建用户设置二级页面状态
   @override
   State<UserSettingsPage> createState() => _UserSettingsPageState();
@@ -75,6 +98,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
   late String _bangumiMirrorHost;
   late bool _hiddenFeaturesEnabled;
   late bool _revealPrivateUserHoldingsEnabled;
+  late bool _useLiquidGlass;
 
   /// 初始化用户设置二级页面状态
   @override
@@ -87,6 +111,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
     _hiddenFeaturesEnabled = widget.preferences.hiddenFeaturesEnabled;
     _revealPrivateUserHoldingsEnabled =
         widget.preferences.revealPrivateUserHoldingsEnabled;
+    _useLiquidGlass = widget.preferences.useLiquidGlass;
   }
 
   /// 构建用户设置二级页面
@@ -119,6 +144,15 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                         value: _useBangumiMirror,
                         mirrorHost: _bangumiMirrorHost,
                         onChanged: _handleBangumiMirrorChanged,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _SettingsSurface(
+                      child: _SettingsSwitchTile(
+                        icon: Icons.blur_on_rounded,
+                        label: '使用液态玻璃效果',
+                        value: _useLiquidGlass,
+                        onChanged: _handleLiquidGlassChanged,
                       ),
                     ),
                     if (_hiddenFeaturesEnabled) ...[
@@ -257,6 +291,34 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
         useMirror: previousValue,
         mirrorHost: _bangumiMirrorHost,
       );
+      AppToast.error(
+        context,
+        text: '保存设置失败，请稍后重试',
+      );
+    }
+  }
+
+  /// 处理液态玻璃开关变化
+  ///
+  /// [value] 是否启用液态玻璃
+  Future<void> _handleLiquidGlassChanged(bool value) async {
+    final previousValue = _useLiquidGlass;
+    setState(() {
+      _useLiquidGlass = value;
+    });
+    widget.onLiquidGlassChanged?.call(value);
+
+    try {
+      await widget.preferences.setUseLiquidGlass(value);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _useLiquidGlass = previousValue;
+      });
+      widget.onLiquidGlassChanged?.call(previousValue);
       AppToast.error(
         context,
         text: '保存设置失败，请稍后重试',

@@ -35,6 +35,7 @@ import 'package:magrail_app/features/user/widgets/user_detail_top_actions.dart';
 import 'package:magrail_app/features/user/widgets/user_profile_card.dart';
 import 'package:magrail_app/features/user/widgets/user_red_packet_send_sheet.dart';
 import 'package:magrail_app/features/user/widgets/user_share_bonus_forecast_sheet.dart';
+import 'package:magrail_app/features/user/view/user_settings_page.dart';
 
 part 'user_detail_page_actions.dart';
 part 'user_detail_page_navigation.dart';
@@ -58,6 +59,7 @@ class UserDetailPage extends StatefulWidget {
   /// [reserveDockPadding] 是否为底部 Dock 预留滚动底部空间
   /// [onOpenSecondary] 一级菜单中打开用户详情二级页的回调
   /// [onSignedOut] 当前用户退出登录后的回调
+  /// [onLiquidGlassChanged] 液态玻璃开关变化回调
   const UserDetailPage({
     super.key,
     required this.entryMode,
@@ -74,6 +76,7 @@ class UserDetailPage extends StatefulWidget {
     this.reserveDockPadding = false,
     this.onOpenSecondary,
     this.onSignedOut,
+    this.onLiquidGlassChanged,
   });
 
   /// 页面入口层级
@@ -117,6 +120,9 @@ class UserDetailPage extends StatefulWidget {
 
   /// 当前用户退出登录后的回调
   final VoidCallback? onSignedOut;
+
+  /// 液态玻璃开关变化回调
+  final ValueChanged<bool>? onLiquidGlassChanged;
 
   /// 创建用户详情页状态
   @override

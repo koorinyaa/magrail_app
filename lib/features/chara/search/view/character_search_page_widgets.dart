@@ -365,7 +365,7 @@ class _CharacterSearchCloseButton extends StatelessWidget {
       onPressed: onPressed,
       interactionScale: 1.0,
       useOwnLayer: true,
-      quality: GlassQuality.standard,
+      quality: GlassQuality.minimal,
     );
   }
 }

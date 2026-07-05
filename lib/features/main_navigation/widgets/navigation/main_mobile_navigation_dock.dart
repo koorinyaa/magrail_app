@@ -8,15 +8,20 @@ class MainMobileNavigationDock extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [currentTab] 当前选中的导航标签
+  /// [useLiquidGlass] 是否启用液态玻璃
   /// [onTabSelected] 导航标签点击回调
   const MainMobileNavigationDock({
     super.key,
     required this.currentTab,
+    required this.useLiquidGlass,
     required this.onTabSelected,
   });
 
   /// 当前选中的导航标签
   final MainTab currentTab;
+
+  /// 是否启用液态玻璃
+  final bool useLiquidGlass;
 
   /// 导航标签点击回调
   final ValueChanged<MainTab> onTabSelected;
@@ -37,7 +42,8 @@ class MainMobileNavigationDock extends StatelessWidget {
         tabs: [
           for (final tab in dockTabs) _buildGlassTab(tab),
         ],
-        quality: GlassQuality.premium,
+        quality:
+            useLiquidGlass ? GlassQuality.premium : GlassQuality.minimal,
         selectedIndex: selectedIndex < 0 ? 0 : selectedIndex,
         onTabSelected: (index) => onTabSelected(dockTabs[index]),
       ),

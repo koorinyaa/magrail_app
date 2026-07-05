@@ -498,8 +498,13 @@ GoRouter createAppRouter({
         name: 'userSettings',
         path: '/user-settings',
         pageBuilder: (context, state) {
-          final onSignedOut =
-              state.extra is VoidCallback ? state.extra as VoidCallback : null;
+          final routeExtra = state.extra is UserSettingsRouteExtra
+              ? state.extra as UserSettingsRouteExtra
+              : null;
+          final onSignedOut = routeExtra?.onSignedOut ??
+              (state.extra is VoidCallback
+                  ? state.extra as VoidCallback
+                  : null);
 
           return MaterialPage(
             key: state.pageKey,
@@ -509,6 +514,7 @@ GoRouter createAppRouter({
               updateController: dependencies.updateController,
               userRepository: dependencies.repositories.user,
               onSignedOut: onSignedOut,
+              onLiquidGlassChanged: routeExtra?.onLiquidGlassChanged,
             ),
           );
         },

@@ -20,6 +20,7 @@ class AppPreferences {
   static const _hiddenFeaturesEnabledKey = 'hidden_features_enabled';
   static const _revealPrivateUserHoldingsEnabledKey =
       'reveal_private_user_holdings_enabled';
+  static const _useLiquidGlassKey = 'use_liquid_glass';
   static const _lastPromptedReleaseTagKey = 'last_prompted_release_tag';
   static const _lastPromptedReleaseTagSavedAtKey =
       'last_prompted_release_tag_saved_at';
@@ -139,6 +140,18 @@ class AppPreferences {
       _revealPrivateUserHoldingsEnabledKey,
       value,
     );
+  }
+
+  /// 读取液态玻璃开关状态
+  bool get useLiquidGlass {
+    return _preferences.getBool(_useLiquidGlassKey) ?? true;
+  }
+
+  /// 保存液态玻璃开关状态
+  ///
+  /// [value] 是否启用液态玻璃
+  Future<void> setUseLiquidGlass(bool value) {
+    return _preferences.setBool(_useLiquidGlassKey, value);
   }
 
   /// 读取上次自动提示的新版本标签

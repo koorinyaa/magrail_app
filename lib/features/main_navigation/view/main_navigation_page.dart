@@ -130,6 +130,14 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   int _rankingScrollResetToken = 0;
   int _rankingScrollToTopToken = 0;
   bool _isOpeningProfile = false;
+  late bool _useLiquidGlass;
+
+  /// 初始化主导航页面状态
+  @override
+  void initState() {
+    super.initState();
+    _useLiquidGlass = widget.preferences.useLiquidGlass;
+  }
 
   /// 释放主导航页面状态
   @override
@@ -160,6 +168,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
             alignment: Alignment.bottomCenter,
             child: MainMobileNavigationDock(
               currentTab: _currentTab,
+              useLiquidGlass: _useLiquidGlass,
               onTabSelected: _selectTab,
             ),
           ),
@@ -241,6 +250,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           reserveDockPadding: true,
           onOpenSecondary: _openUserDetailPage,
           onSignedOut: _switchToHomeAfterSignOut,
+          onLiquidGlassChanged: _handleLiquidGlassChanged,
         ),
     };
   }
@@ -268,6 +278,19 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
     setState(() {
       _currentTab = MainTab.home;
+    });
+  }
+
+  /// 处理液态玻璃开关变化
+  ///
+  /// [enabled] 是否启用液态玻璃
+  void _handleLiquidGlassChanged(bool enabled) {
+    if (!mounted || _useLiquidGlass == enabled) {
+      return;
+    }
+
+    setState(() {
+      _useLiquidGlass = enabled;
     });
   }
 
