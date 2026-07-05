@@ -38,7 +38,7 @@ class _TempleAssetMetrics extends StatelessWidget {
               child: _TempleAssetSoftTags(items: data.tags),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
         ] else
           const Spacer(),
         _TempleAssetProgress(data: data),
@@ -265,7 +265,7 @@ class _TempleAssetSoftTags extends StatelessWidget {
   Widget build(BuildContext context) {
     return Wrap(
       alignment: WrapAlignment.start,
-      spacing: 6,
+      spacing: 5,
       runSpacing: 3,
       children: [
         for (final item in items) _TempleAssetSoftTag(data: item),
@@ -304,8 +304,8 @@ class _TempleAssetSoftTag extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Container(
-        constraints: const BoxConstraints(minHeight: 20, maxWidth: 260),
-        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+        constraints: const BoxConstraints(minHeight: 18, maxWidth: 240),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -316,7 +316,7 @@ class _TempleAssetSoftTag extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: foregroundColor,
-                  fontSize: 10,
+                  fontSize: 9.5,
                   fontWeight: FontWeight.w700,
                   height: 1,
                   fontFeatures: const [FontFeature.tabularFigures()],
@@ -330,7 +330,7 @@ class _TempleAssetSoftTag extends StatelessWidget {
                     ? Icons.star_rounded
                     : Icons.star_border_rounded,
                 color: const Color(0xFFFFD25A),
-                size: 12,
+                size: 11,
               ),
             ],
           ],
@@ -368,7 +368,7 @@ class _TempleAssetProgress extends StatelessWidget {
         : (data.assets / data.sacrifices).clamp(0.0, 1.0).toDouble();
 
     return SizedBox(
-      height: 26,
+      height: 24,
       child: Padding(
         padding: const EdgeInsets.only(right: 4),
         child: Column(
@@ -386,7 +386,7 @@ class _TempleAssetProgress extends StatelessWidget {
                 height: 1,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 5),
             ClipRRect(
               borderRadius: BorderRadius.circular(999),
               child: SizedBox(

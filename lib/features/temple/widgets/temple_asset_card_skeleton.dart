@@ -58,26 +58,26 @@ class _TempleAssetSkeletonSummary extends StatelessWidget {
         Wrap(
           alignment: WrapAlignment.start,
           runSpacing: 3,
-          spacing: 6,
+          spacing: 5,
           children: [
             Bone(
-              width: 84,
-              height: 20,
-              borderRadius: BorderRadius.all(Radius.circular(999)),
-            ),
-            Bone(
               width: 78,
-              height: 20,
+              height: 18,
               borderRadius: BorderRadius.all(Radius.circular(999)),
             ),
             Bone(
-              width: 88,
-              height: 20,
+              width: 72,
+              height: 18,
               borderRadius: BorderRadius.all(Radius.circular(999)),
             ),
             Bone(
-              width: 74,
-              height: 20,
+              width: 82,
+              height: 18,
+              borderRadius: BorderRadius.all(Radius.circular(999)),
+            ),
+            Bone(
+              width: 68,
+              height: 18,
               borderRadius: BorderRadius.all(Radius.circular(999)),
             ),
           ],
@@ -98,7 +98,7 @@ class _TempleAssetSkeletonProgress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const SizedBox(
-      height: 26,
+      height: 24,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -110,7 +110,7 @@ class _TempleAssetSkeletonProgress extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(6)),
             ),
           ),
-          SizedBox(height: 6),
+          SizedBox(height: 5),
           Bone(
             width: double.infinity,
             height: 4,
