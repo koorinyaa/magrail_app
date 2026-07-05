@@ -323,7 +323,7 @@ class _CharacterPageState extends State<CharacterPage> {
     }
 
     if (!hasCookie) {
-      AppToast.error(context, text: '请先登录');
+      AppToast.error(context, text: '该功能需要授权后才能使用');
       return false;
     }
 
@@ -343,7 +343,7 @@ class _CharacterPageState extends State<CharacterPage> {
       case UserAssetsFetchStatus.authExpired:
         AppToast.error(
           context,
-          text: '请先登录',
+          text: '该功能需要授权后才能使用',
         );
         return false;
       case UserAssetsFetchStatus.failure:

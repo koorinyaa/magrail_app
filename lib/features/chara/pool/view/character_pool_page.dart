@@ -182,7 +182,7 @@ class _CharacterPoolPageState extends State<CharacterPoolPage> {
     }
 
     if (!hasCookie) {
-      AppToast.error(context, text: '请先登录');
+      AppToast.error(context, text: '该功能需要授权后才能使用');
       return false;
     }
 
@@ -200,7 +200,7 @@ class _CharacterPoolPageState extends State<CharacterPoolPage> {
       case UserAssetsFetchStatus.success:
         return true;
       case UserAssetsFetchStatus.authExpired:
-        AppToast.error(context, text: '请先登录');
+        AppToast.error(context, text: '该功能需要授权后才能使用');
         return false;
       case UserAssetsFetchStatus.failure:
         AppToast.error(
