@@ -63,6 +63,13 @@ extension _UserDetailPageNavigation on _UserDetailPageState {
   ///
   /// [profile] 用户资料
   void _openRedPacketLogs(UserDetailProfile profile) {
+    final currentUsername =
+        widget.repository.readCachedCurrentUserAssets()?.name.trim() ?? '';
+    if (currentUsername.isEmpty) {
+      AppToast.error(context, text: '该功能需要授权后才能使用');
+      return;
+    }
+
     context.pushNamed(
       'userRedPacketLogs',
       queryParameters: {
@@ -76,6 +83,13 @@ extension _UserDetailPageNavigation on _UserDetailPageState {
   ///
   /// [profile] 用户资料
   void _openSendRedPacket(UserDetailProfile profile) {
+    final currentUsername =
+        widget.repository.readCachedCurrentUserAssets()?.name.trim() ?? '';
+    if (currentUsername.isEmpty) {
+      AppToast.error(context, text: '该功能需要授权后才能使用');
+      return;
+    }
+
     unawaited(showUserRedPacketSendSheet(
       context,
       repository: widget.repository,

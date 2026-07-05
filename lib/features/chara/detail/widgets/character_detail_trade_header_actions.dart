@@ -294,7 +294,8 @@ class _CharacterDetailTradeHeaderActionsState
   bool _isActionEnabled(_TradeHeaderActionEntry action) {
     return switch (action.type) {
       _TradeHeaderActionType.sacrifice ||
-      _TradeHeaderActionType.auction =>
+      _TradeHeaderActionType.auction ||
+      _TradeHeaderActionType.auctionHistory =>
         widget.header.currentUserId != null,
       _ => true,
     };

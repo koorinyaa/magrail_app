@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
+import 'package:magrail_app/core/feedback/app_toast.dart';
 import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 import 'package:magrail_app/core/utils/formatters.dart';
 import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
@@ -35,6 +36,7 @@ PageRoute<void>? _activeCharacterSearchRoute;
 /// 显示角色搜索页
 ///
 /// 已存在角色搜索页时置顶已有页面
+/// 未授权时只弹出提示，不打开搜索页
 ///
 /// [context] 当前组件树上下文
 /// [repository] 角色详情仓库
@@ -50,6 +52,13 @@ Future<void> showCharacterSearchPage(
   required TinygrailOosRepository oosRepository,
   required UserRepository userRepository,
 }) {
+  final currentUsername =
+      userRepository.readCachedCurrentUserAssets()?.name.trim() ?? '';
+  if (currentUsername.isEmpty) {
+    AppToast.error(context, text: '该功能需要授权后才能使用');
+    return Future<void>.value();
+  }
+
   final navigator = Navigator.of(context);
   final activeRoute = _activeCharacterSearchRoute;
   if (activeRoute != null && activeRoute.navigator == navigator) {
