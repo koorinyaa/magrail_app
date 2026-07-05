@@ -265,8 +265,8 @@ class _TempleAssetSoftTags extends StatelessWidget {
   Widget build(BuildContext context) {
     return Wrap(
       alignment: WrapAlignment.start,
-      spacing: 7,
-      runSpacing: 4,
+      spacing: 6,
+      runSpacing: 3,
       children: [
         for (final item in items) _TempleAssetSoftTag(data: item),
       ],
@@ -304,8 +304,8 @@ class _TempleAssetSoftTag extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Container(
-        constraints: const BoxConstraints(minHeight: 22, maxWidth: 260),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        constraints: const BoxConstraints(minHeight: 20, maxWidth: 260),
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -316,7 +316,7 @@ class _TempleAssetSoftTag extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: foregroundColor,
-                  fontSize: 10.5,
+                  fontSize: 10,
                   fontWeight: FontWeight.w700,
                   height: 1,
                   fontFeatures: const [FontFeature.tabularFigures()],
@@ -330,7 +330,7 @@ class _TempleAssetSoftTag extends StatelessWidget {
                     ? Icons.star_rounded
                     : Icons.star_border_rounded,
                 color: const Color(0xFFFFD25A),
-                size: 13,
+                size: 12,
               ),
             ],
           ],

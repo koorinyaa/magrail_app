@@ -57,27 +57,27 @@ class _TempleAssetSkeletonSummary extends StatelessWidget {
         SizedBox(height: 12),
         Wrap(
           alignment: WrapAlignment.start,
-          runSpacing: 6,
+          runSpacing: 3,
           spacing: 6,
           children: [
             Bone(
-              width: 88,
-              height: 22,
-              borderRadius: BorderRadius.all(Radius.circular(999)),
-            ),
-            Bone(
-              width: 82,
-              height: 22,
-              borderRadius: BorderRadius.all(Radius.circular(999)),
-            ),
-            Bone(
-              width: 92,
-              height: 22,
+              width: 84,
+              height: 20,
               borderRadius: BorderRadius.all(Radius.circular(999)),
             ),
             Bone(
               width: 78,
-              height: 22,
+              height: 20,
+              borderRadius: BorderRadius.all(Radius.circular(999)),
+            ),
+            Bone(
+              width: 88,
+              height: 20,
+              borderRadius: BorderRadius.all(Radius.circular(999)),
+            ),
+            Bone(
+              width: 74,
+              height: 20,
               borderRadius: BorderRadius.all(Radius.circular(999)),
             ),
           ],
