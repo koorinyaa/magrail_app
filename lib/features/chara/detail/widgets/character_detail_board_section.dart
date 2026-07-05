@@ -37,6 +37,7 @@ class CharacterDetailBoardSection extends StatefulWidget {
   /// [header] 角色详情已上市头部资料
   /// [collectionsController] 公开展示区控制器
   /// [currentUserName] 当前登录用户名
+  /// [revealPrivateUserHoldings] 是否允许查看未公开用户持股
   /// [boardRefreshSignal] 董事会刷新信号
   const CharacterDetailBoardSection({
     super.key,
@@ -48,6 +49,7 @@ class CharacterDetailBoardSection extends StatefulWidget {
     required this.header,
     required this.collectionsController,
     required this.currentUserName,
+    required this.revealPrivateUserHoldings,
     required this.boardRefreshSignal,
   });
 
@@ -74,6 +76,9 @@ class CharacterDetailBoardSection extends StatefulWidget {
 
   /// 当前登录用户名
   final String currentUserName;
+
+  /// 是否允许查看未公开用户持股
+  final bool revealPrivateUserHoldings;
 
   /// 董事会刷新信号
   final ValueListenable<int> boardRefreshSignal;
@@ -241,7 +246,25 @@ class _CharacterDetailBoardSectionState
       temple: temple,
       onTap: () => _openUser(member),
       onTempleTap: temple == null ? null : () => _openTempleAssetCard(temple),
+      onRevealStock:
+          widget.revealPrivateUserHoldings ? _revealMemberStock : null,
     );
+  }
+
+  /// 查询董事会成员未公开持股
+  ///
+  /// [member] 董事会成员
+  Future<int?> _revealMemberStock(CharacterDetailBoardMember member) async {
+    final username = member.name.trim();
+    if (username.isEmpty) {
+      return null;
+    }
+
+    final holding = await widget.repository.fetchUserCharacterHolding(
+      widget.header.characterId,
+      username,
+    );
+    return holding?.total;
   }
 
   /// 按列拆分董事会预览条目

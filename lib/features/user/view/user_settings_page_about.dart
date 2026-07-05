@@ -4,13 +4,23 @@ part of 'user_settings_page.dart';
 class _AboutPage extends StatefulWidget {
   /// 创建关于二级页面
   ///
+  /// [preferences] 本地偏好设置
   /// [updateController] 应用更新控制器
+  /// [onHiddenFeaturesChanged] 隐藏功能状态变化回调
   const _AboutPage({
+    required this.preferences,
     required this.updateController,
+    required this.onHiddenFeaturesChanged,
   });
+
+  /// 本地偏好设置
+  final AppPreferences preferences;
 
   /// 应用更新控制器
   final AppUpdateController updateController;
+
+  /// 隐藏功能状态变化回调
+  final ValueChanged<bool> onHiddenFeaturesChanged;
 
   /// 创建关于二级页面状态
   @override
@@ -23,12 +33,16 @@ class _AboutPageState extends State<_AboutPage> {
   bool _isCheckingUpdate = false;
   int _appIconTapCount = 0;
   double _appIconTurns = 0;
+  bool _hiddenFeaturesEnabled = false;
+  bool _isTogglingHiddenFeatures = false;
 
   /// 初始化关于二级页面状态
   @override
   void initState() {
     super.initState();
     _packageInfoFuture = PackageInfo.fromPlatform();
+    _hiddenFeaturesEnabled = widget.preferences.hiddenFeaturesEnabled;
+    _appIconTurns = _hiddenFeaturesEnabled ? 0.5 : 0;
   }
 
   /// 构建关于二级页面
@@ -169,16 +183,53 @@ class _AboutPageState extends State<_AboutPage> {
   }
 
   /// 处理应用图标彩蛋点击
-  void _handleAppIconPressed() {
+  Future<void> _handleAppIconPressed() async {
+    if (_isTogglingHiddenFeatures) {
+      return;
+    }
+
     _appIconTapCount += 1;
     if (_appIconTapCount < 10) {
       return;
     }
 
+    final nextValue = !_hiddenFeaturesEnabled;
     setState(() {
       _appIconTapCount = 0;
-      _appIconTurns += 0.5;
+      _isTogglingHiddenFeatures = true;
     });
+
+    try {
+      if (!nextValue) {
+        await widget.preferences.setRevealPrivateUserHoldingsEnabled(false);
+      }
+      await widget.preferences.setHiddenFeaturesEnabled(nextValue);
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _hiddenFeaturesEnabled = nextValue;
+        _appIconTurns = nextValue ? 0.5 : 0;
+      });
+      widget.onHiddenFeaturesChanged(nextValue);
+      AppToast.info(
+        context,
+        text: nextValue ? '隐藏功能已开启' : '隐藏功能已关闭',
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      AppToast.error(context, text: '保存设置失败，请稍后重试');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isTogglingHiddenFeatures = false;
+        });
+      }
+    }
   }
 
   /// 格式化平台包版本号

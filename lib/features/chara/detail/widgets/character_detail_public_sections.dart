@@ -24,6 +24,7 @@ class CharacterDetailPublicSections extends StatefulWidget {
   /// [userRepository] 用户仓库
   /// [header] 角色详情已上市头部资料
   /// [currentUserName] 当前登录用户名
+  /// [revealPrivateUserHoldings] 是否允许查看未公开用户持股
   /// [collectionsRefreshSignal] 连接与圣殿预览刷新信号
   /// [boardRefreshSignal] 董事会预览刷新信号
   const CharacterDetailPublicSections({
@@ -35,6 +36,7 @@ class CharacterDetailPublicSections extends StatefulWidget {
     required this.userRepository,
     required this.header,
     required this.currentUserName,
+    required this.revealPrivateUserHoldings,
     required this.collectionsRefreshSignal,
     required this.boardRefreshSignal,
   });
@@ -59,6 +61,9 @@ class CharacterDetailPublicSections extends StatefulWidget {
 
   /// 当前登录用户名
   final String currentUserName;
+
+  /// 是否允许查看未公开用户持股
+  final bool revealPrivateUserHoldings;
 
   /// 连接与圣殿预览刷新信号
   final ValueListenable<int> collectionsRefreshSignal;
@@ -144,6 +149,7 @@ class _CharacterDetailPublicSectionsState
           header: widget.header,
           collectionsController: _controller,
           currentUserName: widget.currentUserName,
+          revealPrivateUserHoldings: widget.revealPrivateUserHoldings,
           boardRefreshSignal: _boardRefreshSignal,
         ),
         CharacterDetailCollectionsSection(

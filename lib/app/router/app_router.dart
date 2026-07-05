@@ -149,6 +149,9 @@ GoRouter createAppRouter({
               characterName: queryParameters['name'] ?? '',
               totalShares: int.tryParse(queryParameters['total'] ?? '') ?? 0,
               currentUserName: routeExtra?.currentUserName ?? '',
+              revealPrivateUserHoldings:
+                  dependencies.preferences.hiddenFeaturesEnabled &&
+                      dependencies.preferences.revealPrivateUserHoldingsEnabled,
               collectionsController: collectionsController,
             ),
           );

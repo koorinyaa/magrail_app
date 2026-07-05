@@ -192,6 +192,9 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
                       currentPageType == CharacterDetailPageType.ico &&
                           currentIcoInfo != null &&
                           _controller.isAuthorized;
+                  final revealPrivateUserHoldings =
+                      widget.preferences.hiddenFeaturesEnabled &&
+                          widget.preferences.revealPrivateUserHoldingsEnabled;
                   final bottomPadding = MediaQuery.paddingOf(context).bottom +
                       (showIcoInvestBar ? 156 : 24);
 
@@ -231,6 +234,7 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
                         userRepository: widget.userRepository,
                         auctionRepository: widget.auctionRepository,
                         tradeHistoryRepository: widget.tradeHistoryRepository,
+                        revealPrivateUserHoldings: revealPrivateUserHoldings,
                         isGameMaster: _controller.isGameMaster,
                         collectionsRefreshSignal:
                             _publicCollectionsRefreshSignal,

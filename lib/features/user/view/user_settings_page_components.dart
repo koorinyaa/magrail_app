@@ -241,6 +241,98 @@ class _BangumiMirrorSwitchTile extends StatelessWidget {
   }
 }
 
+/// 设置页普通开关
+class _SettingsSwitchTile extends StatelessWidget {
+  /// 创建设置页普通开关
+  ///
+  /// [icon] 左侧图标
+  /// [label] 选项文字
+  /// [value] 当前开关状态
+  /// [onChanged] 开关变化回调
+  const _SettingsSwitchTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  /// 左侧图标
+  final IconData icon;
+
+  /// 选项文字
+  final String label;
+
+  /// 当前开关状态
+  final bool value;
+
+  /// 开关变化回调
+  final ValueChanged<bool> onChanged;
+
+  /// 构建设置页普通开关
+  ///
+  /// [context] 当前组件树上下文
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 6, 12, 6),
+      child: Row(
+        children: [
+          Icon(icon, size: 22),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            thumbColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return null;
+              }
+
+              return colorScheme.onSurfaceVariant.withValues(
+                alpha: isDark ? 0.92 : 0.78,
+              );
+            }),
+            trackColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return null;
+              }
+
+              return colorScheme.onSurfaceVariant.withValues(
+                alpha: isDark ? 0.24 : 0.16,
+              );
+            }),
+            trackOutlineColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return null;
+              }
+
+              return colorScheme.outlineVariant.withValues(
+                alpha: isDark ? 0.72 : 0.44,
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// 退出登录按钮
 class _SignOutButton extends StatelessWidget {
   /// 创建退出登录按钮

@@ -17,6 +17,9 @@ class AppPreferences {
       'tinygrail_current_user_chara_overview';
   static const _characterDetailHistoryCacheKey =
       'tinygrail_character_detail_history';
+  static const _hiddenFeaturesEnabledKey = 'hidden_features_enabled';
+  static const _revealPrivateUserHoldingsEnabledKey =
+      'reveal_private_user_holdings_enabled';
   static const _lastPromptedReleaseTagKey = 'last_prompted_release_tag';
   static const _lastPromptedReleaseTagSavedAtKey =
       'last_prompted_release_tag_saved_at';
@@ -109,6 +112,33 @@ class AppPreferences {
   /// 清除角色详情打开历史缓存
   Future<void> clearCharacterDetailHistoryCache() {
     return _preferences.remove(_characterDetailHistoryCacheKey);
+  }
+
+  /// 读取隐藏功能开关状态
+  bool get hiddenFeaturesEnabled {
+    return _preferences.getBool(_hiddenFeaturesEnabledKey) ?? false;
+  }
+
+  /// 保存隐藏功能开关状态
+  ///
+  /// [value] 是否启用隐藏功能
+  Future<void> setHiddenFeaturesEnabled(bool value) {
+    return _preferences.setBool(_hiddenFeaturesEnabledKey, value);
+  }
+
+  /// 读取未公开用户持股查看开关状态
+  bool get revealPrivateUserHoldingsEnabled {
+    return _preferences.getBool(_revealPrivateUserHoldingsEnabledKey) ?? false;
+  }
+
+  /// 保存未公开用户持股查看开关状态
+  ///
+  /// [value] 是否允许点击未公开用户持股
+  Future<void> setRevealPrivateUserHoldingsEnabled(bool value) {
+    return _preferences.setBool(
+      _revealPrivateUserHoldingsEnabledKey,
+      value,
+    );
   }
 
   /// 读取上次自动提示的新版本标签

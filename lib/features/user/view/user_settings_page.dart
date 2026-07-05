@@ -73,6 +73,8 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
   bool _isSigningOut = false;
   late bool _useBangumiMirror;
   late String _bangumiMirrorHost;
+  late bool _hiddenFeaturesEnabled;
+  late bool _revealPrivateUserHoldingsEnabled;
 
   /// 初始化用户设置二级页面状态
   @override
@@ -82,6 +84,9 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
     _bangumiMirrorHost = BangumiMirrorConfig.resolveHost(
       widget.preferences.bangumiMirrorHost,
     );
+    _hiddenFeaturesEnabled = widget.preferences.hiddenFeaturesEnabled;
+    _revealPrivateUserHoldingsEnabled =
+        widget.preferences.revealPrivateUserHoldingsEnabled;
   }
 
   /// 构建用户设置二级页面
@@ -116,26 +121,49 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                         onChanged: _handleBangumiMirrorChanged,
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    _SettingsSurface(
-                      child: _SettingsActionTile(
-                        icon: Icons.favorite_border_rounded,
-                        label: '打赏',
-                        onPressed: _openDonatePage,
+                    if (_hiddenFeaturesEnabled) ...[
+                      const SizedBox(height: 16),
+                      _SettingsSurface(
+                        child: _SettingsSwitchTile(
+                          icon: Icons.visibility_outlined,
+                          label: '显示未公开用户持股',
+                          value: _revealPrivateUserHoldingsEnabled,
+                          onChanged: _handleRevealPrivateUserHoldingsChanged,
+                        ),
                       ),
-                    ),
+                    ],
                     const SizedBox(height: 16),
                     _SettingsSurface(
-                      child: AnimatedBuilder(
-                        animation: widget.updateController,
-                        builder: (context, child) {
-                          return _SettingsActionTile(
-                            icon: Icons.info_outline_rounded,
-                            label: '关于',
-                            showNewBadge: widget.updateController.hasUpdate,
-                            onPressed: _openAboutPage,
-                          );
-                        },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _SettingsActionTile(
+                            icon: Icons.favorite_border_rounded,
+                            label: '打赏',
+                            onPressed: _openDonatePage,
+                          ),
+                          Divider(
+                            height: 1,
+                            thickness: 0.5,
+                            indent: 50,
+                            endIndent: 16,
+                            color: colorScheme.outlineVariant.withValues(
+                              alpha: 0.72,
+                            ),
+                          ),
+                          AnimatedBuilder(
+                            animation: widget.updateController,
+                            builder: (context, child) {
+                              return _SettingsActionTile(
+                                icon: Icons.info_outline_rounded,
+                                label: '关于',
+                                showNewBadge:
+                                    widget.updateController.hasUpdate,
+                                onPressed: _openAboutPage,
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -169,10 +197,28 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (context) => _AboutPage(
+          preferences: widget.preferences,
           updateController: widget.updateController,
+          onHiddenFeaturesChanged: _handleHiddenFeaturesChanged,
         ),
       ),
     );
+  }
+
+  /// 处理隐藏功能状态变化
+  ///
+  /// [enabled] 是否启用隐藏功能
+  void _handleHiddenFeaturesChanged(bool enabled) {
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _hiddenFeaturesEnabled = enabled;
+      if (!enabled) {
+        _revealPrivateUserHoldingsEnabled = false;
+      }
+    });
   }
 
   /// 处理 Bangumi 镜像开关变化
@@ -211,6 +257,32 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
         useMirror: previousValue,
         mirrorHost: _bangumiMirrorHost,
       );
+      AppToast.error(
+        context,
+        text: '保存设置失败，请稍后重试',
+      );
+    }
+  }
+
+  /// 处理未公开用户持股查看开关变化
+  ///
+  /// [value] 是否允许点击未公开用户持股
+  Future<void> _handleRevealPrivateUserHoldingsChanged(bool value) async {
+    final previousValue = _revealPrivateUserHoldingsEnabled;
+    setState(() {
+      _revealPrivateUserHoldingsEnabled = value;
+    });
+
+    try {
+      await widget.preferences.setRevealPrivateUserHoldingsEnabled(value);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _revealPrivateUserHoldingsEnabled = previousValue;
+      });
       AppToast.error(
         context,
         text: '保存设置失败，请稍后重试',

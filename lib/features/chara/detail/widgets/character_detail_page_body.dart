@@ -46,6 +46,7 @@ class CharacterDetailPageBody extends StatelessWidget {
   /// [userRepository] 用户仓库
   /// [auctionRepository] 拍卖仓库
   /// [tradeHistoryRepository] 角色交易记录仓库
+  /// [revealPrivateUserHoldings] 是否允许查看未公开用户持股
   /// [isGameMaster] 当前用户是否为 GM
   /// [collectionsRefreshSignal] 连接与圣殿预览刷新信号
   /// [boardRefreshSignal] 董事会预览刷新信号
@@ -76,6 +77,7 @@ class CharacterDetailPageBody extends StatelessWidget {
     required this.userRepository,
     required this.auctionRepository,
     required this.tradeHistoryRepository,
+    required this.revealPrivateUserHoldings,
     required this.isGameMaster,
     required this.collectionsRefreshSignal,
     required this.boardRefreshSignal,
@@ -139,6 +141,9 @@ class CharacterDetailPageBody extends StatelessWidget {
 
   /// 角色交易记录仓库
   final CharacterTradeHistoryRepository tradeHistoryRepository;
+
+  /// 是否允许查看未公开用户持股
+  final bool revealPrivateUserHoldings;
 
   /// 当前用户是否为 GM
   final bool isGameMaster;
@@ -215,6 +220,7 @@ class CharacterDetailPageBody extends StatelessWidget {
           magicRepository: magicRepository,
           oosRepository: oosRepository,
           userRepository: userRepository,
+          revealPrivateUserHoldings: revealPrivateUserHoldings,
           collectionsRefreshSignal: collectionsRefreshSignal,
           boardRefreshSignal: boardRefreshSignal,
           onSacrificeChanged: onSacrificeChanged,
@@ -358,6 +364,7 @@ class _CharacterDetailTradeBody extends StatelessWidget {
   /// [templeRepository] 圣殿仓库
   /// [magicRepository] 圣殿资产魔法道具仓库
   /// [userRepository] 用户仓库
+  /// [revealPrivateUserHoldings] 是否允许查看未公开用户持股
   /// [collectionsRefreshSignal] 连接与圣殿预览刷新信号
   /// [boardRefreshSignal] 董事会预览刷新信号
   /// [onSacrificeChanged] 资产重组或股权融资成功回调
@@ -383,6 +390,7 @@ class _CharacterDetailTradeBody extends StatelessWidget {
     required this.magicRepository,
     required this.oosRepository,
     required this.userRepository,
+    required this.revealPrivateUserHoldings,
     required this.collectionsRefreshSignal,
     required this.boardRefreshSignal,
     required this.onSacrificeChanged,
@@ -437,6 +445,9 @@ class _CharacterDetailTradeBody extends StatelessWidget {
 
   /// 用户仓库
   final UserRepository userRepository;
+
+  /// 是否允许查看未公开用户持股
+  final bool revealPrivateUserHoldings;
 
   /// 连接与圣殿预览刷新信号
   final ValueListenable<int> collectionsRefreshSignal;
@@ -535,6 +546,7 @@ class _CharacterDetailTradeBody extends StatelessWidget {
           userRepository: userRepository,
           header: tradeHeader,
           currentUserName: currentUserName,
+          revealPrivateUserHoldings: revealPrivateUserHoldings,
           collectionsRefreshSignal: collectionsRefreshSignal,
           boardRefreshSignal: boardRefreshSignal,
         ),

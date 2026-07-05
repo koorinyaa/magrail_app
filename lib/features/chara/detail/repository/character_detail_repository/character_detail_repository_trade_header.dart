@@ -8,14 +8,14 @@ extension CharacterDetailRepositoryTradeHeaderQueries
   Future<CharacterDetailUserCharacter?> fetchValhallaCharacter(
     int characterId,
   ) async {
-    return _fetchCharacterUserHolding(characterId, 'tinygrail');
+    return fetchUserCharacterHolding(characterId, 'tinygrail');
   }
 
   /// 获取幻想乡角色持股数量
   ///
   /// [characterId] 角色 ID
   Future<int?> fetchGensokyoAmount(int characterId) async {
-    final holding = await _fetchCharacterUserHolding(characterId, 'blueleaf');
+    final holding = await fetchUserCharacterHolding(characterId, 'blueleaf');
     return holding?.amount;
   }
 
@@ -23,7 +23,7 @@ extension CharacterDetailRepositoryTradeHeaderQueries
   ///
   /// [characterId] 角色 ID
   /// [username] Tinygrail 用户名
-  Future<CharacterDetailUserCharacter?> _fetchCharacterUserHolding(
+  Future<CharacterDetailUserCharacter?> fetchUserCharacterHolding(
     int characterId,
     String username,
   ) async {

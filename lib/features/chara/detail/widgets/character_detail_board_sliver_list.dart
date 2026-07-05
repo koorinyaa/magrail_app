@@ -16,6 +16,7 @@ class CharacterDetailBoardSliverList extends StatelessWidget {
   /// [onItemBuilt] 条目构建回调
   /// [onMemberTap] 成员点击回调
   /// [onTempleTap] 圣殿数据点击回调
+  /// [onRevealStock] 未公开持股查询回调
   const CharacterDetailBoardSliverList({
     super.key,
     required this.items,
@@ -24,6 +25,7 @@ class CharacterDetailBoardSliverList extends StatelessWidget {
     this.onItemBuilt,
     this.onMemberTap,
     this.onTempleTap,
+    this.onRevealStock,
   });
 
   /// 董事会成员
@@ -44,6 +46,9 @@ class CharacterDetailBoardSliverList extends StatelessWidget {
 
   /// 圣殿数据点击回调
   final ValueChanged<CharacterDetailTempleItem>? onTempleTap;
+
+  /// 未公开持股查询回调
+  final CharacterDetailBoardMemberStockResolver? onRevealStock;
 
   /// 构建角色董事会 sliver 列表
   ///
@@ -68,6 +73,7 @@ class CharacterDetailBoardSliverList extends StatelessWidget {
               onTempleTap: temple == null || onTempleTap == null
                   ? null
                   : () => onTempleTap!(temple),
+              onRevealStock: onRevealStock,
             ),
           );
         },

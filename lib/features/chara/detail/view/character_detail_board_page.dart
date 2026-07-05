@@ -32,6 +32,7 @@ class CharacterDetailBoardPage extends StatefulWidget {
   /// [characterName] 角色名称
   /// [totalShares] 角色流通股份
   /// [currentUserName] 当前登录用户名
+  /// [revealPrivateUserHoldings] 是否允许查看未公开用户持股
   /// [collectionsController] 一级页面共享的公开展示区控制器
   const CharacterDetailBoardPage({
     super.key,
@@ -44,6 +45,7 @@ class CharacterDetailBoardPage extends StatefulWidget {
     required this.characterName,
     required this.totalShares,
     required this.currentUserName,
+    required this.revealPrivateUserHoldings,
     this.collectionsController,
   });
 
@@ -73,6 +75,9 @@ class CharacterDetailBoardPage extends StatefulWidget {
 
   /// 当前登录用户名
   final String currentUserName;
+
+  /// 是否允许查看未公开用户持股
+  final bool revealPrivateUserHoldings;
 
   /// 一级页面共享的公开展示区控制器
   final CharacterDetailCollectionsController? collectionsController;
@@ -131,6 +136,8 @@ class _CharacterDetailBoardPageState extends State<CharacterDetailBoardPage> {
             onItemBuilt: onItemBuilt,
             onMemberTap: _openUser,
             onTempleTap: _openTempleAssetCard,
+            onRevealStock:
+                widget.revealPrivateUserHoldings ? _revealMemberStock : null,
           ),
         ];
       },
@@ -183,6 +190,22 @@ class _CharacterDetailBoardPageState extends State<CharacterDetailBoardPage> {
       'userDetail',
       queryParameters: {'username': username},
     );
+  }
+
+  /// 查询董事会成员未公开持股
+  ///
+  /// [member] 董事会成员
+  Future<int?> _revealMemberStock(CharacterDetailBoardMember member) async {
+    final username = member.name.trim();
+    if (username.isEmpty) {
+      return null;
+    }
+
+    final holding = await widget.repository.fetchUserCharacterHolding(
+      widget.characterId,
+      username,
+    );
+    return holding?.total;
   }
 
   /// 页面标题
