@@ -21,6 +21,8 @@ class _AboutPage extends StatefulWidget {
 class _AboutPageState extends State<_AboutPage> {
   late final Future<PackageInfo> _packageInfoFuture;
   bool _isCheckingUpdate = false;
+  int _appIconTapCount = 0;
+  double _appIconTurns = 0;
 
   /// 初始化关于二级页面状态
   @override
@@ -55,10 +57,19 @@ class _AboutPageState extends State<_AboutPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Image.asset(
-                      _appIconAsset,
-                      width: 112,
-                      height: 112,
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _handleAppIconPressed,
+                      child: AnimatedRotation(
+                        turns: _appIconTurns,
+                        duration: const Duration(milliseconds: 520),
+                        curve: Curves.easeInOutCubic,
+                        child: Image.asset(
+                          _appIconAsset,
+                          width: 112,
+                          height: 112,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 18),
                     Text(
@@ -126,6 +137,26 @@ class _AboutPageState extends State<_AboutPage> {
                         );
                       },
                     ),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      child: _SettingsSurface(
+                        child: _SettingsActionTile(
+                          leadingIcon: SvgPicture.asset(
+                            _githubIconAsset,
+                            width: 22,
+                            height: 22,
+                            colorFilter: ColorFilter.mode(
+                              colorScheme.onSurface,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          label: _projectGithubLabel,
+                          trailingIcon: Icons.open_in_new_rounded,
+                          onPressed: _openProjectGithubPage,
+                        ),
+                      ),
+                    ),
                     const Spacer(),
                   ],
                 ),
@@ -135,6 +166,19 @@ class _AboutPageState extends State<_AboutPage> {
         ],
       ),
     );
+  }
+
+  /// 处理应用图标彩蛋点击
+  void _handleAppIconPressed() {
+    _appIconTapCount += 1;
+    if (_appIconTapCount < 10) {
+      return;
+    }
+
+    setState(() {
+      _appIconTapCount = 0;
+      _appIconTurns += 0.5;
+    });
   }
 
   /// 格式化平台包版本号
@@ -182,6 +226,17 @@ class _AboutPageState extends State<_AboutPage> {
           _isCheckingUpdate = false;
         });
       }
+    }
+  }
+
+  /// 打开项目 GitHub 页面
+  Future<void> _openProjectGithubPage() async {
+    final opened = await launchUrl(
+      _projectGithubUrl,
+      mode: LaunchMode.externalApplication,
+    );
+    if (!opened && mounted) {
+      AppToast.error(context, text: '无法打开 GitHub 页面，请稍后重试');
     }
   }
 

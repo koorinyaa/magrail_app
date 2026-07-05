@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:magrail_app/core/auth/bangumi_mirror_config.dart';
 import 'package:magrail_app/core/auth/tinygrail_auth_repository.dart';
 import 'package:magrail_app/core/feedback/app_toast.dart';
@@ -14,6 +15,7 @@ import 'package:magrail_app/core/widgets/app_loading_dialog.dart';
 import 'package:magrail_app/core/widgets/secondary_page_sliver_app_bar.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 part 'user_settings_page_about.dart';
 part 'user_settings_page_components.dart';
@@ -21,8 +23,11 @@ part 'user_settings_page_donate.dart';
 
 const _appName = 'MaGrail';
 const _appIconAsset = 'assets/icons/app_icon_foreground.png';
+const _githubIconAsset = 'assets/icons/github.svg';
 const _donateAlipayAsset = 'assets/images/donate/alipay.jpg';
 const _donateWechatPayAsset = 'assets/images/donate/wechatpay.jpg';
+const _projectGithubLabel = '项目地址';
+final _projectGithubUrl = Uri.parse('https://github.com/koorinyaa/magrail_app');
 
 /// 用户设置二级页面
 class UserSettingsPage extends StatefulWidget {
@@ -113,6 +118,14 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                     ),
                     const SizedBox(height: 16),
                     _SettingsSurface(
+                      child: _SettingsActionTile(
+                        icon: Icons.favorite_border_rounded,
+                        label: '打赏',
+                        onPressed: _openDonatePage,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _SettingsSurface(
                       child: AnimatedBuilder(
                         animation: widget.updateController,
                         builder: (context, child) {
@@ -123,14 +136,6 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                             onPressed: _openAboutPage,
                           );
                         },
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _SettingsSurface(
-                      child: _SettingsActionTile(
-                        icon: Icons.favorite_border_rounded,
-                        label: '打赏',
-                        onPressed: _openDonatePage,
                       ),
                     ),
                     const SizedBox(height: 16),

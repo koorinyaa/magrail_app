@@ -43,5 +43,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icons/app_icon_foreground.png
+    - assets/icons/github.svg
     - assets/icons/torii.svg
     - assets/images/donate/

@@ -39,25 +39,35 @@ class _SettingsSurface extends StatelessWidget {
 class _SettingsActionTile extends StatelessWidget {
   /// 创建设置页普通跳转项
   ///
-  /// [icon] 左侧图标
+  /// [icon] 左侧默认图标
+  /// [leadingIcon] 自定义左侧图标
   /// [label] 选项文字
   /// [showNewBadge] 是否显示新版本标签
+  /// [trailingIcon] 右侧状态图标
   /// [onPressed] 点击回调
   const _SettingsActionTile({
-    required this.icon,
+    this.icon,
+    this.leadingIcon,
     required this.label,
     this.showNewBadge = false,
+    this.trailingIcon = Icons.chevron_right_rounded,
     required this.onPressed,
-  });
+  }) : assert(icon != null || leadingIcon != null);
 
-  /// 左侧图标
-  final IconData icon;
+  /// 左侧默认图标
+  final IconData? icon;
+
+  /// 自定义左侧图标
+  final Widget? leadingIcon;
 
   /// 选项文字
   final String label;
 
   /// 是否显示新版本标签
   final bool showNewBadge;
+
+  /// 右侧状态图标
+  final IconData trailingIcon;
 
   /// 点击回调
   final VoidCallback onPressed;
@@ -79,7 +89,7 @@ class _SettingsActionTile extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
           child: Row(
             children: [
-              Icon(icon, size: 22),
+              leadingIcon ?? Icon(icon, size: 22),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -99,7 +109,7 @@ class _SettingsActionTile extends StatelessWidget {
                 const SizedBox(width: 10),
               ],
               Icon(
-                Icons.chevron_right_rounded,
+                trailingIcon,
                 size: 20,
                 color: colorScheme.onSurfaceVariant,
               ),
