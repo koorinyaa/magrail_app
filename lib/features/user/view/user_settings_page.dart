@@ -191,8 +191,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                               return _SettingsActionTile(
                                 icon: Icons.info_outline_rounded,
                                 label: '关于',
-                                showNewBadge:
-                                    widget.updateController.hasUpdate,
+                                showNewBadge: widget.updateController.hasUpdate,
                                 onPressed: _openAboutPage,
                               );
                             },

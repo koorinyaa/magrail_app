@@ -51,10 +51,9 @@ class _TopWeekHistoryPageState extends State<TopWeekHistoryPage> {
     final colorScheme = Theme.of(context).colorScheme;
     final padding = MediaQuery.paddingOf(context);
     const pageTopSpacing = 12.0;
-    final appBarHeight = padding.top +
-        SecondaryPageSliverAppBar.defaultToolbarHeight;
-    final indicatorHeight =
-        TopWeekHistoryPageIndicator.height + padding.bottom;
+    final appBarHeight =
+        padding.top + SecondaryPageSliverAppBar.defaultToolbarHeight;
+    final indicatorHeight = TopWeekHistoryPageIndicator.height + padding.bottom;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,

@@ -158,9 +158,8 @@ class _CharacterDetailBoardMemberRowState
                         text: _stockLabel,
                         backgroundColor: _stockPillColor(context),
                         isEnabled: _canRevealStock,
-                        onPressed: _canRevealStock
-                            ? _handleRevealStockPressed
-                            : null,
+                        onPressed:
+                            _canRevealStock ? _handleRevealStockPressed : null,
                       ),
                       const SizedBox(height: 2),
                       _BoardMemberTempleLine(
