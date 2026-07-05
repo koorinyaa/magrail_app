@@ -100,8 +100,6 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const _SettingsSectionLabel(label: '网络'),
-                    const SizedBox(height: 8),
                     _SettingsSurface(
                       child: _BangumiMirrorSwitchTile(
                         value: _useBangumiMirror,
