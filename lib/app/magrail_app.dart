@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:magrail_app/core/update/app_update_dialog.dart';
 
 import 'bootstrap.dart';
 import 'router/app_router.dart';
 import 'theme/app_material_theme.dart';
 
 /// Magrail 根组件
-class MagrailApp extends StatelessWidget {
+class MagrailApp extends StatefulWidget {
   /// 创建根组件
   ///
   /// [key] Flutter 组件标识
@@ -18,11 +20,43 @@ class MagrailApp extends StatelessWidget {
     ThemeMode? themeMode,
   }) : _themeMode = themeMode;
 
+  /// 应用依赖集合
   final AppDependencies dependencies;
   final ThemeMode? _themeMode;
 
   /// 当前应用主题模式
   ThemeMode get themeMode => _themeMode ?? ThemeMode.system;
+
+  /// 创建根组件状态
+  @override
+  State<MagrailApp> createState() => _MagrailAppState();
+}
+
+/// Magrail 根组件状态
+class _MagrailAppState extends State<MagrailApp> {
+  late final GlobalKey<NavigatorState> _rootNavigatorKey;
+  late final GoRouter _router;
+
+  /// 初始化根组件状态
+  @override
+  void initState() {
+    super.initState();
+    _rootNavigatorKey = GlobalKey<NavigatorState>();
+    _router = createAppRouter(
+      dependencies: widget.dependencies,
+      rootNavigatorKey: _rootNavigatorKey,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkForStartupUpdate();
+    });
+  }
+
+  /// 释放根组件状态
+  @override
+  void dispose() {
+    _router.dispose();
+    super.dispose();
+  }
 
   /// 构建根组件
   ///
@@ -34,7 +68,7 @@ class MagrailApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppMaterialTheme.light(),
       darkTheme: AppMaterialTheme.dark(),
-      themeMode: themeMode,
+      themeMode: widget.themeMode,
       builder: (context, child) {
         final brightness = _resolveBrightness(context);
 
@@ -43,15 +77,44 @@ class MagrailApp extends StatelessWidget {
           child: child ?? const SizedBox.shrink(),
         );
       },
-      routerConfig: createAppRouter(dependencies: dependencies),
+      routerConfig: _router,
     );
+  }
+
+  /// 检查启动时是否需要提示新版本
+  Future<void> _checkForStartupUpdate() async {
+    try {
+      final controller = widget.dependencies.updateController;
+      final result = await controller.checkForUpdate();
+      if (!mounted || !result.hasUpdate) {
+        return;
+      }
+
+      final shouldPrompt = await controller.shouldShowAutomaticPrompt();
+      if (!mounted || !shouldPrompt) {
+        return;
+      }
+
+      final context = _rootNavigatorKey.currentContext;
+      if (context == null || !context.mounted) {
+        return;
+      }
+
+      await showAppUpdateDialog(
+        context,
+        controller: controller,
+        markPrompted: true,
+      );
+    } catch (_) {
+      // 启动检查失败不影响应用正常使用
+    }
   }
 
   /// 解析当前系统栏亮暗模式
   ///
   /// [context] 当前组件树上下文
   Brightness _resolveBrightness(BuildContext context) {
-    return switch (themeMode) {
+    return switch (widget.themeMode) {
       ThemeMode.light => Brightness.light,
       ThemeMode.dark => Brightness.dark,
       ThemeMode.system => MediaQuery.platformBrightnessOf(context),

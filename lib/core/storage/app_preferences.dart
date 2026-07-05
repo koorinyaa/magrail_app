@@ -17,6 +17,9 @@ class AppPreferences {
       'tinygrail_current_user_chara_overview';
   static const _characterDetailHistoryCacheKey =
       'tinygrail_character_detail_history';
+  static const _lastPromptedReleaseTagKey = 'last_prompted_release_tag';
+  static const _lastPromptedReleaseTagSavedAtKey =
+      'last_prompted_release_tag_saved_at';
 
   /// 读取深色模式偏好
   bool get prefersDarkMode =>
@@ -106,5 +109,36 @@ class AppPreferences {
   /// 清除角色详情打开历史缓存
   Future<void> clearCharacterDetailHistoryCache() {
     return _preferences.remove(_characterDetailHistoryCacheKey);
+  }
+
+  /// 读取上次自动提示的新版本标签
+  String? get lastPromptedReleaseTag {
+    return _preferences.getString(_lastPromptedReleaseTagKey);
+  }
+
+  /// 读取上次自动提示新版本的保存时间
+  int? get lastPromptedReleaseTagSavedAtMilliseconds {
+    return _preferences.getInt(_lastPromptedReleaseTagSavedAtKey);
+  }
+
+  /// 保存上次自动提示的新版本标签
+  ///
+  /// [tagName] Release 标签名
+  /// [savedAt] 保存时间
+  Future<void> setLastPromptedReleaseTag({
+    required String tagName,
+    required DateTime savedAt,
+  }) async {
+    await _preferences.setString(_lastPromptedReleaseTagKey, tagName);
+    await _preferences.setInt(
+      _lastPromptedReleaseTagSavedAtKey,
+      savedAt.millisecondsSinceEpoch,
+    );
+  }
+
+  /// 清除上次自动提示的新版本标签
+  Future<void> clearLastPromptedReleaseTag() async {
+    await _preferences.remove(_lastPromptedReleaseTagKey);
+    await _preferences.remove(_lastPromptedReleaseTagSavedAtKey);
   }
 }

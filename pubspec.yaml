@@ -32,6 +32,7 @@ dependencies:
   shared_preferences:
   signalr_netcore:
   skeletonizer:
+  url_launcher:
   webview_flutter:
   liquid_glass_widgets: ^0.19.1
 

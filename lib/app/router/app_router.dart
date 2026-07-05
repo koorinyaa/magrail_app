@@ -37,8 +37,13 @@ import 'package:magrail_app/features/user/view/user_trade_log_page.dart';
 /// 创建应用路由表
 ///
 /// [dependencies] 应用依赖集合
-GoRouter createAppRouter({required AppDependencies dependencies}) {
+/// [rootNavigatorKey] 根导航器标识
+GoRouter createAppRouter({
+  required AppDependencies dependencies,
+  GlobalKey<NavigatorState>? rootNavigatorKey,
+}) {
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/',
     routes: [
       GoRoute(
@@ -498,6 +503,7 @@ GoRouter createAppRouter({required AppDependencies dependencies}) {
             child: UserSettingsPage(
               authRepository: dependencies.authRepository,
               preferences: dependencies.preferences,
+              updateController: dependencies.updateController,
               userRepository: dependencies.repositories.user,
               onSignedOut: onSignedOut,
             ),

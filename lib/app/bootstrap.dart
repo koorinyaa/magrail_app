@@ -7,6 +7,8 @@ import 'package:magrail_app/core/auth/tinygrail_site_config.dart';
 import 'package:magrail_app/core/network/api_client.dart';
 import 'package:magrail_app/core/storage/app_preferences.dart';
 import 'package:magrail_app/core/storage/secure_storage.dart';
+import 'package:magrail_app/core/update/app_update_controller.dart';
+import 'package:magrail_app/core/update/app_update_repository.dart';
 import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
 import 'package:magrail_app/features/chara/auction/repository/auction_repository.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
@@ -32,12 +34,14 @@ class AppDependencies {
   /// [apiClient] Tinygrail API 客户端
   /// [authRepository] Tinygrail 授权仓库
   /// [preferences] 本地偏好设置
+  /// [updateController] 应用更新控制器
   /// [secureStorage] 安全存储
   /// [repositories] 业务仓库集合
   AppDependencies({
     required this.apiClient,
     required this.authRepository,
     required this.preferences,
+    required this.updateController,
     required this.secureStorage,
     required this.repositories,
   });
@@ -50,6 +54,9 @@ class AppDependencies {
 
   /// 本地偏好设置
   final AppPreferences preferences;
+
+  /// 应用更新控制器
+  final AppUpdateController updateController;
 
   /// 安全存储
   final SecureStorage secureStorage;
@@ -204,11 +211,24 @@ Future<AppDependencies> bootstrap() async {
 
   final authRepository =
       TinygrailAuthRepository(dio: dio, cookieJar: cookieJar);
+  final updateController = AppUpdateController(
+    repository: AppUpdateRepository(
+      dio: Dio(
+        BaseOptions(
+          connectTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 30),
+          responseType: ResponseType.json,
+        ),
+      ),
+    ),
+    preferences: preferences,
+  );
 
   return AppDependencies(
     apiClient: apiClient,
     authRepository: authRepository,
     preferences: preferences,
+    updateController: updateController,
     secureStorage: secureStorage,
     repositories: AppRepositories(
       apiClient: apiClient,
