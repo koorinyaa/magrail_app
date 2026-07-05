@@ -129,25 +129,37 @@ class _TopWeekHistoryListItem extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       _TopWeekHistoryNameRow(item: item),
-                      const SizedBox(height: 3),
-                      Text(
-                        _formatPrice(item.price),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelMedium
-                            ?.copyWith(
-                              color: colorScheme.onSurfaceVariant.withValues(
-                                alpha: isDark ? 0.72 : 0.60,
-                              ),
-                              fontWeight: FontWeight.w600,
-                              height: 1.1,
-                            ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 14,
+                        child: Text(
+                          _formatPrice(item.price),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: colorScheme.onSurfaceVariant,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            height: 1,
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 3),
-                      _TopWeekHistorySurplusChip(
-                        value: _formatExtra(item.extra),
+                      SizedBox(
+                        height: 12,
+                        child: Text(
+                          _formatExtra(item.extra),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.58,
+                            ),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            height: 1,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -413,55 +425,6 @@ class _TopWeekHistoryPeopleCount extends StatelessWidget {
                   ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// 往期萌王超出金额胶囊
-class _TopWeekHistorySurplusChip extends StatelessWidget {
-  /// 创建往期萌王超出金额胶囊
-  ///
-  /// [value] 超出金额文本
-  const _TopWeekHistorySurplusChip({
-    required this.value,
-  });
-
-  /// 超出金额文本
-  final String value;
-
-  /// 构建往期萌王超出金额胶囊
-  ///
-  /// [context] 当前组件树上下文
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.10)
-            : Colors.black.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.12)
-              : Colors.black.withValues(alpha: 0.05),
-          width: 0.8,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
-        child: Text(
-          value,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.78)
-                    : Colors.black.withValues(alpha: 0.56),
-                fontWeight: FontWeight.w800,
-                height: 1,
-              ),
         ),
       ),
     );

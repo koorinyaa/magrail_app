@@ -52,8 +52,9 @@ class _TopWeekHistoryPageState extends State<TopWeekHistoryPage> {
     final padding = MediaQuery.paddingOf(context);
     const pageTopSpacing = 12.0;
     final appBarHeight = padding.top +
-        SecondaryPageSliverAppBar.defaultToolbarHeight +
-        TopWeekHistoryPageIndicator.height;
+        SecondaryPageSliverAppBar.defaultToolbarHeight;
+    final indicatorHeight =
+        TopWeekHistoryPageIndicator.height + padding.bottom;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -73,7 +74,7 @@ class _TopWeekHistoryPageState extends State<TopWeekHistoryPage> {
                     0,
                     appBarHeight + pageTopSpacing,
                     0,
-                    16 + padding.bottom,
+                    indicatorHeight + 16,
                   ),
                 ),
               ),
@@ -87,12 +88,24 @@ class _TopWeekHistoryPageState extends State<TopWeekHistoryPage> {
                   slivers: [
                     SecondaryPageSliverAppBar(
                       title: title,
-                      bottom: TopWeekHistoryPageIndicator(
-                        currentPage: _controller.currentPage,
-                        totalPages: _controller.totalPages,
-                      ),
                     ),
                   ],
+                ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: indicatorHeight,
+                child: ColoredBox(
+                  color: colorScheme.surface,
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: padding.bottom),
+                    child: TopWeekHistoryPageIndicator(
+                      currentPage: _controller.currentPage,
+                      totalPages: _controller.totalPages,
+                    ),
+                  ),
                 ),
               ),
             ],
