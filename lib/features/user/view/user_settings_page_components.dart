@@ -1,33 +1,5 @@
 part of 'user_settings_page.dart';
 
-/// 设置分组标题
-class _SettingsSectionLabel extends StatelessWidget {
-  /// 创建设置分组标题
-  ///
-  /// [label] 分组标题
-  const _SettingsSectionLabel({required this.label});
-
-  /// 分组标题
-  final String label;
-
-  /// 构建设置分组标题
-  ///
-  /// [context] 当前组件树上下文
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Text(
-      label,
-      style: TextStyle(
-        color: colorScheme.onSurfaceVariant,
-        fontSize: 13,
-        fontWeight: FontWeight.w700,
-      ),
-    );
-  }
-}
-
 /// 设置页表面分组
 class _SettingsSurface extends StatelessWidget {
   /// 创建设置页表面分组

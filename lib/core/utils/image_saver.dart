@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:gal/gal.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -34,7 +35,10 @@ class ImageSaveResult {
     required this.message,
   });
 
+  /// 保存状态
   final ImageSaveStatus status;
+
+  /// 提示文案
   final String message;
 
   /// 是否保存成功
@@ -45,6 +49,22 @@ class ImageSaveResult {
 ///
 /// [imageUrl] 图片地址
 Future<ImageSaveResult> saveImageToGallery(String imageUrl) async {
+  return _saveImageFileToGallery(() => _downloadImageToTempFile(imageUrl));
+}
+
+/// 保存资源图片到系统相册
+///
+/// [assetName] 资源图片路径
+Future<ImageSaveResult> saveAssetImageToGallery(String assetName) async {
+  return _saveImageFileToGallery(() => _writeAssetImageToTempFile(assetName));
+}
+
+/// 保存临时图片文件到系统相册
+///
+/// [tempFileLoader] 临时图片文件加载器
+Future<ImageSaveResult> _saveImageFileToGallery(
+  Future<File?> Function() tempFileLoader,
+) async {
   if (kIsWeb) {
     return const ImageSaveResult(
       status: ImageSaveStatus.unsupportedPlatform,
@@ -63,7 +83,7 @@ Future<ImageSaveResult> saveImageToGallery(String imageUrl) async {
 
   File? tempFile;
   try {
-    tempFile = await _downloadImageToTempFile(imageUrl);
+    tempFile = await tempFileLoader();
     if (tempFile == null || !tempFile.existsSync()) {
       return const ImageSaveResult(
         status: ImageSaveStatus.downloadFailed,
@@ -106,6 +126,25 @@ Future<File?> _downloadImageToTempFile(String imageUrl) async {
     }
 
     await file.writeAsBytes(bytes, flush: true);
+    return file;
+  } catch (_) {
+    return null;
+  }
+}
+
+/// 写入资源图片到临时文件
+///
+/// [assetName] 资源图片路径
+Future<File?> _writeAssetImageToTempFile(String assetName) async {
+  try {
+    final temporaryDirectory = await getTemporaryDirectory();
+    final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final file = File('${temporaryDirectory.path}/$fileName');
+    final bytes = await rootBundle.load(assetName);
+    await file.writeAsBytes(
+      bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes),
+      flush: true,
+    );
     return file;
   } catch (_) {
     return null;

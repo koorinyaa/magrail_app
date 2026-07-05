@@ -44,3 +44,4 @@ flutter:
   assets:
     - assets/icons/app_icon_foreground.png
     - assets/icons/torii.svg
+    - assets/images/donate/

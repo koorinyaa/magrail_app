@@ -8,6 +8,7 @@ import 'package:magrail_app/core/storage/app_preferences.dart';
 import 'package:magrail_app/core/update/app_update_controller.dart';
 import 'package:magrail_app/core/update/app_update_dialog.dart';
 import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
+import 'package:magrail_app/core/viewer/fullscreen_image_viewer_page.dart';
 import 'package:magrail_app/core/widgets/app_confirm_dialog.dart';
 import 'package:magrail_app/core/widgets/app_loading_dialog.dart';
 import 'package:magrail_app/core/widgets/secondary_page_sliver_app_bar.dart';
@@ -16,9 +17,12 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 part 'user_settings_page_about.dart';
 part 'user_settings_page_components.dart';
+part 'user_settings_page_donate.dart';
 
 const _appName = 'MaGrail';
 const _appIconAsset = 'assets/icons/app_icon_foreground.png';
+const _donateAlipayAsset = 'assets/images/donate/alipay.jpg';
+const _donateWechatPayAsset = 'assets/images/donate/wechatpay.jpg';
 
 /// 用户设置二级页面
 class UserSettingsPage extends StatefulWidget {
@@ -123,6 +127,14 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                     ),
                     const SizedBox(height: 16),
                     _SettingsSurface(
+                      child: _SettingsActionTile(
+                        icon: Icons.favorite_border_rounded,
+                        label: '打赏',
+                        onPressed: _openDonatePage,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _SettingsSurface(
                       child: _SignOutButton(
                         isDisabled: _isSigningOut,
                         onPressed: _handleSignOut,
@@ -134,6 +146,15 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// 打开打赏页面
+  void _openDonatePage() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => const _DonatePage(),
       ),
     );
   }

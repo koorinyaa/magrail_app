@@ -14,10 +14,23 @@ class FullscreenImageViewerPage extends StatefulWidget {
     super.key,
     required this.imageUrl,
     required this.heroTag,
-  });
+  }) : assetName = null;
+
+  /// 创建全屏资源图片查看页面
+  ///
+  /// [assetName] 资源图片路径
+  /// [heroTag] Hero 动画标识
+  const FullscreenImageViewerPage.asset({
+    super.key,
+    required this.assetName,
+    required this.heroTag,
+  }) : imageUrl = null;
 
   /// 图片地址
-  final String imageUrl;
+  final String? imageUrl;
+
+  /// 资源图片路径
+  final String? assetName;
 
   /// Hero 动画标识
   final String heroTag;
@@ -63,37 +76,7 @@ class _FullscreenImageViewerPageState extends State<FullscreenImageViewerPage> {
                   Positioned.fill(
                     child: Hero(
                       tag: widget.heroTag,
-                      child: ExtendedImage.network(
-                        widget.imageUrl,
-                        width: double.infinity,
-                        height: double.infinity,
-                        fit: BoxFit.contain,
-                        cache: true,
-                        cacheMaxAge: const Duration(days: 7),
-                        mode: ExtendedImageMode.gesture,
-                        enableSlideOutPage: true,
-                        initGestureConfigHandler: (state) {
-                          return GestureConfig(
-                            minScale: 0.9,
-                            animationMinScale: 0.7,
-                            maxScale: 4.0,
-                            animationMaxScale: 4.5,
-                            speed: 1.0,
-                            inertialSpeed: 100.0,
-                            initialScale: 1.0,
-                            inPageView: false,
-                            initialAlignment: InitialAlignment.center,
-                          );
-                        },
-                        onDoubleTap: (state) {
-                          final begin = state.gestureDetails?.totalScale ?? 1.0;
-                          final end = begin == 1.0 ? 2.5 : 1.0;
-                          state.handleDoubleTap(
-                            scale: end,
-                            doubleTapPosition: state.pointerDownPosition,
-                          );
-                        },
-                      ),
+                      child: _buildImage(),
                     ),
                   ),
                 ],
@@ -127,6 +110,65 @@ class _FullscreenImageViewerPageState extends State<FullscreenImageViewerPage> {
     );
   }
 
+  /// 构建可缩放图片
+  Widget _buildImage() {
+    final assetName = widget.assetName;
+    if (assetName != null) {
+      return ExtendedImage.asset(
+        assetName,
+        width: double.infinity,
+        height: double.infinity,
+        fit: BoxFit.contain,
+        mode: ExtendedImageMode.gesture,
+        enableSlideOutPage: true,
+        initGestureConfigHandler: _createGestureConfig,
+        onDoubleTap: _handleDoubleTap,
+      );
+    }
+
+    return ExtendedImage.network(
+      widget.imageUrl!,
+      width: double.infinity,
+      height: double.infinity,
+      fit: BoxFit.contain,
+      cache: true,
+      cacheMaxAge: const Duration(days: 7),
+      mode: ExtendedImageMode.gesture,
+      enableSlideOutPage: true,
+      initGestureConfigHandler: _createGestureConfig,
+      onDoubleTap: _handleDoubleTap,
+    );
+  }
+
+  /// 创建全屏图片手势配置
+  ///
+  /// [state] 当前图片状态
+  GestureConfig _createGestureConfig(ExtendedImageState state) {
+    return GestureConfig(
+      minScale: 0.9,
+      animationMinScale: 0.7,
+      maxScale: 4.0,
+      animationMaxScale: 4.5,
+      speed: 1.0,
+      inertialSpeed: 100.0,
+      initialScale: 1.0,
+      inPageView: false,
+      initialAlignment: InitialAlignment.center,
+    );
+  }
+
+  /// 处理双击缩放
+  ///
+  /// [state] 当前图片状态
+  void _handleDoubleTap(ExtendedImageGestureState state) {
+    final begin = state.gestureDetails?.totalScale ?? 1.0;
+    final end = begin == 1.0 ? 2.5 : 1.0;
+    state.handleDoubleTap(
+      scale: end,
+      doubleTapPosition: state.pointerDownPosition,
+    );
+  }
+
   /// 解析滑动关闭时的背景颜色
   ///
   /// [offset] 页面滑动位移
@@ -142,7 +184,10 @@ class _FullscreenImageViewerPageState extends State<FullscreenImageViewerPage> {
   /// [context] 当前组件上下文
   Future<void> _saveImage(BuildContext context) async {
     final rootNavigator = Navigator.of(context, rootNavigator: true);
-    final result = await saveImageToGallery(widget.imageUrl);
+    final assetName = widget.assetName;
+    final result = assetName == null
+        ? await saveImageToGallery(widget.imageUrl!)
+        : await saveAssetImageToGallery(assetName);
     if (!rootNavigator.mounted) {
       return;
     }

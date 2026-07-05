@@ -101,6 +101,15 @@ ios/               iOS 平台工程
 assets/            图标和静态资源
 ```
 
+## 打赏
+
+谢谢支持喵~
+
+<p align="center">
+  <img src="assets/images/donate/alipay.jpg" width="220" alt="支付宝收款码">
+  <img src="assets/images/donate/wechatpay.jpg" width="220" alt="微信支付收款码">
+</p>
+
 ## 开源协议
 
 本项目采用 [MIT License](LICENSE)，欢迎学习、使用和二次开发。分发修改版本时，请保留原始版权声明和许可证文本。
