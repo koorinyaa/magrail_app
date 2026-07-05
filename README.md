@@ -20,6 +20,15 @@ MaGrail 是为小圣杯打造的移动客户端，覆盖小圣杯原有全部功
 - `app-x86_64-release.apk`：Android x86_64 安装包，主要适合模拟器或少数 x86 设备
 - `Magrail-sideload.ipa`：iOS 侧载包，需要自行重签名安装
 
+## 界面预览
+
+<p align="center">
+  <img src="assets/images/readme/app_home.png" width="170" alt="首页">
+  <img src="assets/images/readme/character_detail.png" width="170" alt="角色详情">
+  <img src="assets/images/readme/temple_asset_card.png" width="170" alt="圣殿资产卡片">
+  <img src="assets/images/readme/user_profile.png" width="170" alt="我的页面">
+</p>
+
 ## 功能一览
 
 - 首页聚合：每周萌王、通天塔、最新连接、最新圣殿
