@@ -23,8 +23,14 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Use Swift Package Manager for iOS plugins
+        run: |
+          rm -rf ios/Pods
+          rm -f ios/Podfile.lock
+          rm -f ios/Podfile
+
       - name: Build iOS app without codesign
-        run: flutter build ios --release --no-codesign
+        run: flutter build ios --release --no-codesign --no-pub
 
       - name: Package unsigned IPA
         run: |
