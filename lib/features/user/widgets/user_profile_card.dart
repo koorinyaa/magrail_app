@@ -13,7 +13,6 @@ class UserProfileCard extends StatelessWidget {
   /// [onRecordPressed] 红包记录按钮点击回调
   /// [onSendPressed] 发送红包按钮点击回调
   /// [onCopyPressed] 复制 ID 按钮点击回调
-  /// [onProfilePressed] 资料卡片点击回调
   /// [isCurrentUser] 是否为当前登录用户
   /// [hideBalanceAndAssets] 是否隐藏余额和资产
   const UserProfileCard({
@@ -24,7 +23,6 @@ class UserProfileCard extends StatelessWidget {
     required this.onCopyPressed,
     required this.isCurrentUser,
     required this.hideBalanceAndAssets,
-    this.onProfilePressed,
   });
 
   /// 用户详情页资料
@@ -44,9 +42,6 @@ class UserProfileCard extends StatelessWidget {
 
   /// 是否隐藏余额和资产
   final bool hideBalanceAndAssets;
-
-  /// 资料卡片点击回调
-  final VoidCallback? onProfilePressed;
 
   /// 构建用户资料卡片
   ///
@@ -174,17 +169,6 @@ class UserProfileCard extends StatelessWidget {
       ],
     );
 
-    if (onProfilePressed == null) {
-      return content;
-    }
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onProfilePressed,
-        borderRadius: BorderRadius.circular(16),
-        child: content,
-      ),
-    );
+    return content;
   }
 }

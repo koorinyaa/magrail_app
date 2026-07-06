@@ -57,7 +57,6 @@ class UserDetailPage extends StatefulWidget {
   /// [username] 用户名，不传时展示当前登录用户
   /// [scrollController] 外部滚动控制器，不传时页面内部创建
   /// [reserveDockPadding] 是否为底部 Dock 预留滚动底部空间
-  /// [onOpenSecondary] 一级菜单中打开用户详情二级页的回调
   /// [onSignedOut] 当前用户退出登录后的回调
   /// [onLiquidGlassChanged] 液态玻璃开关变化回调
   const UserDetailPage({
@@ -74,7 +73,6 @@ class UserDetailPage extends StatefulWidget {
     this.username,
     this.scrollController,
     this.reserveDockPadding = false,
-    this.onOpenSecondary,
     this.onSignedOut,
     this.onLiquidGlassChanged,
   });
@@ -114,9 +112,6 @@ class UserDetailPage extends StatefulWidget {
 
   /// 是否为底部 Dock 预留滚动底部空间
   final bool reserveDockPadding;
-
-  /// 一级菜单中打开用户详情二级页的回调
-  final VoidCallback? onOpenSecondary;
 
   /// 当前用户退出登录后的回调
   final VoidCallback? onSignedOut;
@@ -358,7 +353,6 @@ class _UserDetailPageState extends State<UserDetailPage> {
               onRecordPressed: () => _openRedPacketLogs(profile),
               onSendPressed: () => _openSendRedPacket(profile),
               onCopyPressed: () => _copyUserId(context),
-              onProfilePressed: _isSecondary ? null : widget.onOpenSecondary,
             ),
             if (actions.isNotEmpty) ...[
               const SizedBox(height: 12),

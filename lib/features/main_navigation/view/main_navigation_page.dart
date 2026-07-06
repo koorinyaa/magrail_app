@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:magrail_app/core/auth/tinygrail_auth_repository.dart';
 import 'package:magrail_app/core/feedback/app_toast.dart';
 import 'package:magrail_app/core/storage/app_preferences.dart';
@@ -248,7 +247,6 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           scratchTicketRepository: widget.scratchTicketRepository,
           scrollController: _profileScrollController,
           reserveDockPadding: true,
-          onOpenSecondary: _openUserDetailPage,
           onSignedOut: _switchToHomeAfterSignOut,
           onLiquidGlassChanged: _handleLiquidGlassChanged,
         ),
@@ -497,10 +495,5 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       oosRepository: widget.oosRepository,
       userRepository: widget.userRepository,
     );
-  }
-
-  /// 打开用户详情二级页面
-  void _openUserDetailPage() {
-    context.pushNamed('userDetail');
   }
 }
