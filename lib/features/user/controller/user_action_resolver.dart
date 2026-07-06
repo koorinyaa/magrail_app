@@ -44,6 +44,7 @@ class UserActionResolver {
           type: UserActionType.dividendForecast,
           label: '股息预测',
         ),
+        const UserActionEntry(type: UserActionType.bot, label: 'Bot配置'),
         if (profile.isGameMaster)
           const UserActionEntry(type: UserActionType.tradeLog, label: '交易记录'),
       ];

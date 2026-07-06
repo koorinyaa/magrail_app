@@ -4,9 +4,9 @@ part of '../temple_asset_magic_action_sheet.dart';
 class _TempleAssetMagicActionSheetState
     extends State<_TempleAssetMagicActionSheet> {
   static const String _guidepostRecentCharacterIdsKeyPrefix =
-      'tinygrail_guidepost_recent_character_ids';
+      templeAssetMagicGuidepostRecentCharacterIdsKeyPrefix;
   static const String _fisheyeRecentCharacterIdsKeyPrefix =
-      'tinygrail_fisheye_recent_character_ids';
+      templeAssetMagicFisheyeRecentCharacterIdsKeyPrefix;
   static const String _stardustRecentCharacterIdsKeyPrefix =
       'tinygrail_stardust_recent_character_ids';
   static const String _starbreakRecentCharacterIdsKeyPrefix =

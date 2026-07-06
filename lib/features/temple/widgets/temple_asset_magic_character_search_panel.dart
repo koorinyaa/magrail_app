@@ -27,6 +27,14 @@ const int _magicSearchPageSize = 20;
 const int _recentMagicCharacterLimit = 5;
 const double _searchBodyVisibleMinHeight = 160;
 
+/// 虚空道标目标角色最近使用缓存键前缀
+const String templeAssetMagicGuidepostRecentCharacterIdsKeyPrefix =
+    'tinygrail_guidepost_recent_character_ids';
+
+/// 鲤鱼之眼目标角色最近使用缓存键前缀
+const String templeAssetMagicFisheyeRecentCharacterIdsKeyPrefix =
+    'tinygrail_fisheye_recent_character_ids';
+
 /// 魔法道具角色搜索附加数值加载器
 ///
 /// [items] 当前批次角色搜索条目

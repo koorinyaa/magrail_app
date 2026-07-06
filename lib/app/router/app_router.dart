@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:magrail_app/app/bootstrap.dart';
+import 'package:magrail_app/features/bot/view/bot_config_page.dart';
 import 'package:magrail_app/features/chara/detail/controller/character_detail_collections_controller.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_collections_route_extra.dart';
 import 'package:magrail_app/features/chara/detail/view/character_detail_board_page.dart';
@@ -491,6 +492,20 @@ GoRouter createAppRouter({
             repository: dependencies.repositories.user,
             username: state.uri.queryParameters['username'] ?? '',
             nickname: state.uri.queryParameters['nickname'],
+          ),
+        ),
+      ),
+      GoRoute(
+        name: 'userBotConfig',
+        path: '/user-bot-config',
+        pageBuilder: (context, state) => MaterialPage(
+          key: state.pageKey,
+          child: BotConfigPage(
+            authRepository: dependencies.authRepository,
+            preferences: dependencies.preferences,
+            repository: dependencies.repositories.bot,
+            characterRepository: dependencies.repositories.characterDetail,
+            userRepository: dependencies.repositories.user,
           ),
         ),
       ),

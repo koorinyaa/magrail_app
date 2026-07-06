@@ -10,6 +10,7 @@ import 'package:magrail_app/core/storage/secure_storage.dart';
 import 'package:magrail_app/core/update/app_update_controller.dart';
 import 'package:magrail_app/core/update/app_update_repository.dart';
 import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
+import 'package:magrail_app/features/bot/repository/bot_repository.dart';
 import 'package:magrail_app/features/chara/auction/repository/auction_repository.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
 import 'package:magrail_app/features/chara/rank/repository/character_rank_repository.dart';
@@ -96,6 +97,7 @@ class AppRepositories {
       oos: TinygrailOosRepository(apiClient: apiClient, dio: dio),
       auction: auctionRepository,
       scratchTicket: ScratchTicketRepository(apiClient: apiClient),
+      bot: BotRepository(),
       user: UserRepository(
         apiClient: apiClient,
         authRepository: authRepository,
@@ -116,6 +118,7 @@ class AppRepositories {
   /// [oos] Tinygrail OOS 仓库
   /// [auction] 拍卖仓库
   /// [scratchTicket] 刮刮乐仓库
+  /// [bot] fuyuake bot 仓库
   /// [user] 用户仓库
   /// [ranking] 排行榜仓库
   /// [characterRank] 角色排序仓库
@@ -135,6 +138,7 @@ class AppRepositories {
     required this.oos,
     required this.auction,
     required this.scratchTicket,
+    required this.bot,
     required this.user,
   });
 
@@ -176,6 +180,9 @@ class AppRepositories {
 
   /// 刮刮乐仓库
   final ScratchTicketRepository scratchTicket;
+
+  /// fuyuake bot 仓库
+  final BotRepository bot;
 
   /// 用户仓库
   final UserRepository user;

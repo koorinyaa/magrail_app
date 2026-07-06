@@ -3,13 +3,18 @@ part of 'user_detail_page.dart';
 extension _UserDetailPageNavigation on _UserDetailPageState {
   /// 打开用户设置二级页面
   void _openSettingsPage() {
-    context.pushNamed(
+    final route = context.pushNamed(
       'userSettings',
       extra: UserSettingsRouteExtra(
         onSignedOut: widget.onSignedOut,
         onLiquidGlassChanged: widget.onLiquidGlassChanged,
       ),
     );
+    unawaited(route.whenComplete(() {
+      if (mounted) {
+        _refreshVisibleActions();
+      }
+    }));
   }
 
   /// 打开刮刮乐购买弹层
@@ -46,6 +51,37 @@ extension _UserDetailPageNavigation on _UserDetailPageState {
   /// 打开用户道具二级页面
   void _openUserItems() {
     context.pushNamed('userItems');
+  }
+
+  /// 确认 Bot 第三方托管风险后打开配置页面
+  ///
+  /// [context] 当前组件树上下文
+  Future<void> _openBotConfigWithRiskConfirmation(BuildContext context) async {
+    if (!widget.preferences.botRiskAcknowledged) {
+      final confirmed = await showAppConfirmDialog(
+        context,
+        title: 'Bot 托管风险提示',
+        message: '这不是官方功能，而是会将账号托管在第三方网站。请确认你了解相关风险后继续使用。',
+        confirmText: '继续使用',
+        showCancelButton: false,
+        icon: Icons.warning_amber_rounded,
+      );
+      if (!confirmed || !mounted || !context.mounted) {
+        return;
+      }
+
+      await widget.preferences.setBotRiskAcknowledged(true);
+      if (!mounted || !context.mounted) {
+        return;
+      }
+    }
+
+    _openBotConfig();
+  }
+
+  /// 打开 Bot 配置二级页面
+  void _openBotConfig() {
+    context.pushNamed('userBotConfig');
   }
 
   /// 打开用户交易记录二级页面

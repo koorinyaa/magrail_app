@@ -172,6 +172,7 @@ class _UserActionGridItem extends StatelessWidget {
       UserActionType.myItems => Icons.category_outlined,
       UserActionType.holidayBonus => Icons.card_giftcard_outlined,
       UserActionType.dividendForecast => Icons.show_chart_rounded,
+      UserActionType.bot => LucideIcons.bot,
       UserActionType.tradeLog => Icons.receipt_long_outlined,
       UserActionType.block => Icons.block_rounded,
       UserActionType.unblock => Icons.lock_open_rounded,

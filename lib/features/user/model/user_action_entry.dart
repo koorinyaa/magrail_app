@@ -27,6 +27,9 @@ enum UserActionType {
   /// 股息预测入口
   dividendForecast,
 
+  /// bot 配置入口
+  bot,
+
   /// 交易记录入口
   tradeLog,
 

@@ -342,7 +342,10 @@ class _UserDetailPageState extends State<UserDetailPage> {
       ];
     }
 
-    final actions = _controller.visibleActions();
+    final actions = _controller.visibleActions().where((action) {
+      return widget.preferences.showBotAction ||
+          action.type != UserActionType.bot;
+    }).toList(growable: false);
 
     return [
       _buildTopContentSliver(
@@ -425,6 +428,11 @@ class _UserDetailPageState extends State<UserDetailPage> {
     });
   }
 
+  /// 刷新用户操作入口显示状态
+  void _refreshVisibleActions() {
+    setState(() {});
+  }
+
   /// 打开 Tinygrail 授权页并刷新用户详情
   Future<void> _openAuthPage() async {
     await Navigator.of(context).push<bool>(
@@ -469,6 +477,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
         case UserActionType.myItems:
         case UserActionType.scratch:
         case UserActionType.dividendForecast:
+        case UserActionType.bot:
         case UserActionType.tradeLog:
           break;
         case UserActionType.block:

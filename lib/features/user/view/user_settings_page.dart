@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:magrail_app/core/auth/bangumi_mirror_config.dart';
 import 'package:magrail_app/core/auth/tinygrail_auth_repository.dart';
 import 'package:magrail_app/core/feedback/app_toast.dart';
@@ -99,6 +100,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
   late bool _hiddenFeaturesEnabled;
   late bool _revealPrivateUserHoldingsEnabled;
   late bool _useLiquidGlass;
+  late bool _showBotAction;
 
   /// 初始化用户设置二级页面状态
   @override
@@ -112,6 +114,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
     _revealPrivateUserHoldingsEnabled =
         widget.preferences.revealPrivateUserHoldingsEnabled;
     _useLiquidGlass = widget.preferences.useLiquidGlass;
+    _showBotAction = widget.preferences.showBotAction;
   }
 
   /// 构建用户设置二级页面
@@ -153,6 +156,15 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                         label: '使用液态玻璃效果',
                         value: _useLiquidGlass,
                         onChanged: _handleLiquidGlassChanged,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _SettingsSurface(
+                      child: _SettingsSwitchTile(
+                        icon: LucideIcons.bot,
+                        label: '显示 Bot 入口',
+                        value: _showBotAction,
+                        onChanged: _handleShowBotActionChanged,
                       ),
                     ),
                     if (_hiddenFeaturesEnabled) ...[
@@ -318,6 +330,32 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
         _useLiquidGlass = previousValue;
       });
       widget.onLiquidGlassChanged?.call(previousValue);
+      AppToast.error(
+        context,
+        text: '保存设置失败，请稍后重试',
+      );
+    }
+  }
+
+  /// 处理 Bot 入口显示开关变化
+  ///
+  /// [value] 是否显示 Bot 入口
+  Future<void> _handleShowBotActionChanged(bool value) async {
+    final previousValue = _showBotAction;
+    setState(() {
+      _showBotAction = value;
+    });
+
+    try {
+      await widget.preferences.setShowBotAction(value);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _showBotAction = previousValue;
+      });
       AppToast.error(
         context,
         text: '保存设置失败，请稍后重试',

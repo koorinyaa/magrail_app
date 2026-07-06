@@ -21,6 +21,8 @@ class AppPreferences {
   static const _revealPrivateUserHoldingsEnabledKey =
       'reveal_private_user_holdings_enabled';
   static const _useLiquidGlassKey = 'use_liquid_glass';
+  static const _showBotActionKey = 'show_bot_action';
+  static const _botRiskAcknowledgedKey = 'bot_risk_acknowledged';
   static const _lastPromptedReleaseTagKey = 'last_prompted_release_tag';
   static const _lastPromptedReleaseTagSavedAtKey =
       'last_prompted_release_tag_saved_at';
@@ -152,6 +154,35 @@ class AppPreferences {
   /// [value] 是否启用液态玻璃
   Future<void> setUseLiquidGlass(bool value) {
     return _preferences.setBool(_useLiquidGlassKey, value);
+  }
+
+  /// 读取 Bot 入口显示状态
+  bool get showBotAction {
+    return _preferences.getBool(_showBotActionKey) ?? false;
+  }
+
+  /// 保存 Bot 入口显示状态
+  ///
+  /// [value] 是否在当前用户页显示 Bot 入口
+  Future<void> setShowBotAction(bool value) {
+    return _preferences.setBool(_showBotActionKey, value);
+  }
+
+  /// 读取 Bot 托管风险确认状态
+  bool get botRiskAcknowledged {
+    return _preferences.getBool(_botRiskAcknowledgedKey) ?? false;
+  }
+
+  /// 保存 Bot 托管风险确认状态
+  ///
+  /// [value] 是否已确认 Bot 第三方托管风险
+  Future<void> setBotRiskAcknowledged(bool value) {
+    return _preferences.setBool(_botRiskAcknowledgedKey, value);
+  }
+
+  /// 清除 Bot 托管风险确认状态
+  Future<void> clearBotRiskAcknowledged() {
+    return _preferences.remove(_botRiskAcknowledgedKey);
   }
 
   /// 读取上次自动提示的新版本标签

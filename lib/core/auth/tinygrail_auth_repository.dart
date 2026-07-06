@@ -31,6 +31,23 @@ class TinygrailAuthRepository {
     return cookies.isNotEmpty;
   }
 
+  /// 读取 fuyuake bot 授权 token
+  Future<String> readFuyuakeBotToken() async {
+    final cookies = [
+      ...await _cookieJar.loadForRequest(TinygrailSiteConfig.siteUri),
+      ...await _cookieJar.loadForRequest(TinygrailSiteConfig.apiBaseUri),
+    ];
+    for (final cookie in cookies) {
+      // fuyuake bot 使用 Tinygrail 会话 Cookie 的 value 作为 token
+      if (cookie.name == '.AspNetCore.Identity.Application' &&
+          cookie.value.trim().isNotEmpty) {
+        return cookie.value;
+      }
+    }
+
+    throw StateError('请先授权');
+  }
+
   /// 清除 Tinygrail 会话 Cookie
   Future<void> clearSession() async {
     await _cookieJar.delete(TinygrailSiteConfig.siteUri);

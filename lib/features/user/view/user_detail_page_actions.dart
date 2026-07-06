@@ -59,6 +59,9 @@ extension _UserDetailPageActions on _UserDetailPageState {
       case UserActionType.dividendForecast:
         _openShareBonusForecast(context);
         return;
+      case UserActionType.bot:
+        unawaited(_openBotConfigWithRiskConfirmation(context));
+        return;
       case UserActionType.block:
         unawaited(_updateUserBanState(context, shouldBan: true));
         return;
