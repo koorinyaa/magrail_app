@@ -186,15 +186,12 @@ class _TempleAssetPrimaryLine extends StatelessWidget {
       children: [
         Flexible(
           fit: FlexFit.loose,
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              text,
-              maxLines: 1,
-              softWrap: false,
-              style: style,
-            ),
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            softWrap: false,
+            style: style,
           ),
         ),
         const SizedBox(width: 6),
