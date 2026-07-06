@@ -10,7 +10,7 @@
   <img alt="License" src="https://img.shields.io/badge/license-MIT-green">
 </p>
 
-MaGrail 是为小圣杯打造的移动客户端，覆盖小圣杯原有全部功能，并针对移动端使用体验进行了重新设计。
+MaGrail 是为小圣杯打造的移动端 APP，覆盖小圣杯原有全部功能，并针对移动端使用体验进行了重新设计。
 
 ## 下载与安装
 
