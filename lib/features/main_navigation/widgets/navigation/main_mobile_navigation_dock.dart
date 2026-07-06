@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:magrail_app/features/main_navigation/model/main_tab.dart';
 
+// 平板横屏下限制底部 Dock 宽度，避免导航项被过度拉伸
+const double _mainMobileNavigationDockMaxWidth = 480;
+
 /// 移动端液态玻璃导航
 class MainMobileNavigationDock extends StatelessWidget {
   /// 创建移动端液态玻璃导航
@@ -38,13 +41,22 @@ class MainMobileNavigationDock extends StatelessWidget {
 
     return SafeArea(
       top: false,
-      child: GlassTabBar.bottom(
-        tabs: [
-          for (final tab in dockTabs) _buildGlassTab(tab),
-        ],
-        quality: useLiquidGlass ? GlassQuality.premium : GlassQuality.minimal,
-        selectedIndex: selectedIndex < 0 ? 0 : selectedIndex,
-        onTabSelected: (index) => onTabSelected(dockTabs[index]),
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: _mainMobileNavigationDockMaxWidth,
+          ),
+          child: GlassTabBar.bottom(
+            tabs: [
+              for (final tab in dockTabs) _buildGlassTab(tab),
+            ],
+            quality:
+                useLiquidGlass ? GlassQuality.premium : GlassQuality.minimal,
+            selectedIndex: selectedIndex < 0 ? 0 : selectedIndex,
+            onTabSelected: (index) => onTabSelected(dockTabs[index]),
+          ),
+        ),
       ),
     );
   }
