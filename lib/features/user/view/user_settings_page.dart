@@ -151,6 +151,35 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _SettingsSurface(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _SettingsValueActionTile(
+                            icon: Icons.dark_mode_outlined,
+                            label: '深色模式',
+                            value: _themeMode.settingsLabel,
+                            onPressed: _openThemeModePage,
+                          ),
+                          Divider(
+                            height: 1,
+                            thickness: 0.5,
+                            indent: 50,
+                            endIndent: 16,
+                            color: colorScheme.outlineVariant.withValues(
+                              alpha: 0.72,
+                            ),
+                          ),
+                          _SettingsSwitchTile(
+                            icon: Icons.blur_on_rounded,
+                            label: '液态玻璃',
+                            value: _useLiquidGlass,
+                            onChanged: _handleLiquidGlassChanged,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _SettingsSurface(
                       child: _BangumiMirrorSwitchTile(
                         value: _useBangumiMirror,
                         mirrorHost: _bangumiMirrorHost,
@@ -159,42 +188,36 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                     ),
                     const SizedBox(height: 16),
                     _SettingsSurface(
-                      child: _SettingsValueActionTile(
-                        icon: Icons.dark_mode_outlined,
-                        label: '深色模式',
-                        value: _themeMode.settingsLabel,
-                        onPressed: _openThemeModePage,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _SettingsSwitchTile(
+                            icon: LucideIcons.bot,
+                            label: '显示 Bot 入口',
+                            value: _showBotAction,
+                            onChanged: _handleShowBotActionChanged,
+                          ),
+                          if (_hiddenFeaturesEnabled) ...[
+                            Divider(
+                              height: 1,
+                              thickness: 0.5,
+                              indent: 50,
+                              endIndent: 16,
+                              color: colorScheme.outlineVariant.withValues(
+                                alpha: 0.72,
+                              ),
+                            ),
+                            _SettingsSwitchTile(
+                              icon: Icons.visibility_outlined,
+                              label: '显示未公开用户持股',
+                              value: _revealPrivateUserHoldingsEnabled,
+                              onChanged:
+                                  _handleRevealPrivateUserHoldingsChanged,
+                            ),
+                          ],
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    _SettingsSurface(
-                      child: _SettingsSwitchTile(
-                        icon: Icons.blur_on_rounded,
-                        label: '液态玻璃',
-                        value: _useLiquidGlass,
-                        onChanged: _handleLiquidGlassChanged,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _SettingsSurface(
-                      child: _SettingsSwitchTile(
-                        icon: LucideIcons.bot,
-                        label: '显示 Bot 入口',
-                        value: _showBotAction,
-                        onChanged: _handleShowBotActionChanged,
-                      ),
-                    ),
-                    if (_hiddenFeaturesEnabled) ...[
-                      const SizedBox(height: 16),
-                      _SettingsSurface(
-                        child: _SettingsSwitchTile(
-                          icon: Icons.visibility_outlined,
-                          label: '显示未公开用户持股',
-                          value: _revealPrivateUserHoldingsEnabled,
-                          onChanged: _handleRevealPrivateUserHoldingsChanged,
-                        ),
-                      ),
-                    ],
                     const SizedBox(height: 16),
                     _SettingsSurface(
                       child: Column(
