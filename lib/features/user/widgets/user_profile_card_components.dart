@@ -244,7 +244,7 @@ class UserProfileIdRow extends StatelessWidget {
                   color: colorScheme.onSurfaceVariant,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  height: 1,
+                  height: 1.2,
                 ),
               ),
               const SizedBox(width: 6),

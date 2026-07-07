@@ -63,6 +63,7 @@ class AppMaterialTheme {
   }) {
     return ThemeData(
       useMaterial3: true,
+      fontFamily: 'NotoSansSC',
       colorScheme: colorScheme,
       scaffoldBackgroundColor: scaffoldBackgroundColor,
       appBarTheme: AppBarTheme(
