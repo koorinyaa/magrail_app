@@ -528,7 +528,6 @@ class _BotTempleBlacklistSearchField extends StatelessWidget {
         filter: AppBlurStyle.filter,
         child: TextField(
           controller: controller,
-          onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
           textInputAction: TextInputAction.search,
           decoration: InputDecoration(
             prefixIcon: const Icon(Icons.search_rounded, size: 18),

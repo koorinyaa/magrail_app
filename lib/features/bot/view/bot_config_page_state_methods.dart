@@ -361,7 +361,6 @@ extension _BotConfigPageStateMethods on _BotConfigPageState {
         content: TextField(
           controller: editController,
           autofocus: true,
-          onTapOutside: (_) => FocusScope.of(context).unfocus(),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           inputFormatters: [
             FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),

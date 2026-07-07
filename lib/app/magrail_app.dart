@@ -72,9 +72,17 @@ class _MagrailAppState extends State<MagrailApp> {
       builder: (context, child) {
         final brightness = _resolveBrightness(context);
 
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: _buildSystemOverlayStyle(brightness),
-          child: child ?? const SizedBox.shrink(),
+        return Actions(
+          actions: <Type, Action<Intent>>{
+            EditableTextTapOutsideIntent:
+                CallbackAction<EditableTextTapOutsideIntent>(
+              onInvoke: _unfocusEditableText,
+            ),
+          },
+          child: AnnotatedRegion<SystemUiOverlayStyle>(
+            value: _buildSystemOverlayStyle(brightness),
+            child: child ?? const SizedBox.shrink(),
+          ),
         );
       },
       routerConfig: _router,
@@ -132,6 +140,14 @@ class _MagrailAppState extends State<MagrailApp> {
     setState(() {
       _themeMode = themeMode;
     });
+  }
+
+  /// 处理输入框外部点击意图
+  ///
+  /// [intent] 输入框外部点击意图
+  Object? _unfocusEditableText(EditableTextTapOutsideIntent intent) {
+    intent.focusNode.unfocus();
+    return null;
   }
 
   /// 构建系统栏样式

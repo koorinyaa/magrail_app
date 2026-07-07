@@ -248,7 +248,6 @@ class TempleAssetMagicCharacterSearchPanelState
         filter: AppBlurStyle.filter,
         child: TextField(
           controller: _searchController,
-          onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
           textInputAction: TextInputAction.search,
           decoration: InputDecoration(
             prefixIcon: const Icon(LucideIcons.search, size: 18),
