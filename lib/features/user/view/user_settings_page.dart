@@ -99,7 +99,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
   late String _bangumiMirrorHost;
   late bool _hiddenFeaturesEnabled;
   late bool _revealPrivateUserHoldingsEnabled;
-  late bool _disableLiquidGlass;
+  late bool _useLiquidGlass;
   late bool _showBotAction;
 
   /// 初始化用户设置二级页面状态
@@ -113,7 +113,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
     _hiddenFeaturesEnabled = widget.preferences.hiddenFeaturesEnabled;
     _revealPrivateUserHoldingsEnabled =
         widget.preferences.revealPrivateUserHoldingsEnabled;
-    _disableLiquidGlass = !widget.preferences.useLiquidGlass;
+    _useLiquidGlass = widget.preferences.useLiquidGlass;
     _showBotAction = widget.preferences.showBotAction;
   }
 
@@ -153,8 +153,8 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                     _SettingsSurface(
                       child: _SettingsSwitchTile(
                         icon: Icons.blur_on_rounded,
-                        label: '关闭液态玻璃',
-                        value: _disableLiquidGlass,
+                        label: '液态玻璃',
+                        value: _useLiquidGlass,
                         onChanged: _handleLiquidGlassChanged,
                       ),
                     ),
@@ -309,28 +309,27 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
     }
   }
 
-  /// 处理关闭液态玻璃开关变化
+  /// 处理液态玻璃开关变化
   ///
-  /// [value] 是否关闭液态玻璃
+  /// [value] 是否启用液态玻璃
   Future<void> _handleLiquidGlassChanged(bool value) async {
-    final previousValue = _disableLiquidGlass;
-    final useLiquidGlass = !value;
+    final previousValue = _useLiquidGlass;
     setState(() {
-      _disableLiquidGlass = value;
+      _useLiquidGlass = value;
     });
-    widget.onLiquidGlassChanged?.call(useLiquidGlass);
+    widget.onLiquidGlassChanged?.call(value);
 
     try {
-      await widget.preferences.setUseLiquidGlass(useLiquidGlass);
+      await widget.preferences.setUseLiquidGlass(value);
     } catch (_) {
       if (!mounted) {
         return;
       }
 
       setState(() {
-        _disableLiquidGlass = previousValue;
+        _useLiquidGlass = previousValue;
       });
-      widget.onLiquidGlassChanged?.call(!previousValue);
+      widget.onLiquidGlassChanged?.call(previousValue);
       AppToast.error(
         context,
         text: '保存设置失败，请稍后重试',
