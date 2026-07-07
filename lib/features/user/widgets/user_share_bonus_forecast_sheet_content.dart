@@ -51,7 +51,7 @@ class _ShareBonusForecastHeader extends StatelessWidget {
 }
 
 /// 股息预测内容
-class _ShareBonusForecastContent extends StatelessWidget {
+class _ShareBonusForecastContent extends StatefulWidget {
   /// 创建股息预测内容
   ///
   /// [forecast] 股息预测数据
@@ -62,6 +62,17 @@ class _ShareBonusForecastContent extends StatelessWidget {
   /// 股息预测数据
   final UserShareBonusForecast forecast;
 
+  /// 创建股息预测内容状态
+  @override
+  State<_ShareBonusForecastContent> createState() =>
+      _ShareBonusForecastContentState();
+}
+
+/// 股息预测内容状态
+class _ShareBonusForecastContentState
+    extends State<_ShareBonusForecastContent> {
+  bool _showFullNumbers = false;
+
   /// 构建股息预测内容
   ///
   /// [context] 当前组件树上下文
@@ -71,13 +82,30 @@ class _ShareBonusForecastContent extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _ShareBonusForecastSummary(forecast: forecast),
+        _ShareBonusForecastSummary(
+          forecast: widget.forecast,
+          showFullNumbers: _showFullNumbers,
+          onToggleNumbers: _toggleNumberDisplayMode,
+        ),
         const SizedBox(height: 12),
-        _ShareBonusForecastChart(forecast: forecast),
+        _ShareBonusForecastChart(
+          forecast: widget.forecast,
+          showFullNumbers: _showFullNumbers,
+        ),
         const SizedBox(height: 12),
-        _ShareBonusForecastStats(forecast: forecast),
+        _ShareBonusForecastStats(
+          forecast: widget.forecast,
+          showFullNumbers: _showFullNumbers,
+        ),
       ],
     );
+  }
+
+  /// 切换股息预测数字显示模式
+  void _toggleNumberDisplayMode() {
+    setState(() {
+      _showFullNumbers = !_showFullNumbers;
+    });
   }
 }
 
@@ -86,12 +114,22 @@ class _ShareBonusForecastSummary extends StatelessWidget {
   /// 创建股息预测摘要
   ///
   /// [forecast] 股息预测数据
+  /// [showFullNumbers] 是否显示完整数字
+  /// [onToggleNumbers] 数字显示模式切换回调
   const _ShareBonusForecastSummary({
     required this.forecast,
+    required this.showFullNumbers,
+    required this.onToggleNumbers,
   });
 
   /// 股息预测数据
   final UserShareBonusForecast forecast;
+
+  /// 是否显示完整数字
+  final bool showFullNumbers;
+
+  /// 数字显示模式切换回调
+  final VoidCallback onToggleNumbers;
 
   /// 构建股息预测摘要
   ///
@@ -110,50 +148,81 @@ class _ShareBonusForecastSummary extends StatelessWidget {
           color: colorScheme.primary.withValues(alpha: 0.18),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '税后收入',
-              style: TextStyle(
-                color: colorScheme.onSurfaceVariant,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                height: 1.2,
-              ),
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '税后收入',
+                  style: TextStyle(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    _formatShareBonusCurrency(
+                      forecast.afterTax,
+                      showFullNumbers: showFullNumbers,
+                    ),
+                    maxLines: 1,
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontSize: 30,
+                      fontWeight: FontWeight.w900,
+                      height: 1.05,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '预期股息 ${_formatShareBonusCurrency(
+                    forecast.share,
+                    showFullNumbers: showFullNumbers,
+                  )}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    height: 1.2,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 6),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                Formatters.tinygrailCurrency(forecast.afterTax),
-                maxLines: 1,
-                style: TextStyle(
-                  color: colorScheme.primary,
-                  fontSize: 30,
-                  fontWeight: FontWeight.w900,
-                  height: 1.05,
+          ),
+          Positioned(
+            top: 10,
+            right: 10,
+            child: Material(
+              color: colorScheme.primary.withValues(alpha: 0.12),
+              shape: const CircleBorder(),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: onToggleNumbers,
+                customBorder: const CircleBorder(),
+                child: SizedBox.square(
+                  dimension: 32,
+                  child: Icon(
+                    Icons.swap_horiz_rounded,
+                    size: 17,
+                    color: colorScheme.primary,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              '预期股息 ${Formatters.tinygrailCurrency(forecast.share)}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: colorScheme.onSurfaceVariant,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                height: 1.2,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -164,12 +233,17 @@ class _ShareBonusForecastStats extends StatelessWidget {
   /// 创建股息预测明细
   ///
   /// [forecast] 股息预测数据
+  /// [showFullNumbers] 是否显示完整数字
   const _ShareBonusForecastStats({
     required this.forecast,
+    required this.showFullNumbers,
   });
 
   /// 股息预测数据
   final UserShareBonusForecast forecast;
+
+  /// 是否显示完整数字
+  final bool showFullNumbers;
 
   /// 构建股息预测明细
   ///
@@ -179,19 +253,27 @@ class _ShareBonusForecastStats extends StatelessWidget {
     final entries = [
       _ShareBonusStatEntry(
         label: '计息股份',
-        value: '${Formatters.groupedNumber(forecast.total)} 股',
+        value:
+            '${_formatShareBonusNumber(forecast.total, showFullNumbers: showFullNumbers)} 股',
       ),
       _ShareBonusStatEntry(
         label: '圣殿数量',
-        value: '${Formatters.groupedNumber(forecast.temples)} 座',
+        value:
+            '${_formatShareBonusNumber(forecast.temples, showFullNumbers: showFullNumbers)} 座',
       ),
       _ShareBonusStatEntry(
         label: '预期股息',
-        value: Formatters.tinygrailCurrency(forecast.share),
+        value: _formatShareBonusCurrency(
+          forecast.share,
+          showFullNumbers: showFullNumbers,
+        ),
       ),
       _ShareBonusStatEntry(
         label: '个人所得税',
-        value: Formatters.tinygrailCurrency(forecast.tax),
+        value: _formatShareBonusCurrency(
+          forecast.tax,
+          showFullNumbers: showFullNumbers,
+        ),
       ),
       _ShareBonusStatEntry(
         label: '税率',
@@ -199,7 +281,10 @@ class _ShareBonusForecastStats extends StatelessWidget {
       ),
       _ShareBonusStatEntry(
         label: '登录奖励',
-        value: Formatters.tinygrailCurrency(forecast.daily),
+        value: _formatShareBonusCurrency(
+          forecast.daily,
+          showFullNumbers: showFullNumbers,
+        ),
       ),
     ];
 
@@ -220,6 +305,36 @@ class _ShareBonusForecastStats extends StatelessWidget {
       },
     );
   }
+}
+
+/// 格式化股息预测金额
+///
+/// [value] 金额数值
+/// [showFullNumbers] 是否显示完整数字
+String _formatShareBonusCurrency(
+  num value, {
+  required bool showFullNumbers,
+}) {
+  if (showFullNumbers) {
+    return Formatters.tinygrailCurrency(value);
+  }
+
+  return Formatters.tinygrailCompactValue(value, prefix: '₵');
+}
+
+/// 格式化股息预测数量
+///
+/// [value] 数量数值
+/// [showFullNumbers] 是否显示完整数字
+String _formatShareBonusNumber(
+  num value, {
+  required bool showFullNumbers,
+}) {
+  if (showFullNumbers) {
+    return Formatters.groupedNumber(value);
+  }
+
+  return Formatters.tinygrailCompactValue(value);
 }
 
 /// 股息预测明细条目数据

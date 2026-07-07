@@ -10,15 +10,20 @@ class UserBalanceLogRow extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [item] 用户资金日志条目
+  /// [showFullBalance] 是否显示完整余额
   /// [onCharacterTap] 角色 ID 点击回调
   const UserBalanceLogRow({
     super.key,
     required this.item,
+    required this.showFullBalance,
     this.onCharacterTap,
   });
 
   /// 用户资金日志条目
   final UserBalanceLogApiItem item;
+
+  /// 是否显示完整余额
+  final bool showFullBalance;
 
   /// 角色 ID 点击回调
   final ValueChanged<int>? onCharacterTap;
@@ -49,7 +54,7 @@ class UserBalanceLogRow extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        Formatters.tinygrailCurrency(item.balance),
+                        _formatBalance(item.balance),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -109,6 +114,17 @@ class UserBalanceLogRow extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// 格式化余额
+  ///
+  /// [value] 余额数值
+  String _formatBalance(num value) {
+    if (showFullBalance) {
+      return Formatters.tinygrailCurrency(value);
+    }
+
+    return Formatters.tinygrailCompactValue(value, prefix: '₵');
   }
 
   /// 格式化资金变动

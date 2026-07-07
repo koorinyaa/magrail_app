@@ -5,7 +5,7 @@ import 'package:magrail_app/features/user/widgets/user_avatar.dart';
 import 'package:magrail_app/features/user/widgets/user_profile_card_components.dart';
 
 /// 用户资料卡片
-class UserProfileCard extends StatelessWidget {
+class UserProfileCard extends StatefulWidget {
   /// 创建用户资料卡片
   ///
   /// [key] Flutter 组件标识
@@ -43,6 +43,26 @@ class UserProfileCard extends StatelessWidget {
   /// 是否隐藏余额和资产
   final bool hideBalanceAndAssets;
 
+  /// 创建用户资料卡片状态
+  @override
+  State<UserProfileCard> createState() => _UserProfileCardState();
+}
+
+/// 用户资料卡片状态
+class _UserProfileCardState extends State<UserProfileCard> {
+  bool _showFullBalanceAndAssets = false;
+
+  /// 处理用户资料变化
+  ///
+  /// [oldWidget] 更新前的用户资料卡片
+  @override
+  void didUpdateWidget(covariant UserProfileCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.profile.userId != widget.profile.userId) {
+      _showFullBalanceAndAssets = false;
+    }
+  }
+
   /// 构建用户资料卡片
   ///
   /// [context] 当前组件树上下文
@@ -52,20 +72,19 @@ class UserProfileCard extends StatelessWidget {
     final isDark = colorScheme.brightness == Brightness.dark;
     final cardColor =
         isDark ? colorScheme.surfaceContainerLow : colorScheme.surface;
-    final nickname = profile.nickname.trim();
-    final displayName = nickname.isEmpty ? profile.name : nickname;
-    final balanceText = hideBalanceAndAssets
+    final nickname = widget.profile.nickname.trim();
+    final displayName = nickname.isEmpty ? widget.profile.name : nickname;
+    final balanceText = widget.hideBalanceAndAssets
         ? '******'
-        : Formatters.tinygrailCurrency(profile.balance);
-    final assetsText = hideBalanceAndAssets
+        : _formatBalanceAndAssets(widget.profile.balance);
+    final assetsText = widget.hideBalanceAndAssets
         ? '******'
-        : Formatters.tinygrailCurrency(profile.assets);
+        : _formatBalanceAndAssets(widget.profile.assets);
     final content = Stack(
       clipBehavior: Clip.none,
       children: [
         Container(
           constraints: const BoxConstraints(minHeight: 186),
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
           decoration: BoxDecoration(
             color: cardColor,
             borderRadius: BorderRadius.circular(16),
@@ -77,98 +96,145 @@ class UserProfileCard extends StatelessWidget {
               ),
             ],
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Align(
-                alignment: Alignment.centerRight,
-                child: UserProfileCardActions(
-                  isCurrentUser: isCurrentUser,
-                  onRecordPressed: onRecordPressed,
-                  onSendPressed: onSendPressed,
-                ),
-              ),
-              const SizedBox(height: 15),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            displayName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: profile.isBanned
-                                  ? const Color(0xFFEF4444)
-                                  : colorScheme.onSurface,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              height: 1.15,
+          child: IntrinsicHeight(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: UserProfileCardActions(
+                          isCurrentUser: widget.isCurrentUser,
+                          onRecordPressed: widget.onRecordPressed,
+                          onSendPressed: widget.onSendPressed,
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    displayName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: widget.profile.isBanned
+                                          ? const Color(0xFFEF4444)
+                                          : colorScheme.onSurface,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w800,
+                                      height: 1.15,
+                                    ),
+                                  ),
+                                ),
+                                if (widget.profile.rank > 0) ...[
+                                  const SizedBox(width: 9),
+                                  UserProfileRankBadge(
+                                    rank: widget.profile.rank,
+                                  ),
+                                ],
+                              ],
                             ),
                           ),
-                        ),
-                        if (profile.rank > 0) ...[
-                          const SizedBox(width: 9),
-                          UserProfileRankBadge(rank: profile.rank),
                         ],
+                      ),
+                      const SizedBox(height: 5),
+                      UserProfileIdRow(
+                        userId: widget.profile.userId,
+                        onCopyPressed: widget.onCopyPressed,
+                      ),
+                      if (widget.profile.isBanned) ...[
+                        const SizedBox(height: 5),
+                        const UserBannedLabel(),
                       ],
-                    ),
+                      SizedBox(height: widget.profile.isBanned ? 14 : 20),
+                      Divider(
+                        height: 1,
+                        thickness: 1,
+                        color: colorScheme.outlineVariant.withValues(
+                          alpha: isDark ? 0.34 : 0.55,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 5),
-              UserProfileIdRow(
-                userId: profile.userId,
-                onCopyPressed: onCopyPressed,
-              ),
-              if (profile.isBanned) ...[
-                const SizedBox(height: 5),
-                const UserBannedLabel(),
-              ],
-              SizedBox(height: profile.isBanned ? 14 : 20),
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: colorScheme.outlineVariant.withValues(
-                  alpha: isDark ? 0.34 : 0.55,
                 ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: UserProfileMetric(
-                      value: balanceText,
-                      label: '余额',
+                Expanded(
+                  child: Material(
+                    color: Colors.transparent,
+                    borderRadius: const BorderRadius.vertical(
+                      bottom: Radius.circular(16),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      onTap: _toggleBalanceAndAssetsDisplayMode,
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: UserProfileMetric(
+                                  value: balanceText,
+                                  label: '余额',
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: UserProfileMetric(
+                                  value: assetsText,
+                                  label: '资产',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: UserProfileMetric(
-                      value: assetsText,
-                      label: '资产',
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
         Positioned(
           left: 18,
           top: -20,
           child: UserAvatar(
-            imageUrl: profile.avatar,
-            isBanned: profile.isBanned,
+            imageUrl: widget.profile.avatar,
+            isBanned: widget.profile.isBanned,
           ),
         ),
       ],
     );
 
     return content;
+  }
+
+  /// 切换余额和资产显示模式
+  void _toggleBalanceAndAssetsDisplayMode() {
+    setState(() {
+      _showFullBalanceAndAssets = !_showFullBalanceAndAssets;
+    });
+  }
+
+  /// 格式化余额和资产文本
+  ///
+  /// [value] 余额或资产数值
+  String _formatBalanceAndAssets(num value) {
+    if (_showFullBalanceAndAssets) {
+      return Formatters.tinygrailCurrency(value);
+    }
+
+    return Formatters.tinygrailCompactValue(value, prefix: '₵');
   }
 }

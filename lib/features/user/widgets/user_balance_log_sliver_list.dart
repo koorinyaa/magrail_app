@@ -12,9 +12,11 @@ class UserBalanceLogSliverList extends StatelessWidget {
   /// [items] 用户资金日志条目
   /// [onItemBuilt] 条目构建回调
   /// [onCharacterTap] 角色 ID 点击回调
+  /// [showFullBalance] 是否显示完整余额
   const UserBalanceLogSliverList({
     super.key,
     required this.items,
+    required this.showFullBalance,
     this.onItemBuilt,
     this.onCharacterTap,
   });
@@ -28,6 +30,9 @@ class UserBalanceLogSliverList extends StatelessWidget {
   /// 角色 ID 点击回调
   final ValueChanged<int>? onCharacterTap;
 
+  /// 是否显示完整余额
+  final bool showFullBalance;
+
   /// 构建用户资金日志 sliver 列表
   ///
   /// [context] 当前组件树上下文
@@ -40,6 +45,7 @@ class UserBalanceLogSliverList extends StatelessWidget {
           child: UserBalanceLogRow(
             item: items[index],
             onCharacterTap: onCharacterTap,
+            showFullBalance: showFullBalance,
           ),
         );
       },

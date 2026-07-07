@@ -28,6 +28,7 @@ class UserBalanceLogPage extends StatefulWidget {
 /// 用户资金日志二级页面状态
 class _UserBalanceLogPageState extends State<UserBalanceLogPage> {
   late final UserBalanceLogPageController _controller;
+  bool _showFullBalance = false;
 
   /// 初始化用户资金日志二级页面状态
   @override
@@ -53,6 +54,20 @@ class _UserBalanceLogPageState extends State<UserBalanceLogPage> {
     return TinygrailPagedSliverPage(
       controller: _controller,
       title: '资金日志',
+      appBarActions: [
+        SizedBox(
+          width: kToolbarHeight,
+          child: Center(
+            child: IconButton(
+              onPressed: _toggleBalanceDisplayMode,
+              icon: const Icon(
+                Icons.swap_horiz_rounded,
+                size: 22,
+              ),
+            ),
+          ),
+        ),
+      ],
       loadingSliver: const UserBalanceLogSkeletonSliverList(),
       emptySliverBuilder: (context, controller) {
         return const PagedSliverState(
@@ -67,11 +82,19 @@ class _UserBalanceLogPageState extends State<UserBalanceLogPage> {
             items: items,
             onItemBuilt: onItemBuilt,
             onCharacterTap: _handleCharacterTap,
+            showFullBalance: _showFullBalance,
           ),
         ];
       },
       completedLabel: '没有更多资金日志了',
     );
+  }
+
+  /// 切换余额显示模式
+  void _toggleBalanceDisplayMode() {
+    setState(() {
+      _showFullBalance = !_showFullBalance;
+    });
   }
 
   /// 处理资金日志角色 ID 点击

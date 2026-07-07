@@ -5,12 +5,17 @@ class _ShareBonusForecastChart extends StatelessWidget {
   /// 创建股息预测图表
   ///
   /// [forecast] 股息预测数据
+  /// [showFullNumbers] 是否显示完整数字
   const _ShareBonusForecastChart({
     required this.forecast,
+    required this.showFullNumbers,
   });
 
   /// 股息预测数据
   final UserShareBonusForecast forecast;
+
+  /// 是否显示完整数字
+  final bool showFullNumbers;
 
   /// 构建股息预测图表
   ///
@@ -88,13 +93,19 @@ class _ShareBonusForecastChart extends StatelessWidget {
                   _ShareBonusChartLegendItem(
                     color: afterTaxColor,
                     label: '税后收入',
-                    value: Formatters.tinygrailCurrency(forecast.afterTax),
+                    value: _formatShareBonusCurrency(
+                      forecast.afterTax,
+                      showFullNumbers: showFullNumbers,
+                    ),
                   ),
                   const SizedBox(height: 10),
                   _ShareBonusChartLegendItem(
                     color: taxColor,
                     label: '个人所得税',
-                    value: Formatters.tinygrailCurrency(forecast.tax),
+                    value: _formatShareBonusCurrency(
+                      forecast.tax,
+                      showFullNumbers: showFullNumbers,
+                    ),
                   ),
                 ],
               ),

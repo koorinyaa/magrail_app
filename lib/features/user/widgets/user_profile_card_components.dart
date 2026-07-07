@@ -286,6 +286,13 @@ class UserProfileMetric extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final labelColor = colorScheme.onSurfaceVariant.withValues(alpha: 0.72);
+    final valueStyle = TextStyle(
+      color: colorScheme.onSurface,
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
+      height: 1.2,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,24 +306,30 @@ class UserProfileMetric extends StatelessWidget {
             child: Text(
               value,
               maxLines: 1,
-              style: TextStyle(
-                color: colorScheme.onSurface,
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                height: 1.2,
-              ),
+              style: valueStyle,
             ),
           ),
         ),
         const SizedBox(height: 2),
-        Text(
-          label,
-          style: TextStyle(
-            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.72),
-            fontSize: 10,
-            fontWeight: FontWeight.w500,
-            height: 1.2,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: labelColor,
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                height: 1.2,
+              ),
+            ),
+            const SizedBox(width: 3),
+            Icon(
+              Icons.swap_horiz_rounded,
+              size: 10,
+              color: labelColor,
+            ),
+          ],
         ),
       ],
     );
