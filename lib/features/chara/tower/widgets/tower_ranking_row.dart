@@ -48,14 +48,19 @@ class TowerRankingRow extends StatelessWidget {
               children: [
                 SizedBox(
                   width: 34,
-                  child: Text(
-                    '${entry.rank}',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: entry.rankColor,
-                      fontSize: _rankFontSize,
-                      fontWeight: FontWeight.w600,
-                      height: 1,
+                  child: Center(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        '${entry.rank}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: entry.rankColor,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          height: 1,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -107,19 +112,6 @@ class TowerRankingRow extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  /// 排名字体大小
-  double get _rankFontSize {
-    if (entry.rank >= 1000) {
-      return 13;
-    }
-
-    if (entry.rank >= 100) {
-      return 16;
-    }
-
-    return 22;
   }
 }
 
