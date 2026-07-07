@@ -38,9 +38,9 @@ class UserDetailSkeleton extends StatelessWidget {
       clipBehavior: Clip.none,
       children: [
         Container(
-          constraints: const BoxConstraints(minHeight: 186),
+          constraints: const BoxConstraints(minHeight: 176),
           width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
           decoration: BoxDecoration(
             color: cardColor,
             borderRadius: BorderRadius.circular(16),
@@ -95,11 +95,18 @@ class UserDetailSkeleton extends StatelessWidget {
                 height: 1,
                 borderRadius: BorderRadius.circular(1),
               ),
-              const SizedBox(height: 12),
-              const Row(
+              const SizedBox(height: 10),
+              Row(
                 children: [
-                  Expanded(child: _UserMetricSkeleton()),
-                  Expanded(child: _UserMetricSkeleton()),
+                  const Expanded(child: _UserMetricSkeleton()),
+                  const SizedBox(width: 12),
+                  const Expanded(child: _UserMetricSkeleton()),
+                  const SizedBox(width: 10),
+                  Bone(
+                    width: 28,
+                    height: 28,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ],
               ),
             ],
@@ -169,19 +176,21 @@ class _UserMetricSkeleton extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Bone(
-          width: 96,
-          height: 18,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        const SizedBox(height: 4),
         Bone(
           width: 30,
           height: 10,
           borderRadius: BorderRadius.circular(4),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Bone(
+            width: 84,
+            height: 16,
+            borderRadius: BorderRadius.circular(6),
+          ),
         ),
       ],
     );

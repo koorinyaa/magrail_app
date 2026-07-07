@@ -289,47 +289,37 @@ class UserProfileMetric extends StatelessWidget {
     final labelColor = colorScheme.onSurfaceVariant.withValues(alpha: 0.72);
     final valueStyle = TextStyle(
       color: colorScheme.onSurface,
-      fontSize: 16,
+      fontSize: 14,
       fontWeight: FontWeight.w700,
-      height: 1.2,
+      height: 1.15,
     );
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        SizedBox(
-          height: 20,
-          width: double.infinity,
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              value,
-              maxLines: 1,
-              style: valueStyle,
-            ),
+        Text(
+          label,
+          style: TextStyle(
+            color: labelColor,
+            fontSize: 10,
+            fontWeight: FontWeight.w500,
+            height: 1.2,
           ),
         ),
-        const SizedBox(height: 2),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: labelColor,
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                height: 1.2,
+        const SizedBox(width: 6),
+        Expanded(
+          child: SizedBox(
+            height: 18,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                value,
+                maxLines: 1,
+                style: valueStyle,
               ),
             ),
-            const SizedBox(width: 3),
-            Icon(
-              Icons.swap_horiz_rounded,
-              size: 10,
-              color: labelColor,
-            ),
-          ],
+          ),
         ),
       ],
     );

@@ -84,7 +84,7 @@ class _UserProfileCardState extends State<UserProfileCard> {
       clipBehavior: Clip.none,
       children: [
         Container(
-          constraints: const BoxConstraints(minHeight: 186),
+          constraints: const BoxConstraints(minHeight: 176),
           decoration: BoxDecoration(
             color: cardColor,
             borderRadius: BorderRadius.circular(16),
@@ -167,39 +167,28 @@ class _UserProfileCardState extends State<UserProfileCard> {
                     ],
                   ),
                 ),
-                Expanded(
-                  child: Material(
-                    color: Colors.transparent,
-                    borderRadius: const BorderRadius.vertical(
-                      bottom: Radius.circular(16),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: InkWell(
-                      onTap: _toggleBalanceAndAssetsDisplayMode,
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: UserProfileMetric(
-                                  value: balanceText,
-                                  label: '余额',
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: UserProfileMetric(
-                                  value: assetsText,
-                                  label: '资产',
-                                ),
-                              ),
-                            ],
-                          ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: UserProfileMetric(
+                          value: balanceText,
+                          label: '余额',
                         ),
                       ),
-                    ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: UserProfileMetric(
+                          value: assetsText,
+                          label: '资产',
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      _BalanceAndAssetsToggleButton(
+                        onPressed: _toggleBalanceAndAssetsDisplayMode,
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -236,5 +225,44 @@ class _UserProfileCardState extends State<UserProfileCard> {
     }
 
     return Formatters.tinygrailCompactValue(value, prefix: '₵');
+  }
+}
+
+/// 余额和资产显示模式切换按钮
+class _BalanceAndAssetsToggleButton extends StatelessWidget {
+  /// 创建余额和资产显示模式切换按钮
+  ///
+  /// [onPressed] 按钮点击回调
+  const _BalanceAndAssetsToggleButton({
+    required this.onPressed,
+  });
+
+  /// 按钮点击回调
+  final VoidCallback onPressed;
+
+  /// 构建余额和资产显示模式切换按钮
+  ///
+  /// [context] 当前组件树上下文
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Material(
+      color: colorScheme.primary.withValues(alpha: 0.08),
+      shape: const CircleBorder(),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onPressed,
+        child: SizedBox(
+          width: 28,
+          height: 28,
+          child: Icon(
+            Icons.swap_horiz_rounded,
+            size: 16,
+            color: colorScheme.primary,
+          ),
+        ),
+      ),
+    );
   }
 }
