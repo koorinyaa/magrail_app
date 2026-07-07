@@ -41,8 +41,8 @@ const double _templeAssetLinkedThumbnailHeight =
     _templeAssetThumbnailHeight - _templeAssetLinkedThumbnailYOffset;
 // 内部圣殿封面圆角小于外部卡片，保持嵌套层级
 const double _templeAssetThumbnailRadius = 12;
-// 用户昵称水印最大宽度，顶部主文案会按该宽度预留空间
-const double _templeAssetWatermarkMaxWidth = 96;
+// 用户昵称水印最大宽度，按中文约 4-6 个字预留顶部主文案空间
+const double _templeAssetWatermarkMaxWidth = 60;
 const double _templeAssetWatermarkGap = 8;
 
 // Tinygrail 圣殿道具操作使用站点静态图标
