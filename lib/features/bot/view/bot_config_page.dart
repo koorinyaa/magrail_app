@@ -117,18 +117,18 @@ class _BotConfigPageState extends State<BotConfigPage> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return PopScope(
-      canPop: _allowPagePop,
-      onPopInvokedWithResult: _handlePopInvoked,
-      child: Scaffold(
-        backgroundColor: colorScheme.surfaceContainerLowest,
-        body: ListenableBuilder(
-          listenable: _controller,
-          builder: (context, child) {
-            final config = _controller.config;
-            _syncAmountControllers(config);
+    return ListenableBuilder(
+      listenable: _controller,
+      builder: (context, child) {
+        final config = _controller.config;
+        _syncAmountControllers(config);
 
-            return RefreshIndicator(
+        return PopScope(
+          canPop: _allowPagePop || !_hasUnsavedConfigChanges(),
+          onPopInvokedWithResult: _handlePopInvoked,
+          child: Scaffold(
+            backgroundColor: colorScheme.surfaceContainerLowest,
+            body: RefreshIndicator(
               onRefresh: _refresh,
               child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -164,10 +164,10 @@ class _BotConfigPageState extends State<BotConfigPage> {
                     ),
                 ],
               ),
-            );
-          },
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 
