@@ -58,7 +58,7 @@ final class CharacterDetailIcoParticipant {
       return '+???';
     }
 
-    return '+${Formatters.groupedNumber(amount)}';
+    return '+${Formatters.tinygrailCurrency(amount)}';
   }
 
   /// 从 JSON 创建角色详情 ICO 参与者资料

@@ -85,6 +85,23 @@ class CharacterDetailIcoPrediction {
   /// 展示用发行价
   double get displayPrice => math.max(price, 10);
 
+  /// 根据投入金额计算预计可得股数
+  ///
+  /// [investment] 投入金额
+  int expectedShares(num investment) {
+    final baseAmount = 10000 + (level - 1) * 7500;
+    if (baseAmount <= 0) {
+      return 0;
+    }
+
+    final costPerShare = displayPrice + 500000 / baseAmount;
+    if (costPerShare <= 0) {
+      return 0;
+    }
+
+    return (investment / costPerShare).floor();
+  }
+
   /// 上市等级
   int get listingLevel {
     if (amount <= 0) {

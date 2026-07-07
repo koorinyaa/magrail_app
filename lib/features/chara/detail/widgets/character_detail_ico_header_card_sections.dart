@@ -507,15 +507,20 @@ class _IcoHeaderInfoChip extends StatelessWidget {
       child: Container(
         constraints: const BoxConstraints(minHeight: 22, maxWidth: 260),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Text(
-          text,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: foregroundColor,
-            fontSize: 10.5,
-            fontWeight: FontWeight.w700,
-            height: 1,
+        child: Align(
+          alignment: Alignment.center,
+          widthFactor: 1,
+          heightFactor: 1,
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: foregroundColor,
+              fontSize: 10.5,
+              fontWeight: FontWeight.w700,
+              height: 1,
+            ),
           ),
         ),
       ),

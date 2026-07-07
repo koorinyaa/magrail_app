@@ -112,9 +112,10 @@ class _IcoInvestForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final prediction = CharacterDetailIcoPrediction.fromInfo(icoInfo);
+    final expectedShares = prediction.expectedShares(userInfo.amount);
     final promptText = userInfo.hasInvested
         ? '已注资 ${Formatters.tinygrailCurrency(userInfo.amount)}，预计可得 '
-            '${Formatters.groupedNumber(_expectedShares(prediction))} 股'
+            '${Formatters.groupedNumber(expectedShares)} 股'
         : '追加注资请在下方输入金额';
     final balanceText = balance == null
         ? '账户余额：未知'
@@ -186,23 +187,6 @@ class _IcoInvestForm extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  /// 计算当前用户预计可得股数
-  ///
-  /// [prediction] ICO 预测数据
-  int _expectedShares(CharacterDetailIcoPrediction prediction) {
-    final baseAmount = 10000 + (prediction.level - 1) * 7500;
-    if (baseAmount <= 0) {
-      return 0;
-    }
-
-    final costPerShare = prediction.displayPrice + 500000 / baseAmount;
-    if (costPerShare <= 0) {
-      return 0;
-    }
-
-    return (userInfo.amount / costPerShare).floor();
   }
 }
 

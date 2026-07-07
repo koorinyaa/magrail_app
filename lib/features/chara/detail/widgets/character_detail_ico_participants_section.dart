@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:magrail_app/core/controller/tinygrail_paged_list_controller.dart';
 import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
+import 'package:magrail_app/core/utils/formatters.dart';
 import 'package:magrail_app/core/utils/user_error_message.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
 import 'package:magrail_app/core/widgets/page_section_sliver.dart';
@@ -134,6 +135,7 @@ class _CharacterDetailIcoParticipantsSectionState
     return <Widget>[
       _IcoParticipantsGrid(
         items: _controller.items,
+        prediction: CharacterDetailIcoPrediction.fromInfo(widget.icoInfo),
         onItemBuilt: _controller.handleItemBuilt,
         onParticipantTap: _openUser,
       ),
@@ -229,16 +231,21 @@ class _IcoParticipantsGrid extends StatelessWidget {
   /// 创建 ICO 参与者响应式网格
   ///
   /// [items] 参与者条目
+  /// [prediction] ICO 预测数据
   /// [onItemBuilt] 条目构建回调
   /// [onParticipantTap] 参与者点击回调
   const _IcoParticipantsGrid({
     required this.items,
+    required this.prediction,
     required this.onItemBuilt,
     required this.onParticipantTap,
   });
 
   /// 参与者条目
   final List<CharacterDetailIcoParticipant> items;
+
+  /// ICO 预测数据
+  final CharacterDetailIcoPrediction prediction;
 
   /// 条目构建回调
   final ValueChanged<int> onItemBuilt;
@@ -268,6 +275,7 @@ class _IcoParticipantsGrid extends StatelessWidget {
             onItemBuilt(index);
             return _IcoParticipantRow(
               participant: item,
+              prediction: prediction,
               serialNumber: index + 1,
               onTap: () => onParticipantTap(item),
             );
@@ -385,16 +393,21 @@ class _IcoParticipantRow extends StatelessWidget {
   /// 创建 ICO 参与者行
   ///
   /// [participant] 参与者资料
+  /// [prediction] ICO 预测数据
   /// [serialNumber] 展示序号
   /// [onTap] 点击回调
   const _IcoParticipantRow({
     required this.participant,
+    required this.prediction,
     required this.serialNumber,
     required this.onTap,
   });
 
   /// 参与者资料
   final CharacterDetailIcoParticipant participant;
+
+  /// ICO 预测数据
+  final CharacterDetailIcoPrediction prediction;
 
   /// 展示序号
   final int serialNumber;
@@ -408,6 +421,8 @@ class _IcoParticipantRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final expectedShares = prediction.expectedShares(participant.amount);
+    final showExpectedShares = participant.amount > 0 && expectedShares > 0;
 
     return Material(
       color: Colors.transparent,
@@ -468,6 +483,20 @@ class _IcoParticipantRow extends StatelessWidget {
                         text: participant.amountLabel,
                         backgroundColor: _amountBadgeColor,
                       ),
+                      if (showExpectedShares) ...[
+                        const SizedBox(height: 3),
+                        Text(
+                          '${Formatters.groupedNumber(expectedShares)}股',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: colorScheme.onSurfaceVariant,
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w600,
+                            height: 1.1,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -540,6 +569,12 @@ class _IcoParticipantRowSkeleton extends StatelessWidget {
                       height: 16,
                       borderRadius: BorderRadius.circular(999),
                     ),
+                    const SizedBox(height: 3),
+                    Bone(
+                      width: 46,
+                      height: 12,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                   ],
                 ),
               ),
@@ -582,15 +617,20 @@ class _IcoParticipantAmountBadge extends StatelessWidget {
           color: backgroundColor,
           borderRadius: BorderRadius.circular(999),
         ),
-        child: Text(
-          text,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 10,
-            fontWeight: FontWeight.w700,
-            height: 1,
+        child: Align(
+          alignment: Alignment.center,
+          widthFactor: 1,
+          heightFactor: 1,
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              height: 1,
+            ),
           ),
         ),
       ),

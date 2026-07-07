@@ -116,7 +116,7 @@ class UserIcoAssetRow extends StatelessWidget {
       metrics: [
         CharacterAssetMetric(
           label: '已注资',
-          value: Formatters.tinygrailCurrency(item.state),
+          value: _formatInvestment(item.state),
           isValueMuted: true,
         ),
         CharacterAssetMetric(
@@ -131,5 +131,16 @@ class UserIcoAssetRow extends StatelessWidget {
       ),
       onTap: onTap,
     );
+  }
+
+  /// 格式化 ICO 已注资金额
+  ///
+  /// [value] 已注资金额
+  String _formatInvestment(num value) {
+    if (value <= 0) {
+      return '--';
+    }
+
+    return Formatters.tinygrailCurrency(value);
   }
 }
