@@ -53,7 +53,6 @@ class MainMobileNavigationDock extends StatelessWidget {
             ],
             quality:
                 useLiquidGlass ? GlassQuality.premium : GlassQuality.minimal,
-            adaptiveBrightness: useLiquidGlass,
             selectedIndex: selectedIndex < 0 ? 0 : selectedIndex,
             onTabSelected: (index) => onTabSelected(dockTabs[index]),
           ),
