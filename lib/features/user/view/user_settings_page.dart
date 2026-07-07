@@ -21,6 +21,7 @@ import 'package:url_launcher/url_launcher.dart';
 part 'user_settings_page_about.dart';
 part 'user_settings_page_components.dart';
 part 'user_settings_page_donate.dart';
+part 'user_settings_page_theme.dart';
 
 const _appName = 'MaGrail';
 const _appIconAsset = 'assets/icons/app_icon_foreground.png';
@@ -59,6 +60,7 @@ class UserSettingsPage extends StatefulWidget {
   /// [userRepository] 用户仓库
   /// [onSignedOut] 退出登录后的回调
   /// [onLiquidGlassChanged] 液态玻璃开关变化回调
+  /// [onThemeModeChanged] 应用主题模式变化回调
   const UserSettingsPage({
     super.key,
     required this.authRepository,
@@ -67,6 +69,7 @@ class UserSettingsPage extends StatefulWidget {
     required this.userRepository,
     this.onSignedOut,
     this.onLiquidGlassChanged,
+    this.onThemeModeChanged,
   });
 
   /// Tinygrail 授权仓库
@@ -87,6 +90,9 @@ class UserSettingsPage extends StatefulWidget {
   /// 液态玻璃开关变化回调
   final ValueChanged<bool>? onLiquidGlassChanged;
 
+  /// 应用主题模式变化回调
+  final ValueChanged<ThemeMode>? onThemeModeChanged;
+
   /// 创建用户设置二级页面状态
   @override
   State<UserSettingsPage> createState() => _UserSettingsPageState();
@@ -101,6 +107,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
   late bool _revealPrivateUserHoldingsEnabled;
   late bool _useLiquidGlass;
   late bool _showBotAction;
+  late ThemeMode _themeMode;
 
   /// 初始化用户设置二级页面状态
   @override
@@ -115,6 +122,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
         widget.preferences.revealPrivateUserHoldingsEnabled;
     _useLiquidGlass = widget.preferences.useLiquidGlass;
     _showBotAction = widget.preferences.showBotAction;
+    _themeMode = widget.preferences.themeMode;
   }
 
   /// 构建用户设置二级页面
@@ -147,6 +155,15 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                         value: _useBangumiMirror,
                         mirrorHost: _bangumiMirrorHost,
                         onChanged: _handleBangumiMirrorChanged,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _SettingsSurface(
+                      child: _SettingsValueActionTile(
+                        icon: Icons.dark_mode_outlined,
+                        label: '深色模式',
+                        value: _themeMode.settingsLabel,
+                        onPressed: _openThemeModePage,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -248,6 +265,33 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
         ),
       ),
     );
+  }
+
+  /// 打开深色模式设置页面
+  void _openThemeModePage() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => _ThemeModePage(
+          preferences: widget.preferences,
+          initialThemeMode: _themeMode,
+          onChanged: _handleThemeModeChanged,
+        ),
+      ),
+    );
+  }
+
+  /// 处理应用主题模式变化
+  ///
+  /// [themeMode] 新的应用主题模式
+  void _handleThemeModeChanged(ThemeMode themeMode) {
+    if (!mounted || _themeMode == themeMode) {
+      return;
+    }
+
+    setState(() {
+      _themeMode = themeMode;
+    });
+    widget.onThemeModeChanged?.call(themeMode);
   }
 
   /// 处理隐藏功能状态变化

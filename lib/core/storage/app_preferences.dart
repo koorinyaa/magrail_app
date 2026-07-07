@@ -1,4 +1,5 @@
-﻿import 'package:shared_preferences/shared_preferences.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// 本地偏好设置
 class AppPreferences {
@@ -10,6 +11,7 @@ class AppPreferences {
   final SharedPreferences _preferences;
 
   static const _prefersDarkModeKey = 'prefers_dark_mode';
+  static const _themeModeKey = 'theme_mode';
   static const _useBangumiMirrorKey = 'use_bangumi_mirror';
   static const _bangumiMirrorHostKey = 'bangumi_mirror_host';
   static const _currentUserAssetsCacheKey = 'tinygrail_current_user_assets';
@@ -27,15 +29,32 @@ class AppPreferences {
   static const _lastPromptedReleaseTagSavedAtKey =
       'last_prompted_release_tag_saved_at';
 
-  /// 读取深色模式偏好
-  bool get prefersDarkMode =>
-      _preferences.getBool(_prefersDarkModeKey) ?? false;
+  /// 读取应用主题模式
+  ThemeMode get themeMode {
+    final value = _preferences.getString(_themeModeKey);
+    return switch (value) {
+      'light' => ThemeMode.light,
+      'dark' => ThemeMode.dark,
+      'system' => ThemeMode.system,
+      _ => _legacyThemeMode,
+    };
+  }
 
-  /// 保存深色模式偏好
+  /// 保存应用主题模式
   ///
-  /// [value] 深色模式偏好值
-  Future<void> setPrefersDarkMode(bool value) {
-    return _preferences.setBool(_prefersDarkModeKey, value);
+  /// [value] 应用主题模式
+  Future<void> setThemeMode(ThemeMode value) {
+    return _preferences.setString(_themeModeKey, value.name);
+  }
+
+  /// 读取旧版深色模式偏好
+  ThemeMode get _legacyThemeMode {
+    final prefersDarkMode = _preferences.getBool(_prefersDarkModeKey);
+    if (prefersDarkMode == null) {
+      return ThemeMode.system;
+    }
+
+    return prefersDarkMode ? ThemeMode.dark : ThemeMode.light;
   }
 
   /// 读取 Bangumi 镜像偏好

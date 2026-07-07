@@ -13,7 +13,7 @@ class MagrailApp extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [dependencies] 应用依赖集合
-  /// [themeMode] 应用主题模式
+  /// [themeMode] 启动时覆盖本地偏好的主题模式
   const MagrailApp({
     super.key,
     required this.dependencies,
@@ -24,9 +24,6 @@ class MagrailApp extends StatefulWidget {
   final AppDependencies dependencies;
   final ThemeMode? _themeMode;
 
-  /// 当前应用主题模式
-  ThemeMode get themeMode => _themeMode ?? ThemeMode.system;
-
   /// 创建根组件状态
   @override
   State<MagrailApp> createState() => _MagrailAppState();
@@ -36,15 +33,18 @@ class MagrailApp extends StatefulWidget {
 class _MagrailAppState extends State<MagrailApp> {
   late final GlobalKey<NavigatorState> _rootNavigatorKey;
   late final GoRouter _router;
+  late ThemeMode _themeMode;
 
   /// 初始化根组件状态
   @override
   void initState() {
     super.initState();
+    _themeMode = widget._themeMode ?? widget.dependencies.preferences.themeMode;
     _rootNavigatorKey = GlobalKey<NavigatorState>();
     _router = createAppRouter(
       dependencies: widget.dependencies,
       rootNavigatorKey: _rootNavigatorKey,
+      onThemeModeChanged: _handleThemeModeChanged,
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkForStartupUpdate();
@@ -68,7 +68,7 @@ class _MagrailAppState extends State<MagrailApp> {
       debugShowCheckedModeBanner: false,
       theme: AppMaterialTheme.light(),
       darkTheme: AppMaterialTheme.dark(),
-      themeMode: widget.themeMode,
+      themeMode: _themeMode,
       builder: (context, child) {
         final brightness = _resolveBrightness(context);
 
@@ -114,11 +114,24 @@ class _MagrailAppState extends State<MagrailApp> {
   ///
   /// [context] 当前组件树上下文
   Brightness _resolveBrightness(BuildContext context) {
-    return switch (widget.themeMode) {
+    return switch (_themeMode) {
       ThemeMode.light => Brightness.light,
       ThemeMode.dark => Brightness.dark,
       ThemeMode.system => MediaQuery.platformBrightnessOf(context),
     };
+  }
+
+  /// 处理应用主题模式变化
+  ///
+  /// [themeMode] 新的应用主题模式
+  void _handleThemeModeChanged(ThemeMode themeMode) {
+    if (!mounted || _themeMode == themeMode) {
+      return;
+    }
+
+    setState(() {
+      _themeMode = themeMode;
+    });
   }
 
   /// 构建系统栏样式

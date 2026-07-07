@@ -39,9 +39,11 @@ import 'package:magrail_app/features/user/view/user_trade_log_page.dart';
 ///
 /// [dependencies] 应用依赖集合
 /// [rootNavigatorKey] 根导航器标识
+/// [onThemeModeChanged] 应用主题模式变化回调
 GoRouter createAppRouter({
   required AppDependencies dependencies,
   GlobalKey<NavigatorState>? rootNavigatorKey,
+  ValueChanged<ThemeMode>? onThemeModeChanged,
 }) {
   return GoRouter(
     navigatorKey: rootNavigatorKey,
@@ -530,6 +532,7 @@ GoRouter createAppRouter({
               userRepository: dependencies.repositories.user,
               onSignedOut: onSignedOut,
               onLiquidGlassChanged: routeExtra?.onLiquidGlassChanged,
+              onThemeModeChanged: onThemeModeChanged,
             ),
           );
         },

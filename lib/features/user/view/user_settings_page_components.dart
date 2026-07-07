@@ -121,6 +121,97 @@ class _SettingsActionTile extends StatelessWidget {
   }
 }
 
+/// 设置页带当前值的跳转项
+class _SettingsValueActionTile extends StatelessWidget {
+  /// 创建设置页带当前值的跳转项
+  ///
+  /// [icon] 左侧图标
+  /// [label] 选项文字
+  /// [value] 当前值文字
+  /// [onPressed] 点击回调
+  const _SettingsValueActionTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.onPressed,
+  });
+
+  /// 左侧图标
+  final IconData icon;
+
+  /// 选项文字
+  final String label;
+
+  /// 当前值文字
+  final String value;
+
+  /// 点击回调
+  final VoidCallback onPressed;
+
+  /// 构建设置页带当前值的跳转项
+  ///
+  /// [context] 当前组件树上下文
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(16),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onPressed,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 6, 10, 6),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 48),
+            child: Row(
+              children: [
+                Icon(icon, size: 22),
+                const SizedBox(width: 12),
+                Expanded(
+                  flex: 4,
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  flex: 5,
+                  child: Text(
+                    value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: colorScheme.onSurfaceVariant,
+                  size: 20,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// 设置页新版本标签
 class _SettingsNewBadge extends StatelessWidget {
   /// 创建设置页新版本标签
