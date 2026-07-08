@@ -401,7 +401,7 @@ class _TopWeekHistorySkeletonRow extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: 8),
+                    SizedBox(height: 6),
                     Bone(
                       width: 82,
                       height: 11,

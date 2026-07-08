@@ -129,7 +129,7 @@ class _TopWeekHistoryListItem extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       _TopWeekHistoryNameRow(item: item),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       SizedBox(
                         height: 14,
                         child: Text(
