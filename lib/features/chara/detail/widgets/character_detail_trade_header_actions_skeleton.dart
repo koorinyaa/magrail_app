@@ -37,48 +37,26 @@ class CharacterDetailTradeHeaderActionsSkeleton extends StatelessWidget {
             ),
           ],
         ),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            const minItemWidth = 88.0;
-            final rawColumnCount =
-                (constraints.maxWidth / minItemWidth).floor();
-            final columnCount = switch (rawColumnCount) {
-              < 1 => 1,
-              > 6 => 6,
-              _ => rawColumnCount,
-            };
-            final itemWidth = constraints.maxWidth / columnCount;
-
+        child: PagedActionGrid(
+          itemCount: isGameMaster ? 8 : 5,
+          itemBuilder: (context, index) {
             final itemWidths = isGameMaster
                 ? [48.0, 48.0, 48.0, 48.0, 48.0, 62.0, 48.0, 48.0]
                 : [48.0, 48.0, 48.0, 48.0, 48.0];
-
-            return Wrap(
-              alignment: WrapAlignment.start,
-              spacing: 0,
-              runSpacing: 8,
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                for (final width in itemWidths)
-                  SizedBox(
-                    width: itemWidth,
-                    height: 56,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Bone(
-                          width: 22,
-                          height: 22,
-                          borderRadius: BorderRadius.circular(11),
-                        ),
-                        const SizedBox(height: 8),
-                        Bone(
-                          width: width,
-                          height: 10,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ],
-                    ),
-                  ),
+                Bone(
+                  width: 22,
+                  height: 22,
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                const SizedBox(height: 8),
+                Bone(
+                  width: itemWidths[index],
+                  height: 10,
+                  borderRadius: BorderRadius.circular(5),
+                ),
               ],
             );
           },

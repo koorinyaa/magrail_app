@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:magrail_app/features/user/model/user_action_entry.dart';
+import 'package:magrail_app/shared/widgets/paged_action_grid.dart';
 
 /// 用户菜单网格卡片
 class UserActionGridCard extends StatelessWidget {
@@ -43,32 +44,13 @@ class UserActionGridCard extends StatelessWidget {
           ),
         ],
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          const minItemWidth = 88.0;
-          final rawColumnCount = (constraints.maxWidth / minItemWidth).floor();
-          final columnCount = switch (rawColumnCount) {
-            < 1 => 1,
-            > 6 => 6,
-            _ => rawColumnCount,
-          };
-          final itemWidth = constraints.maxWidth / columnCount;
-
-          return Wrap(
-            alignment: WrapAlignment.start,
-            runSpacing: 8,
-            spacing: 0,
-            children: [
-              for (final action in actions)
-                SizedBox(
-                  width: itemWidth,
-                  height: 56,
-                  child: _UserActionGridItem(
-                    action: action,
-                    onPressed: () => onActionPressed(action),
-                  ),
-                ),
-            ],
+      child: PagedActionGrid(
+        itemCount: actions.length,
+        itemBuilder: (context, index) {
+          final action = actions[index];
+          return _UserActionGridItem(
+            action: action,
+            onPressed: () => onActionPressed(action),
           );
         },
       ),

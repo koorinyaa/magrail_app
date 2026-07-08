@@ -193,36 +193,16 @@ class _CharacterDetailTradeHeaderActionsState
           ),
         ],
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          const minItemWidth = 88.0;
-          final rawColumnCount = (constraints.maxWidth / minItemWidth).floor();
-          final columnCount = switch (rawColumnCount) {
-            < 1 => 1,
-            > 6 => 6,
-            _ => rawColumnCount,
-          };
-          final itemWidth = constraints.maxWidth / columnCount;
-
-          return Wrap(
-            alignment: WrapAlignment.start,
-            runSpacing: 8,
-            spacing: 0,
-            children: [
-              for (final action in actions)
-                SizedBox(
-                  width: itemWidth,
-                  height: 56,
-                  child: _TradeHeaderActionButton(
-                    action: action,
-                    isLoading: _pendingAction == action.type,
-                    onPressed:
-                        _pendingAction == null && _isActionEnabled(action)
-                            ? () => _handleActionPressed(context, action)
-                            : null,
-                  ),
-                ),
-            ],
+      child: PagedActionGrid(
+        itemCount: actions.length,
+        itemBuilder: (context, index) {
+          final action = actions[index];
+          return _TradeHeaderActionButton(
+            action: action,
+            isLoading: _pendingAction == action.type,
+            onPressed: _pendingAction == null && _isActionEnabled(action)
+                ? () => _handleActionPressed(context, action)
+                : null,
           );
         },
       ),
