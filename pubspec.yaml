@@ -46,6 +46,7 @@ flutter:
     - assets/icons/github.svg
     - assets/icons/torii.svg
     - assets/images/donate/
+    - assets/images/magic/
   fonts:
     - family: NotoSansSC
       fonts:

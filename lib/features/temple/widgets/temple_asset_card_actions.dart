@@ -64,31 +64,31 @@ class _TempleAssetActions extends StatelessWidget {
         label: '虚空道标',
         toastLabel: '虚空道标',
         magicAction: TempleAssetMagicAction.guidepost,
-        imageUrl: _templeActionPostIconUrl,
+        imageAsset: TempleAssetMagicAssets.guidepostIcon,
       ),
       const _TempleAssetActionData(
         label: '混沌魔方',
         toastLabel: '混沌魔方',
         magicAction: TempleAssetMagicAction.chaosCube,
-        imageUrl: _templeActionChaosCubeIconUrl,
+        imageAsset: TempleAssetMagicAssets.chaosCubeIcon,
       ),
       const _TempleAssetActionData(
         label: '鲤鱼之眼',
         toastLabel: '鲤鱼之眼',
         magicAction: TempleAssetMagicAction.fisheye,
-        imageUrl: _templeActionFisheyeIconUrl,
+        imageAsset: TempleAssetMagicAssets.fisheyeIcon,
       ),
       const _TempleAssetActionData(
         label: '星光碎片',
         toastLabel: '星光碎片',
         magicAction: TempleAssetMagicAction.stardust,
-        imageUrl: _templeActionStardustIconUrl,
+        imageAsset: TempleAssetMagicAssets.stardustIcon,
       ),
       const _TempleAssetActionData(
         label: '闪光结晶',
         toastLabel: '闪光结晶',
         magicAction: TempleAssetMagicAction.starbreak,
-        imageUrl: _templeActionAttackIconUrl,
+        imageAsset: TempleAssetMagicAssets.starbreakIcon,
       ),
       const _TempleAssetActionData(
         label: '星之力',
@@ -307,19 +307,17 @@ class _TempleAssetActionIcon extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final imageUrl = action.imageUrl;
-    if (imageUrl != null) {
+    final imageAsset = action.imageAsset;
+    if (imageAsset != null) {
       return ClipOval(
         child: SizedBox.square(
           dimension: 13,
           child: Transform.scale(
             scale: 1.24,
-            child: CachedNetworkImage(
-              imageUrl: imageUrl,
+            child: Image.asset(
+              imageAsset,
               fit: BoxFit.cover,
-              placeholder: (context, url) =>
-                  const SizedBox.square(dimension: 13),
-              errorWidget: (context, url, error) => Icon(
+              errorBuilder: (context, error, stackTrace) => Icon(
                 LucideIcons.imageOff,
                 size: 13,
                 color: color,
@@ -449,7 +447,7 @@ class _TempleAssetActionData {
   /// [label] 按钮展示文案
   /// [toastLabel] 操作反馈文案
   /// [icon] 本地图标
-  /// [imageUrl] 网络图标地址
+  /// [imageAsset] 本地图标资源
   /// [magicAction] 魔法道具操作类型
   /// [usesStarPowerIcon] 是否使用星之力图标
   /// [opensRefineSheet] 是否打开精炼抽屉
@@ -463,7 +461,7 @@ class _TempleAssetActionData {
     required this.label,
     required this.toastLabel,
     this.icon,
-    this.imageUrl,
+    this.imageAsset,
     this.magicAction,
     this.usesStarPowerIcon = false,
     this.opensRefineSheet = false,
@@ -484,8 +482,8 @@ class _TempleAssetActionData {
   /// 本地图标
   final IconData? icon;
 
-  /// 网络图标地址
-  final String? imageUrl;
+  /// 本地图标资源
+  final String? imageAsset;
 
   /// 魔法道具操作类型
   final TempleAssetMagicAction? magicAction;

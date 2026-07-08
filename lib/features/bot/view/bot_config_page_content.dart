@@ -76,7 +76,7 @@ extension _BotConfigPageContent on _BotConfigPageState {
                     onPressed: () => _openTemplePicker(
                       title: '混沌魔方',
                       selectedId: config.chaosUseTemple,
-                      imageUrl: botChaosCubeActionIconUrl,
+                      imageAsset: botChaosCubeActionIconAsset,
                       fallbackIcon: Icons.casino_outlined,
                       onSelected: (item) {
                         config.chaosUseTemple = item.characterId;
@@ -127,7 +127,7 @@ extension _BotConfigPageContent on _BotConfigPageState {
                     onPressed: () => _openTemplePicker(
                       title: '虚空道标',
                       selectedId: config.guidepostUseTemple,
-                      imageUrl: botGuidepostActionIconUrl,
+                      imageAsset: botGuidepostActionIconAsset,
                       fallbackIcon: Icons.assistant_direction_outlined,
                       onSelected: (item) {
                         config.guidepostUseTemple = item.characterId;
@@ -145,7 +145,7 @@ extension _BotConfigPageContent on _BotConfigPageState {
                     description: '请选择虚空道标的目标角色',
                     recentStorageKeyPrefix:
                         templeAssetMagicGuidepostRecentCharacterIdsKeyPrefix,
-                    imageUrl: botGuidepostActionIconUrl,
+                    imageAsset: botGuidepostActionIconAsset,
                     fallbackIcon: Icons.assistant_direction_outlined,
                     onSelected: (item) {
                       config.guidepostTarget = item.characterId;
@@ -185,7 +185,7 @@ extension _BotConfigPageContent on _BotConfigPageState {
                     onPressed: () => _openTemplePicker(
                       title: '鲤鱼之眼',
                       selectedId: config.fishUseTemple,
-                      imageUrl: botFisheyeActionIconUrl,
+                      imageAsset: botFisheyeActionIconAsset,
                       fallbackIcon: Icons.remove_red_eye_outlined,
                       onSelected: (item) {
                         config.fishUseTemple = item.characterId;
@@ -203,7 +203,7 @@ extension _BotConfigPageContent on _BotConfigPageState {
                     description: '请选择鲤鱼之眼的目标角色',
                     recentStorageKeyPrefix:
                         templeAssetMagicFisheyeRecentCharacterIdsKeyPrefix,
-                    imageUrl: botFisheyeActionIconUrl,
+                    imageAsset: botFisheyeActionIconAsset,
                     fallbackIcon: Icons.remove_red_eye_outlined,
                     useFisheyeSupplement: true,
                     onSelected: (item) {

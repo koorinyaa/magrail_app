@@ -207,13 +207,13 @@ extension _BotConfigPageStateMethods on _BotConfigPageState {
   ///
   /// [title] 抽屉标题
   /// [selectedId] 当前已选圣殿角色 ID
-  /// [imageUrl] 标题图片地址
+  /// [imageAsset] 标题图片资源
   /// [fallbackIcon] 标题图片失败图标
   /// [onSelected] 选择回调
   Future<void> _openTemplePicker({
     required String title,
     required int? selectedId,
-    required String imageUrl,
+    required String imageAsset,
     required IconData fallbackIcon,
     required ValueChanged<BotTempleOption> onSelected,
   }) async {
@@ -222,7 +222,7 @@ extension _BotConfigPageStateMethods on _BotConfigPageState {
       context,
       title: title,
       selected: selected,
-      imageUrl: imageUrl,
+      imageAsset: imageAsset,
       fallbackIcon: fallbackIcon,
       search: _controller.searchTemplePage,
     );
@@ -241,7 +241,7 @@ extension _BotConfigPageStateMethods on _BotConfigPageState {
   /// [title] 抽屉标题
   /// [description] 抽屉说明文案
   /// [recentStorageKeyPrefix] 最近使用缓存键前缀
-  /// [imageUrl] 标题图片地址
+  /// [imageAsset] 标题图片资源
   /// [fallbackIcon] 标题图片失败图标
   /// [onSelected] 选择回调
   /// [useFisheyeSupplement] 是否加载幻想乡持股补充数据
@@ -249,7 +249,7 @@ extension _BotConfigPageStateMethods on _BotConfigPageState {
     required String title,
     required String description,
     required String recentStorageKeyPrefix,
-    required String imageUrl,
+    required String imageAsset,
     required IconData fallbackIcon,
     required ValueChanged<BotCharacterOption> onSelected,
     bool useFisheyeSupplement = false,
@@ -267,7 +267,7 @@ extension _BotConfigPageStateMethods on _BotConfigPageState {
       recentStorageKeyPrefix: recentStorageKeyPrefix,
       characterRepository: widget.characterRepository,
       userRepository: widget.userRepository,
-      imageUrl: imageUrl,
+      imageAsset: imageAsset,
       fallbackIcon: fallbackIcon,
       secondaryTextBuilder: useFisheyeSupplement
           ? _fisheyeSearchSecondaryTextFor

@@ -9,7 +9,7 @@ class _BotTempleMultiSearchSheet extends StatefulWidget {
   /// [description] 抽屉说明文案
   /// [emptyText] 未搜索时的空状态文案
   /// [icon] 抽屉图标
-  /// [imageUrl] 抽屉图片地址
+  /// [imageAsset] 抽屉图片资源
   /// [useErrorColor] 是否使用错误色图标
   /// [search] 分页搜索回调
   /// [selected] 当前已选圣殿列表
@@ -21,7 +21,7 @@ class _BotTempleMultiSearchSheet extends StatefulWidget {
     required this.description,
     required this.emptyText,
     required this.icon,
-    required this.imageUrl,
+    required this.imageAsset,
     required this.useErrorColor,
     required this.search,
     required this.selected,
@@ -44,8 +44,8 @@ class _BotTempleMultiSearchSheet extends StatefulWidget {
   /// 抽屉图标
   final IconData icon;
 
-  /// 抽屉图片地址
-  final String imageUrl;
+  /// 抽屉图片资源
+  final String imageAsset;
 
   /// 是否使用错误色图标
   final bool useErrorColor;
@@ -167,7 +167,7 @@ class _BotTempleMultiSearchSheetState
                                     title: widget.title,
                                     subtitle: _headerSubtitle,
                                     icon: widget.icon,
-                                    imageUrl: widget.imageUrl,
+                                    imageAsset: widget.imageAsset,
                                     useErrorColor: widget.useErrorColor,
                                   ),
                                   const SizedBox(height: 16),

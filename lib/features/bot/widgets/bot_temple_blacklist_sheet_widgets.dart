@@ -7,13 +7,13 @@ class _BotTempleBlacklistHeader extends StatelessWidget {
   /// [title] 标题文案
   /// [subtitle] 副标题文案
   /// [icon] 标题图标
-  /// [imageUrl] 标题图片地址
+  /// [imageAsset] 标题图片资源
   /// [useErrorColor] 是否使用错误色图标
   const _BotTempleBlacklistHeader({
     required this.title,
     required this.subtitle,
     required this.icon,
-    required this.imageUrl,
+    required this.imageAsset,
     required this.useErrorColor,
   });
 
@@ -26,8 +26,8 @@ class _BotTempleBlacklistHeader extends StatelessWidget {
   /// 标题图标
   final IconData icon;
 
-  /// 标题图片地址
-  final String imageUrl;
+  /// 标题图片资源
+  final String imageAsset;
 
   /// 是否使用错误色图标
   final bool useErrorColor;
@@ -42,7 +42,7 @@ class _BotTempleBlacklistHeader extends StatelessWidget {
 
     return Row(
       children: [
-        if (imageUrl.trim().isEmpty)
+        if (imageAsset.trim().isEmpty)
           DecoratedBox(
             decoration: BoxDecoration(
               color: iconColor.withValues(alpha: 0.12),
@@ -64,13 +64,10 @@ class _BotTempleBlacklistHeader extends StatelessWidget {
               dimension: 40,
               child: Transform.scale(
                 scale: 1.24,
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl,
+                child: Image.asset(
+                  imageAsset,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) {
-                    return const SizedBox.square(dimension: 40);
-                  },
-                  errorWidget: (context, url, error) {
+                  errorBuilder: (context, error, stackTrace) {
                     return DecoratedBox(
                       decoration: BoxDecoration(
                         color: iconColor.withValues(alpha: 0.12),

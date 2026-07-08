@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -13,6 +12,7 @@ import 'package:magrail_app/core/viewer/fullscreen_image_viewer_page.dart';
 import 'package:magrail_app/core/widgets/level_badge.dart';
 import 'package:magrail_app/core/widgets/temple_cover_image.dart';
 import 'package:magrail_app/features/temple/model/temple_asset_card_data.dart';
+import 'package:magrail_app/features/temple/model/temple_asset_magic_assets.dart';
 import 'package:magrail_app/features/temple/widgets/temple_asset_cover_reset_flow.dart';
 import 'package:magrail_app/features/temple/widgets/temple_asset_cover_update_flow.dart';
 import 'package:magrail_app/features/temple/widgets/temple_asset_destroy_flow.dart';
@@ -44,18 +44,6 @@ const double _templeAssetThumbnailRadius = 12;
 // 用户昵称水印最大宽度，按中文约 4-6 个字预留顶部主文案空间
 const double _templeAssetWatermarkMaxWidth = 60;
 const double _templeAssetWatermarkGap = 8;
-
-// Tinygrail 圣殿道具操作使用站点静态图标
-const String _templeActionPostIconUrl =
-    'https://tinygrail.mange.cn/image/sign.png!w120';
-const String _templeActionChaosCubeIconUrl =
-    'https://tinygrail.mange.cn/image/cube.png!w120';
-const String _templeActionFisheyeIconUrl =
-    'https://tinygrail.mange.cn/image/eye2.png!w120';
-const String _templeActionStardustIconUrl =
-    'https://tinygrail.mange.cn/image/star.png!w120';
-const String _templeActionAttackIconUrl =
-    'https://tinygrail.mange.cn/image/fire.png!w120';
 
 /// 圣殿资产卡片
 class TempleAssetCard extends StatelessWidget {

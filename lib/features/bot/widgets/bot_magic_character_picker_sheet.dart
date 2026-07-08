@@ -10,7 +10,7 @@ class _BotMagicCharacterSearchSheet extends StatelessWidget {
   /// [recentStorageKeyPrefix] 最近使用缓存键前缀
   /// [characterRepository] 角色仓库
   /// [userRepository] 用户仓库
-  /// [imageUrl] 标题图片地址
+  /// [imageAsset] 标题图片资源
   /// [fallbackIcon] 标题图片失败图标
   /// [secondaryTextBuilder] 第二行文案构造器
   /// [supplementLoader] 静默附加数值加载器
@@ -21,7 +21,7 @@ class _BotMagicCharacterSearchSheet extends StatelessWidget {
     required this.recentStorageKeyPrefix,
     required this.characterRepository,
     required this.userRepository,
-    required this.imageUrl,
+    required this.imageAsset,
     required this.fallbackIcon,
     required this.secondaryTextBuilder,
     required this.supplementLoader,
@@ -45,8 +45,8 @@ class _BotMagicCharacterSearchSheet extends StatelessWidget {
   /// 用户仓库
   final UserRepository userRepository;
 
-  /// 标题图片地址
-  final String imageUrl;
+  /// 标题图片资源
+  final String imageAsset;
 
   /// 标题图片失败图标
   final IconData fallbackIcon;
@@ -105,7 +105,7 @@ class _BotMagicCharacterSearchSheet extends StatelessWidget {
                     child: TempleAssetMagicCharacterSearchPanel(
                       header: _BotMagicCharacterSearchHeader(
                         title: title,
-                        imageUrl: imageUrl,
+                        imageAsset: imageAsset,
                         fallbackIcon: fallbackIcon,
                       ),
                       hintText: description,
@@ -149,19 +149,19 @@ class _BotMagicCharacterSearchHeader extends StatelessWidget {
   /// 创建 bot 魔法道具目标角色抽屉标题
   ///
   /// [title] 标题文案
-  /// [imageUrl] 标题图片地址
+  /// [imageAsset] 标题图片资源
   /// [fallbackIcon] 标题图片失败图标
   const _BotMagicCharacterSearchHeader({
     required this.title,
-    required this.imageUrl,
+    required this.imageAsset,
     required this.fallbackIcon,
   });
 
   /// 标题文案
   final String title;
 
-  /// 标题图片地址
-  final String imageUrl;
+  /// 标题图片资源
+  final String imageAsset;
 
   /// 标题图片失败图标
   final IconData fallbackIcon;
@@ -181,13 +181,10 @@ class _BotMagicCharacterSearchHeader extends StatelessWidget {
             dimension: 40,
             child: Transform.scale(
               scale: 1.24,
-              child: CachedNetworkImage(
-                imageUrl: imageUrl,
+              child: Image.asset(
+                imageAsset,
                 fit: BoxFit.cover,
-                placeholder: (context, url) {
-                  return const SizedBox.square(dimension: 40);
-                },
-                errorWidget: (context, url, error) {
+                errorBuilder: (context, error, stackTrace) {
                   return DecoratedBox(
                     decoration: BoxDecoration(
                       color: colorScheme.primary.withValues(alpha: 0.12),

@@ -1,19 +1,20 @@
 part of '../temple_asset_magic_action_sheet.dart';
 
+/// 圣殿资产魔法道具图片图标
 class _TempleAssetMagicImageIcon extends StatelessWidget {
   /// 创建圣殿资产魔法道具图片图标
   ///
-  /// [imageUrl] 图片地址
-  /// [fallbackIcon] 加载失败时的图标
+  /// [imageAsset] 本地图标资源
+  /// [fallbackIcon] 资源加载失败时的图标
   const _TempleAssetMagicImageIcon({
-    required this.imageUrl,
+    required this.imageAsset,
     required this.fallbackIcon,
   });
 
-  /// 图片地址
-  final String imageUrl;
+  /// 本地图标资源
+  final String imageAsset;
 
-  /// 加载失败时的图标
+  /// 资源加载失败时的图标
   final IconData fallbackIcon;
 
   /// 构建圣殿资产魔法道具图片图标
@@ -29,13 +30,10 @@ class _TempleAssetMagicImageIcon extends StatelessWidget {
         dimension: 40,
         child: Transform.scale(
           scale: 1.24,
-          child: CachedNetworkImage(
-            imageUrl: imageUrl,
+          child: Image.asset(
+            imageAsset,
             fit: BoxFit.cover,
-            placeholder: (context, url) {
-              return const SizedBox.square(dimension: 40);
-            },
-            errorWidget: (context, url, error) {
+            errorBuilder: (context, error, stackTrace) {
               return DecoratedBox(
                 decoration: BoxDecoration(
                   color: colorScheme.primary.withValues(alpha: 0.12),
@@ -88,23 +86,23 @@ class _TempleAssetMagicSheetHeader extends StatelessWidget {
     final subtitle = '#$characterId 「$resolvedCharacterName」';
     final iconWidget = switch (action) {
       TempleAssetMagicAction.guidepost => const _TempleAssetMagicImageIcon(
-          imageUrl: _guidepostActionIconUrl,
+          imageAsset: TempleAssetMagicAssets.guidepostIcon,
           fallbackIcon: LucideIcons.mapPinned,
         ),
       TempleAssetMagicAction.chaosCube => const _TempleAssetMagicImageIcon(
-          imageUrl: _chaosCubeActionIconUrl,
+          imageAsset: TempleAssetMagicAssets.chaosCubeIcon,
           fallbackIcon: LucideIcons.dices,
         ),
       TempleAssetMagicAction.fisheye => const _TempleAssetMagicImageIcon(
-          imageUrl: _fisheyeActionIconUrl,
+          imageAsset: TempleAssetMagicAssets.fisheyeIcon,
           fallbackIcon: LucideIcons.eye,
         ),
       TempleAssetMagicAction.stardust => const _TempleAssetMagicImageIcon(
-          imageUrl: _stardustActionIconUrl,
+          imageAsset: TempleAssetMagicAssets.stardustIcon,
           fallbackIcon: LucideIcons.sparkles,
         ),
       TempleAssetMagicAction.starbreak => const _TempleAssetMagicImageIcon(
-          imageUrl: _starbreakActionIconUrl,
+          imageAsset: TempleAssetMagicAssets.starbreakIcon,
           fallbackIcon: LucideIcons.flame,
         ),
       TempleAssetMagicAction.starForces => _TempleAssetMagicSymbolIcon(

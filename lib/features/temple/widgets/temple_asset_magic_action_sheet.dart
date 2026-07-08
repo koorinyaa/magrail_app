@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
@@ -21,6 +20,7 @@ import 'package:magrail_app/features/chara/widgets/tinygrail_character_reward_ca
 import 'package:magrail_app/features/chara/detail/model/character_detail_search_item.dart';
 import 'package:magrail_app/features/temple/controller/temple_asset_magic_action_controller.dart';
 import 'package:magrail_app/features/temple/model/temple_asset_card_data.dart';
+import 'package:magrail_app/features/temple/model/temple_asset_magic_assets.dart';
 import 'package:magrail_app/features/temple/widgets/temple_asset_magic_character_search_panel.dart';
 
 part 'magic_action_sheet/temple_asset_magic_confirm_contents.dart';
@@ -38,17 +38,6 @@ part 'magic_action_sheet/temple_asset_magic_search_config.dart';
 part 'magic_action_sheet/temple_asset_magic_submit_logic.dart';
 part 'magic_action_sheet/temple_asset_magic_state_queries.dart';
 part 'magic_action_sheet/temple_asset_magic_dialog_flow.dart';
-
-const String _guidepostActionIconUrl =
-    'https://tinygrail.mange.cn/image/sign.png!w120';
-const String _chaosCubeActionIconUrl =
-    'https://tinygrail.mange.cn/image/cube.png!w120';
-const String _fisheyeActionIconUrl =
-    'https://tinygrail.mange.cn/image/eye2.png!w120';
-const String _stardustActionIconUrl =
-    'https://tinygrail.mange.cn/image/star.png!w120';
-const String _starbreakActionIconUrl =
-    'https://tinygrail.mange.cn/image/fire.png!w120';
 
 /// 圣殿资产魔法道具操作类型
 enum TempleAssetMagicAction {
