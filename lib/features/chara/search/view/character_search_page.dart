@@ -440,8 +440,7 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
                     fontWeight: FontWeight.w600,
                   ),
                   placeholderStyle: TextStyle(
-                    color:
-                        colorScheme.onSurfaceVariant.withValues(alpha: 0.72),
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.72),
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),

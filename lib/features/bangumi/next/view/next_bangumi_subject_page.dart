@@ -357,10 +357,10 @@ class _NextBangumiSubjectPageState extends State<NextBangumiSubjectPage> {
           : page.items
               .where((item) => !existingIds.contains(item.characterId))
               .toList(growable: false);
-      final statuses = await widget.characterRepository
-          .fetchCharacterBasicInfoList(
-            items.map((item) => item.characterId).toList(growable: false),
-          );
+      final statuses =
+          await widget.characterRepository.fetchCharacterBasicInfoList(
+        items.map((item) => item.characterId).toList(growable: false),
+      );
       if (!mounted || requestId != _charactersRequestId) {
         return;
       }
@@ -453,8 +453,8 @@ class _NextBangumiSubjectPageState extends State<NextBangumiSubjectPage> {
     }
 
     final maxIndex = itemCount - 1;
-    final triggerIndex = (maxIndex - (_subjectCharacterPageSize / 2).ceil())
-        .clamp(0, maxIndex);
+    final triggerIndex =
+        (maxIndex - (_subjectCharacterPageSize / 2).ceil()).clamp(0, maxIndex);
     if (index < triggerIndex || !_canLoadNextSubjectCharacterPage) {
       return;
     }

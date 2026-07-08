@@ -264,9 +264,7 @@ extension _CharacterSearchPageBangumiSubjectLogic on _CharacterSearchPageState {
 
   /// 当前 Bangumi 条目空结果文案
   String get _bangumiSubjectEmptyTextForCurrentKeyword {
-    return _searchController.text.trim().isEmpty
-        ? '输入条目名称开始搜索'
-        : '未找到相关条目';
+    return _searchController.text.trim().isEmpty ? '输入条目名称开始搜索' : '未找到相关条目';
   }
 
   /// 当前是否允许加载下一页 Bangumi 条目搜索结果

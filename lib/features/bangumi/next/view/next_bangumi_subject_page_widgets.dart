@@ -253,7 +253,8 @@ class _NextBangumiSubjectDetailSliver extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _subjectContentMaxWidth),
+              constraints:
+                  const BoxConstraints(maxWidth: _subjectContentMaxWidth),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [

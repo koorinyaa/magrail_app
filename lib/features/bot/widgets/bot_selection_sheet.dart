@@ -30,12 +30,10 @@ const double _botTempleBlacklistBodyVisibleMinHeight = 160;
 const int _botTempleBlacklistPageSize = 20;
 
 /// 混沌魔方道具图标资源
-const String botChaosCubeActionIconAsset =
-    TempleAssetMagicAssets.chaosCubeIcon;
+const String botChaosCubeActionIconAsset = TempleAssetMagicAssets.chaosCubeIcon;
 
 /// 虚空道标道具图标资源
-const String botGuidepostActionIconAsset =
-    TempleAssetMagicAssets.guidepostIcon;
+const String botGuidepostActionIconAsset = TempleAssetMagicAssets.guidepostIcon;
 
 /// 鲤鱼之眼道具图标资源
 const String botFisheyeActionIconAsset = TempleAssetMagicAssets.fisheyeIcon;

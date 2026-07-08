@@ -12,9 +12,8 @@ extension _CharacterSearchPageBangumiLogic on _CharacterSearchPageState {
         : mediaQuery.padding.bottom;
     final resultRowCount =
         _bangumiResults.isEmpty ? 0 : _bangumiResults.length * 2 - 1;
-    final emptyText = _bangumiResults.isEmpty
-        ? _bangumiEmptyTextForCurrentKeyword
-        : null;
+    final emptyText =
+        _bangumiResults.isEmpty ? _bangumiEmptyTextForCurrentKeyword : null;
     final hasFooter = _bangumiResults.isNotEmpty;
     final itemCount =
         1 + resultRowCount + (emptyText == null ? 0 : 1) + (hasFooter ? 1 : 0);
@@ -455,9 +454,7 @@ extension _CharacterSearchPageBangumiLogic on _CharacterSearchPageState {
 
   /// 当前 Bangumi 空结果文案
   String get _bangumiEmptyTextForCurrentKeyword {
-    return _searchController.text.trim().isEmpty
-        ? '输入角色名称开始搜索'
-        : '未找到相关角色';
+    return _searchController.text.trim().isEmpty ? '输入角色名称开始搜索' : '未找到相关角色';
   }
 
   /// 当前是否允许加载下一页 Bangumi 搜索结果
@@ -468,5 +465,4 @@ extension _CharacterSearchPageBangumiLogic on _CharacterSearchPageState {
         !_isBangumiLoadingMore &&
         _bangumiLoadMoreError.isEmpty;
   }
-
 }

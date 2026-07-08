@@ -517,8 +517,9 @@ class CharacterDetailController extends ChangeNotifier {
         return;
       }
 
-      final rawName =
-          character.nameCn.trim().isNotEmpty ? character.nameCn : character.name;
+      final rawName = character.nameCn.trim().isNotEmpty
+          ? character.nameCn
+          : character.name;
       final name = TinygrailFormatters.decodeHtmlEntities(rawName).trim();
       final rawAvatarUrl = character.avatarUrl.trim();
       final avatarUrl = rawAvatarUrl.isEmpty
