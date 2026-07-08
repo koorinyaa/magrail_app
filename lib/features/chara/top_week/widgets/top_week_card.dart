@@ -228,32 +228,35 @@ class _TopWeekCard extends StatelessWidget {
                 width: 0.8,
               ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 5,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (icon != null) ...[
-                    Icon(
-                      icon,
-                      size: 13,
-                      color: Colors.white.withValues(alpha: 0.90),
-                    ),
-                    const SizedBox(width: 4),
-                  ],
-                  Text(
-                    text,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.90),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      height: 1,
-                    ),
+            child: SizedBox(
+              height: 24,
+              child: Center(
+                widthFactor: 1,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (icon != null) ...[
+                        Icon(
+                          icon,
+                          size: 13,
+                          color: Colors.white.withValues(alpha: 0.90),
+                        ),
+                        const SizedBox(width: 4),
+                      ],
+                      Text(
+                        text,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.90),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                          height: 1,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
