@@ -111,6 +111,13 @@ class TinygrailAssetUrls {
     return _applyBangumiMirror(_normalizeHttps(avatar));
   }
 
+  /// 标准化 Bangumi 地址
+  ///
+  /// [url] 原始资源或接口地址
+  static String normalizeBangumiUrl(String url) {
+    return _applyBangumiMirror(_normalizeHttps(url));
+  }
+
   /// 标准化 HTTPS 地址
   ///
   /// [url] 原始资源地址

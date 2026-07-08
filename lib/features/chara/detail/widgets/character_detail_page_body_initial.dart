@@ -55,6 +55,7 @@ class _CharacterDetailInitialBody extends StatelessWidget {
         children: [
           CharacterDetailIcoStartSection(
             characterId: item.characterId,
+            displayName: item.displayName,
             repository: repository,
             isAuthorized: isAuthorized,
             showAuthGuide: showAuthGuide,

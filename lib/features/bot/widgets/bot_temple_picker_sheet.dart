@@ -255,8 +255,6 @@ class _BotTempleMultiSearchSheetState
 
   /// 构建圣殿黑名单网格
   Widget _buildGrid() {
-    final hasFooter = _isLoadingMore || _loadMoreError.isNotEmpty;
-
     return LayoutBuilder(
       builder: (context, constraints) {
         final layout = _BotTempleBlacklistGridLayout.resolve(
@@ -288,14 +286,13 @@ class _BotTempleMultiSearchSheetState
                 childCount: _items.length,
               ),
             ),
-            if (hasFooter)
-              SliverToBoxAdapter(
-                child: _loadMoreError.isNotEmpty
-                    ? _BotTempleBlacklistLoadMoreError(
-                        onRetry: () => unawaited(_retryNextPage()),
-                      )
-                    : const _BotTempleBlacklistLoadingMore(),
-              ),
+            PaginationFooterSliver(
+              isLoadingMore: _isLoadingMore,
+              hasLoadMoreError: _loadMoreError.isNotEmpty,
+              canLoadMore: _canLoadMore,
+              completedLabel: '没有更多圣殿了',
+              onRetry: () => unawaited(_retryNextPage()),
+            ),
             const SliverToBoxAdapter(
               child: SizedBox(height: 58),
             ),

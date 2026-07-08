@@ -6,6 +6,7 @@ import 'package:magrail_app/core/network/tinygrail_page.dart';
 import 'package:magrail_app/core/storage/app_preferences.dart';
 import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
 import 'package:magrail_app/core/utils/tinygrail_formatters.dart';
+import 'package:magrail_app/features/bangumi/next/repository/next_bangumi_repository.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_basic_info.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_board_member.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_history_item.dart';
@@ -57,6 +58,7 @@ class CharacterDetailController extends ChangeNotifier {
   final AppPreferences _preferences;
   final CharacterDetailRepository _repository;
   final UserRepository _userRepository;
+  final NextBangumiRepository _bangumiRepository = NextBangumiRepository();
   final int? _initialCharacterId;
   final String _initialName;
   final String _initialAvatarUrl;
@@ -195,6 +197,7 @@ class CharacterDetailController extends ChangeNotifier {
   @override
   void dispose() {
     _isDisposed = true;
+    _bangumiRepository.close();
     super.dispose();
   }
 
@@ -415,7 +418,10 @@ class CharacterDetailController extends ChangeNotifier {
 
       final name = TinygrailFormatters.decodeHtmlEntities(info.name).trim();
       final icon = info.icon.trim();
-      final avatarUrl = TinygrailAssetUrls.normalizeAvatar(icon);
+      // 小圣杯未返回头像时保留入口或 BGM 补全头像
+      final avatarUrl =
+          icon.isEmpty ? '' : TinygrailAssetUrls.normalizeAvatar(icon);
+      final icoInfo = info.icoInfo;
 
       _CharacterDetailControllerHistory(this)._updateCharacterInfo(
         CharacterDetailHistoryItem(
@@ -424,8 +430,18 @@ class CharacterDetailController extends ChangeNotifier {
           avatarUrl: avatarUrl,
         ),
         pageType: info.pageType,
-        icoInfo: info.icoInfo,
+        icoInfo: icoInfo,
       );
+
+      if ((info.pageType == CharacterDetailPageType.ico && icoInfo != null) ||
+          info.pageType == CharacterDetailPageType.initial) {
+        unawaited(
+          _refreshIcoBangumiCharacterInfo(
+            characterId,
+            refreshGeneration: generation,
+          ),
+        );
+      }
 
       final tradeHeader = info.tradeHeader;
       if (tradeHeader != null) {
@@ -469,6 +485,65 @@ class CharacterDetailController extends ChangeNotifier {
           ._isLatestCharacterRefresh(characterId, generation)) {
         _refreshingCharacterIds.remove(characterId);
       }
+    }
+  }
+
+  /// 静默刷新 ICO 角色的 Bangumi 展示资料
+  ///
+  /// [characterId] 角色 ID
+  /// [refreshGeneration] 当前角色刷新代次
+  Future<void> _refreshIcoBangumiCharacterInfo(
+    int characterId, {
+    required int refreshGeneration,
+  }) async {
+    if (characterId <= 0) {
+      return;
+    }
+
+    try {
+      final character = await _bangumiRepository.fetchCharacter(characterId);
+      if (_isDisposed ||
+          !_CharacterDetailControllerRefresh(this)._isLatestCharacterRefresh(
+            characterId,
+            refreshGeneration,
+          )) {
+        return;
+      }
+
+      final currentPageType = _pageTypes[characterId];
+      final currentIcoInfo = _icoInfos[characterId];
+      if (currentIcoInfo == null &&
+          currentPageType != CharacterDetailPageType.initial) {
+        return;
+      }
+
+      final rawName =
+          character.nameCn.trim().isNotEmpty ? character.nameCn : character.name;
+      final name = TinygrailFormatters.decodeHtmlEntities(rawName).trim();
+      final rawAvatarUrl = character.avatarUrl.trim();
+      final avatarUrl = rawAvatarUrl.isEmpty
+          ? ''
+          : TinygrailAssetUrls.normalizeAvatar(rawAvatarUrl);
+      if (name.isEmpty && avatarUrl.isEmpty) {
+        return;
+      }
+
+      _CharacterDetailControllerHistory(this)._updateCharacterInfo(
+        CharacterDetailHistoryItem(
+          characterId: characterId,
+          name: name,
+          avatarUrl: avatarUrl,
+        ),
+        pageType: currentIcoInfo == null
+            ? CharacterDetailPageType.initial
+            : CharacterDetailPageType.ico,
+        icoInfo: currentIcoInfo?.copyWith(
+          name: name.isEmpty ? null : name,
+          icon: avatarUrl.isEmpty ? null : avatarUrl,
+        ),
+      );
+    } catch (_) {
+      // BGM 补充资料失败时保持小圣杯接口的原始展示
     }
   }
 

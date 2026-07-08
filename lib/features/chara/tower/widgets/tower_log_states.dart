@@ -16,59 +16,19 @@ class _TowerLogFooter extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     if (controller.hasLargeRealtimeUpdate) {
       return _TowerLogExpiredFooter(
         onRefresh: controller.refreshLatest,
       );
     }
 
-    if (controller.isLoadingMore) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        child: Center(
-          child: SizedBox.square(
-            dimension: 18,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: colorScheme.primary,
-            ),
-          ),
-        ),
-      );
-    }
-
-    if (controller.loadMoreError != null) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Center(
-          child: TextButton.icon(
-            onPressed: controller.loadNextPage,
-            icon: const Icon(Icons.refresh_rounded, size: 16),
-            label: const Text('加载失败，点击重试'),
-          ),
-        ),
-      );
-    }
-
-    if (!controller.canLoadMore) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        child: Center(
-          child: Text(
-            '没有更多日志了',
-            style: TextStyle(
-              color: colorScheme.onSurfaceVariant,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      );
-    }
-
-    return const SizedBox(height: 16);
+    return PaginationFooter(
+      isLoadingMore: controller.isLoadingMore,
+      hasLoadMoreError: controller.loadMoreError != null,
+      canLoadMore: controller.canLoadMore,
+      completedLabel: '没有更多日志了',
+      onRetry: controller.loadNextPage,
+    );
   }
 }
 

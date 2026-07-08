@@ -12,6 +12,7 @@ import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
 import 'package:magrail_app/core/utils/tinygrail_formatters.dart';
 import 'package:magrail_app/core/widgets/app_bottom_sheet_drag_handle.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
+import 'package:magrail_app/core/widgets/pagination_footer_sliver.dart';
 import 'package:magrail_app/core/widgets/temple_card.dart';
 import 'package:magrail_app/features/bot/model/bot_models.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';

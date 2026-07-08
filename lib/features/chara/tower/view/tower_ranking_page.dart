@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
+import 'package:magrail_app/core/widgets/pagination_footer_sliver.dart';
 import 'package:magrail_app/core/widgets/secondary_page_sliver_app_bar.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_hero.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
@@ -228,60 +229,12 @@ class _TowerRankingFooter extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    if (controller.isLoadingMore) {
-      return SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          child: Center(
-            child: SizedBox.square(
-              dimension: 18,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: colorScheme.primary,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    if (controller.loadMoreError != null) {
-      return SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Center(
-            child: TextButton.icon(
-              onPressed: controller.loadNextPage,
-              icon: const Icon(Icons.refresh_rounded, size: 16),
-              label: const Text('加载失败，点击重试'),
-            ),
-          ),
-        ),
-      );
-    }
-
-    if (!controller.canLoadMore) {
-      return SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          child: Center(
-            child: Text(
-              '没有更多角色了',
-              style: TextStyle(
-                color: colorScheme.onSurfaceVariant,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    return const SliverToBoxAdapter(
-      child: SizedBox(height: 16),
+    return PaginationFooterSliver(
+      isLoadingMore: controller.isLoadingMore,
+      hasLoadMoreError: controller.loadMoreError != null,
+      canLoadMore: controller.canLoadMore,
+      completedLabel: '没有更多角色了',
+      onRetry: controller.loadNextPage,
     );
   }
 }

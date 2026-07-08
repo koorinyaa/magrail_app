@@ -12,9 +12,16 @@ import 'package:magrail_app/core/utils/user_error_message.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
 import 'package:magrail_app/core/widgets/character_avatar.dart';
 import 'package:magrail_app/core/widgets/level_badge.dart';
+import 'package:magrail_app/core/widgets/pagination_footer.dart';
 import 'package:magrail_app/core/widgets/temple_card.dart';
+import 'package:magrail_app/core/widgets/temple_cover_image.dart';
+import 'package:magrail_app/features/bangumi/next/next_bangumi_subject_navigation.dart';
+import 'package:magrail_app/features/bangumi/next/model/next_bangumi_character_search_item.dart';
+import 'package:magrail_app/features/bangumi/next/model/next_bangumi_subject_search_item.dart';
+import 'package:magrail_app/features/bangumi/next/repository/next_bangumi_repository.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_hero.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
+import 'package:magrail_app/features/chara/detail/model/character_detail_basic_info.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_search_item.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
 import 'package:magrail_app/features/oos/repository/tinygrail_oos_repository.dart';
@@ -28,10 +35,28 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 part 'character_search_page_route.dart';
 part 'character_search_page_widgets.dart';
+part 'character_search_page_bangumi_logic.dart';
+part 'character_search_page_bangumi_subject_logic.dart';
+part 'character_search_page_bangumi_widgets.dart';
 
 const Duration _characterSearchDebounceDelay = Duration(milliseconds: 450);
+const int _bangumiSearchPageSize = 20;
+// 底部控件包含来源切换器和搜索框，列表需要预留防遮挡空间
+const double _characterSearchBottomContentPadding = 128;
 // 角色搜索页在同一个导航栈内只保留一个实例
 PageRoute<void>? _activeCharacterSearchRoute;
+
+/// 角色搜索来源
+enum _CharacterSearchSource {
+  /// 小圣杯角色搜索
+  tinygrail,
+
+  /// Bangumi 角色搜索
+  bangumi,
+
+  /// Bangumi 条目搜索
+  bangumiSubject,
+}
 
 /// 显示角色搜索页
 ///
@@ -140,8 +165,10 @@ class CharacterSearchPage extends StatefulWidget {
 class _CharacterSearchPageState extends State<CharacterSearchPage> {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  late final NextBangumiRepository _bangumiRepository = NextBangumiRepository();
 
   Timer? _searchDebounce;
+  var _searchSource = _CharacterSearchSource.tinygrail;
   var _requestId = 0;
   var _lastSearchText = '';
   var _isSearching = false;
@@ -153,6 +180,23 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
   List<CharacterDetailSearchItem> _results =
       const <CharacterDetailSearchItem>[];
   List<UserTempleApiItem> _templeResults = const <UserTempleApiItem>[];
+  List<NextBangumiCharacterSearchItem> _bangumiResults =
+      const <NextBangumiCharacterSearchItem>[];
+  List<NextBangumiSubjectSearchItem> _bangumiSubjectResults =
+      const <NextBangumiSubjectSearchItem>[];
+  Map<int, CharacterDetailBasicInfo> _bangumiStatuses =
+      const <int, CharacterDetailBasicInfo>{};
+  // BGM 搜索分页状态按接口原始 offset 推进
+  var _bangumiNextOffset = 0;
+  var _bangumiCanLoadMore = false;
+  var _isBangumiLoadingMore = false;
+  var _bangumiLoadMoreError = '';
+  int? _bangumiLastPreloadItemCount;
+  var _bangumiSubjectNextOffset = 0;
+  var _bangumiSubjectCanLoadMore = false;
+  var _isBangumiSubjectLoadingMore = false;
+  var _bangumiSubjectLoadMoreError = '';
+  int? _bangumiSubjectLastPreloadItemCount;
 
   /// 初始化角色搜索页状态
   @override
@@ -170,6 +214,7 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
       ..removeListener(_handleSearchTextChanged)
       ..dispose();
     _scrollController.dispose();
+    _bangumiRepository.close();
     super.dispose();
   }
 
@@ -234,8 +279,22 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
   ///
   /// [context] 当前组件树上下文
   Widget _buildResultState(BuildContext context) {
-    final hasResults = _results.isNotEmpty || _templeResults.isNotEmpty;
-    if ((_isSearching || _isSearchingTemples) && !hasResults) {
+    final hasResults = _hasVisibleResults;
+    final isLoadingBangumiMore =
+        _searchSource == _CharacterSearchSource.bangumi &&
+            _isBangumiLoadingMore;
+    final isLoadingBangumiSubjectMore =
+        _searchSource == _CharacterSearchSource.bangumiSubject &&
+            _isBangumiSubjectLoadingMore;
+    if ((_isSearching ||
+            _isSearchingTemples ||
+            isLoadingBangumiMore ||
+            isLoadingBangumiSubjectMore) &&
+        !hasResults) {
+      if (_searchSource == _CharacterSearchSource.bangumiSubject) {
+        return const _BangumiSubjectSearchSkeletonList();
+      }
+
       return const _CharacterSearchSkeletonList();
     }
 
@@ -250,10 +309,24 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
       return _buildResultList(context);
     }
 
+    if (!hasResults &&
+        _searchSource == _CharacterSearchSource.bangumi &&
+        _errorMessage.isEmpty) {
+      return _buildResultList(context);
+    }
+
+    if (!hasResults &&
+        _searchSource == _CharacterSearchSource.bangumiSubject &&
+        _errorMessage.isEmpty) {
+      return _buildResultList(context);
+    }
+
     if (!hasResults) {
-      final text = !_hasSearched && _searchController.text.trim().isEmpty
+      final text = _searchSource == _CharacterSearchSource.tinygrail &&
+              !_hasSearched &&
+              _searchController.text.trim().isEmpty
           ? '输入角色 ID 或名称开始搜索'
-          : '未找到相关角色或圣殿';
+          : '未找到相关角色';
       return _CharacterSearchEmptyText(text: text);
     }
 
@@ -264,6 +337,14 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
   ///
   /// [context] 当前组件树上下文
   Widget _buildResultList(BuildContext context) {
+    if (_searchSource == _CharacterSearchSource.bangumi) {
+      return _buildBangumiResultList(context);
+    }
+
+    if (_searchSource == _CharacterSearchSource.bangumiSubject) {
+      return _buildBangumiSubjectResultList(context);
+    }
+
     final mediaQuery = MediaQuery.of(context);
     final bottomInset = mediaQuery.viewInsets.bottom > 0
         ? mediaQuery.viewInsets.bottom
@@ -272,7 +353,9 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
     return ListView(
       controller: _scrollController,
       primary: false,
-      padding: EdgeInsets.only(bottom: bottomInset + 76),
+      padding: EdgeInsets.only(
+        bottom: bottomInset + _characterSearchBottomContentPadding,
+      ),
       children: [
         if (_templeResults.isNotEmpty || _templeErrorMessage.isNotEmpty) ...[
           const _CharacterSearchSectionLabel(text: '圣殿'),
@@ -325,41 +408,54 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
     final colorScheme = Theme.of(context).colorScheme;
     const searchFieldHeight = 44.0;
 
-    return Row(
-      children: [
-        Expanded(
-          child: GlassTextField.search(
-            controller: _searchController,
-            autofocus: true,
-            placeholder: '搜索角色（角色ID或名称）',
-            prefixIcon: Icon(
-              LucideIcons.search,
-              size: 18,
-              color: colorScheme.onSurfaceVariant,
-            ),
-            onSubmitted: (_) => _searchNow(),
-            height: searchFieldHeight,
-            useOwnLayer: true,
-            quality: GlassQuality.minimal,
-            interactionBehavior: GlassInteractionBehavior.glowOnly,
-            textStyle: TextStyle(
-              color: colorScheme.onSurface,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-            placeholderStyle: TextStyle(
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.72),
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
+    return TextFieldTapRegion(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _CharacterSearchSourceSegmentedControl(
+            value: _searchSource,
+            onChanged: _handleSearchSourceChanged,
           ),
-        ),
-        const SizedBox(width: 10),
-        _CharacterSearchCloseButton(
-          size: searchFieldHeight,
-          onPressed: widget.onClose,
-        ),
-      ],
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: GlassTextField.search(
+                  controller: _searchController,
+                  autofocus: true,
+                  placeholder: _searchPlaceholder,
+                  prefixIcon: Icon(
+                    LucideIcons.search,
+                    size: 18,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  onSubmitted: (_) => _searchNow(),
+                  height: searchFieldHeight,
+                  useOwnLayer: true,
+                  quality: GlassQuality.minimal,
+                  interactionBehavior: GlassInteractionBehavior.glowOnly,
+                  textStyle: TextStyle(
+                    color: colorScheme.onSurface,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  placeholderStyle: TextStyle(
+                    color:
+                        colorScheme.onSurfaceVariant.withValues(alpha: 0.72),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              _CharacterSearchCloseButton(
+                size: searchFieldHeight,
+                onPressed: widget.onClose,
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -378,84 +474,18 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
   /// 立即执行当前搜索
   Future<void> _searchNow() async {
     _searchDebounce?.cancel();
-    final keyword = _searchController.text.trim();
-    final requestId = ++_requestId;
-    final cachedUsername = _cachedCurrentUserName;
-    final shouldSearchTemples = keyword.isNotEmpty && cachedUsername.isNotEmpty;
+    return switch (_searchSource) {
+      _CharacterSearchSource.tinygrail => _searchTinygrailNow(),
+      _CharacterSearchSource.bangumi => _searchBangumiNow(),
+      _CharacterSearchSource.bangumiSubject => _searchBangumiSubjectNow(),
+    };
+  }
 
-    setState(() {
-      _isSearching = true;
-      _isSearchingTemples = shouldSearchTemples;
-      _errorMessage = '';
-      _templeErrorMessage = '';
-      _results = const <CharacterDetailSearchItem>[];
-      _templeResults = const <UserTempleApiItem>[];
-      _hasSearchedTemples = false;
-    });
-
-    final resultsFuture = widget.repository.searchCharacters(
-      keyword,
-      allowEmptyKeyword: true,
-    );
-    final templesFuture = shouldSearchTemples
-        ? widget.userRepository.fetchUserTemplePage(
-            username: cachedUsername,
-            keyword: keyword,
-            pageSize: 12,
-          )
-        : null;
-
-    Object? searchError;
-    Object? templeError;
-    var results = const <CharacterDetailSearchItem>[];
-    var temples = const <UserTempleApiItem>[];
-
-    try {
-      results = await resultsFuture;
-    } catch (error) {
-      searchError = error;
-    }
-
-    if (templesFuture != null) {
-      try {
-        final page = await templesFuture;
-        temples = page.items;
-      } catch (error) {
-        templeError = error;
-      }
-    }
-
-    if (!mounted || requestId != _requestId) {
-      return;
-    }
-
-    if (searchError == null) {
-      setState(() {
-        _hasSearched = true;
-        _hasSearchedTemples = shouldSearchTemples;
-        _isSearching = false;
-        _isSearchingTemples = false;
-        _results = results;
-      });
-    } else {
-      setState(() {
-        _hasSearched = true;
-        _hasSearchedTemples = shouldSearchTemples;
-        _isSearching = false;
-        _isSearchingTemples = false;
-        _errorMessage = _messageForError(searchError!);
-      });
-    }
-
-    if (templeError == null) {
-      setState(() {
-        _templeResults = temples;
-      });
-    } else {
-      setState(() {
-        _templeErrorMessage = _messageForError(templeError!);
-      });
-    }
+  /// 更新搜索页状态
+  ///
+  /// [callback] 状态更新回调
+  void _updateSearchState(VoidCallback callback) {
+    setState(callback);
   }
 
   /// 重试当前搜索
@@ -510,6 +540,22 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
     );
   }
 
+  /// 选择 Bangumi 条目搜索结果
+  ///
+  /// [item] Bangumi 条目搜索结果
+  void _selectBangumiSubject(NextBangumiSubjectSearchItem item) {
+    openNextBangumiSubjectFromSearchItem(context, item);
+  }
+
+  /// 当前来源搜索框占位文案
+  String get _searchPlaceholder {
+    return switch (_searchSource) {
+      _CharacterSearchSource.tinygrail => '搜索小圣杯角色（角色ID或名称）',
+      _CharacterSearchSource.bangumi => '搜索bgm角色',
+      _CharacterSearchSource.bangumiSubject => '搜索bgm条目',
+    };
+  }
+
   /// 当前用户缓存用户名
   String get _cachedCurrentUserName {
     return widget.userRepository.readCachedCurrentUserAssets()?.name.trim() ??
@@ -532,6 +578,10 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
 /// 解析角色搜索错误文案
 ///
 /// [error] 原始错误
-String _messageForError(Object error) {
-  return resolveUserErrorMessage(error, fallback: '搜索角色失败');
+/// [fallback] 无法解析时的兜底文案
+String _messageForError(
+  Object error, {
+  String fallback = '搜索角色失败',
+}) {
+  return resolveUserErrorMessage(error, fallback: fallback);
 }

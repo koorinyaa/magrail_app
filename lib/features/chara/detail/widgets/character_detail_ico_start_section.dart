@@ -17,6 +17,7 @@ class CharacterDetailIcoStartSection extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [characterId] 角色 ID
+  /// [displayName] 角色显示名称
   /// [repository] 角色详情仓库
   /// [isAuthorized] 当前 Tinygrail 会话是否可用
   /// [showAuthGuide] 是否显示授权引导
@@ -26,6 +27,7 @@ class CharacterDetailIcoStartSection extends StatefulWidget {
   const CharacterDetailIcoStartSection({
     super.key,
     required this.characterId,
+    required this.displayName,
     required this.repository,
     required this.isAuthorized,
     required this.showAuthGuide,
@@ -36,6 +38,9 @@ class CharacterDetailIcoStartSection extends StatefulWidget {
 
   /// 角色 ID
   final int characterId;
+
+  /// 角色显示名称
+  final String displayName;
 
   /// 角色详情仓库
   final CharacterDetailRepository repository;
@@ -111,7 +116,10 @@ class _CharacterDetailIcoStartSectionState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _IcoStartHeader(characterId: widget.characterId),
+          _IcoStartHeader(
+            characterId: widget.characterId,
+            displayName: widget.displayName,
+          ),
           const SizedBox(height: 16),
           if (killVotes == null)
             const _IcoStartStatus(text: '正在检查删除投票状态')
@@ -281,12 +289,17 @@ class _IcoStartHeader extends StatelessWidget {
   /// 创建 ICO 启动标题区
   ///
   /// [characterId] 角色 ID
+  /// [displayName] 角色显示名称
   const _IcoStartHeader({
     required this.characterId,
+    required this.displayName,
   });
 
   /// 角色 ID
   final int characterId;
+
+  /// 角色显示名称
+  final String displayName;
 
   /// 构建 ICO 启动标题区
   ///
@@ -294,6 +307,8 @@ class _IcoStartHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final resolvedDisplayName =
+        displayName.trim().isEmpty ? '#$characterId' : displayName.trim();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -313,7 +328,7 @@ class _IcoStartHeader extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Text(
-          '#$characterId 已做好准备',
+          '$resolvedDisplayName 已做好准备',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.center,

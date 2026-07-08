@@ -40,6 +40,46 @@ extension CharacterDetailRepositoryBasicQueries on CharacterDetailRepository {
     return response.value!;
   }
 
+  /// 批量获取角色详情基础资料
+  ///
+  /// [characterIds] 角色 ID 列表
+  Future<Map<int, CharacterDetailBasicInfo>> fetchCharacterBasicInfoList(
+    List<int> characterIds,
+  ) async {
+    final resolvedIds = characterIds
+        .where((characterId) => characterId > 0)
+        .toSet()
+        .toList(growable: false);
+    if (resolvedIds.isEmpty) {
+      return const <int, CharacterDetailBasicInfo>{};
+    }
+
+    final json = await _apiClient.postJson<Map<String, Object?>>(
+      'chara/list',
+      data: resolvedIds,
+    );
+    final response = TinygrailResponse<List<CharacterDetailBasicInfo>>.fromJson(
+      json,
+      (value) {
+        return TinygrailResponseParser.asObjectList(
+          value,
+          CharacterDetailBasicInfo.fromJson,
+        );
+      },
+    );
+
+    if (!response.isSuccess) {
+      // State 不为 0 与详情页保持一致，按未上市缺失状态处理
+      return const <int, CharacterDetailBasicInfo>{};
+    }
+
+    final items = response.value ?? const <CharacterDetailBasicInfo>[];
+    return {
+      for (final item in items)
+        if (item.characterId > 0) item.characterId: item,
+    };
+  }
+
   /// 获取角色深度信息
   ///
   /// [characterId] 角色 ID

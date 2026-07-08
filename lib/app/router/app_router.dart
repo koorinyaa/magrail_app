@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:magrail_app/app/bootstrap.dart';
+import 'package:magrail_app/features/bangumi/next/next_bangumi_subject_navigation.dart';
+import 'package:magrail_app/features/bangumi/next/view/next_bangumi_subject_page.dart';
 import 'package:magrail_app/features/bot/view/bot_config_page.dart';
 import 'package:magrail_app/features/chara/detail/controller/character_detail_collections_controller.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_collections_route_extra.dart';
@@ -119,6 +121,28 @@ GoRouter createAppRouter({
                   ) ??
                   0,
               characterName: queryParameters['name'],
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        name: nextBangumiSubjectRouteName,
+        path: '/next-bangumi-subject',
+        pageBuilder: (context, state) {
+          final queryParameters = state.uri.queryParameters;
+
+          return MaterialPage(
+            key: state.pageKey,
+            child: NextBangumiSubjectPage(
+              subjectId: int.tryParse(
+                    queryParameters['subjectId'] ?? '',
+                  ) ??
+                  0,
+              characterRepository: dependencies.repositories.characterDetail,
+              templeRepository: dependencies.repositories.temple,
+              magicRepository: dependencies.repositories.templeAssetMagic,
+              oosRepository: dependencies.repositories.oos,
+              userRepository: dependencies.repositories.user,
             ),
           );
         },

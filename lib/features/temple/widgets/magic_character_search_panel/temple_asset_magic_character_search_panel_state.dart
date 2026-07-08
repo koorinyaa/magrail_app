@@ -155,7 +155,9 @@ class TempleAssetMagicCharacterSearchPanelState
             : 0;
     final searchRowCount =
         _searchResults.isEmpty ? 0 : _searchResults.length * 2 - 1;
-    final hasFooter = _isInitialLoadingMore || _loadMoreError.isNotEmpty;
+    final hasFooter =
+        _TempleAssetMagicCharacterSearchData(this)._isInitialSearchMode &&
+            _searchResults.isNotEmpty;
     final itemCount = recentRowCount + searchRowCount + (hasFooter ? 1 : 0);
 
     return ListView.builder(
@@ -179,13 +181,13 @@ class TempleAssetMagicCharacterSearchPanelState
 
         final searchIndex = index - recentRowCount;
         if (searchIndex >= searchRowCount) {
-          if (_loadMoreError.isNotEmpty) {
-            return _TempleAssetMagicSearchLoadMoreError(
-              onRetry: _retryNextInitialSearchPage,
-            );
-          }
-
-          return const _TempleAssetMagicSearchLoadingMore();
+          return PaginationFooter(
+            isLoadingMore: _isInitialLoadingMore,
+            hasLoadMoreError: _loadMoreError.isNotEmpty,
+            canLoadMore: _initialCanLoadMore,
+            completedLabel: '没有更多角色了',
+            onRetry: _retryNextInitialSearchPage,
+          );
         }
 
         if (searchIndex.isOdd) {

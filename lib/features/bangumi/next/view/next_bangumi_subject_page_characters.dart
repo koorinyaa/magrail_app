@@ -1,0 +1,520 @@
+part of 'next_bangumi_subject_page.dart';
+
+/// Next Bangumi 条目详情角色区
+class _NextBangumiSubjectCharacterSection extends StatelessWidget {
+  /// 创建 Next Bangumi 条目详情角色区
+  ///
+  /// [items] 条目角色列表
+  /// [statuses] 小圣杯角色状态
+  /// [isInitialLoading] 是否正在首次加载
+  /// [initialError] 首次加载错误文案
+  /// [isLoadingMore] 是否正在加载下一页
+  /// [hasLoadMoreError] 是否存在下一页加载错误
+  /// [canLoadMore] 是否还有下一页
+  /// [onRetryInitial] 首次加载重试回调
+  /// [onRetryMore] 下一页重试回调
+  /// [onItemBuilt] 条目构建回调
+  /// [onItemTap] 条目点击回调
+  const _NextBangumiSubjectCharacterSection({
+    required this.items,
+    required this.statuses,
+    required this.isInitialLoading,
+    required this.initialError,
+    required this.isLoadingMore,
+    required this.hasLoadMoreError,
+    required this.canLoadMore,
+    required this.onRetryInitial,
+    required this.onRetryMore,
+    required this.onItemBuilt,
+    required this.onItemTap,
+  });
+
+  /// 条目角色列表
+  final List<NextBangumiSubjectCharacterItem> items;
+
+  /// 小圣杯角色状态
+  final Map<int, CharacterDetailBasicInfo> statuses;
+
+  /// 是否正在首次加载
+  final bool isInitialLoading;
+
+  /// 首次加载错误文案
+  final String initialError;
+
+  /// 是否正在加载下一页
+  final bool isLoadingMore;
+
+  /// 是否存在下一页加载错误
+  final bool hasLoadMoreError;
+
+  /// 是否还有下一页
+  final bool canLoadMore;
+
+  /// 首次加载重试回调
+  final VoidCallback onRetryInitial;
+
+  /// 下一页重试回调
+  final VoidCallback onRetryMore;
+
+  /// 条目构建回调
+  final ValueChanged<int> onItemBuilt;
+
+  /// 条目点击回调
+  final ValueChanged<NextBangumiSubjectCharacterItem> onItemTap;
+
+  /// 构建 Next Bangumi 条目详情角色区
+  ///
+  /// [context] 当前组件上下文
+  @override
+  Widget build(BuildContext context) {
+    return SliverMainAxisGroup(
+      slivers: [
+        const PageSectionSliver(
+          title: '角色',
+          topSpacing: 24,
+          child: SizedBox.shrink(),
+        ),
+        if (isInitialLoading)
+          const _NextBangumiSubjectCharacterSkeletonGrid()
+        else if (initialError.isNotEmpty)
+          _NextBangumiSubjectCharacterErrorSliver(
+            message: initialError,
+            onRetry: onRetryInitial,
+          )
+        else if (items.isEmpty)
+          const _NextBangumiSubjectCharacterEmptySliver()
+        else ...[
+          _NextBangumiSubjectCharacterGrid(
+            items: items,
+            statuses: statuses,
+            onItemBuilt: onItemBuilt,
+            onItemTap: onItemTap,
+          ),
+          PaginationFooterSliver(
+            isLoadingMore: isLoadingMore,
+            hasLoadMoreError: hasLoadMoreError,
+            canLoadMore: canLoadMore,
+            completedLabel: '没有更多角色了',
+            onRetry: onRetryMore,
+          ),
+        ],
+        const _NextBangumiSubjectCharacterBottomSpacer(),
+      ],
+    );
+  }
+}
+
+/// Next Bangumi 条目角色网格
+class _NextBangumiSubjectCharacterGrid extends StatelessWidget {
+  /// 创建 Next Bangumi 条目角色网格
+  ///
+  /// [items] 条目角色列表
+  /// [statuses] 小圣杯角色状态
+  /// [onItemBuilt] 条目构建回调
+  /// [onItemTap] 条目点击回调
+  const _NextBangumiSubjectCharacterGrid({
+    required this.items,
+    required this.statuses,
+    required this.onItemBuilt,
+    required this.onItemTap,
+  });
+
+  /// 条目角色列表
+  final List<NextBangumiSubjectCharacterItem> items;
+
+  /// 小圣杯角色状态
+  final Map<int, CharacterDetailBasicInfo> statuses;
+
+  /// 条目构建回调
+  final ValueChanged<int> onItemBuilt;
+
+  /// 条目点击回调
+  final ValueChanged<NextBangumiSubjectCharacterItem> onItemTap;
+
+  /// 构建 Next Bangumi 条目角色网格
+  ///
+  /// [context] 当前组件上下文
+  @override
+  Widget build(BuildContext context) {
+    return SliverPadding(
+      padding: AppSafeAreaInsets.fromLTRB(
+        context,
+        left: 16,
+        top: 2,
+        right: 16,
+        bottom: 0,
+      ),
+      sliver: SliverGrid(
+        gridDelegate: _NextBangumiSubjectCharacterGridMetrics.delegate,
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final item = items[index];
+            onItemBuilt(index);
+            return _NextBangumiSubjectCharacterTile(
+              item: item,
+              status: statuses[item.characterId],
+              onTap: () => onItemTap(item),
+            );
+          },
+          childCount: items.length,
+        ),
+      ),
+    );
+  }
+}
+
+/// Next Bangumi 条目角色卡片
+class _NextBangumiSubjectCharacterTile extends StatelessWidget {
+  /// 创建 Next Bangumi 条目角色卡片
+  ///
+  /// [item] 条目角色
+  /// [status] 小圣杯角色状态
+  /// [onTap] 点击回调
+  const _NextBangumiSubjectCharacterTile({
+    required this.item,
+    required this.status,
+    required this.onTap,
+  });
+
+  /// 条目角色
+  final NextBangumiSubjectCharacterItem item;
+
+  /// 小圣杯角色状态
+  final CharacterDetailBasicInfo? status;
+
+  /// 点击回调
+  final VoidCallback onTap;
+
+  /// 构建 Next Bangumi 条目角色卡片
+  ///
+  /// [context] 当前组件上下文
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final rawAvatarUrl = _rawAvatarUrlForSubjectCharacter(item, status);
+    final avatarUrl = _resolvedAvatarUrlForSubjectCharacter(rawAvatarUrl);
+    final avatarHeroTag = createCharacterDetailAvatarHeroTag(
+      characterId: item.characterId,
+      avatarUrl: rawAvatarUrl,
+      source: item,
+    );
+    final name = _decodeBangumiSubjectText(item.displayName);
+    final avatar = CharacterAvatar(
+      imageUrl: avatarUrl,
+      size: 48,
+      borderRadius: 18,
+    );
+
+    return Center(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: SizedBox(
+            width: 104,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  if (avatarHeroTag == null)
+                    avatar
+                  else
+                    Hero(
+                      tag: avatarHeroTag,
+                      transitionOnUserGestures: true,
+                      child: avatar,
+                    ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          name.isEmpty ? '未知角色' : name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: colorScheme.onSurface,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            height: 1.1,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      _NextBangumiSubjectCharacterStatusBadge(status: status),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    '#${item.characterId}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                      height: 1,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Next Bangumi 条目角色状态胶囊
+class _NextBangumiSubjectCharacterStatusBadge extends StatelessWidget {
+  /// 创建 Next Bangumi 条目角色状态胶囊
+  ///
+  /// [status] 小圣杯角色状态
+  const _NextBangumiSubjectCharacterStatusBadge({
+    required this.status,
+  });
+
+  /// 小圣杯角色状态
+  final CharacterDetailBasicInfo? status;
+
+  /// 构建 Next Bangumi 条目角色状态胶囊
+  ///
+  /// [context] 当前组件上下文
+  @override
+  Widget build(BuildContext context) {
+    final resolvedStatus = status;
+    if (resolvedStatus?.pageType == CharacterDetailPageType.trade) {
+      final header = resolvedStatus?.tradeHeader;
+      return LevelBadge(
+        level: header?.level ?? 0,
+        zeroCount: header?.zeroCount ?? 0,
+        isCompact: true,
+      );
+    }
+
+    if (resolvedStatus?.pageType == CharacterDetailPageType.ico) {
+      return const LevelBadge.ico(isCompact: true);
+    }
+
+    return const LevelBadge.unlisted(isCompact: true);
+  }
+}
+
+/// Next Bangumi 条目角色骨架网格
+class _NextBangumiSubjectCharacterSkeletonGrid extends StatelessWidget {
+  /// 创建 Next Bangumi 条目角色骨架网格
+  const _NextBangumiSubjectCharacterSkeletonGrid();
+
+  /// 构建 Next Bangumi 条目角色骨架网格
+  ///
+  /// [context] 当前组件上下文
+  @override
+  Widget build(BuildContext context) {
+    return SliverPadding(
+      padding: AppSafeAreaInsets.fromLTRB(
+        context,
+        left: 16,
+        top: 2,
+        right: 16,
+        bottom: 0,
+      ),
+      sliver: SliverGrid(
+        gridDelegate: _NextBangumiSubjectCharacterGridMetrics.delegate,
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            return const _NextBangumiSubjectCharacterSkeletonTile();
+          },
+          childCount: _NextBangumiSubjectPageState._subjectCharacterPageSize,
+        ),
+      ),
+    );
+  }
+}
+
+/// Next Bangumi 条目角色骨架卡片
+class _NextBangumiSubjectCharacterSkeletonTile extends StatelessWidget {
+  /// 创建 Next Bangumi 条目角色骨架卡片
+  const _NextBangumiSubjectCharacterSkeletonTile();
+
+  /// 构建 Next Bangumi 条目角色骨架卡片
+  ///
+  /// [context] 当前组件上下文
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Skeletonizer.zone(
+        child: SizedBox(
+          width: 104,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Bone(
+                width: 48,
+                height: 48,
+                borderRadius: BorderRadius.all(Radius.circular(18)),
+              ),
+              SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Bone(
+                      width: 52,
+                      height: 12,
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                    ),
+                  ),
+                  SizedBox(width: 4),
+                  Bone(
+                    width: 28,
+                    height: 15,
+                    borderRadius: BorderRadius.all(Radius.circular(999)),
+                  ),
+                ],
+              ),
+              SizedBox(height: 5),
+              Bone(
+                width: 38,
+                height: 10,
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Next Bangumi 条目角色失败状态
+class _NextBangumiSubjectCharacterErrorSliver extends StatelessWidget {
+  /// 创建 Next Bangumi 条目角色失败状态
+  ///
+  /// [message] 失败文案
+  /// [onRetry] 重试回调
+  const _NextBangumiSubjectCharacterErrorSliver({
+    required this.message,
+    required this.onRetry,
+  });
+
+  /// 失败文案
+  final String message;
+
+  /// 重试回调
+  final VoidCallback onRetry;
+
+  /// 构建 Next Bangumi 条目角色失败状态
+  ///
+  /// [context] 当前组件上下文
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: AppSafeAreaInsets.symmetricHorizontal(
+          context,
+          horizontal: 16,
+        ),
+        child: AppLoadFailedState(
+          message: message,
+          onActionPressed: onRetry,
+        ),
+      ),
+    );
+  }
+}
+
+/// Next Bangumi 条目角色空状态
+class _NextBangumiSubjectCharacterEmptySliver extends StatelessWidget {
+  /// 创建 Next Bangumi 条目角色空状态
+  const _NextBangumiSubjectCharacterEmptySliver();
+
+  /// 构建 Next Bangumi 条目角色空状态
+  ///
+  /// [context] 当前组件上下文
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: AppSafeAreaInsets.fromLTRB(
+          context,
+          left: 24,
+          top: 8,
+          right: 24,
+          bottom: 16,
+        ),
+        child: Text(
+          '暂无角色',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: colorScheme.onSurfaceVariant,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Next Bangumi 条目角色底部留白
+class _NextBangumiSubjectCharacterBottomSpacer extends StatelessWidget {
+  /// 创建 Next Bangumi 条目角色底部留白
+  const _NextBangumiSubjectCharacterBottomSpacer();
+
+  /// 构建 Next Bangumi 条目角色底部留白
+  ///
+  /// [context] 当前组件上下文
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: SizedBox(height: MediaQuery.paddingOf(context).bottom + 24),
+    );
+  }
+}
+
+/// Next Bangumi 条目角色网格尺寸
+final class _NextBangumiSubjectCharacterGridMetrics {
+  /// 禁止创建 Next Bangumi 条目角色网格尺寸实例
+  const _NextBangumiSubjectCharacterGridMetrics._();
+
+  /// 条目角色网格代理
+  static const SliverGridDelegateWithMaxCrossAxisExtent delegate =
+      SliverGridDelegateWithMaxCrossAxisExtent(
+    maxCrossAxisExtent: 118,
+    mainAxisExtent: 116,
+    mainAxisSpacing: 14,
+    crossAxisSpacing: 10,
+  );
+}
+
+/// 解析条目角色原始头像地址
+///
+/// [item] 条目角色
+/// [status] 小圣杯角色状态
+String _rawAvatarUrlForSubjectCharacter(
+  NextBangumiSubjectCharacterItem item,
+  CharacterDetailBasicInfo? status,
+) {
+  final tinygrailAvatar = status?.icon.trim();
+  if (tinygrailAvatar != null && tinygrailAvatar.isNotEmpty) {
+    return tinygrailAvatar;
+  }
+
+  return item.avatarUrl;
+}
+
+/// 标准化条目角色头像地址
+///
+/// [avatarUrl] 原始头像地址
+String _resolvedAvatarUrlForSubjectCharacter(String avatarUrl) {
+  return TinygrailAssetUrls.normalizeAvatar(avatarUrl.trim());
+}

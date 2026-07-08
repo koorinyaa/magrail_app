@@ -182,7 +182,9 @@ class _CharacterSearchSkeletonList extends StatelessWidget {
 
     return ListView.builder(
       primary: false,
-      padding: EdgeInsets.only(bottom: bottomInset + 76),
+      padding: EdgeInsets.only(
+        bottom: bottomInset + _characterSearchBottomContentPadding,
+      ),
       itemBuilder: (context, index) {
         if (index == 0) {
           return const _CharacterSearchSectionLabel(text: '角色');

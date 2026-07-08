@@ -11,6 +11,7 @@ import 'package:magrail_app/core/utils/user_error_message.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
 import 'package:magrail_app/core/widgets/character_avatar.dart';
 import 'package:magrail_app/core/widgets/level_badge.dart';
+import 'package:magrail_app/core/widgets/pagination_footer.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_search_item.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
 import 'package:magrail_app/features/user/model/user_character_api_item.dart';

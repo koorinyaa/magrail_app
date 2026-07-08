@@ -11,6 +11,7 @@ import 'package:magrail_app/core/utils/user_error_message.dart';
 import 'package:magrail_app/core/widgets/app_bottom_sheet_drag_handle.dart';
 import 'package:magrail_app/core/widgets/app_confirm_dialog.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
+import 'package:magrail_app/core/widgets/pagination_footer_sliver.dart';
 import 'package:magrail_app/features/temple/model/temple_asset_card_data.dart';
 import 'package:magrail_app/features/temple/widgets/temple_asset_link_components.dart';
 import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
@@ -258,8 +259,6 @@ class _TempleAssetLinkSheetState extends State<TempleAssetLinkSheet> {
 
   /// 构建圣殿网格
   Widget _buildGrid() {
-    final hasFooter = _isLoadingMore || _loadMoreError.isNotEmpty;
-
     return LayoutBuilder(
       builder: (context, constraints) {
         final layout = _TempleAssetLinkGridLayout.resolve(
@@ -289,14 +288,13 @@ class _TempleAssetLinkSheetState extends State<TempleAssetLinkSheet> {
                 childCount: _items.length,
               ),
             ),
-            if (hasFooter)
-              SliverToBoxAdapter(
-                child: _loadMoreError.isNotEmpty
-                    ? _TempleAssetLinkLoadMoreError(
-                        onRetry: () => unawaited(_retryNextPage()),
-                      )
-                    : const _TempleAssetLinkLoadingMore(),
-              ),
+            PaginationFooterSliver(
+              isLoadingMore: _isLoadingMore,
+              hasLoadMoreError: _loadMoreError.isNotEmpty,
+              canLoadMore: _canLoadMore,
+              completedLabel: '没有更多圣殿了',
+              onRetry: () => unawaited(_retryNextPage()),
+            ),
             const SliverToBoxAdapter(
               child: SizedBox(height: 58),
             ),

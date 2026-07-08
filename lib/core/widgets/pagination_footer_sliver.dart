@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:magrail_app/core/widgets/pagination_footer.dart';
 
 /// 分页底部状态 sliver
 class PaginationFooterSliver extends StatelessWidget {
@@ -39,60 +40,14 @@ class PaginationFooterSliver extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    if (isLoadingMore) {
-      return SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Center(
-            child: SizedBox.square(
-              dimension: 18,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: colorScheme.primary,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    if (hasLoadMoreError) {
-      return SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Center(
-            child: TextButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh_rounded, size: 16),
-              label: const Text('加载失败，点击重试'),
-            ),
-          ),
-        ),
-      );
-    }
-
-    if (!canLoadMore) {
-      return SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Center(
-            child: Text(
-              completedLabel,
-              style: TextStyle(
-                color: colorScheme.onSurfaceVariant,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    return const SliverToBoxAdapter(
-      child: SizedBox(height: 16),
+    return SliverToBoxAdapter(
+      child: PaginationFooter(
+        isLoadingMore: isLoadingMore,
+        hasLoadMoreError: hasLoadMoreError,
+        canLoadMore: canLoadMore,
+        completedLabel: completedLabel,
+        onRetry: onRetry,
+      ),
     );
   }
 }

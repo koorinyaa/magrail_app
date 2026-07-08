@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class LevelBadge extends StatelessWidget {
   /// 创建等级标签
   ///
+  /// [key] Flutter 组件标识
   /// [level] 等级数值
   /// [zeroCount] 等级为 0 时显示的 st 数量
   /// [isCompact] 是否使用更小尺寸
@@ -12,7 +13,32 @@ class LevelBadge extends StatelessWidget {
     required this.level,
     this.zeroCount = 0,
     this.isCompact = false,
-  });
+  })  : _fixedLabel = null,
+        _fixedBackgroundColor = null;
+
+  /// 创建 ICO 状态标签
+  ///
+  /// [key] Flutter 组件标识
+  /// [isCompact] 是否使用更小尺寸
+  const LevelBadge.ico({
+    super.key,
+    this.isCompact = false,
+  })  : level = 0,
+        zeroCount = 0,
+        _fixedLabel = 'ico',
+        _fixedBackgroundColor = const Color(0xFFFF9800);
+
+  /// 创建未上市状态标签
+  ///
+  /// [key] Flutter 组件标识
+  /// [isCompact] 是否使用更小尺寸
+  const LevelBadge.unlisted({
+    super.key,
+    this.isCompact = false,
+  })  : level = 0,
+        zeroCount = 0,
+        _fixedLabel = '未上市',
+        _fixedBackgroundColor = const Color(0xFF9CA3AF);
 
   /// 等级数值
   final int level;
@@ -22,6 +48,9 @@ class LevelBadge extends StatelessWidget {
 
   /// 是否使用更小尺寸
   final bool isCompact;
+
+  final String? _fixedLabel;
+  final Color? _fixedBackgroundColor;
 
   /// 构建等级标签
   ///
@@ -33,11 +62,11 @@ class LevelBadge extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: isCompact ? 6 : 7),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: _backgroundColor.withValues(alpha: 0.92),
+        color: _resolvedBackgroundColor.withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
-        _label,
+        _displayLabel,
         style: TextStyle(
           color: Colors.white,
           fontSize: isCompact ? 8 : 9,
@@ -49,7 +78,12 @@ class LevelBadge extends StatelessWidget {
   }
 
   /// 标签文案
-  String get _label {
+  String get _displayLabel {
+    final fixedLabel = _fixedLabel?.trim();
+    if (fixedLabel != null && fixedLabel.isNotEmpty) {
+      return fixedLabel;
+    }
+
     if (level == 0 && zeroCount != 0) {
       return 'st$zeroCount';
     }
@@ -58,7 +92,12 @@ class LevelBadge extends StatelessWidget {
   }
 
   /// 背景色
-  Color get _backgroundColor {
+  Color get _resolvedBackgroundColor {
+    final fixedBackgroundColor = _fixedBackgroundColor;
+    if (fixedBackgroundColor != null) {
+      return fixedBackgroundColor;
+    }
+
     if (level == 0) {
       return const Color(0xFFD2D2D2);
     }
