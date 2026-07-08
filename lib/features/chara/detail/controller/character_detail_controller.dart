@@ -433,10 +433,9 @@ class CharacterDetailController extends ChangeNotifier {
         icoInfo: icoInfo,
       );
 
-      if ((info.pageType == CharacterDetailPageType.ico && icoInfo != null) ||
-          info.pageType == CharacterDetailPageType.initial) {
+      if (info.pageType == CharacterDetailPageType.initial) {
         unawaited(
-          _refreshIcoBangumiCharacterInfo(
+          _refreshInitialBangumiCharacterInfo(
             characterId,
             refreshGeneration: generation,
           ),
@@ -488,11 +487,11 @@ class CharacterDetailController extends ChangeNotifier {
     }
   }
 
-  /// 静默刷新 ICO 角色的 Bangumi 展示资料
+  /// 静默刷新启动 ICO 页面的 Bangumi 展示资料
   ///
   /// [characterId] 角色 ID
   /// [refreshGeneration] 当前角色刷新代次
-  Future<void> _refreshIcoBangumiCharacterInfo(
+  Future<void> _refreshInitialBangumiCharacterInfo(
     int characterId, {
     required int refreshGeneration,
   }) async {
@@ -510,10 +509,7 @@ class CharacterDetailController extends ChangeNotifier {
         return;
       }
 
-      final currentPageType = _pageTypes[characterId];
-      final currentIcoInfo = _icoInfos[characterId];
-      if (currentIcoInfo == null &&
-          currentPageType != CharacterDetailPageType.initial) {
+      if (_pageTypes[characterId] != CharacterDetailPageType.initial) {
         return;
       }
 
@@ -535,16 +531,10 @@ class CharacterDetailController extends ChangeNotifier {
           name: name,
           avatarUrl: avatarUrl,
         ),
-        pageType: currentIcoInfo == null
-            ? CharacterDetailPageType.initial
-            : CharacterDetailPageType.ico,
-        icoInfo: currentIcoInfo?.copyWith(
-          name: name.isEmpty ? null : name,
-          icon: avatarUrl.isEmpty ? null : avatarUrl,
-        ),
+        pageType: CharacterDetailPageType.initial,
       );
     } catch (_) {
-      // BGM 补充资料失败时保持小圣杯接口的原始展示
+      // BGM 补充资料失败时保持启动 ICO 页面的原始展示
     }
   }
 

@@ -47,26 +47,6 @@ class CharacterDetailIcoInfo {
   /// 参与人数
   final int users;
 
-  /// 复制可补充的 ICO 头部展示资料
-  ///
-  /// [name] 角色名称
-  /// [icon] 角色头像地址
-  CharacterDetailIcoInfo copyWith({
-    String? name,
-    String? icon,
-  }) {
-    return CharacterDetailIcoInfo(
-      id: id,
-      characterId: characterId,
-      name: name ?? this.name,
-      icon: icon ?? this.icon,
-      begin: begin,
-      end: end,
-      total: total,
-      users: users,
-    );
-  }
-
   /// 从 JSON 创建角色详情 ICO 头部资料
   ///
   /// [json] 原始 ICO JSON
