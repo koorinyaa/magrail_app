@@ -240,6 +240,7 @@ class CharacterDetailPageBody extends StatelessWidget {
           key: ValueKey<String>('ico-${currentItem.characterId}'),
           repository: repository,
           icoInfo: icoInfo!,
+          onCharacterSynced: onAvatarChanged,
         ),
       CharacterDetailPageType.initial => _CharacterDetailInitialBody(
           key: ValueKey<String>('initial-${currentItem.characterId}'),
@@ -268,11 +269,14 @@ class _CharacterDetailIcoBody extends StatelessWidget {
   /// 创建角色详情 ICO 主体
   ///
   /// [key] Flutter 组件标识
+  /// [repository] 角色详情仓库
   /// [icoInfo] 当前角色 ICO 头部资料
+  /// [onCharacterSynced] 角色资料同步后的刷新回调
   const _CharacterDetailIcoBody({
     super.key,
     required this.repository,
     required this.icoInfo,
+    required this.onCharacterSynced,
   });
 
   /// 角色详情仓库
@@ -280,6 +284,9 @@ class _CharacterDetailIcoBody extends StatelessWidget {
 
   /// 当前角色 ICO 头部资料
   final CharacterDetailIcoInfo icoInfo;
+
+  /// 角色资料同步后的刷新回调
+  final Future<void> Function() onCharacterSynced;
 
   /// 构建角色详情 ICO 主体
   ///
@@ -297,7 +304,9 @@ class _CharacterDetailIcoBody extends StatelessWidget {
               CharacterDetailBangumiActionsCard(
                 characterId: icoInfo.characterId,
                 characterName: icoInfo.name,
+                characterIcon: icoInfo.icon,
                 repository: repository,
+                onCharacterSynced: onCharacterSynced,
               ),
             ],
           ),

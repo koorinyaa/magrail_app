@@ -36,6 +36,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 part 'character_detail_trade_header_badges.dart';
 part 'character_detail_trade_header_badge_dialog_chips.dart';
+part 'character_detail_trade_header_action_entry.dart';
 part 'character_detail_trade_header_actions.dart';
 part 'character_detail_trade_header_actions_skeleton.dart';
 part 'character_detail_trade_header_kill_vote_list.dart';

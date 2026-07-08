@@ -80,6 +80,24 @@ extension CharacterDetailRepositoryBasicQueries on CharacterDetailRepository {
     };
   }
 
+  /// 从 Bangumi 同步角色名称和头像
+  ///
+  /// [characterId] 角色 ID
+  Future<String> syncCharacterProfile(int characterId) async {
+    final json = await _apiClient.getJson<Map<String, Object?>>(
+      'chara/update/$characterId',
+    );
+    final response = TinygrailResponse<String>.fromJson(
+      json,
+      TinygrailResponseParser.asNullableString,
+    );
+    if (!response.isSuccess) {
+      throw StateError(response.message ?? '角色资料同步失败');
+    }
+
+    return response.value ?? response.message ?? '角色资料同步成功';
+  }
+
   /// 获取角色深度信息
   ///
   /// [characterId] 角色 ID
