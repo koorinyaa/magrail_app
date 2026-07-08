@@ -55,7 +55,7 @@ extension _CharacterSearchPageBangumiSubjectLogic on _CharacterSearchPageState {
         _handleBangumiSubjectSearchItemBuilt(itemIndex);
         final item = _bangumiSubjectResults[itemIndex];
 
-        return _BangumiSubjectSearchRow(
+        return NextBangumiSubjectSearchRow(
           item: item,
           onTap: () => _selectBangumiSubject(item),
         );

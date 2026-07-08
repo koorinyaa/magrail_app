@@ -28,6 +28,12 @@ enum _TradeHeaderActionType {
 
   /// GM 查看投票入口
   viewVotes,
+
+  /// Bangumi 关联角色入口
+  bangumiRelations,
+
+  /// Bangumi 出演作品入口
+  bangumiCasts,
 }
 
 /// 已上市头部操作入口
@@ -265,6 +271,16 @@ class _CharacterDetailTradeHeaderActionsState
             icon: LucideIcons.vote,
           ),
       ],
+      const _TradeHeaderActionEntry(
+        type: _TradeHeaderActionType.bangumiRelations,
+        label: '关联角色',
+        icon: LucideIcons.usersRound,
+      ),
+      const _TradeHeaderActionEntry(
+        type: _TradeHeaderActionType.bangumiCasts,
+        label: '出演作品',
+        icon: LucideIcons.film,
+      ),
     ];
   }
 
@@ -347,6 +363,10 @@ class _CharacterDetailTradeHeaderActionsState
         await _handleRevokeVote(context, action);
       case _TradeHeaderActionType.viewVotes:
         await _showKillVotesDialog(context);
+      case _TradeHeaderActionType.bangumiRelations:
+        await _openBangumiRelationsSheet(context);
+      case _TradeHeaderActionType.bangumiCasts:
+        await _openBangumiCastsSheet(context);
     }
   }
 
@@ -420,6 +440,29 @@ class _CharacterDetailTradeHeaderActionsState
     return showCharacterTradeHistorySheet(
       context,
       repository: widget.tradeHistoryRepository,
+      characterId: widget.header.characterId,
+      characterName: widget.header.name,
+    );
+  }
+
+  /// 打开 Bangumi 关联角色底部抽屉
+  ///
+  /// [context] 当前组件树上下文
+  Future<void> _openBangumiRelationsSheet(BuildContext context) {
+    return showCharacterBangumiRelationsSheet(
+      context,
+      characterId: widget.header.characterId,
+      characterName: widget.header.name,
+      characterRepository: widget.repository,
+    );
+  }
+
+  /// 打开 Bangumi 出演作品底部抽屉
+  ///
+  /// [context] 当前组件树上下文
+  Future<void> _openBangumiCastsSheet(BuildContext context) {
+    return showCharacterBangumiCastsSheet(
+      context,
       characterId: widget.header.characterId,
       characterName: widget.header.name,
     );

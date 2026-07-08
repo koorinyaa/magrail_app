@@ -9,6 +9,7 @@ import 'package:magrail_app/features/chara/detail/model/character_detail_trade_h
 import 'package:magrail_app/features/chara/detail/model/character_detail_user_assets.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
 import 'package:magrail_app/features/chara/detail/widgets/character_detail_auth_guide.dart';
+import 'package:magrail_app/features/chara/detail/widgets/character_detail_bangumi_actions_card.dart';
 import 'package:magrail_app/features/chara/detail/widgets/character_detail_ico_header_card.dart';
 import 'package:magrail_app/features/chara/detail/widgets/character_detail_ico_start_section.dart';
 import 'package:magrail_app/features/chara/detail/widgets/character_detail_ico_participants_section.dart';
@@ -292,6 +293,12 @@ class _CharacterDetailIcoBody extends StatelessWidget {
           sliver: SliverList.list(
             children: [
               CharacterDetailIcoHeaderCard(info: icoInfo),
+              const SizedBox(height: 12),
+              CharacterDetailBangumiActionsCard(
+                characterId: icoInfo.characterId,
+                characterName: icoInfo.name,
+                repository: repository,
+              ),
             ],
           ),
         ),

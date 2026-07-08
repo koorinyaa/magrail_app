@@ -23,6 +23,7 @@ import 'package:magrail_app/features/chara/detail/model/character_detail_sacrifi
 import 'package:magrail_app/features/chara/detail/model/character_detail_trade_header.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
 import 'package:magrail_app/features/chara/detail/widgets/character_detail_avatar_update_sheet.dart';
+import 'package:magrail_app/features/chara/detail/widgets/character_detail_bangumi_related_sheet.dart';
 import 'package:magrail_app/features/chara/detail/widgets/character_detail_sacrifice_sheet.dart';
 import 'package:magrail_app/features/chara/trade_history/repository/character_trade_history_repository.dart';
 import 'package:magrail_app/features/chara/trade_history/widgets/character_trade_history_sheet.dart';

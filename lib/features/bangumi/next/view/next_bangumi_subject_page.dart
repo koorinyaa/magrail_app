@@ -9,14 +9,13 @@ import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
 import 'package:magrail_app/core/utils/tinygrail_formatters.dart';
 import 'package:magrail_app/core/utils/user_error_message.dart';
 import 'package:magrail_app/core/viewer/fullscreen_image_viewer_page.dart';
-import 'package:magrail_app/core/widgets/character_avatar.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
-import 'package:magrail_app/core/widgets/level_badge.dart';
 import 'package:magrail_app/core/widgets/page_section_sliver.dart';
 import 'package:magrail_app/core/widgets/pagination_footer_sliver.dart';
 import 'package:magrail_app/features/bangumi/next/model/next_bangumi_subject_character.dart';
 import 'package:magrail_app/features/bangumi/next/model/next_bangumi_subject.dart';
 import 'package:magrail_app/features/bangumi/next/repository/next_bangumi_repository.dart';
+import 'package:magrail_app/features/bangumi/next/widgets/next_bangumi_character_grid_item.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_hero.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_basic_info.dart';
@@ -493,7 +492,7 @@ class _NextBangumiSubjectPageState extends State<NextBangumiSubjectPage> {
   ///
   /// [item] 条目角色
   String _avatarUrlForSubjectCharacter(NextBangumiSubjectCharacterItem item) {
-    return _rawAvatarUrlForSubjectCharacter(
+    return resolveNextBangumiCharacterAvatarUrl(
       item,
       _subjectCharacterStatuses[item.characterId],
     );

@@ -150,7 +150,7 @@ class _NextBangumiSubjectCharacterGrid extends StatelessWidget {
           (context, index) {
             final item = items[index];
             onItemBuilt(index);
-            return _NextBangumiSubjectCharacterTile(
+            return NextBangumiCharacterGridItem(
               item: item,
               status: statuses[item.characterId],
               onTap: () => onItemTap(item),
@@ -160,149 +160,6 @@ class _NextBangumiSubjectCharacterGrid extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-/// Next Bangumi 条目角色卡片
-class _NextBangumiSubjectCharacterTile extends StatelessWidget {
-  /// 创建 Next Bangumi 条目角色卡片
-  ///
-  /// [item] 条目角色
-  /// [status] 小圣杯角色状态
-  /// [onTap] 点击回调
-  const _NextBangumiSubjectCharacterTile({
-    required this.item,
-    required this.status,
-    required this.onTap,
-  });
-
-  /// 条目角色
-  final NextBangumiSubjectCharacterItem item;
-
-  /// 小圣杯角色状态
-  final CharacterDetailBasicInfo? status;
-
-  /// 点击回调
-  final VoidCallback onTap;
-
-  /// 构建 Next Bangumi 条目角色卡片
-  ///
-  /// [context] 当前组件上下文
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final rawAvatarUrl = _rawAvatarUrlForSubjectCharacter(item, status);
-    final avatarUrl = _resolvedAvatarUrlForSubjectCharacter(rawAvatarUrl);
-    final avatarHeroTag = createCharacterDetailAvatarHeroTag(
-      characterId: item.characterId,
-      avatarUrl: rawAvatarUrl,
-      source: item,
-    );
-    final name = _decodeBangumiSubjectText(item.displayName);
-    final avatar = CharacterAvatar(
-      imageUrl: avatarUrl,
-      size: 48,
-      borderRadius: 18,
-    );
-
-    return Center(
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(14),
-          child: SizedBox(
-            width: 104,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  if (avatarHeroTag == null)
-                    avatar
-                  else
-                    Hero(
-                      tag: avatarHeroTag,
-                      transitionOnUserGestures: true,
-                      child: avatar,
-                    ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          name.isEmpty ? '未知角色' : name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: colorScheme.onSurface,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            height: 1.1,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      _NextBangumiSubjectCharacterStatusBadge(status: status),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    '#${item.characterId}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: colorScheme.onSurfaceVariant,
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w700,
-                      height: 1,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Next Bangumi 条目角色状态胶囊
-class _NextBangumiSubjectCharacterStatusBadge extends StatelessWidget {
-  /// 创建 Next Bangumi 条目角色状态胶囊
-  ///
-  /// [status] 小圣杯角色状态
-  const _NextBangumiSubjectCharacterStatusBadge({
-    required this.status,
-  });
-
-  /// 小圣杯角色状态
-  final CharacterDetailBasicInfo? status;
-
-  /// 构建 Next Bangumi 条目角色状态胶囊
-  ///
-  /// [context] 当前组件上下文
-  @override
-  Widget build(BuildContext context) {
-    final resolvedStatus = status;
-    if (resolvedStatus?.pageType == CharacterDetailPageType.trade) {
-      final header = resolvedStatus?.tradeHeader;
-      return LevelBadge(
-        level: header?.level ?? 0,
-        zeroCount: header?.zeroCount ?? 0,
-        isCompact: true,
-      );
-    }
-
-    if (resolvedStatus?.pageType == CharacterDetailPageType.ico) {
-      return const LevelBadge.ico(isCompact: true);
-    }
-
-    return const LevelBadge.unlisted(isCompact: true);
   }
 }
 
@@ -494,27 +351,4 @@ final class _NextBangumiSubjectCharacterGridMetrics {
     mainAxisSpacing: 14,
     crossAxisSpacing: 10,
   );
-}
-
-/// 解析条目角色原始头像地址
-///
-/// [item] 条目角色
-/// [status] 小圣杯角色状态
-String _rawAvatarUrlForSubjectCharacter(
-  NextBangumiSubjectCharacterItem item,
-  CharacterDetailBasicInfo? status,
-) {
-  final tinygrailAvatar = status?.icon.trim();
-  if (tinygrailAvatar != null && tinygrailAvatar.isNotEmpty) {
-    return tinygrailAvatar;
-  }
-
-  return item.avatarUrl;
-}
-
-/// 标准化条目角色头像地址
-///
-/// [avatarUrl] 原始头像地址
-String _resolvedAvatarUrlForSubjectCharacter(String avatarUrl) {
-  return TinygrailAssetUrls.normalizeAvatar(avatarUrl.trim());
 }

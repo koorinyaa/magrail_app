@@ -3,6 +3,8 @@ import 'package:magrail_app/core/network/api_exception.dart';
 import 'package:magrail_app/core/network/tinygrail_response.dart';
 import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
 import 'package:magrail_app/features/bangumi/next/model/next_bangumi_character.dart';
+import 'package:magrail_app/features/bangumi/next/model/next_bangumi_character_cast.dart';
+import 'package:magrail_app/features/bangumi/next/model/next_bangumi_character_relation.dart';
 import 'package:magrail_app/features/bangumi/next/model/next_bangumi_subject.dart';
 import 'package:magrail_app/features/bangumi/next/model/next_bangumi_character_search_item.dart';
 import 'package:magrail_app/features/bangumi/next/model/next_bangumi_subject_character.dart';
@@ -178,6 +180,98 @@ class NextBangumiRepository {
     }
   }
 
+  /// 获取 Bangumi 角色关联角色
+  ///
+  /// [characterId] 角色 ID
+  /// [limit] 每页条目数量
+  /// [offset] 起始偏移量
+  Future<NextBangumiCharacterRelationPage> fetchCharacterRelations(
+    int characterId, {
+    required int limit,
+    required int offset,
+  }) async {
+    if (characterId <= 0) {
+      throw const ApiException(message: '获取 BGM 关联角色失败');
+    }
+
+    try {
+      final response = await _dio.get<dynamic>(
+        TinygrailAssetUrls.normalizeBangumiUrl(
+          '$_characterUrl/$characterId/relations',
+        ),
+        queryParameters: {
+          'limit': limit,
+          'offset': offset,
+        },
+      );
+      final responseJson = TinygrailResponseParser.asObjectMap(response.data);
+      if (responseJson == null) {
+        throw const ApiException(message: '获取 BGM 关联角色失败');
+      }
+
+      final rawItems = TinygrailResponseParser.asObjectList(
+            responseJson['data'],
+            NextBangumiSubjectCharacterItem.fromJson,
+          ) ??
+          const <NextBangumiSubjectCharacterItem>[];
+      return NextBangumiCharacterRelationPage(
+        items: rawItems
+            .where((item) => item.characterId > 0)
+            .toList(growable: false),
+        total: TinygrailResponseParser.asInt(responseJson['total']),
+        rawItemCount: rawItems.length,
+      );
+    } on DioException catch (error) {
+      throw ApiException.fromDio(error);
+    }
+  }
+
+  /// 获取 Bangumi 角色出演作品
+  ///
+  /// [characterId] 角色 ID
+  /// [limit] 每页条目数量
+  /// [offset] 起始偏移量
+  Future<NextBangumiCharacterCastPage> fetchCharacterCasts(
+    int characterId, {
+    required int limit,
+    required int offset,
+  }) async {
+    if (characterId <= 0) {
+      throw const ApiException(message: '获取 BGM 出演作品失败');
+    }
+
+    try {
+      final response = await _dio.get<dynamic>(
+        TinygrailAssetUrls.normalizeBangumiUrl(
+          '$_characterUrl/$characterId/casts',
+        ),
+        queryParameters: {
+          'limit': limit,
+          'offset': offset,
+        },
+      );
+      final responseJson = TinygrailResponseParser.asObjectMap(response.data);
+      if (responseJson == null) {
+        throw const ApiException(message: '获取 BGM 出演作品失败');
+      }
+
+      final rawItems = TinygrailResponseParser.asObjectList(
+            responseJson['data'],
+            _castSubjectFromJson,
+          ) ??
+          const <NextBangumiSubjectSearchItem>[];
+      return NextBangumiCharacterCastPage(
+        items: rawItems
+            .where((item) => item.subjectId > 0)
+            .toList(growable: false),
+        total: TinygrailResponseParser.asInt(responseJson['total']),
+        rawItemCount: rawItems.length,
+      );
+    } on DioException catch (error) {
+      throw ApiException.fromDio(error);
+    }
+  }
+
   /// 获取 Bangumi 条目详情
   ///
   /// [subjectId] 条目 ID
@@ -253,4 +347,14 @@ class NextBangumiRepository {
   void close() {
     _dio.close(force: true);
   }
+}
+
+/// 从出演作品 JSON 读取条目资料
+///
+/// [json] 原始出演作品 JSON
+NextBangumiSubjectSearchItem _castSubjectFromJson(Map<String, Object?> json) {
+  final subject = TinygrailResponseParser.asObjectMap(json['subject']);
+  return NextBangumiSubjectSearchItem.fromSubjectJson(
+    subject ?? const <String, Object?>{},
+  );
 }
