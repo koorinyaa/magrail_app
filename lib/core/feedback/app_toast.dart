@@ -50,11 +50,14 @@ class AppToast {
           variant: variant,
           duration: duration,
           onDismissed: () {
-            entry.remove();
-            if (_activeEntry == entry) {
-              _activeEntry = null;
-              _activeOverlayKey = null;
+            // 新提示可能已提前移除当前 Entry，避免退出动画完成后重复 remove
+            if (_activeEntry != entry) {
+              return;
             }
+
+            _activeEntry = null;
+            _activeOverlayKey = null;
+            entry.remove();
           },
         );
       },
