@@ -4,8 +4,8 @@ import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_
 import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
 
 /// 用户星光圣殿二级页面控制器
-class UserStarlightTemplePageController extends TinygrailPagedListController<
-    UserTempleApiItem, UserTempleApiItem> {
+class UserStarlightTemplePageController
+    extends TinygrailPagedListController<UserTempleApiItem, UserTempleApiItem> {
   /// 创建用户星光圣殿二级页面控制器
   ///
   /// [snapshotRepository] 用户资产快照仓库

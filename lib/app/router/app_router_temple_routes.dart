@@ -16,8 +16,7 @@ List<RouteBase> buildTempleRoutes(AppDependencies dependencies) {
         key: state.pageKey,
         child: LatestTemplePage(
           repository: dependencies.repositories.temple,
-          characterDetailRepository:
-              dependencies.repositories.characterDetail,
+          characterDetailRepository: dependencies.repositories.characterDetail,
           oosRepository: dependencies.repositories.oos,
           magicRepository: dependencies.repositories.templeAssetMagic,
           userRepository: dependencies.repositories.user,
@@ -31,8 +30,7 @@ List<RouteBase> buildTempleRoutes(AppDependencies dependencies) {
         key: state.pageKey,
         child: LatestLinkPage(
           repository: dependencies.repositories.temple,
-          characterDetailRepository:
-              dependencies.repositories.characterDetail,
+          characterDetailRepository: dependencies.repositories.characterDetail,
           oosRepository: dependencies.repositories.oos,
           magicRepository: dependencies.repositories.templeAssetMagic,
           userRepository: dependencies.repositories.user,

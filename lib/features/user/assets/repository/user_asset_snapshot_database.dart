@@ -145,9 +145,8 @@ class UserAssetSnapshotDatabase {
         ''',
         [username, starlightTempleStarForcesThreshold],
       );
-      final totalItems = countRows.isEmpty
-          ? 0
-          : _rowInt(countRows.first['total_count']);
+      final totalItems =
+          countRows.isEmpty ? 0 : _rowInt(countRows.first['total_count']);
       final rows = await transaction.query(
         _templeTableName,
         columns: const ['temple_id', 'payload_json'],

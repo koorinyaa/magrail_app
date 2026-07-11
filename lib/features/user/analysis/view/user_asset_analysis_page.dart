@@ -379,7 +379,6 @@ class _UserAssetAnalysisPageState extends State<UserAssetAnalysisPage> {
       text: _controller.errorMessage ?? '刷新资产分析失败',
     );
   }
-
 }
 
 /// 用户资产分析刷新按钮

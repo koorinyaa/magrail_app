@@ -37,8 +37,7 @@ List<RouteBase> buildUserRoutes(
           authRepository: dependencies.authRepository,
           preferences: dependencies.preferences,
           repository: dependencies.repositories.user,
-          characterDetailRepository:
-              dependencies.repositories.characterDetail,
+          characterDetailRepository: dependencies.repositories.characterDetail,
           templeRepository: dependencies.repositories.temple,
           templeAssetMagicRepository:
               dependencies.repositories.templeAssetMagic,
@@ -55,8 +54,7 @@ List<RouteBase> buildUserRoutes(
         key: state.pageKey,
         child: UserLinkPage(
           repository: dependencies.repositories.user,
-          characterDetailRepository:
-              dependencies.repositories.characterDetail,
+          characterDetailRepository: dependencies.repositories.characterDetail,
           templeRepository: dependencies.repositories.temple,
           templeAssetMagicRepository:
               dependencies.repositories.templeAssetMagic,
@@ -74,8 +72,7 @@ List<RouteBase> buildUserRoutes(
         key: state.pageKey,
         child: UserAssetAnalysisPage(
           repository: dependencies.repositories.user,
-          characterDetailRepository:
-              dependencies.repositories.characterDetail,
+          characterDetailRepository: dependencies.repositories.characterDetail,
           username: state.uri.queryParameters['username'] ?? '',
           nickname: state.uri.queryParameters['nickname'],
         ),
@@ -156,8 +153,7 @@ List<RouteBase> buildUserRoutes(
         key: state.pageKey,
         child: UserTemplePage(
           repository: dependencies.repositories.user,
-          characterDetailRepository:
-              dependencies.repositories.characterDetail,
+          characterDetailRepository: dependencies.repositories.characterDetail,
           templeRepository: dependencies.repositories.temple,
           templeAssetMagicRepository:
               dependencies.repositories.templeAssetMagic,
@@ -175,8 +171,7 @@ List<RouteBase> buildUserRoutes(
         key: state.pageKey,
         child: UserStarlightTemplePage(
           userRepository: dependencies.repositories.user,
-          characterDetailRepository:
-              dependencies.repositories.characterDetail,
+          characterDetailRepository: dependencies.repositories.characterDetail,
           templeRepository: dependencies.repositories.temple,
           templeAssetMagicRepository:
               dependencies.repositories.templeAssetMagic,

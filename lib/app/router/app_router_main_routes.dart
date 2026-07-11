@@ -19,8 +19,7 @@ List<RouteBase> buildMainRoutes(AppDependencies dependencies) {
           topWeekRepository: dependencies.repositories.topWeek,
           rankingRepository: dependencies.repositories.ranking,
           auctionRepository: dependencies.repositories.auction,
-          characterDetailRepository:
-              dependencies.repositories.characterDetail,
+          characterDetailRepository: dependencies.repositories.characterDetail,
           towerRepository: dependencies.repositories.tower,
           icoCharacterRepository: dependencies.repositories.icoCharacter,
           stCharacterRepository: dependencies.repositories.stCharacter,
