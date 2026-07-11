@@ -172,26 +172,9 @@ class _UserAssetsListContent extends StatelessWidget {
     required CharacterDetailTradeHeader header,
     required UserTempleApiItem temple,
   }) {
-    if (_isTowerTop500(header.rank)) {
-      final characterLevel =
-          temple.characterLevel > 0 ? temple.characterLevel : header.level;
-      final levelCoefficient = 2 * characterLevel + 1;
-      if (levelCoefficient <= 0) {
-        return 0;
-      }
-
-      final baseRate = header.rate * (601 - header.rank) * 0.005;
-      final refineCoefficient = 2 * (characterLevel + temple.refine) + 1;
-      return baseRate / levelCoefficient * refineCoefficient;
-    }
-
-    return header.dividend;
-  }
-
-  /// 判断角色是否处于通天塔前 500 名
-  ///
-  /// [rank] 通天塔排名
-  bool _isTowerTop500(int rank) {
-    return rank > 0 && rank <= 500;
+    return header.templeDividend(
+      characterLevel: temple.characterLevel,
+      refine: temple.refine,
+    );
   }
 }

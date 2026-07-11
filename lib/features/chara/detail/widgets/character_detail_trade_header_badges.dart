@@ -143,7 +143,7 @@ class _TradeHeaderTowerChip extends StatelessWidget {
 
   /// 通天塔 Chip 强调色
   Color? get _accentColor {
-    if (header.rank < 500) {
+    if (header.rank > 0 && header.rank <= 500) {
       return const Color(0xFF673AB7);
     }
 

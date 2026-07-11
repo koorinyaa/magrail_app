@@ -231,7 +231,8 @@ class _TradeHeaderDividendChip extends StatelessWidget {
     final rankFormulaText = '${Formatters.tinygrailCurrency(header.rate)} × '
         '0.005 × (601 - ${header.rank})';
     final starFormulaText = '${header.stars} × $perStarDividendText';
-    final appliedFormulaText = header.rank <= 500
+    final usesTowerFormula = header.rank > 0 && header.rank <= 500;
+    final appliedFormulaText = usesTowerFormula
         ? '$rankFormulaText = $dividendText'
         : '$starFormulaText = $dividendText';
     final message = '在通天塔前 500 名时：\n'

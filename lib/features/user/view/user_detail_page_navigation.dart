@@ -101,6 +101,22 @@ extension _UserDetailPageNavigation on _UserDetailPageState {
     );
   }
 
+  /// 打开用户资产分析二级页面
+  void _openUserAssetAnalysis() {
+    final profile = _controller.profile;
+    if (profile == null) {
+      return;
+    }
+
+    context.pushNamed(
+      'userAssetAnalysis',
+      queryParameters: {
+        'username': profile.name,
+        'nickname': profile.nickname,
+      },
+    );
+  }
+
   /// 打开红包记录二级页面
   ///
   /// [profile] 用户资料

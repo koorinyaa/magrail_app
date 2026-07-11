@@ -136,11 +136,34 @@ class CharacterDetailTradeHeader {
 
   /// 预估股息
   double get dividend {
-    if (rank <= 500) {
+    if (rank > 0 && rank <= 500) {
       return rate * 0.005 * (601 - rank);
     }
 
     return stars * _outsideTowerDividendPerStar;
+  }
+
+  /// 计算圣殿单期股息
+  ///
+  /// [characterLevel] 圣殿对应角色等级
+  /// [refine] 圣殿精炼等级
+  double templeDividend({
+    required int characterLevel,
+    required int refine,
+  }) {
+    // 500 名外的圣殿股息不受等级和精炼影响
+    if (rank <= 0 || rank > 500) {
+      return dividend;
+    }
+
+    final resolvedLevel = characterLevel > 0 ? characterLevel : level;
+    final levelCoefficient = 2 * resolvedLevel + 1;
+    if (levelCoefficient <= 0) {
+      return 0;
+    }
+
+    final refineCoefficient = 2 * (resolvedLevel + refine) + 1;
+    return dividend / levelCoefficient * refineCoefficient;
   }
 
   /// 删除投票数量
@@ -224,5 +247,26 @@ class CharacterDetailTradeHeader {
       starForces: TinygrailResponseParser.asInt(json['StarForces']),
       listedDate: TinygrailResponseParser.asString(json['ListedDate']),
     );
+  }
+
+  /// 转换为缓存 JSON
+  Map<String, Object?> toJson() {
+    return {
+      'CharacterId': characterId,
+      'Name': name,
+      'Icon': icon,
+      'Current': current,
+      'Total': total,
+      'Rate': rate,
+      'Rank': rank,
+      'Stars': stars,
+      'Fluctuation': fluctuation,
+      'Level': level,
+      'ZeroCount': zeroCount,
+      'Crown': crown,
+      'Bonus': bonus,
+      'StarForces': starForces,
+      'ListedDate': listedDate,
+    };
   }
 }

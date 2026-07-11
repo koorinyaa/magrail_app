@@ -15,6 +15,7 @@ dependencies:
   dio:
   dio_cookie_manager:
   flutter_bloc:
+  flutter_animate:
   flutter_secure_storage:
   flutter_svg:
   gal:
@@ -26,12 +27,16 @@ dependencies:
   intl:
   lucide_flutter:
   material_symbols_icons:
+  mesh_gradient:
   mime:
   package_info_plus:
   path_provider:
+  screenshot: ^3.0.0
+  share_plus: ^13.2.0
   shared_preferences:
   signalr_netcore:
   skeletonizer:
+  sqflite:
   url_launcher:
   webview_flutter:
   liquid_glass_widgets: ^0.19.1
@@ -42,6 +47,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/icons/app_icon_cropped.png
     - assets/icons/app_icon_foreground.png
     - assets/icons/github.svg
     - assets/icons/torii.svg

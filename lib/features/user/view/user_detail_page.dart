@@ -471,6 +471,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
         case UserActionType.myItems:
         case UserActionType.scratch:
         case UserActionType.dividendForecast:
+        case UserActionType.assetAnalysis:
         case UserActionType.bot:
         case UserActionType.tradeLog:
           break;

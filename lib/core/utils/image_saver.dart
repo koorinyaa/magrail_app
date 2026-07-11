@@ -59,6 +59,54 @@ Future<ImageSaveResult> saveAssetImageToGallery(String assetName) async {
   return _saveImageFileToGallery(() => _writeAssetImageToTempFile(assetName));
 }
 
+/// 保存图片字节到系统相册
+///
+/// [bytes] PNG 图片字节
+/// [imageName] 不含扩展名的相册图片名称
+Future<ImageSaveResult> saveImageBytesToGallery(
+  Uint8List bytes, {
+  required String imageName,
+}) async {
+  if (kIsWeb) {
+    return const ImageSaveResult(
+      status: ImageSaveStatus.unsupportedPlatform,
+      message: '当前平台不支持保存图片',
+    );
+  }
+  if (bytes.isEmpty) {
+    return const ImageSaveResult(
+      status: ImageSaveStatus.saveFailed,
+      message: '图片数据为空',
+    );
+  }
+
+  try {
+    final hasAccess = await Gal.hasAccess(toAlbum: true);
+    final granted = hasAccess || await Gal.requestAccess(toAlbum: true);
+    if (!granted) {
+      return const ImageSaveResult(
+        status: ImageSaveStatus.permissionDenied,
+        message: '未授予相册权限',
+      );
+    }
+
+    await Gal.putImageBytes(
+      bytes,
+      album: 'magrail',
+      name: imageName,
+    );
+    return const ImageSaveResult(
+      status: ImageSaveStatus.success,
+      message: '图片已保存',
+    );
+  } catch (_) {
+    return const ImageSaveResult(
+      status: ImageSaveStatus.saveFailed,
+      message: '写入相册失败',
+    );
+  }
+}
+
 /// 保存临时图片文件到系统相册
 ///
 /// [tempFileLoader] 临时图片文件加载器

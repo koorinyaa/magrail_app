@@ -23,6 +23,7 @@ import 'package:magrail_app/features/ico/view/st_character_page.dart';
 import 'package:magrail_app/features/main_navigation/view/main_navigation_page.dart';
 import 'package:magrail_app/features/temple/view/latest_link_page.dart';
 import 'package:magrail_app/features/temple/view/latest_temple_page.dart';
+import 'package:magrail_app/features/user/analysis/view/user_asset_analysis_page.dart';
 import 'package:magrail_app/features/user/model/user_detail_entry_mode.dart';
 import 'package:magrail_app/features/user/view/user_auction_page.dart';
 import 'package:magrail_app/features/user/view/user_balance_log_page.dart';
@@ -36,6 +37,8 @@ import 'package:magrail_app/features/user/view/user_red_packet_log_page.dart';
 import 'package:magrail_app/features/user/view/user_settings_page.dart';
 import 'package:magrail_app/features/user/view/user_temple_page.dart';
 import 'package:magrail_app/features/user/view/user_trade_log_page.dart';
+
+part 'app_router_character_detail_extra.dart';
 
 /// 创建应用路由表
 ///
@@ -411,6 +414,20 @@ GoRouter createAppRouter({
         ),
       ),
       GoRoute(
+        name: 'userAssetAnalysis',
+        path: '/user-asset-analysis',
+        pageBuilder: (context, state) => MaterialPage(
+          key: state.pageKey,
+          child: UserAssetAnalysisPage(
+            repository: dependencies.repositories.user,
+            characterDetailRepository:
+                dependencies.repositories.characterDetail,
+            username: state.uri.queryParameters['username'] ?? '',
+            nickname: state.uri.queryParameters['nickname'],
+          ),
+        ),
+      ),
+      GoRoute(
         name: 'userBalanceLogs',
         path: '/user-balance-logs',
         pageBuilder: (context, state) => MaterialPage(
@@ -563,32 +580,4 @@ GoRouter createAppRouter({
       ),
     ],
   );
-}
-
-/// 从路由附加数据读取角色详情公开展示区控制器
-///
-/// [extra] 路由附加数据
-CharacterDetailCollectionsController?
-    _characterDetailCollectionsControllerFromExtra(Object? extra) {
-  if (extra is CharacterDetailCollectionsRouteExtra) {
-    return extra.controller;
-  }
-
-  if (extra is CharacterDetailCollectionsController) {
-    return extra;
-  }
-
-  return null;
-}
-
-/// 从路由附加数据读取角色详情公开展示区上下文
-///
-/// [extra] 路由附加数据
-CharacterDetailCollectionsRouteExtra?
-    _characterDetailCollectionsRouteExtraFromExtra(Object? extra) {
-  if (extra is CharacterDetailCollectionsRouteExtra) {
-    return extra;
-  }
-
-  return null;
 }

@@ -421,19 +421,10 @@ class _TempleAssetSourceDialogContentState
     required CharacterDetailTradeHeader header,
     required UserTempleApiItem temple,
   }) {
-    if (header.rank > 0 && header.rank <= 500) {
-      final characterLevel = header.level;
-      final levelCoefficient = 2 * characterLevel + 1;
-      if (levelCoefficient <= 0) {
-        return 0;
-      }
-
-      final baseRate = header.rate * (601 - header.rank) * 0.005;
-      final refineCoefficient = 2 * (characterLevel + temple.refine) + 1;
-      return baseRate / levelCoefficient * refineCoefficient;
-    }
-
-    return header.dividend;
+    return header.templeDividend(
+      characterLevel: temple.characterLevel,
+      refine: temple.refine,
+    );
   }
 }
 
