@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:magrail_app/core/utils/user_error_message.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 /// 应用错误报告
 class AppErrorReport {
@@ -62,10 +63,25 @@ class AppErrorReport {
   String get summary => resolveUserErrorMessage(error, fallback: '应用运行异常');
 
   /// 构建可复制的反馈文本
-  String toClipboardText() {
+  Future<String> toClipboardText() async {
+    var version = '未知';
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      final packageVersion = packageInfo.version.trim();
+      final buildNumber = packageInfo.buildNumber.trim();
+      if (packageVersion.isNotEmpty) {
+        version = buildNumber.isEmpty
+            ? packageVersion
+            : '$packageVersion+$buildNumber';
+      }
+    } catch (_) {
+      // 版本读取失败不阻止用户复制核心错误信息
+    }
+
     return [
       'MaGrail 错误反馈',
       '时间: ${time.toIso8601String()}',
+      '版本: $version',
       '模式: ${kReleaseMode ? 'release' : 'debug'}',
       '平台: ${defaultTargetPlatform.name}',
       '来源: $source',

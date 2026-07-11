@@ -110,8 +110,9 @@ class _AppFatalErrorViewState extends State<AppFatalErrorView> {
   /// 复制错误报告
   Future<void> _copyReport() async {
     try {
+      final reportText = await widget.report.toClipboardText();
       await Clipboard.setData(
-        ClipboardData(text: widget.report.toClipboardText()),
+        ClipboardData(text: reportText),
       );
       if (!mounted) {
         return;
