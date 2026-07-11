@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:magrail_app/core/update/app_update_dialog.dart';
 
 import 'bootstrap.dart';
 import 'router/app_router.dart';
 import 'theme/app_material_theme.dart';
+
+// 采用 Cupertino 支持集确保 Android 与 iOS 文本操作菜单都有对应翻译
+final List<Locale> _flutterSupportedLocales = <Locale>[
+  const Locale('en'),
+  for (final languageCode in kCupertinoSupportedLanguages)
+    if (languageCode != 'en') Locale(languageCode),
+];
 
 /// Magrail 根组件
 class MagrailApp extends StatefulWidget {
@@ -69,6 +77,8 @@ class _MagrailAppState extends State<MagrailApp> {
       theme: AppMaterialTheme.light(),
       darkTheme: AppMaterialTheme.dark(),
       themeMode: _themeMode,
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      supportedLocales: _flutterSupportedLocales,
       builder: (context, child) {
         final brightness = _resolveBrightness(context);
 
