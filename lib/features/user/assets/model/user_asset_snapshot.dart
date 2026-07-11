@@ -6,6 +6,9 @@ import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
 /// 用户资产四类缓存统一有效期
 const Duration userAssetCacheLifetime = Duration(days: 7);
 
+/// 圣殿星之力达到该值时点亮星星
+const int starlightTempleStarForcesThreshold = 10000;
+
 /// 用户资产快照
 class UserAssetSnapshot {
   /// 创建用户资产快照
@@ -162,14 +165,21 @@ class UserAssetSourceState {
           charactersUpdatedAtMilliseconds,
           nowMilliseconds,
         ) &&
-        _isTimestampFresh(
-          templesUpdatedAtMilliseconds,
-          nowMilliseconds,
-        ) &&
+        isTempleDataFreshAt(now) &&
         _isTimestampFresh(
           characterHeadersUpdatedAtMilliseconds,
           nowMilliseconds,
         );
+  }
+
+  /// 用户圣殿数据是否仍在有效期内
+  ///
+  /// [now] 有效期判断基准时间
+  bool isTempleDataFreshAt(DateTime now) {
+    return _isTimestampFresh(
+      templesUpdatedAtMilliseconds,
+      now.millisecondsSinceEpoch,
+    );
   }
 
   /// 判断单个原始数据时间是否仍有效

@@ -8,6 +8,7 @@ import 'package:magrail_app/features/chara/detail/model/character_detail_trade_h
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
 import 'package:magrail_app/features/user/assets/model/user_asset_snapshot.dart';
 import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_database.dart';
+import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_database_models.dart';
 import 'package:magrail_app/features/user/model/user_character_api_item.dart';
 import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
@@ -178,6 +179,38 @@ class UserAssetSnapshotRepository {
       }
       return null;
     }
+  }
+
+  /// 从本地快照分页读取星光圣殿
+  ///
+  /// [username] 用户名
+  /// [page] 页码
+  /// [pageSize] 每页圣殿数量
+  Future<TinygrailPage<UserTempleApiItem>> readStarlightTemplePage({
+    required String username,
+    required int page,
+    required int pageSize,
+  }) async {
+    final payloadPage = await _database.readStarlightTemplePage(
+      username: username.trim(),
+      page: page,
+      pageSize: pageSize,
+    );
+    return TinygrailPage(
+      items: List<UserTempleApiItem>.unmodifiable(
+        payloadPage.items.map((row) {
+          return _decodeSnapshotRow(
+            row,
+            UserTempleApiItem.fromJson,
+            (item) => item.id,
+          );
+        }),
+      ),
+      currentPage: payloadPage.currentPage,
+      totalPages: payloadPage.totalPages,
+      totalItems: payloadPage.totalItems,
+      itemsPerPage: payloadPage.itemsPerPage,
+    );
   }
 
   /// 拉取全部用户角色

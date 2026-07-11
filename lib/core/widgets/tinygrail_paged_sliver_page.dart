@@ -30,6 +30,8 @@ class TinygrailPagedSliverPage<T, R> extends StatefulWidget {
   /// [appBarActions] 顶部栏右侧操作组件
   /// [appBarBottom] 顶部栏下方的固定区域
   /// [scrollController] 页面滚动控制器
+  /// [initialErrorMessage] 首屏加载失败说明
+  /// [refreshErrorText] 下拉刷新失败提示
   const TinygrailPagedSliverPage({
     super.key,
     required this.controller,
@@ -41,6 +43,8 @@ class TinygrailPagedSliverPage<T, R> extends StatefulWidget {
     this.appBarActions,
     this.appBarBottom,
     this.scrollController,
+    this.initialErrorMessage = '请检查网络后重试',
+    this.refreshErrorText = '刷新失败，请检查网络后重试',
   });
 
   /// 分页控制器
@@ -72,6 +76,12 @@ class TinygrailPagedSliverPage<T, R> extends StatefulWidget {
 
   /// 页面滚动控制器
   final ScrollController? scrollController;
+
+  /// 首屏加载失败说明
+  final String initialErrorMessage;
+
+  /// 下拉刷新失败提示
+  final String refreshErrorText;
 
   /// 创建 Tinygrail 分页二级页面通用壳层状态
   @override
@@ -113,7 +123,7 @@ class _TinygrailPagedSliverPageState<T, R>
                   widget.loadingSliver
                 else if (widget.controller.initialError != null)
                   AppLoadFailedSliver(
-                    message: '请检查网络后重试',
+                    message: widget.initialErrorMessage,
                     onActionPressed: widget.controller.refresh,
                   )
                 else if (items.isEmpty)
@@ -169,7 +179,7 @@ class _TinygrailPagedSliverPageState<T, R>
 
     AppToast.error(
       context,
-      text: '刷新失败，请检查网络后重试',
+      text: widget.refreshErrorText,
     );
   }
 }

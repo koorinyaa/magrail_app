@@ -37,15 +37,12 @@ class UserAssetAnalysisRepository {
     final sourceState = await _snapshotRepository.readSourceState(
       resolvedUsername,
     );
-    if (sourceState == null) {
-      return cachedAnalysis;
+    if (sourceState == null || !sourceState.isFreshAt(DateTime.now())) {
+      return null;
     }
     if (cachedAnalysis != null &&
         cachedAnalysis.sourceRevisions.matches(sourceState.revisions)) {
       return cachedAnalysis;
-    }
-    if (!sourceState.isFreshAt(DateTime.now())) {
-      return null;
     }
 
     return _rebuildAnalysisFromLocalSnapshot(resolvedUsername);

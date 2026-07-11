@@ -19,6 +19,7 @@ _SerializedSnapshotRows _serializeUserAssetSnapshotRows(
         UserAssetSnapshotPayload(
           id: item.id,
           payloadJson: jsonEncode(item.toJson()),
+          starForces: item.starForces,
         ),
     ],
     characterHeaderRows: [

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:magrail_app/core/feedback/app_toast.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_hero.dart';
@@ -21,6 +22,8 @@ import 'package:magrail_app/features/user/analysis/widgets/user_asset_analysis_s
 import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_database.dart';
 import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_repository.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
+
+part 'user_asset_analysis_page_navigation.dart';
 
 /// 用户资产分析二级页
 class UserAssetAnalysisPage extends StatefulWidget {
@@ -223,6 +226,9 @@ class _UserAssetAnalysisPageState extends State<UserAssetAnalysisPage> {
                 progressLabel: _controller.progressLabel,
                 hasRefreshError: !_controller.isRefreshing &&
                     _controller.errorMessage != null,
+                onCharactersTap: _openUserCharacters,
+                onTemplesTap: _openUserTemples,
+                onStarlightTemplesTap: _openUserStarlightTemples,
               ),
             ),
     );
@@ -374,26 +380,6 @@ class _UserAssetAnalysisPageState extends State<UserAssetAnalysisPage> {
     );
   }
 
-  /// 打开角色详情页
-  ///
-  /// [bubble] 角色圆图气泡
-  void _openCharacterDetail(UserAssetAnalysisCharacterBubble bubble) {
-    if (bubble.characterId <= 0) {
-      return;
-    }
-
-    openCharacterDetail(
-      context,
-      characterId: bubble.characterId,
-      name: bubble.name,
-      avatarUrl: bubble.avatarUrl,
-      avatarHeroTag: createCharacterDetailAvatarHeroTag(
-        characterId: bubble.characterId,
-        avatarUrl: bubble.avatarUrl,
-        source: bubble,
-      ),
-    );
-  }
 }
 
 /// 用户资产分析刷新按钮

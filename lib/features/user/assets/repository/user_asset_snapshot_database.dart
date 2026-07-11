@@ -1,4 +1,6 @@
+import 'package:magrail_app/core/network/tinygrail_page.dart';
 import 'package:magrail_app/features/user/assets/model/user_asset_snapshot.dart';
+import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_database_models.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
 const String _metaTableName = 'user_asset_snapshot_meta';
@@ -71,10 +73,8 @@ class UserAssetSnapshotDatabase {
         username: entry.username,
         rows: entry.characterRows,
       );
-      await _insertPayloadRows(
+      await _insertTemplePayloadRows(
         transaction,
-        tableName: _templeTableName,
-        keyColumn: 'temple_id',
         username: entry.username,
         rows: entry.templeRows,
       );
@@ -111,6 +111,69 @@ class UserAssetSnapshotDatabase {
   Future<UserAssetSourceState?> readSourceState(String username) async {
     final database = await _openDatabase();
     return _readSourceState(database, username);
+  }
+
+  /// 分页读取星光圣殿快照
+  ///
+  /// [username] 用户名
+  /// [page] 页码
+  /// [pageSize] 每页圣殿数量
+  Future<TinygrailPage<UserAssetSnapshotPayload>> readStarlightTemplePage({
+    required String username,
+    required int page,
+    required int pageSize,
+  }) async {
+    if (page <= 0 || pageSize <= 0) {
+      throw ArgumentError('星光圣殿分页参数无效');
+    }
+
+    final database = await _openDatabase();
+    return database.transaction((transaction) async {
+      final sourceState = await _readSourceState(transaction, username);
+      if (sourceState == null) {
+        throw StateError('圣殿快照不存在，请返回资产分析刷新');
+      }
+      if (!sourceState.isTempleDataFreshAt(DateTime.now())) {
+        throw StateError('圣殿快照已过期，请返回资产分析刷新');
+      }
+
+      final countRows = await transaction.rawQuery(
+        '''
+        SELECT COUNT(*) AS total_count
+        FROM $_templeTableName
+        WHERE username = ? AND star_forces >= ?
+        ''',
+        [username, starlightTempleStarForcesThreshold],
+      );
+      final totalItems = countRows.isEmpty
+          ? 0
+          : _rowInt(countRows.first['total_count']);
+      final rows = await transaction.query(
+        _templeTableName,
+        columns: const ['temple_id', 'payload_json'],
+        where: 'username = ? AND star_forces >= ?',
+        whereArgs: [username, starlightTempleStarForcesThreshold],
+        orderBy: 'row_order ASC',
+        limit: pageSize,
+        offset: (page - 1) * pageSize,
+      );
+      final totalPages = totalItems == 0 ? 0 : (totalItems / pageSize).ceil();
+
+      return TinygrailPage(
+        items: List<UserAssetSnapshotPayload>.unmodifiable(
+          rows.map((row) {
+            return UserAssetSnapshotPayload(
+              id: _rowInt(row['temple_id']),
+              payloadJson: row['payload_json'] as String? ?? '',
+            );
+          }),
+        ),
+        currentPage: page,
+        totalPages: totalPages,
+        totalItems: totalItems,
+        itemsPerPage: pageSize,
+      );
+    });
   }
 
   /// 读取用户资产快照行
@@ -268,6 +331,7 @@ class UserAssetSnapshotDatabase {
         username TEXT NOT NULL,
         temple_id INTEGER NOT NULL,
         row_order INTEGER NOT NULL,
+        star_forces INTEGER NOT NULL,
         payload_json TEXT NOT NULL,
         PRIMARY KEY (username, temple_id)
       )
@@ -301,6 +365,10 @@ class UserAssetSnapshotDatabase {
       ON $_templeTableName (username, row_order)
       ''');
     await database.execute('''
+      CREATE INDEX idx_asset_snapshot_temple_star_forces
+      ON $_templeTableName (username, star_forces)
+      ''');
+    await database.execute('''
       CREATE INDEX idx_asset_snapshot_character_header_order
       ON $_characterHeaderTableName (username, row_order)
       ''');
@@ -331,6 +399,37 @@ class UserAssetSnapshotDatabase {
             'username': username,
             keyColumn: row.id,
             'row_order': index,
+            'payload_json': row.payloadJson,
+          },
+          conflictAlgorithm: sqflite.ConflictAlgorithm.replace,
+        );
+      }
+      await batch.commit(noResult: true);
+    }
+  }
+
+  /// 批量写入用户圣殿快照
+  ///
+  /// [transaction] SQLite 写入事务
+  /// [username] 用户名
+  /// [rows] 用户圣殿快照明细
+  Future<void> _insertTemplePayloadRows(
+    sqflite.Transaction transaction, {
+    required String username,
+    required List<UserAssetSnapshotPayload> rows,
+  }) async {
+    for (var start = 0; start < rows.length; start += _insertBatchSize) {
+      final batch = transaction.batch();
+      final end = (start + _insertBatchSize).clamp(0, rows.length);
+      for (var index = start; index < end; index += 1) {
+        final row = rows[index];
+        batch.insert(
+          _templeTableName,
+          {
+            'username': username,
+            'temple_id': row.id,
+            'row_order': index,
+            'star_forces': row.starForces,
             'payload_json': row.payloadJson,
           },
           conflictAlgorithm: sqflite.ConflictAlgorithm.replace,
@@ -440,70 +539,4 @@ class UserAssetSnapshotDatabase {
   int _rowInt(Object? value) {
     return value is num ? value.toInt() : 0;
   }
-}
-
-/// 用户资产快照行
-class UserAssetSnapshotEntry {
-  /// 创建用户资产快照行
-  ///
-  /// [username] 用户名
-  /// [nickname] 用户昵称
-  /// [characterRows] 用户角色快照明细
-  /// [templeRows] 用户圣殿快照明细
-  /// [characterHeaderRows] 角色头部资料快照明细
-  /// [characterTotalItems] 角色接口总数
-  /// [templeTotalItems] 圣殿接口总数
-  /// [sourceState] 读取时返回的三类原始数据状态
-  const UserAssetSnapshotEntry({
-    required this.username,
-    required this.nickname,
-    required this.characterRows,
-    required this.templeRows,
-    required this.characterHeaderRows,
-    required this.characterTotalItems,
-    required this.templeTotalItems,
-    this.sourceState,
-  });
-
-  /// 用户名
-  final String username;
-
-  /// 用户昵称
-  final String nickname;
-
-  /// 用户角色快照明细
-  final List<UserAssetSnapshotPayload> characterRows;
-
-  /// 用户圣殿快照明细
-  final List<UserAssetSnapshotPayload> templeRows;
-
-  /// 角色头部资料快照明细
-  final List<UserAssetSnapshotPayload> characterHeaderRows;
-
-  /// 角色接口总数
-  final int characterTotalItems;
-
-  /// 圣殿接口总数
-  final int templeTotalItems;
-
-  /// 读取时返回的三类原始数据状态
-  final UserAssetSourceState? sourceState;
-}
-
-/// 用户资产快照明细
-class UserAssetSnapshotPayload {
-  /// 创建用户资产快照明细
-  ///
-  /// [id] 资产主键
-  /// [payloadJson] 资产 JSON
-  const UserAssetSnapshotPayload({
-    required this.id,
-    required this.payloadJson,
-  });
-
-  /// 资产主键
-  final int id;
-
-  /// 资产 JSON
-  final String payloadJson;
 }

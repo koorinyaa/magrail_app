@@ -12,9 +12,6 @@ export 'package:magrail_app/features/user/analysis/model/user_asset_analysis_cha
 // 股息和资产模式各缓存前 24 个角色，避免保存无展示用途的完整聚合列表
 const int _cachedCharacterBubblesPerMode = 24;
 
-// 圣殿星之力达到 10000 时点亮星星
-const int _templeStarForcesThreshold = 10000;
-
 /// 在后台 isolate 构建用户资产分析结果
 ///
 /// [snapshot] 用户资产快照
@@ -43,7 +40,7 @@ class UserAssetAnalysis {
   /// [updatedAtMilliseconds] 分析更新时间戳
   /// [characterTotalItems] 角色接口总数
   /// [templeTotalItems] 圣殿接口总数
-  /// [templeStarCount] 已点亮星星的圣殿数量
+  /// [starlightTempleCount] 星光圣殿数量
   /// [totalShares] 持股总数
   /// [dividendSegments] 股息构成分段
   /// [levelBuckets] 等级分布
@@ -56,7 +53,7 @@ class UserAssetAnalysis {
     required this.updatedAtMilliseconds,
     required this.characterTotalItems,
     required this.templeTotalItems,
-    required this.templeStarCount,
+    required this.starlightTempleCount,
     required this.totalShares,
     required this.dividendSegments,
     required this.levelBuckets,
@@ -80,8 +77,8 @@ class UserAssetAnalysis {
   /// 圣殿接口总数
   final int templeTotalItems;
 
-  /// 已点亮星星的圣殿数量
-  final int templeStarCount;
+  /// 星光圣殿数量
+  final int starlightTempleCount;
 
   /// 持股总数
   final int totalShares;
@@ -120,7 +117,7 @@ class UserAssetAnalysis {
       updatedAtMilliseconds: DateTime.now().millisecondsSinceEpoch,
       characterTotalItems: snapshot.characterTotalItems,
       templeTotalItems: snapshot.templeTotalItems,
-      templeStarCount: metrics.templeStarCount,
+      starlightTempleCount: metrics.starlightTempleCount,
       totalShares: metrics.totalShares,
       dividendSegments: metrics.dividendSegments,
       levelBuckets: metrics.levelBuckets,
@@ -140,6 +137,9 @@ class UserAssetAnalysis {
     if (sourceRevisionsJson == null) {
       throw const FormatException('资产分析原始数据版本缺失');
     }
+    if (!json.containsKey('starlightTempleCount')) {
+      throw const FormatException('资产分析星光圣殿数量缺失');
+    }
 
     return UserAssetAnalysis(
       username: TinygrailResponseParser.asString(json['username']),
@@ -153,7 +153,9 @@ class UserAssetAnalysis {
       templeTotalItems: TinygrailResponseParser.asInt(
         json['templeTotalItems'],
       ),
-      templeStarCount: TinygrailResponseParser.asInt(json['templeStarCount']),
+      starlightTempleCount: TinygrailResponseParser.asInt(
+        json['starlightTempleCount'],
+      ),
       totalShares: TinygrailResponseParser.asInt(json['totalShares']),
       dividendSegments: List<UserAssetAnalysisDividendSegment>.unmodifiable(
         TinygrailResponseParser.asObjectList(
@@ -191,7 +193,7 @@ class UserAssetAnalysis {
       'updatedAtMilliseconds': updatedAtMilliseconds,
       'characterTotalItems': characterTotalItems,
       'templeTotalItems': templeTotalItems,
-      'templeStarCount': templeStarCount,
+      'starlightTempleCount': starlightTempleCount,
       'totalShares': totalShares,
       'dividendSegments': [for (final item in dividendSegments) item.toJson()],
       'levelBuckets': [for (final item in levelBuckets) item.toJson()],
@@ -207,14 +209,14 @@ class _UserAssetAnalysisMetrics {
   /// 创建用户资产分析后台指标
   ///
   /// [totalShares] 持股总数
-  /// [templeStarCount] 已点亮星星的圣殿数量
+  /// [starlightTempleCount] 星光圣殿数量
   /// [dividendSegments] 股息构成分段
   /// [levelBuckets] 等级分布
   /// [characterBubbles] 角色圆图数据
   /// [templeCoverage] 圣殿覆盖率
   const _UserAssetAnalysisMetrics({
     required this.totalShares,
-    required this.templeStarCount,
+    required this.starlightTempleCount,
     required this.dividendSegments,
     required this.levelBuckets,
     required this.characterBubbles,
@@ -222,7 +224,7 @@ class _UserAssetAnalysisMetrics {
   });
 
   final int totalShares;
-  final int templeStarCount;
+  final int starlightTempleCount;
   final List<UserAssetAnalysisDividendSegment> dividendSegments;
   final List<UserAssetAnalysisLevelBucket> levelBuckets;
   final List<UserAssetAnalysisCharacterBubble> characterBubbles;
@@ -287,8 +289,8 @@ class _UserAssetAnalysisMetrics {
 
     return _UserAssetAnalysisMetrics(
       totalShares: _sumInt(characters.map((item) => item.userTotal)),
-      templeStarCount: temples.where((item) {
-        return item.starForces >= _templeStarForcesThreshold;
+      starlightTempleCount: temples.where((item) {
+        return item.starForces >= starlightTempleStarForcesThreshold;
       }).length,
       dividendSegments: [
         UserAssetAnalysisDividendSegment(

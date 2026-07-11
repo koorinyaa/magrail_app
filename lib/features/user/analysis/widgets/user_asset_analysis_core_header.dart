@@ -18,6 +18,9 @@ class UserAssetAnalysisCoreHeader extends StatelessWidget {
   /// [progressLabel] 刷新状态文案
   /// [hasRefreshError] 是否显示刷新失败状态
   /// [contentTopPadding] 顶部内容与安全区的间距
+  /// [onCharactersTap] 角色指标点击回调
+  /// [onTemplesTap] 圣殿指标点击回调
+  /// [onStarlightTemplesTap] 星光圣殿指标点击回调
   const UserAssetAnalysisCoreHeader({
     super.key,
     required this.analysis,
@@ -27,6 +30,9 @@ class UserAssetAnalysisCoreHeader extends StatelessWidget {
     required this.progressLabel,
     required this.hasRefreshError,
     this.contentTopPadding = 76,
+    this.onCharactersTap,
+    this.onTemplesTap,
+    this.onStarlightTemplesTap,
   });
 
   /// 用户资产分析结果
@@ -49,6 +55,15 @@ class UserAssetAnalysisCoreHeader extends StatelessWidget {
 
   /// 顶部内容与安全区的间距
   final double contentTopPadding;
+
+  /// 角色指标点击回调
+  final VoidCallback? onCharactersTap;
+
+  /// 圣殿指标点击回调
+  final VoidCallback? onTemplesTap;
+
+  /// 星光圣殿指标点击回调
+  final VoidCallback? onStarlightTemplesTap;
 
   /// 构建用户资产分析沉浸式核心头图
   ///
@@ -244,6 +259,7 @@ class UserAssetAnalysisCoreHeader extends StatelessWidget {
                                 label: '角色',
                                 textColor: primaryTextColor,
                                 mutedTextColor: mutedTextColor,
+                                onTap: onCharactersTap,
                               ),
                             ),
                             _HeroMetricDivider(color: primaryTextColor),
@@ -256,6 +272,7 @@ class UserAssetAnalysisCoreHeader extends StatelessWidget {
                                 label: '圣殿',
                                 textColor: primaryTextColor,
                                 mutedTextColor: mutedTextColor,
+                                onTap: onTemplesTap,
                               ),
                             ),
                             _HeroMetricDivider(color: primaryTextColor),
@@ -263,11 +280,12 @@ class UserAssetAnalysisCoreHeader extends StatelessWidget {
                               child: _HeroMetric(
                                 icon: LucideIcons.star,
                                 value: Formatters.groupedNumber(
-                                  analysis.templeStarCount,
+                                  analysis.starlightTempleCount,
                                 ),
                                 label: '星光圣殿',
                                 textColor: primaryTextColor,
                                 mutedTextColor: mutedTextColor,
+                                onTap: onStarlightTemplesTap,
                               ),
                             ),
                           ],
@@ -294,12 +312,14 @@ class _HeroMetric extends StatelessWidget {
   /// [label] 指标标签
   /// [textColor] 主要文字颜色
   /// [mutedTextColor] 次要文字颜色
+  /// [onTap] 指标点击回调
   const _HeroMetric({
     required this.icon,
     required this.value,
     required this.label,
     required this.textColor,
     required this.mutedTextColor,
+    this.onTap,
   });
 
   /// 指标图标
@@ -317,6 +337,9 @@ class _HeroMetric extends StatelessWidget {
   /// 次要文字颜色
   final Color mutedTextColor;
 
+  /// 指标点击回调
+  final VoidCallback? onTap;
+
   /// 构建用户资产分析头图指标
   ///
   /// [context] 当前组件树上下文
@@ -324,49 +347,60 @@ class _HeroMetric extends StatelessWidget {
   Widget build(BuildContext context) {
     final iconColor = mutedTextColor.withValues(alpha: 0.60);
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 15, color: iconColor),
-        const SizedBox(width: 8),
-        Flexible(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: SizedBox(
+          height: 48,
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  value,
-                  maxLines: 1,
-                  style: TextStyle(
-                    color: textColor.withValues(alpha: 0.90),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    height: 1,
-                    letterSpacing: 0,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: mutedTextColor.withValues(alpha: 0.52),
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  height: 1,
-                  letterSpacing: 0,
+              Icon(icon, size: 15, color: iconColor),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        value,
+                        maxLines: 1,
+                        style: TextStyle(
+                          color: textColor.withValues(alpha: 0.90),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          height: 1,
+                          letterSpacing: 0,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: mutedTextColor.withValues(alpha: 0.52),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        height: 1,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
         ),
-      ],
+      ),
     );
   }
 }
