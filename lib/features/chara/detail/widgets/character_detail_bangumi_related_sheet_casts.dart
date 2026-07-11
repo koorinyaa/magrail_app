@@ -109,7 +109,7 @@ class _CharacterBangumiCastsSheetState
           return const SizedBox.shrink();
         }
 
-        return const Divider(height: 1);
+        return const _CharacterBangumiCastDivider();
       },
       itemBuilder: (context, index) {
         if (index == _items.length) {
@@ -294,13 +294,40 @@ class _CharacterBangumiCastSkeletonList extends StatelessWidget {
     return ListView.builder(
       primary: false,
       padding: EdgeInsets.zero,
-      itemCount: 10,
+      itemCount: 19,
       itemBuilder: (context, index) {
+        if (index.isOdd) {
+          return const _CharacterBangumiCastDivider();
+        }
+
         return const Skeletonizer(
           enabled: true,
           child: _CharacterBangumiCastSkeletonRow(),
         );
       },
+    );
+  }
+}
+
+/// 出演作品条目分割线
+class _CharacterBangumiCastDivider extends StatelessWidget {
+  /// 创建出演作品条目分割线
+  const _CharacterBangumiCastDivider();
+
+  /// 构建出演作品条目分割线
+  ///
+  /// [context] 当前组件树上下文
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 52, right: 4),
+      child: Divider(
+        height: 1,
+        thickness: 0.6,
+        color: colorScheme.outlineVariant.withValues(alpha: 0.52),
+      ),
     );
   }
 }

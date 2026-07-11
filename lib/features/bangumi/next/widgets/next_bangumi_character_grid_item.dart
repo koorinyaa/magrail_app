@@ -79,24 +79,21 @@ class NextBangumiCharacterGridItem extends StatelessWidget {
                       child: avatar,
                     ),
                   const SizedBox(height: 8),
+                  Text(
+                    name.isEmpty ? '未知角色' : name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      height: 1.1,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Flexible(
-                        child: Text(
-                          name.isEmpty ? '未知角色' : name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: colorScheme.onSurface,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            height: 1.1,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
                       _NextBangumiCharacterStatusBadge(status: status),
                     ],
                   ),

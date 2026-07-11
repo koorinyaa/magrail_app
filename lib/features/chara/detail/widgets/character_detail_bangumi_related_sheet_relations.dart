@@ -392,23 +392,16 @@ class _CharacterBangumiRelationSkeletonItem extends StatelessWidget {
                 borderRadius: BorderRadius.all(Radius.circular(18)),
               ),
               SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: Bone(
-                      width: 52,
-                      height: 12,
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                    ),
-                  ),
-                  SizedBox(width: 4),
-                  Bone(
-                    width: 28,
-                    height: 15,
-                    borderRadius: BorderRadius.all(Radius.circular(999)),
-                  ),
-                ],
+              Bone(
+                width: 52,
+                height: 12,
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+              ),
+              SizedBox(height: 5),
+              Bone(
+                width: 28,
+                height: 15,
+                borderRadius: BorderRadius.all(Radius.circular(999)),
               ),
               SizedBox(height: 5),
               Bone(
@@ -433,7 +426,7 @@ final class _CharacterBangumiRelationGridMetrics {
   static const SliverGridDelegateWithMaxCrossAxisExtent delegate =
       SliverGridDelegateWithMaxCrossAxisExtent(
     maxCrossAxisExtent: 118,
-    mainAxisExtent: 116,
+    mainAxisExtent: 136,
     mainAxisSpacing: 14,
     crossAxisSpacing: 10,
   );
