@@ -9,6 +9,7 @@ extension _UserAssetAnalysisPageNavigation on _UserAssetAnalysisPageState {
       queryParameters: {
         'username': widget.username,
         'nickname': widget.nickname ?? '',
+        'currentUserName': widget.username,
       },
     );
   }

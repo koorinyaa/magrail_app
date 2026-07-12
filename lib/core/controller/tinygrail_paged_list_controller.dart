@@ -28,7 +28,10 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
   int _nextPage = 1;
   bool _canLoadMore = true;
   bool _isRefreshing = false;
+  bool _isReplacingPages = false;
+  bool _isPrependingPage = false;
   bool _isDisposed = false;
+  final Set<Completer<void>> _pagingIdleWaiters = <Completer<void>>{};
   // 自动预加载只针对当前已加载条目数量触发一次
   int? _lastPreloadItemCount;
 
@@ -50,7 +53,8 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
 
   /// 是否正在首次加载
   bool get isInitialLoading {
-    return _pagingController.isLoading && _pagingController.pages == null;
+    return forceInitialLoading ||
+        (_pagingController.isLoading && _pagingController.pages == null);
   }
 
   /// 是否正在下拉刷新
@@ -58,11 +62,24 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
 
   /// 是否正在加载下一页
   bool get isLoadingMore {
-    return _pagingController.isLoading && _pagingController.pages != null;
+    return (_pagingController.isLoading && _pagingController.pages != null) ||
+        (items.isNotEmpty && showPausedLoadMoreIndicator);
   }
 
   /// 是否还有下一页
   bool get canLoadMore => _pagingController.hasNextPage && _canLoadMore;
+
+  /// 是否暂停下一页请求
+  @protected
+  bool get isNextPageLoadPaused => false;
+
+  /// 暂停下一页时是否显示底部加载状态
+  @protected
+  bool get showPausedLoadMoreIndicator => false;
+
+  /// 是否强制显示首屏加载状态
+  @protected
+  bool get forceInitialLoading => false;
 
   /// 首次加载错误
   Object? get initialError {
@@ -168,6 +185,138 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
     await _fetchNextPageAndWait();
   }
 
+  /// 等待分页控制器结束当前请求
+  @protected
+  Future<void> waitForPagingIdle() {
+    if (_isDisposed || !_hasActiveRequest) {
+      return Future.value();
+    }
+    final completer = Completer<void>();
+    _pagingIdleWaiters.add(completer);
+
+    void listener() {
+      if (!_isDisposed && _hasActiveRequest) {
+        return;
+      }
+      removeListener(listener);
+      _pagingIdleWaiters.remove(completer);
+      if (!completer.isCompleted) {
+        completer.complete();
+      }
+    }
+
+    addListener(listener);
+    listener();
+    return completer.future;
+  }
+
+  /// 从指定页面替换当前分页窗口
+  ///
+  /// [page] 目标页码
+  /// [followingPageCount] 一并预取的后续页数
+  /// [shouldCommit] 数据读取完成后是否仍应提交本次分页窗口
+  /// [beforeCommit] 提交分页窗口前接收新条目的同步回调
+  @protected
+  Future<bool> replaceFromPage(
+    int page, {
+    int followingPageCount = 0,
+    bool Function()? shouldCommit,
+    void Function(List<ItemType> items)? beforeCommit,
+  }) async {
+    if (_isDisposed ||
+        page <= 0 ||
+        followingPageCount < 0 ||
+        _hasActiveRequest) {
+      return false;
+    }
+    final validationError = validatePageRequest();
+    if (validationError != null) {
+      _setInitialError(validationError);
+      return false;
+    }
+    final previousState = _pagingController.value;
+    final previousNextPage = _nextPage;
+    final previousCanLoadMore = _canLoadMore;
+    _isReplacingPages = true;
+    _notifySafely();
+    try {
+      _nextPage = page;
+      _canLoadMore = true;
+      _lastPreloadItemCount = null;
+      final replacementPages = <List<ItemType>>[];
+      final replacementKeys = <int>[];
+      var nextPage = page;
+      for (var index = 0; index <= followingPageCount; index += 1) {
+        replacementKeys.add(nextPage);
+        replacementPages.add(await _fetchDisplayPageBatch(nextPage));
+        if (_isDisposed || !(shouldCommit?.call() ?? true)) {
+          _nextPage = previousNextPage;
+          _canLoadMore = previousCanLoadMore;
+          return false;
+        }
+        if (!_canLoadMore) {
+          break;
+        }
+        nextPage = _nextPage;
+      }
+      if (beforeCommit != null) {
+        beforeCommit(
+          replacementPages.expand((items) => items).toList(growable: false),
+        );
+      }
+      _pagingController.value = PagingState<int, ItemType>(
+        pages: replacementPages,
+        keys: replacementKeys,
+        hasNextPage: _canLoadMore,
+      );
+      return true;
+    } catch (_) {
+      _nextPage = previousNextPage;
+      _canLoadMore = previousCanLoadMore;
+      if (!_isDisposed) {
+        _pagingController.value = previousState;
+      }
+      return false;
+    } finally {
+      _isReplacingPages = false;
+      _notifySafely();
+    }
+  }
+
+  /// 在当前分页窗口前插入指定页面
+  ///
+  /// [page] 目标页码
+  @protected
+  Future<int> prependPage(int page) async {
+    if (_isDisposed || page <= 0 || _hasActiveRequest) {
+      return 0;
+    }
+    final pages = _pagingController.pages;
+    final keys = _pagingController.keys;
+    if (pages == null || keys == null || pages.isEmpty) {
+      return 0;
+    }
+    _isPrependingPage = true;
+    _notifySafely();
+    try {
+      final result = await requestPage(page: page, pageSize: pageSize);
+      if (_isDisposed) {
+        return 0;
+      }
+      final prependedItems = convertPageItems(result.items);
+      _pagingController.value = _pagingController.value.copyWith(
+        pages: <List<ItemType>>[prependedItems, ...pages],
+        keys: <int>[page, ...keys],
+        error: null,
+      );
+      _lastPreloadItemCount = null;
+      return prependedItems.length;
+    } finally {
+      _isPrependingPage = false;
+      _notifySafely();
+    }
+  }
+
   /// 处理展示条目构建触发的分页预加载
   ///
   /// [index] 当前构建的展示条目下标
@@ -202,6 +351,12 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
   @override
   void dispose() {
     _isDisposed = true;
+    for (final waiter in _pagingIdleWaiters) {
+      if (!waiter.isCompleted) {
+        waiter.complete();
+      }
+    }
+    _pagingIdleWaiters.clear();
     _pagingController
       ..removeListener(_notifySafely)
       ..dispose();
@@ -232,13 +387,17 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
 
   /// 是否存在正在执行的分页请求
   bool get _hasActiveRequest {
-    return _pagingController.isLoading || _isRefreshing;
+    return _pagingController.isLoading ||
+        _isRefreshing ||
+        _isReplacingPages ||
+        _isPrependingPage;
   }
 
   /// 是否允许请求下一页
   bool get _canRequestNextPage {
     return !_isDisposed &&
         !_hasActiveRequest &&
+        !isNextPageLoadPaused &&
         canLoadMore &&
         validatePageRequest() == null &&
         !(items.isEmpty && initialError != null);

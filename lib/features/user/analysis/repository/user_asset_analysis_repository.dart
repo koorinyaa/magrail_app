@@ -124,8 +124,8 @@ class UserAssetAnalysisRepository {
                 UserAssetAnalysisLoadKind.characterHeaders,
             },
             label: progress.label,
-            completedPages: progress.completedPages,
-            totalPages: progress.totalPages,
+            completedSteps: progress.completedSteps,
+            totalSteps: progress.totalSteps,
           ),
         );
       },
@@ -134,8 +134,8 @@ class UserAssetAnalysisRepository {
       const UserAssetAnalysisLoadProgress(
         kind: UserAssetAnalysisLoadKind.analysis,
         label: '正在计算资产分析',
-        completedPages: 0,
-        totalPages: 2,
+        completedSteps: 0,
+        totalSteps: 2,
       ),
     );
     var analysis = await buildUserAssetAnalysis(snapshot);
@@ -143,8 +143,8 @@ class UserAssetAnalysisRepository {
       const UserAssetAnalysisLoadProgress(
         kind: UserAssetAnalysisLoadKind.analysis,
         label: '正在缓存资产分析',
-        completedPages: 1,
-        totalPages: 2,
+        completedSteps: 1,
+        totalSteps: 2,
       ),
     );
     if (!await _cacheAnalysisIfCurrent(analysis)) {
@@ -158,8 +158,8 @@ class UserAssetAnalysisRepository {
       const UserAssetAnalysisLoadProgress(
         kind: UserAssetAnalysisLoadKind.analysis,
         label: '正在完成资产分析',
-        completedPages: 2,
-        totalPages: 2,
+        completedSteps: 2,
+        totalSteps: 2,
       ),
     );
     return analysis;
@@ -252,13 +252,13 @@ class UserAssetAnalysisLoadProgress {
   ///
   /// [kind] 加载类型
   /// [label] 加载状态文案
-  /// [completedPages] 已完成阶段数
-  /// [totalPages] 总阶段数
+  /// [completedSteps] 已完成阶段数
+  /// [totalSteps] 总阶段数
   const UserAssetAnalysisLoadProgress({
     required this.kind,
     required this.label,
-    required this.completedPages,
-    required this.totalPages,
+    required this.completedSteps,
+    required this.totalSteps,
   });
 
   /// 加载类型
@@ -268,8 +268,8 @@ class UserAssetAnalysisLoadProgress {
   final String label;
 
   /// 已完成阶段数
-  final int completedPages;
+  final int completedSteps;
 
   /// 总阶段数
-  final int totalPages;
+  final int totalSteps;
 }

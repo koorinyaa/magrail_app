@@ -196,6 +196,7 @@ extension _UserDetailPageNavigation on _UserDetailPageState {
       queryParameters: {
         'username': profile.name,
         'nickname': profile.nickname,
+        if (_controller.isCurrentUser) 'currentUserName': profile.name,
       },
     );
   }

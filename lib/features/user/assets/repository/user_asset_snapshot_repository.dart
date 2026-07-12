@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:magrail_app/core/network/tinygrail_page.dart';
 import 'package:magrail_app/core/network/tinygrail_response.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_trade_header.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
+import 'package:magrail_app/features/user/assets/model/user_character_snapshot_query.dart';
 import 'package:magrail_app/features/user/assets/model/user_asset_snapshot.dart';
 import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_database.dart';
 import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_database_models.dart';
@@ -14,6 +16,7 @@ import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
 
 part 'user_asset_snapshot_repository_codec.dart';
+part 'user_asset_snapshot_repository_fetching.dart';
 
 /// 用户资产快照仓库
 class UserAssetSnapshotRepository {
@@ -35,6 +38,10 @@ class UserAssetSnapshotRepository {
 
   // 角色、圣殿和角色资料共用请求阀门
   static const int _maxServerConcurrency = 3;
+
+  // 同一用户的角色全量请求合并，避免启动刷新与页面刷新重复访问服务器
+  static final Map<String, Future<_AllCharactersResult>>
+      _characterFetchOperations = {};
 
   final UserRepository _userRepository;
   final CharacterDetailRepository _characterDetailRepository;
@@ -61,7 +68,7 @@ class UserAssetSnapshotRepository {
     late int charactersUpdatedAtMilliseconds;
     late int templesUpdatedAtMilliseconds;
     late int characterHeadersUpdatedAtMilliseconds;
-    final charactersFuture = _fetchAllCharacters(
+    final charactersFuture = _fetchAllCharactersShared(
       username: resolvedUsername,
       requestGate: requestGate,
       onProgress: onProgress,
@@ -98,10 +105,12 @@ class UserAssetSnapshotRepository {
         characters: characterResult.items,
         temples: templeResult.items,
         characterHeaders: characterHeaders,
+        characterTotalItems: characterResult.totalItems,
+        templeTotalItems: templeResult.totalItems,
       ),
     );
-    final sourceState = await _database.upsertSnapshotEntry(
-      UserAssetSnapshotEntry(
+    final sourceState = await _database.upsertSnapshotRecord(
+      UserAssetSnapshotRecord(
         username: resolvedUsername,
         nickname: nickname.trim(),
         characterRows: serializedRows.characterRows,
@@ -114,6 +123,9 @@ class UserAssetSnapshotRepository {
       templesUpdatedAtMilliseconds: templesUpdatedAtMilliseconds,
       characterHeadersUpdatedAtMilliseconds:
           characterHeadersUpdatedAtMilliseconds,
+      characterContentHash: serializedRows.characterContentHash,
+      templeContentHash: serializedRows.templeContentHash,
+      characterHeaderContentHash: serializedRows.characterHeaderContentHash,
     );
     return UserAssetSnapshot(
       username: resolvedUsername,
@@ -138,6 +150,103 @@ class UserAssetSnapshotRepository {
     return _database.readSourceState(resolvedUsername);
   }
 
+  /// 单独刷新并缓存当前用户角色
+  ///
+  /// [username] 用户名
+  /// [nickname] 用户昵称
+  /// [onProgress] 拉取进度回调
+  Future<bool> refreshCharacters({
+    required String username,
+    required String nickname,
+    void Function(UserAssetSnapshotLoadProgress progress)? onProgress,
+  }) async {
+    final resolvedUsername = username.trim();
+    if (resolvedUsername.isEmpty) {
+      throw StateError('缺少用户名');
+    }
+    final result = await _fetchAllCharactersShared(
+      username: resolvedUsername,
+      requestGate: _UserAssetSnapshotRequestGate(1),
+      onProgress: onProgress ?? _ignoreSnapshotProgress,
+    );
+    final serialized = await compute(
+      _serializeUserCharacterSnapshotRows,
+      _CharacterRowsSerializeRequest(
+        characters: result.items,
+        totalItems: result.totalItems,
+      ),
+    );
+    return _database.upsertCharacterSnapshot(
+      username: resolvedUsername,
+      nickname: nickname.trim(),
+      rows: serialized.rows,
+      totalItems: result.totalItems,
+      updatedAtMilliseconds: DateTime.now().millisecondsSinceEpoch,
+      contentHash: serialized.contentHash,
+    );
+  }
+
+  /// 从本地快照分页读取有效的用户角色
+  ///
+  /// [username] 用户名
+  /// [page] 页码
+  /// [pageSize] 每页角色数量
+  /// [sort] 排序字段
+  /// [direction] 排序方向
+  Future<TinygrailPage<UserCharacterApiItem>?> readCharacterPage({
+    required String username,
+    required int page,
+    required int pageSize,
+    required UserCharacterSnapshotSort sort,
+    required UserCharacterSnapshotSortDirection direction,
+  }) async {
+    final resolvedUsername = username.trim();
+    final payloadPage = await _database.readCharacterPage(
+      username: resolvedUsername,
+      page: page,
+      pageSize: pageSize,
+      sort: sort,
+      direction: direction,
+    );
+    if (payloadPage == null) {
+      return null;
+    }
+    try {
+      return TinygrailPage(
+        items: List<UserCharacterApiItem>.unmodifiable(
+          payloadPage.items.map(
+            (row) => _decodeSnapshotRow(
+              row,
+              UserCharacterApiItem.fromJson,
+              (item) => item.characterId,
+            ),
+          ),
+        ),
+        currentPage: payloadPage.currentPage,
+        totalPages: payloadPage.totalPages,
+        totalItems: payloadPage.totalItems,
+        itemsPerPage: payloadPage.itemsPerPage,
+      );
+    } on FormatException {
+      await _database.invalidateCharacterSnapshot(resolvedUsername);
+      return null;
+    }
+  }
+
+  /// 读取等级排序下的快速跳转位置
+  ///
+  /// [username] 用户名
+  /// [direction] 等级排序方向
+  Future<List<UserCharacterLevelPosition>> readCharacterLevelPositions({
+    required String username,
+    required UserCharacterSnapshotSortDirection direction,
+  }) {
+    return _database.readCharacterLevelPositions(
+      username: username.trim(),
+      direction: direction,
+    );
+  }
+
   /// 从本地原始数据读取有效的用户资产快照
   ///
   /// [username] 用户名
@@ -147,11 +256,11 @@ class UserAssetSnapshotRepository {
       return null;
     }
 
-    final entry = await _database.readSnapshotEntry(resolvedUsername);
-    if (entry == null) {
+    final record = await _database.readSnapshotRecord(resolvedUsername);
+    if (record == null) {
       return null;
     }
-    final sourceState = entry.sourceState;
+    final sourceState = record.sourceState;
     if (sourceState == null ||
         !sourceState.revisions.isComplete ||
         !sourceState.isFreshAt(DateTime.now())) {
@@ -159,17 +268,17 @@ class UserAssetSnapshotRepository {
     }
 
     try {
-      final rows = await _deserializeSnapshotRows(entry);
+      final rows = await _deserializeSnapshotRows(record);
       return UserAssetSnapshot(
-        username: entry.username,
-        nickname: entry.nickname,
+        username: record.username,
+        nickname: record.nickname,
         characters: List<UserCharacterApiItem>.unmodifiable(rows.characters),
         temples: List<UserTempleApiItem>.unmodifiable(rows.temples),
         characterHeaders: List<CharacterDetailTradeHeader>.unmodifiable(
           rows.characterHeaders,
         ),
-        characterTotalItems: entry.characterTotalItems,
-        templeTotalItems: entry.templeTotalItems,
+        characterTotalItems: record.characterTotalItems,
+        templeTotalItems: record.templeTotalItems,
         sourceState: sourceState,
       );
     } catch (_) {
@@ -215,252 +324,6 @@ class UserAssetSnapshotRepository {
     );
   }
 
-  /// 拉取全部用户角色
-  ///
-  /// [username] 用户名
-  /// [requestGate] 服务器请求并发阀门
-  /// [onProgress] 拉取进度回调
-  Future<_AllCharactersResult> _fetchAllCharacters({
-    required String username,
-    required _UserAssetSnapshotRequestGate requestGate,
-    required void Function(UserAssetSnapshotLoadProgress progress) onProgress,
-  }) async {
-    onProgress(
-      const UserAssetSnapshotLoadProgress(
-        kind: UserAssetSnapshotLoadKind.characters,
-        label: '正在读取角色数量',
-        completedPages: 0,
-        totalPages: 2,
-      ),
-    );
-    final totalPage = await _fetchUserCharacterPage(
-      username: username,
-      pageNumber: 1,
-      pageSize: _totalProbePageSize,
-      requestGate: requestGate,
-    );
-    final totalItems = totalPage.totalItems > 0
-        ? totalPage.totalItems
-        : totalPage.items.length;
-    if (totalItems <= 0) {
-      onProgress(
-        const UserAssetSnapshotLoadProgress(
-          kind: UserAssetSnapshotLoadKind.characters,
-          label: '正在整理角色数据',
-          completedPages: 2,
-          totalPages: 2,
-        ),
-      );
-      return const _AllCharactersResult(
-        items: <UserCharacterApiItem>[],
-        totalItems: 0,
-      );
-    }
-
-    onProgress(
-      const UserAssetSnapshotLoadProgress(
-        kind: UserAssetSnapshotLoadKind.characters,
-        label: '正在获取角色数据',
-        completedPages: 1,
-        totalPages: 2,
-      ),
-    );
-    final fullPage = await _fetchUserCharacterPage(
-      username: username,
-      pageNumber: 1,
-      pageSize: totalItems,
-      requestGate: requestGate,
-    );
-    if (fullPage.items.length < totalItems) {
-      // 全量页未返回完整数据时不写入快照，避免上游使用半截资产
-      throw StateError('角色数据未完整返回：${fullPage.items.length}/$totalItems');
-    }
-    final items = <UserCharacterApiItem>[];
-    final seenIds = <int>{};
-    onProgress(
-      const UserAssetSnapshotLoadProgress(
-        kind: UserAssetSnapshotLoadKind.characters,
-        label: '正在整理角色数据',
-        completedPages: 2,
-        totalPages: 2,
-      ),
-    );
-
-    for (final item in fullPage.items) {
-      if (seenIds.add(item.characterId)) {
-        items.add(item);
-      }
-    }
-
-    return _AllCharactersResult(
-      items: List<UserCharacterApiItem>.unmodifiable(items),
-      totalItems: totalItems,
-    );
-  }
-
-  /// 拉取全部用户圣殿
-  ///
-  /// [username] 用户名
-  /// [requestGate] 服务器请求并发阀门
-  /// [onProgress] 拉取进度回调
-  Future<_AllTemplesResult> _fetchAllTemples({
-    required String username,
-    required _UserAssetSnapshotRequestGate requestGate,
-    required void Function(UserAssetSnapshotLoadProgress progress) onProgress,
-  }) async {
-    onProgress(
-      const UserAssetSnapshotLoadProgress(
-        kind: UserAssetSnapshotLoadKind.temples,
-        label: '正在读取圣殿数量',
-        completedPages: 0,
-        totalPages: 2,
-      ),
-    );
-    final totalPage = await _fetchUserTemplePage(
-      username: username,
-      pageNumber: 1,
-      pageSize: _totalProbePageSize,
-      requestGate: requestGate,
-    );
-    final totalItems = totalPage.totalItems > 0
-        ? totalPage.totalItems
-        : totalPage.items.length;
-    if (totalItems <= 0) {
-      onProgress(
-        const UserAssetSnapshotLoadProgress(
-          kind: UserAssetSnapshotLoadKind.temples,
-          label: '正在整理圣殿数据',
-          completedPages: 2,
-          totalPages: 2,
-        ),
-      );
-      return const _AllTemplesResult(
-        items: <UserTempleApiItem>[],
-        totalItems: 0,
-      );
-    }
-
-    onProgress(
-      const UserAssetSnapshotLoadProgress(
-        kind: UserAssetSnapshotLoadKind.temples,
-        label: '正在获取圣殿数据',
-        completedPages: 1,
-        totalPages: 2,
-      ),
-    );
-    final fullPage = await _fetchUserTemplePage(
-      username: username,
-      pageNumber: 1,
-      pageSize: totalItems,
-      requestGate: requestGate,
-    );
-    if (fullPage.items.length < totalItems) {
-      // 全量页未返回完整数据时不写入快照，避免上游使用半截资产
-      throw StateError('圣殿数据未完整返回：${fullPage.items.length}/$totalItems');
-    }
-    final items = <UserTempleApiItem>[];
-    final seenIds = <int>{};
-    onProgress(
-      const UserAssetSnapshotLoadProgress(
-        kind: UserAssetSnapshotLoadKind.temples,
-        label: '正在整理圣殿数据',
-        completedPages: 2,
-        totalPages: 2,
-      ),
-    );
-
-    for (final item in fullPage.items) {
-      if (seenIds.add(item.id)) {
-        items.add(item);
-      }
-    }
-
-    return _AllTemplesResult(
-      items: List<UserTempleApiItem>.unmodifiable(items),
-      totalItems: totalItems,
-    );
-  }
-
-  /// 拉取全部角色头部资料
-  ///
-  /// [requestGate] 服务器请求并发阀门
-  /// [onProgress] 拉取进度回调
-  Future<List<CharacterDetailTradeHeader>> _fetchAllCharacterHeaders({
-    required _UserAssetSnapshotRequestGate requestGate,
-    required void Function(UserAssetSnapshotLoadProgress progress) onProgress,
-  }) async {
-    onProgress(
-      const UserAssetSnapshotLoadProgress(
-        kind: UserAssetSnapshotLoadKind.characterHeaders,
-        label: '正在获取角色资料',
-        completedPages: 0,
-        totalPages: 1,
-      ),
-    );
-    final fullItems = await requestGate.run(
-      _characterDetailRepository.fetchAllListedCharacterHeaders,
-    );
-    final items = <CharacterDetailTradeHeader>[];
-    final seenIds = <int>{};
-    for (final item in fullItems) {
-      if (seenIds.add(item.characterId)) {
-        items.add(item);
-      }
-    }
-    onProgress(
-      const UserAssetSnapshotLoadProgress(
-        kind: UserAssetSnapshotLoadKind.characterHeaders,
-        label: '正在整理角色资料',
-        completedPages: 1,
-        totalPages: 1,
-      ),
-    );
-
-    return List<CharacterDetailTradeHeader>.unmodifiable(items);
-  }
-
-  /// 拉取用户角色分页
-  ///
-  /// [username] 用户名
-  /// [pageNumber] 页码
-  /// [pageSize] 每页条目数量
-  /// [requestGate] 服务器请求并发阀门
-  Future<TinygrailPage<UserCharacterApiItem>> _fetchUserCharacterPage({
-    required String username,
-    required int pageNumber,
-    required int pageSize,
-    required _UserAssetSnapshotRequestGate requestGate,
-  }) {
-    return requestGate.run(() {
-      return _userRepository.fetchUserCharacterPage(
-        username: username,
-        page: pageNumber,
-        pageSize: pageSize,
-      );
-    });
-  }
-
-  /// 拉取用户圣殿分页
-  ///
-  /// [username] 用户名
-  /// [pageNumber] 页码
-  /// [pageSize] 每页条目数量
-  /// [requestGate] 服务器请求并发阀门
-  Future<TinygrailPage<UserTempleApiItem>> _fetchUserTemplePage({
-    required String username,
-    required int pageNumber,
-    required int pageSize,
-    required _UserAssetSnapshotRequestGate requestGate,
-  }) {
-    return requestGate.run(() {
-      return _userRepository.fetchUserTemplePage(
-        username: username,
-        page: pageNumber,
-        pageSize: pageSize,
-      );
-    });
-  }
-
   /// 序列化快照明细
   ///
   /// [request] 待序列化资产列表
@@ -472,128 +335,10 @@ class UserAssetSnapshotRepository {
 
   /// 反序列化快照明细
   ///
-  /// [entry] 本地资产快照行
+  /// [record] 本地资产快照持久化记录
   Future<_DeserializedSnapshotRows> _deserializeSnapshotRows(
-    UserAssetSnapshotEntry entry,
+    UserAssetSnapshotRecord record,
   ) {
-    return compute(_deserializeUserAssetSnapshotRows, entry);
+    return compute(_deserializeUserAssetSnapshotRows, record);
   }
-}
-
-/// 用户资产快照请求阀门
-class _UserAssetSnapshotRequestGate {
-  /// 创建用户资产快照请求阀门
-  ///
-  /// [maxConcurrent] 最大并发请求数
-  _UserAssetSnapshotRequestGate(int maxConcurrent)
-      : _maxConcurrent = maxConcurrent < 1 ? 1 : maxConcurrent;
-
-  final int _maxConcurrent;
-  final List<void Function()> _queue = [];
-  int _runningCount = 0;
-
-  /// 加入请求队列
-  ///
-  /// [action] 请求任务
-  Future<T> run<T>(Future<T> Function() action) {
-    final completer = Completer<T>();
-    _queue.add(() {
-      _runningCount += 1;
-      Future.sync(action)
-          .then(
-        completer.complete,
-        onError: completer.completeError,
-      )
-          .whenComplete(() {
-        _runningCount -= 1;
-        _pump();
-      });
-    });
-    _pump();
-    return completer.future;
-  }
-
-  /// 调度等待中的请求
-  void _pump() {
-    while (_runningCount < _maxConcurrent && _queue.isNotEmpty) {
-      final next = _queue.removeAt(0);
-      next();
-    }
-  }
-}
-
-/// 全量用户角色拉取结果
-class _AllCharactersResult {
-  /// 创建全量用户角色结果
-  ///
-  /// [items] 用户全部角色
-  /// [totalItems] 接口返回总数
-  const _AllCharactersResult({
-    required this.items,
-    required this.totalItems,
-  });
-
-  /// 用户全部角色
-  final List<UserCharacterApiItem> items;
-
-  /// 接口返回总数
-  final int totalItems;
-}
-
-/// 全量用户圣殿拉取结果
-class _AllTemplesResult {
-  /// 创建全量用户圣殿结果
-  ///
-  /// [items] 用户全部圣殿
-  /// [totalItems] 接口返回总数
-  const _AllTemplesResult({
-    required this.items,
-    required this.totalItems,
-  });
-
-  /// 用户全部圣殿
-  final List<UserTempleApiItem> items;
-
-  /// 接口返回总数
-  final int totalItems;
-}
-
-/// 用户资产快照加载类型
-enum UserAssetSnapshotLoadKind {
-  /// 角色分页加载
-  characters,
-
-  /// 圣殿分页加载
-  temples,
-
-  /// 角色头部资料分页加载
-  characterHeaders,
-}
-
-/// 用户资产快照加载进度
-class UserAssetSnapshotLoadProgress {
-  /// 创建用户资产快照加载进度
-  ///
-  /// [kind] 加载类型
-  /// [label] 加载进度文案
-  /// [completedPages] 已完成页数
-  /// [totalPages] 总页数
-  const UserAssetSnapshotLoadProgress({
-    required this.kind,
-    required this.label,
-    required this.completedPages,
-    required this.totalPages,
-  });
-
-  /// 加载类型
-  final UserAssetSnapshotLoadKind kind;
-
-  /// 加载进度文案
-  final String label;
-
-  /// 已完成页数
-  final int completedPages;
-
-  /// 总页数
-  final int totalPages;
 }

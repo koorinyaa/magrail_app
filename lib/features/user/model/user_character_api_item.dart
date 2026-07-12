@@ -1,5 +1,8 @@
 import 'package:magrail_app/core/network/tinygrail_response.dart';
 
+// 通天塔 500 名外按每颗星固定折算单期股息
+const double _outsideTowerDividendPerStar = 2;
+
 /// 用户角色接口条目
 class UserCharacterApiItem {
   /// 创建用户角色接口条目
@@ -10,6 +13,7 @@ class UserCharacterApiItem {
   /// [level] 角色等级
   /// [zeroCount] ST 等级
   /// [starForces] 星之力
+  /// [stars] 角色星级
   /// [userAmount] 用户可用活股数量
   /// [userTotal] 用户持股数量
   /// [sacrifices] 固定资产数量
@@ -18,6 +22,7 @@ class UserCharacterApiItem {
   /// [state] 数量
   /// [price] 价格
   /// [rate] 股息
+  /// [rank] 通天塔排名
   const UserCharacterApiItem({
     required this.characterId,
     required this.name,
@@ -25,6 +30,7 @@ class UserCharacterApiItem {
     required this.level,
     required this.zeroCount,
     required this.starForces,
+    this.stars = 0,
     required this.userAmount,
     required this.userTotal,
     required this.sacrifices,
@@ -33,6 +39,7 @@ class UserCharacterApiItem {
     required this.state,
     required this.price,
     required this.rate,
+    this.rank = 0,
   });
 
   /// 角色 ID
@@ -52,6 +59,9 @@ class UserCharacterApiItem {
 
   /// 星之力
   final int starForces;
+
+  /// 角色星级
+  final int stars;
 
   /// 用户可用活股数量
   final int userAmount;
@@ -77,6 +87,20 @@ class UserCharacterApiItem {
   /// 股息
   final double rate;
 
+  /// 通天塔排名
+  final int rank;
+
+  /// 计算角色单期股息
+  double get singleDividend {
+    if (rank > 0 && rank <= 500) {
+      return rate * 0.005 * (601 - rank);
+    }
+    return stars * _outsideTowerDividendPerStar;
+  }
+
+  /// 计算角色持股总息
+  double get totalDividend => singleDividend * userTotal;
+
   /// 从 JSON 创建用户角色接口条目
   ///
   /// [json] 原始条目 JSON
@@ -92,6 +116,7 @@ class UserCharacterApiItem {
       level: TinygrailResponseParser.asInt(json['Level']),
       zeroCount: TinygrailResponseParser.asInt(json['ZeroCount']),
       starForces: TinygrailResponseParser.asInt(json['StarForces']),
+      stars: TinygrailResponseParser.asInt(json['Stars']),
       userAmount: TinygrailResponseParser.asInt(json['UserAmount']),
       userTotal: TinygrailResponseParser.asInt(json['UserTotal']),
       sacrifices: TinygrailResponseParser.asInt(json['Sacrifices']),
@@ -100,6 +125,7 @@ class UserCharacterApiItem {
       state: TinygrailResponseParser.asInt(json['State']),
       price: TinygrailResponseParser.asDouble(json['Price']),
       rate: TinygrailResponseParser.asDouble(json['Rate']),
+      rank: TinygrailResponseParser.asInt(json['Rank']),
     );
   }
 
@@ -112,6 +138,7 @@ class UserCharacterApiItem {
       'Level': level,
       'ZeroCount': zeroCount,
       'StarForces': starForces,
+      'Stars': stars,
       'UserAmount': userAmount,
       'UserTotal': userTotal,
       'Sacrifices': sacrifices,
@@ -120,6 +147,7 @@ class UserCharacterApiItem {
       'State': state,
       'Price': price,
       'Rate': rate,
+      'Rank': rank,
     };
   }
 }

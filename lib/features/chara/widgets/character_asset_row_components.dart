@@ -10,11 +10,13 @@ class CharacterAssetMetric {
   /// [value] 数据文本
   /// [isValueMuted] 是否使用浅色数字
   /// [valueColor] 数据文本颜色
+  /// [valueWidget] 自定义数据展示组件
   const CharacterAssetMetric({
     required this.value,
     this.label,
     this.isValueMuted = false,
     this.valueColor,
+    this.valueWidget,
   });
 
   /// 数据标签
@@ -28,6 +30,9 @@ class CharacterAssetMetric {
 
   /// 数据文本颜色
   final Color? valueColor;
+
+  /// 自定义数据展示组件
+  final Widget? valueWidget;
 }
 
 /// 角色资产行
@@ -245,6 +250,16 @@ class _CharacterAssetMetricText extends StatelessWidget {
         : colorScheme.onSurfaceVariant.withValues(alpha: 0.58);
     final valueColor = metric.valueColor ??
         (metric.isValueMuted ? textColor : colorScheme.onSurface);
+
+    final valueWidget = metric.valueWidget;
+    if (valueWidget != null) {
+      return Row(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Flexible(child: valueWidget),
+        ],
+      );
+    }
 
     return RichText(
       maxLines: 1,

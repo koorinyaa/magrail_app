@@ -189,8 +189,10 @@ List<RouteBase> buildUserRoutes(
         key: state.pageKey,
         child: UserCharacterPage(
           repository: dependencies.repositories.user,
+          characterDetailRepository: dependencies.repositories.characterDetail,
           username: state.uri.queryParameters['username'] ?? '',
           nickname: state.uri.queryParameters['nickname'],
+          currentUserName: state.uri.queryParameters['currentUserName'] ?? '',
         ),
       ),
     ),

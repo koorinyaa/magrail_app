@@ -26,14 +26,14 @@ class UserAssetAnalysisController extends ChangeNotifier {
   String? _errorMessage;
   String _progressLabel = '';
   double _progress = 0;
-  int _characterCompletedPages = 0;
-  int _characterTotalPages = 1;
-  int _templeCompletedPages = 0;
-  int _templeTotalPages = 1;
-  int _characterHeaderCompletedPages = 0;
-  int _characterHeaderTotalPages = 1;
-  int _analysisCompletedPages = 0;
-  int _analysisTotalPages = 1;
+  int _characterCompletedSteps = 0;
+  int _characterTotalSteps = 1;
+  int _templeCompletedSteps = 0;
+  int _templeTotalSteps = 1;
+  int _characterHeaderCompletedSteps = 0;
+  int _characterHeaderTotalSteps = 1;
+  int _analysisCompletedSteps = 0;
+  int _analysisTotalSteps = 1;
   bool _isInitialLoading = false;
   bool _isRefreshing = false;
   bool _isDisposed = false;
@@ -217,30 +217,30 @@ class UserAssetAnalysisController extends ChangeNotifier {
   void _handleProgress(UserAssetAnalysisLoadProgress progress) {
     switch (progress.kind) {
       case UserAssetAnalysisLoadKind.characters:
-        _characterCompletedPages = progress.completedPages;
-        _characterTotalPages = progress.totalPages;
+        _characterCompletedSteps = progress.completedSteps;
+        _characterTotalSteps = progress.totalSteps;
       case UserAssetAnalysisLoadKind.temples:
-        _templeCompletedPages = progress.completedPages;
-        _templeTotalPages = progress.totalPages;
+        _templeCompletedSteps = progress.completedSteps;
+        _templeTotalSteps = progress.totalSteps;
       case UserAssetAnalysisLoadKind.characterHeaders:
-        _characterHeaderCompletedPages = progress.completedPages;
-        _characterHeaderTotalPages = progress.totalPages;
+        _characterHeaderCompletedSteps = progress.completedSteps;
+        _characterHeaderTotalSteps = progress.totalSteps;
       case UserAssetAnalysisLoadKind.analysis:
-        _analysisCompletedPages = progress.completedPages;
-        _analysisTotalPages = progress.totalPages;
+        _analysisCompletedSteps = progress.completedSteps;
+        _analysisTotalSteps = progress.totalSteps;
     }
     _progressLabel = progress.label;
-    final completedPages = _characterCompletedPages +
-        _templeCompletedPages +
-        _characterHeaderCompletedPages +
-        _analysisCompletedPages;
-    final totalPages = _characterTotalPages +
-        _templeTotalPages +
-        _characterHeaderTotalPages +
-        _analysisTotalPages;
-    _progress = totalPages <= 0
+    final completedSteps = _characterCompletedSteps +
+        _templeCompletedSteps +
+        _characterHeaderCompletedSteps +
+        _analysisCompletedSteps;
+    final totalSteps = _characterTotalSteps +
+        _templeTotalSteps +
+        _characterHeaderTotalSteps +
+        _analysisTotalSteps;
+    _progress = totalSteps <= 0
         ? 0
-        : (completedPages / totalPages).clamp(0, 1).toDouble();
+        : (completedSteps / totalSteps).clamp(0, 1).toDouble();
     _notifyIfActive();
   }
 
@@ -248,14 +248,14 @@ class UserAssetAnalysisController extends ChangeNotifier {
   void _resetProgress() {
     _progressLabel = '正在准备资产分析';
     _progress = 0;
-    _characterCompletedPages = 0;
-    _characterTotalPages = 1;
-    _templeCompletedPages = 0;
-    _templeTotalPages = 1;
-    _characterHeaderCompletedPages = 0;
-    _characterHeaderTotalPages = 1;
-    _analysisCompletedPages = 0;
-    _analysisTotalPages = 2;
+    _characterCompletedSteps = 0;
+    _characterTotalSteps = 1;
+    _templeCompletedSteps = 0;
+    _templeTotalSteps = 1;
+    _characterHeaderCompletedSteps = 0;
+    _characterHeaderTotalSteps = 1;
+    _analysisCompletedSteps = 0;
+    _analysisTotalSteps = 2;
   }
 
   /// 通知仍挂载的监听者

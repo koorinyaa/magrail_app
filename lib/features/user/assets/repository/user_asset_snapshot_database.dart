@@ -1,7 +1,11 @@
 import 'package:magrail_app/core/network/tinygrail_page.dart';
+import 'package:magrail_app/features/user/assets/model/user_character_snapshot_query.dart';
 import 'package:magrail_app/features/user/assets/model/user_asset_snapshot.dart';
 import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_database_models.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
+
+part 'user_asset_snapshot_database_persistence.dart';
+part 'user_asset_snapshot_database_schema.dart';
 
 const String _metaTableName = 'user_asset_snapshot_meta';
 const String _characterTableName = 'user_asset_snapshot_characters';
@@ -9,8 +13,6 @@ const String _templeTableName = 'user_asset_snapshot_temples';
 const String _characterHeaderTableName =
     'user_asset_snapshot_character_headers';
 const String _sourceStateTableName = 'user_asset_snapshot_source_state';
-// 每批 500 行用于控制 3 万条快照写入时的 SQLite 参数与内存占用
-const int _insertBatchSize = 500;
 
 /// 用户资产快照数据库
 class UserAssetSnapshotDatabase {
@@ -20,88 +22,141 @@ class UserAssetSnapshotDatabase {
   sqflite.Database? _database;
   Future<sqflite.Database>? _openingDatabase;
 
-  /// 写入用户资产快照行
+  /// 写入完整用户资产快照
   ///
-  /// [entry] 用户资产快照行
+  /// [record] 用户资产快照持久化记录
   /// [charactersUpdatedAtMilliseconds] 用户角色更新时间戳
   /// [templesUpdatedAtMilliseconds] 用户圣殿更新时间戳
   /// [characterHeadersUpdatedAtMilliseconds] 全部角色资料更新时间戳
-  Future<UserAssetSourceState> upsertSnapshotEntry(
-    UserAssetSnapshotEntry entry, {
+  /// [characterContentHash] 用户角色内容哈希
+  /// [templeContentHash] 用户圣殿内容哈希
+  /// [characterHeaderContentHash] 全部角色资料内容哈希
+  Future<UserAssetSourceState> upsertSnapshotRecord(
+    UserAssetSnapshotRecord record, {
     required int charactersUpdatedAtMilliseconds,
     required int templesUpdatedAtMilliseconds,
     required int characterHeadersUpdatedAtMilliseconds,
+    required String characterContentHash,
+    required String templeContentHash,
+    required String characterHeaderContentHash,
   }) async {
     final database = await _openDatabase();
     return database.transaction((transaction) async {
-      final sourceState = await _nextSourceState(
+      final current = await _readStoredSourceState(
         transaction,
-        entry.username,
-        charactersUpdatedAtMilliseconds,
-        templesUpdatedAtMilliseconds,
-        characterHeadersUpdatedAtMilliseconds,
+        record.username,
       );
-      await transaction.insert(
-        _metaTableName,
-        {
-          'username': entry.username,
-          'nickname': entry.nickname,
-          'character_total_items': entry.characterTotalItems,
-          'temple_total_items': entry.templeTotalItems,
-        },
-        conflictAlgorithm: sqflite.ConflictAlgorithm.replace,
+      final characterChanged =
+          current?.characterContentHash != characterContentHash;
+      final templeChanged = current?.templeContentHash != templeContentHash;
+      final headerChanged =
+          current?.characterHeaderContentHash != characterHeaderContentHash;
+      final sourceState = _buildSourceState(
+        current: current,
+        characterChanged: characterChanged,
+        templeChanged: templeChanged,
+        characterHeaderChanged: headerChanged,
+        charactersUpdatedAtMilliseconds: charactersUpdatedAtMilliseconds,
+        templesUpdatedAtMilliseconds: templesUpdatedAtMilliseconds,
+        characterHeadersUpdatedAtMilliseconds:
+            characterHeadersUpdatedAtMilliseconds,
       );
-      await transaction.delete(
-        _characterTableName,
-        where: 'username = ?',
-        whereArgs: [entry.username],
-      );
-      await transaction.delete(
-        _templeTableName,
-        where: 'username = ?',
-        whereArgs: [entry.username],
-      );
-      await transaction.delete(
-        _characterHeaderTableName,
-        where: 'username = ?',
-        whereArgs: [entry.username],
-      );
-      await _insertPayloadRows(
+
+      await _upsertMetadata(
         transaction,
-        tableName: _characterTableName,
-        keyColumn: 'character_id',
-        username: entry.username,
-        rows: entry.characterRows,
+        username: record.username,
+        nickname: record.nickname,
+        characterTotalItems: record.characterTotalItems,
+        templeTotalItems: record.templeTotalItems,
       );
-      await _insertTemplePayloadRows(
+      if (characterChanged) {
+        await _replaceCharacterRows(
+          transaction,
+          username: record.username,
+          rows: record.characterRows,
+        );
+      }
+      if (templeChanged) {
+        await _replaceTempleRows(
+          transaction,
+          username: record.username,
+          rows: record.templeRows,
+        );
+      }
+      if (headerChanged) {
+        await _replaceCharacterHeaderRows(
+          transaction,
+          username: record.username,
+          rows: record.characterHeaderRows,
+        );
+      }
+      await _writeSourceState(
         transaction,
-        username: entry.username,
-        rows: entry.templeRows,
-      );
-      await _insertPayloadRows(
-        transaction,
-        tableName: _characterHeaderTableName,
-        keyColumn: 'character_id',
-        username: entry.username,
-        rows: entry.characterHeaderRows,
-      );
-      await transaction.insert(
-        _sourceStateTableName,
-        {
-          'username': entry.username,
-          'character_revision': sourceState.revisions.characters,
-          'temple_revision': sourceState.revisions.temples,
-          'character_header_revision': sourceState.revisions.characterHeaders,
-          'character_updated_at_milliseconds':
-              sourceState.charactersUpdatedAtMilliseconds,
-          'temple_updated_at_milliseconds':
-              sourceState.templesUpdatedAtMilliseconds,
-          'character_header_updated_at_milliseconds':
-              sourceState.characterHeadersUpdatedAtMilliseconds,
-        },
-        conflictAlgorithm: sqflite.ConflictAlgorithm.replace,
+        username: record.username,
+        sourceState: sourceState,
+        characterContentHash: characterContentHash,
+        templeContentHash: templeContentHash,
+        characterHeaderContentHash: characterHeaderContentHash,
       );
       return sourceState;
+    });
+  }
+
+  /// 单独写入用户角色快照
+  ///
+  /// [username] 用户名
+  /// [nickname] 用户昵称
+  /// [rows] 用户角色快照明细
+  /// [totalItems] 角色接口总数
+  /// [updatedAtMilliseconds] 用户角色更新时间戳
+  /// [contentHash] 用户角色内容哈希
+  Future<bool> upsertCharacterSnapshot({
+    required String username,
+    required String nickname,
+    required List<UserCharacterSnapshotPayload> rows,
+    required int totalItems,
+    required int updatedAtMilliseconds,
+    required String contentHash,
+  }) async {
+    final database = await _openDatabase();
+    return database.transaction((transaction) async {
+      final current = await _readStoredSourceState(transaction, username);
+      final changed = current?.characterContentHash != contentHash;
+      final sourceState = _buildSourceState(
+        current: current,
+        characterChanged: changed,
+        templeChanged: false,
+        characterHeaderChanged: false,
+        charactersUpdatedAtMilliseconds: updatedAtMilliseconds,
+        templesUpdatedAtMilliseconds:
+            current?.sourceState.templesUpdatedAtMilliseconds ?? 0,
+        characterHeadersUpdatedAtMilliseconds:
+            current?.sourceState.characterHeadersUpdatedAtMilliseconds ?? 0,
+      );
+      final metadata = await _readMetadata(transaction, username);
+      await _upsertMetadata(
+        transaction,
+        username: username,
+        nickname: nickname,
+        characterTotalItems: totalItems,
+        templeTotalItems: _rowInt(metadata?['temple_total_items']),
+      );
+      if (changed) {
+        await _replaceCharacterRows(
+          transaction,
+          username: username,
+          rows: rows,
+        );
+      }
+      await _writeSourceState(
+        transaction,
+        username: username,
+        sourceState: sourceState,
+        characterContentHash: contentHash,
+        templeContentHash: current?.templeContentHash ?? '',
+        characterHeaderContentHash: current?.characterHeaderContentHash ?? '',
+      );
+      return changed;
     });
   }
 
@@ -110,7 +165,114 @@ class UserAssetSnapshotDatabase {
   /// [username] 用户名
   Future<UserAssetSourceState?> readSourceState(String username) async {
     final database = await _openDatabase();
-    return _readSourceState(database, username);
+    return (await _readStoredSourceState(database, username))?.sourceState;
+  }
+
+  /// 分页读取有效的用户角色快照
+  ///
+  /// [username] 用户名
+  /// [page] 页码
+  /// [pageSize] 每页角色数量
+  /// [sort] 排序字段
+  /// [direction] 排序方向
+  Future<TinygrailPage<UserAssetSnapshotPayload>?> readCharacterPage({
+    required String username,
+    required int page,
+    required int pageSize,
+    required UserCharacterSnapshotSort sort,
+    required UserCharacterSnapshotSortDirection direction,
+  }) async {
+    if (page <= 0 || pageSize <= 0) {
+      throw ArgumentError('用户角色分页参数无效');
+    }
+    final database = await _openDatabase();
+    return database.transaction((transaction) async {
+      final sourceState = await _readStoredSourceState(transaction, username);
+      if (sourceState == null ||
+          !sourceState.sourceState.isCharacterDataFreshAt(DateTime.now())) {
+        return null;
+      }
+      final totalItems = await _countRows(
+        transaction,
+        tableName: _characterTableName,
+        username: username,
+      );
+      final metadata = await _readMetadata(transaction, username);
+      if (metadata == null ||
+          _rowInt(metadata['character_total_items']) != totalItems) {
+        await transaction.rawUpdate(
+          'UPDATE $_sourceStateTableName '
+          'SET character_updated_at_milliseconds = 0, '
+          'character_content_hash = ? WHERE username = ?',
+          ['', username],
+        );
+        return null;
+      }
+      final rows = await transaction.rawQuery(
+        'SELECT c.character_id, c.payload_json '
+        'FROM $_characterTableName c '
+        'WHERE c.username = ? '
+        'ORDER BY ${_characterOrderBy(sort, direction)} '
+        'LIMIT ? OFFSET ?',
+        [username, pageSize, (page - 1) * pageSize],
+      );
+      return TinygrailPage(
+        items: List<UserAssetSnapshotPayload>.unmodifiable(
+          rows.map(
+            (row) => UserAssetSnapshotPayload(
+              id: _rowInt(row['character_id']),
+              payloadJson: row['payload_json'] as String? ?? '',
+            ),
+          ),
+        ),
+        currentPage: page,
+        totalPages: totalItems == 0 ? 0 : (totalItems / pageSize).ceil(),
+        totalItems: totalItems,
+        itemsPerPage: pageSize,
+      );
+    });
+  }
+
+  /// 标记用户角色快照失效并保留其他来源数据
+  ///
+  /// [username] 用户名
+  Future<void> invalidateCharacterSnapshot(String username) async {
+    final database = await _openDatabase();
+    await database.rawUpdate(
+      'UPDATE $_sourceStateTableName '
+      'SET character_updated_at_milliseconds = 0, '
+      'character_content_hash = ? WHERE username = ?',
+      ['', username],
+    );
+  }
+
+  /// 读取等级排序下的快速跳转位置
+  ///
+  /// [username] 用户名
+  /// [direction] 等级排序方向
+  Future<List<UserCharacterLevelPosition>> readCharacterLevelPositions({
+    required String username,
+    required UserCharacterSnapshotSortDirection direction,
+  }) async {
+    final database = await _openDatabase();
+    final rows = await database.rawQuery(
+      'SELECT level, COUNT(*) AS item_count '
+      'FROM $_characterTableName WHERE username = ? '
+      'GROUP BY level ORDER BY level ${_sqlDirection(direction)}',
+      [username],
+    );
+    var absoluteIndex = 0;
+    final positions = <UserCharacterLevelPosition>[];
+    for (final row in rows) {
+      positions.add(
+        UserCharacterLevelPosition(
+          level: _rowInt(row['level']),
+          absoluteIndex: absoluteIndex,
+        ),
+      );
+      absoluteIndex += _rowInt(row['item_count']);
+    }
+    return List<UserCharacterLevelPosition>.unmodifiable(positions);
   }
 
   /// 分页读取星光圣殿快照
@@ -126,23 +288,18 @@ class UserAssetSnapshotDatabase {
     if (page <= 0 || pageSize <= 0) {
       throw ArgumentError('星光圣殿分页参数无效');
     }
-
     final database = await _openDatabase();
     return database.transaction((transaction) async {
-      final sourceState = await _readSourceState(transaction, username);
-      if (sourceState == null) {
-        throw StateError('圣殿快照不存在，请返回资产分析刷新');
+      final storedState = await _readStoredSourceState(transaction, username);
+      if (storedState == null) {
+        throw StateError('圣殿快照不存在');
       }
-      if (!sourceState.isTempleDataFreshAt(DateTime.now())) {
-        throw StateError('圣殿快照已过期，请返回资产分析刷新');
+      if (!storedState.sourceState.isTempleDataFreshAt(DateTime.now())) {
+        throw StateError('圣殿快照已过期');
       }
-
       final countRows = await transaction.rawQuery(
-        '''
-        SELECT COUNT(*) AS total_count
-        FROM $_templeTableName
-        WHERE username = ? AND star_forces >= ?
-        ''',
+        'SELECT COUNT(*) AS total_count FROM $_templeTableName '
+        'WHERE username = ? AND star_forces >= ?',
         [username, starlightTempleStarForcesThreshold],
       );
       final totalItems =
@@ -156,75 +313,53 @@ class UserAssetSnapshotDatabase {
         limit: pageSize,
         offset: (page - 1) * pageSize,
       );
-      final totalPages = totalItems == 0 ? 0 : (totalItems / pageSize).ceil();
-
       return TinygrailPage(
         items: List<UserAssetSnapshotPayload>.unmodifiable(
-          rows.map((row) {
-            return UserAssetSnapshotPayload(
+          rows.map(
+            (row) => UserAssetSnapshotPayload(
               id: _rowInt(row['temple_id']),
               payloadJson: row['payload_json'] as String? ?? '',
-            );
-          }),
+            ),
+          ),
         ),
         currentPage: page,
-        totalPages: totalPages,
+        totalPages: totalItems == 0 ? 0 : (totalItems / pageSize).ceil(),
         totalItems: totalItems,
         itemsPerPage: pageSize,
       );
     });
   }
 
-  /// 读取用户资产快照行
+  /// 读取用户资产快照持久化记录
   ///
   /// [username] 用户名
-  Future<UserAssetSnapshotEntry?> readSnapshotEntry(String username) async {
+  Future<UserAssetSnapshotRecord?> readSnapshotRecord(String username) async {
     final database = await _openDatabase();
     return database.transaction((transaction) async {
-      final metadataRows = await transaction.query(
-        _metaTableName,
-        where: 'username = ?',
-        whereArgs: [username],
-        limit: 1,
-      );
-      if (metadataRows.isEmpty) {
+      final metadata = await _readMetadata(transaction, username);
+      if (metadata == null) {
         return null;
       }
-
-      final sourceState = await _readSourceState(transaction, username);
-      if (sourceState == null || !sourceState.revisions.isComplete) {
+      final sourceState = await _readStoredSourceState(transaction, username);
+      if (sourceState == null ||
+          !sourceState.sourceState.revisions.isComplete) {
         return null;
       }
-
-      final metadata = metadataRows.first;
-      final characterRows = await _readPayloadRows(
-        transaction,
-        tableName: _characterTableName,
-        keyColumn: 'character_id',
-        username: username,
-      );
-      final templeRows = await _readPayloadRows(
-        transaction,
-        tableName: _templeTableName,
-        keyColumn: 'temple_id',
-        username: username,
-      );
-      final characterHeaderRows = await _readPayloadRows(
-        transaction,
-        tableName: _characterHeaderTableName,
-        keyColumn: 'character_id',
-        username: username,
-      );
-
-      return UserAssetSnapshotEntry(
+      return UserAssetSnapshotRecord(
         username: metadata['username'] as String? ?? '',
         nickname: metadata['nickname'] as String? ?? '',
-        characterRows: characterRows,
-        templeRows: templeRows,
-        characterHeaderRows: characterHeaderRows,
+        characterRows: await _readCharacterRows(transaction, username),
+        templeRows: await _readPayloadRows(
+          transaction,
+          tableName: _templeTableName,
+          keyColumn: 'temple_id',
+          username: username,
+        ),
+        characterHeaderRows:
+            await _readCharacterHeaderRows(transaction, username),
         characterTotalItems: _rowInt(metadata['character_total_items']),
         templeTotalItems: _rowInt(metadata['temple_total_items']),
-        sourceState: sourceState,
+        sourceState: sourceState.sourceState,
       );
     });
   }
@@ -263,279 +398,46 @@ class UserAssetSnapshotDatabase {
         return;
       }
     }
-
     _database = null;
     _openingDatabase = null;
-    if (database == null || !database.isOpen) {
-      return;
-    }
-
-    await database.close();
-  }
-
-  /// 打开用户资产快照数据库
-  Future<sqflite.Database> _openDatabase() {
-    final database = _database;
     if (database != null && database.isOpen) {
-      return Future.value(database);
-    }
-
-    final openingDatabase = _openingDatabase;
-    if (openingDatabase != null) {
-      return openingDatabase;
-    }
-
-    // sqflite 使用平台 SQLite 插件，避免 sqlite3 native assets 热更新缺失导致启动失败
-    final nextOpeningDatabase = sqflite
-        .openDatabase(
-      'user_assets.sqlite',
-      version: 1,
-      // 页面实例使用独立连接，避免旧页面关闭新页面复用的同路径连接
-      singleInstance: false,
-      onCreate: (database, _) => _createSchema(database),
-    )
-        .then((database) {
-      _database = database;
-      return database;
-    });
-    _openingDatabase = nextOpeningDatabase;
-    return nextOpeningDatabase.whenComplete(() {
-      _openingDatabase = null;
-    });
-  }
-
-  /// 创建用户资产快照表
-  ///
-  /// [database] 用户资产快照数据库
-  Future<void> _createSchema(sqflite.Database database) async {
-    await database.execute('''
-      CREATE TABLE $_metaTableName (
-        username TEXT NOT NULL PRIMARY KEY,
-        nickname TEXT NOT NULL,
-        character_total_items INTEGER NOT NULL,
-        temple_total_items INTEGER NOT NULL
-      )
-      ''');
-    await database.execute('''
-      CREATE TABLE $_characterTableName (
-        username TEXT NOT NULL,
-        character_id INTEGER NOT NULL,
-        row_order INTEGER NOT NULL,
-        payload_json TEXT NOT NULL,
-        PRIMARY KEY (username, character_id)
-      )
-      ''');
-    await database.execute('''
-      CREATE TABLE $_templeTableName (
-        username TEXT NOT NULL,
-        temple_id INTEGER NOT NULL,
-        row_order INTEGER NOT NULL,
-        star_forces INTEGER NOT NULL,
-        payload_json TEXT NOT NULL,
-        PRIMARY KEY (username, temple_id)
-      )
-      ''');
-    await database.execute('''
-      CREATE TABLE $_characterHeaderTableName (
-        username TEXT NOT NULL,
-        character_id INTEGER NOT NULL,
-        row_order INTEGER NOT NULL,
-        payload_json TEXT NOT NULL,
-        PRIMARY KEY (username, character_id)
-      )
-      ''');
-    await database.execute('''
-      CREATE TABLE $_sourceStateTableName (
-        username TEXT NOT NULL PRIMARY KEY,
-        character_revision INTEGER NOT NULL,
-        temple_revision INTEGER NOT NULL,
-        character_header_revision INTEGER NOT NULL,
-        character_updated_at_milliseconds INTEGER NOT NULL,
-        temple_updated_at_milliseconds INTEGER NOT NULL,
-        character_header_updated_at_milliseconds INTEGER NOT NULL
-      )
-      ''');
-    await database.execute('''
-      CREATE INDEX idx_asset_snapshot_character_order
-      ON $_characterTableName (username, row_order)
-      ''');
-    await database.execute('''
-      CREATE INDEX idx_asset_snapshot_temple_order
-      ON $_templeTableName (username, row_order)
-      ''');
-    await database.execute('''
-      CREATE INDEX idx_asset_snapshot_temple_star_forces
-      ON $_templeTableName (username, star_forces)
-      ''');
-    await database.execute('''
-      CREATE INDEX idx_asset_snapshot_character_header_order
-      ON $_characterHeaderTableName (username, row_order)
-      ''');
-  }
-
-  /// 批量写入资产 payload JSON
-  ///
-  /// [transaction] SQLite 写入事务
-  /// [tableName] 快照明细表名
-  /// [keyColumn] 明细主键列名
-  /// [username] 用户名
-  /// [rows] 快照明细行
-  Future<void> _insertPayloadRows(
-    sqflite.Transaction transaction, {
-    required String tableName,
-    required String keyColumn,
-    required String username,
-    required List<UserAssetSnapshotPayload> rows,
-  }) async {
-    for (var start = 0; start < rows.length; start += _insertBatchSize) {
-      final batch = transaction.batch();
-      final end = (start + _insertBatchSize).clamp(0, rows.length);
-      for (var index = start; index < end; index += 1) {
-        final row = rows[index];
-        batch.insert(
-          tableName,
-          {
-            'username': username,
-            keyColumn: row.id,
-            'row_order': index,
-            'payload_json': row.payloadJson,
-          },
-          conflictAlgorithm: sqflite.ConflictAlgorithm.replace,
-        );
-      }
-      await batch.commit(noResult: true);
+      await database.close();
     }
   }
 
-  /// 批量写入用户圣殿快照
+  /// 生成写入后的原始数据状态
   ///
-  /// [transaction] SQLite 写入事务
-  /// [username] 用户名
-  /// [rows] 用户圣殿快照明细
-  Future<void> _insertTemplePayloadRows(
-    sqflite.Transaction transaction, {
-    required String username,
-    required List<UserAssetSnapshotPayload> rows,
-  }) async {
-    for (var start = 0; start < rows.length; start += _insertBatchSize) {
-      final batch = transaction.batch();
-      final end = (start + _insertBatchSize).clamp(0, rows.length);
-      for (var index = start; index < end; index += 1) {
-        final row = rows[index];
-        batch.insert(
-          _templeTableName,
-          {
-            'username': username,
-            'temple_id': row.id,
-            'row_order': index,
-            'star_forces': row.starForces,
-            'payload_json': row.payloadJson,
-          },
-          conflictAlgorithm: sqflite.ConflictAlgorithm.replace,
-        );
-      }
-      await batch.commit(noResult: true);
-    }
-  }
-
-  /// 生成下一组原始数据状态
-  ///
-  /// [executor] SQLite 执行器
-  /// [username] 用户名
+  /// [current] 当前数据库状态
+  /// [characterChanged] 用户角色是否变化
+  /// [templeChanged] 用户圣殿是否变化
+  /// [characterHeaderChanged] 全部角色资料是否变化
   /// [charactersUpdatedAtMilliseconds] 用户角色更新时间戳
   /// [templesUpdatedAtMilliseconds] 用户圣殿更新时间戳
   /// [characterHeadersUpdatedAtMilliseconds] 全部角色资料更新时间戳
-  Future<UserAssetSourceState> _nextSourceState(
-    sqflite.DatabaseExecutor executor,
-    String username,
-    int charactersUpdatedAtMilliseconds,
-    int templesUpdatedAtMilliseconds,
-    int characterHeadersUpdatedAtMilliseconds,
-  ) async {
-    final current = await _readSourceState(executor, username);
+  UserAssetSourceState _buildSourceState({
+    required _StoredUserAssetSourceState? current,
+    required bool characterChanged,
+    required bool templeChanged,
+    required bool characterHeaderChanged,
+    required int charactersUpdatedAtMilliseconds,
+    required int templesUpdatedAtMilliseconds,
+    required int characterHeadersUpdatedAtMilliseconds,
+  }) {
+    final revisions = current?.sourceState.revisions;
     return UserAssetSourceState(
       revisions: UserAssetDataRevisions(
-        characters: (current?.revisions.characters ?? 0) + 1,
-        temples: (current?.revisions.temples ?? 0) + 1,
-        characterHeaders: (current?.revisions.characterHeaders ?? 0) + 1,
+        characters: _nextRevision(revisions?.characters, characterChanged),
+        temples: _nextRevision(revisions?.temples, templeChanged),
+        characterHeaders: _nextRevision(
+          revisions?.characterHeaders,
+          characterHeaderChanged,
+        ),
+        schemaVersion: userAssetSnapshotSchemaVersion,
       ),
       charactersUpdatedAtMilliseconds: charactersUpdatedAtMilliseconds,
       templesUpdatedAtMilliseconds: templesUpdatedAtMilliseconds,
       characterHeadersUpdatedAtMilliseconds:
           characterHeadersUpdatedAtMilliseconds,
     );
-  }
-
-  /// 通过 SQLite 执行器读取原始数据状态
-  ///
-  /// [executor] SQLite 执行器
-  /// [username] 用户名
-  Future<UserAssetSourceState?> _readSourceState(
-    sqflite.DatabaseExecutor executor,
-    String username,
-  ) async {
-    final rows = await executor.query(
-      _sourceStateTableName,
-      where: 'username = ?',
-      whereArgs: [username],
-      limit: 1,
-    );
-    if (rows.isEmpty) {
-      return null;
-    }
-
-    final row = rows.first;
-    return UserAssetSourceState(
-      revisions: UserAssetDataRevisions(
-        characters: _rowInt(row['character_revision']),
-        temples: _rowInt(row['temple_revision']),
-        characterHeaders: _rowInt(row['character_header_revision']),
-      ),
-      charactersUpdatedAtMilliseconds: _rowInt(
-        row['character_updated_at_milliseconds'],
-      ),
-      templesUpdatedAtMilliseconds: _rowInt(
-        row['temple_updated_at_milliseconds'],
-      ),
-      characterHeadersUpdatedAtMilliseconds: _rowInt(
-        row['character_header_updated_at_milliseconds'],
-      ),
-    );
-  }
-
-  /// 读取快照明细行
-  ///
-  /// [executor] SQLite 执行器
-  /// [tableName] 快照明细表名
-  /// [keyColumn] 明细主键列名
-  /// [username] 用户名
-  Future<List<UserAssetSnapshotPayload>> _readPayloadRows(
-    sqflite.DatabaseExecutor executor, {
-    required String tableName,
-    required String keyColumn,
-    required String username,
-  }) async {
-    final rows = await executor.query(
-      tableName,
-      columns: [keyColumn, 'payload_json'],
-      where: 'username = ?',
-      whereArgs: [username],
-      orderBy: 'row_order ASC',
-    );
-    return List<UserAssetSnapshotPayload>.unmodifiable(
-      rows.map((row) {
-        return UserAssetSnapshotPayload(
-          id: _rowInt(row[keyColumn]),
-          payloadJson: row['payload_json'] as String? ?? '',
-        );
-      }),
-    );
-  }
-
-  /// 将 SQLite 数字字段转换为整数
-  ///
-  /// [value] SQLite 字段值
-  int _rowInt(Object? value) {
-    return value is num ? value.toInt() : 0;
   }
 }

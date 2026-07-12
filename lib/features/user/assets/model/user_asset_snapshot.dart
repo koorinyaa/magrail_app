@@ -6,6 +6,9 @@ import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
 /// 用户资产四类缓存统一有效期
 const Duration userAssetCacheLifetime = Duration(days: 7);
 
+/// 用户资产快照当前结构版本
+const int userAssetSnapshotSchemaVersion = 9;
+
 /// 圣殿星之力达到该值时点亮星星
 const int starlightTempleStarForcesThreshold = 10000;
 
@@ -67,10 +70,12 @@ class UserAssetDataRevisions {
   /// [characters] 用户角色版本
   /// [temples] 用户圣殿版本
   /// [characterHeaders] 全部角色资料版本
+  /// [schemaVersion] 快照数据库结构版本
   const UserAssetDataRevisions({
     required this.characters,
     required this.temples,
     required this.characterHeaders,
+    required this.schemaVersion,
   });
 
   /// 从缓存 JSON 创建原始数据版本
@@ -79,7 +84,8 @@ class UserAssetDataRevisions {
   factory UserAssetDataRevisions.fromJson(Map<String, Object?> json) {
     if (!json.containsKey('characters') ||
         !json.containsKey('temples') ||
-        !json.containsKey('characterHeaders')) {
+        !json.containsKey('characterHeaders') ||
+        !json.containsKey('schemaVersion')) {
       throw const FormatException('资产原始数据版本字段缺失');
     }
 
@@ -89,6 +95,7 @@ class UserAssetDataRevisions {
       characterHeaders: TinygrailResponseParser.asInt(
         json['characterHeaders'],
       ),
+      schemaVersion: TinygrailResponseParser.asInt(json['schemaVersion']),
     );
     if (!revisions.isComplete) {
       throw const FormatException('资产原始数据版本无效');
@@ -105,9 +112,15 @@ class UserAssetDataRevisions {
   /// 全部角色资料版本
   final int characterHeaders;
 
+  /// 快照数据库结构版本
+  final int schemaVersion;
+
   /// 三类原始数据是否都已形成完整版本
   bool get isComplete {
-    return characters > 0 && temples > 0 && characterHeaders > 0;
+    return characters > 0 &&
+        temples > 0 &&
+        characterHeaders > 0 &&
+        schemaVersion == userAssetSnapshotSchemaVersion;
   }
 
   /// 判断是否与另一组原始数据版本一致
@@ -116,7 +129,8 @@ class UserAssetDataRevisions {
   bool matches(UserAssetDataRevisions other) {
     return characters == other.characters &&
         temples == other.temples &&
-        characterHeaders == other.characterHeaders;
+        characterHeaders == other.characterHeaders &&
+        schemaVersion == other.schemaVersion;
   }
 
   /// 转换为缓存 JSON
@@ -125,6 +139,7 @@ class UserAssetDataRevisions {
       'characters': characters,
       'temples': temples,
       'characterHeaders': characterHeaders,
+      'schemaVersion': schemaVersion,
     };
   }
 }
@@ -160,6 +175,9 @@ class UserAssetSourceState {
   ///
   /// [now] 有效期判断基准时间
   bool isFreshAt(DateTime now) {
+    if (!revisions.isComplete) {
+      return false;
+    }
     final nowMilliseconds = now.millisecondsSinceEpoch;
     return _isTimestampFresh(
           charactersUpdatedAtMilliseconds,
@@ -172,14 +190,28 @@ class UserAssetSourceState {
         );
   }
 
+  /// 用户角色数据是否仍在有效期内
+  ///
+  /// [now] 有效期判断基准时间
+  bool isCharacterDataFreshAt(DateTime now) {
+    return revisions.characters > 0 &&
+        revisions.schemaVersion == userAssetSnapshotSchemaVersion &&
+        _isTimestampFresh(
+          charactersUpdatedAtMilliseconds,
+          now.millisecondsSinceEpoch,
+        );
+  }
+
   /// 用户圣殿数据是否仍在有效期内
   ///
   /// [now] 有效期判断基准时间
   bool isTempleDataFreshAt(DateTime now) {
-    return _isTimestampFresh(
-      templesUpdatedAtMilliseconds,
-      now.millisecondsSinceEpoch,
-    );
+    return revisions.temples > 0 &&
+        revisions.schemaVersion == userAssetSnapshotSchemaVersion &&
+        _isTimestampFresh(
+          templesUpdatedAtMilliseconds,
+          now.millisecondsSinceEpoch,
+        );
   }
 
   /// 判断单个原始数据时间是否仍有效
