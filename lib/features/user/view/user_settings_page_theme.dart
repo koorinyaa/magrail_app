@@ -66,7 +66,7 @@ class _ThemeModePageState extends State<_ThemeModePage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       _ThemeModeOptionTile(
-                        icon: Icons.brightness_auto_rounded,
+                        icon: LucideIcons.sunMoon,
                         label: ThemeMode.system.settingsLabel,
                         isSelected: _themeMode == ThemeMode.system,
                         isDisabled: _isSaving,
