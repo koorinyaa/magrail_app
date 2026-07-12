@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:magrail_app/core/update/app_update_dialog.dart';
+import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_database.dart';
+import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_repository.dart';
 
 import 'bootstrap.dart';
 import 'router/app_router.dart';
@@ -55,7 +59,8 @@ class _MagrailAppState extends State<MagrailApp> {
       onThemeModeChanged: _handleThemeModeChanged,
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkForStartupUpdate();
+      unawaited(_checkForStartupUpdate());
+      unawaited(_refreshCurrentUserAssetSourcesSilently());
     });
   }
 
@@ -125,6 +130,40 @@ class _MagrailAppState extends State<MagrailApp> {
       );
     } catch (_) {
       // 启动检查失败不影响应用正常使用
+    }
+  }
+
+  /// 静默刷新当前用户的资产来源数据
+  Future<void> _refreshCurrentUserAssetSourcesSilently() async {
+    final userRepository = widget.dependencies.repositories.user;
+    final database = UserAssetSnapshotDatabase();
+    try {
+      if (!await userRepository.hasCurrentUserSessionCookie()) {
+        return;
+      }
+
+      var profile = userRepository.readCachedCurrentUserAssets();
+      profile ??= (await userRepository.fetchUserAssets()).profile;
+      if (profile == null || profile.name.trim().isEmpty) {
+        return;
+      }
+
+      final snapshotRepository = UserAssetSnapshotRepository(
+        userRepository: userRepository,
+        characterDetailRepository:
+            widget.dependencies.repositories.characterDetail,
+        database: database,
+      );
+      await snapshotRepository.refreshSnapshot(
+        username: profile.name,
+        nickname: profile.nickname,
+        onProgress: (_) {},
+        maxServerConcurrency: 1,
+      );
+    } catch (_) {
+      // 启动静默刷新失败不影响应用正常使用
+    } finally {
+      await database.close();
     }
   }
 

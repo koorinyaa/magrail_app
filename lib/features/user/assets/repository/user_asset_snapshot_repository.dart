@@ -45,17 +45,19 @@ class UserAssetSnapshotRepository {
   /// [username] 用户名
   /// [nickname] 用户昵称
   /// [onProgress] 拉取进度回调
+  /// [maxServerConcurrency] 当前刷新允许的最大服务器并发请求数
   Future<UserAssetSnapshot> refreshSnapshot({
     required String username,
     required String nickname,
     required void Function(UserAssetSnapshotLoadProgress progress) onProgress,
+    int maxServerConcurrency = _maxServerConcurrency,
   }) async {
     final resolvedUsername = username.trim();
     if (resolvedUsername.isEmpty) {
       throw StateError('缺少用户名');
     }
 
-    final requestGate = _UserAssetSnapshotRequestGate(_maxServerConcurrency);
+    final requestGate = _UserAssetSnapshotRequestGate(maxServerConcurrency);
     late int charactersUpdatedAtMilliseconds;
     late int templesUpdatedAtMilliseconds;
     late int characterHeadersUpdatedAtMilliseconds;
