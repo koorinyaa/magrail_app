@@ -5,7 +5,7 @@ import 'package:magrail_app/features/chara/detail/character_detail_hero.dart';
 import 'package:magrail_app/features/user/assets/model/user_character_snapshot_query.dart';
 import 'package:magrail_app/features/user/model/user_character_api_item.dart';
 import 'package:magrail_app/features/user/model/user_ico_api_item.dart';
-import 'package:magrail_app/features/user/widgets/user_chara_asset_row.dart';
+import 'package:magrail_app/features/user/widgets/user_asset_rows.dart';
 
 /// 用户角色资产 sliver 列表
 class UserCharacterAssetSliverList extends StatelessWidget {
@@ -102,12 +102,19 @@ class UserCharacterAssetSliverList extends StatelessWidget {
     );
   }
 
-  /// 计算等级列表完整高度
+  /// 计算角色列表内容高度
   ///
   /// [items] 已加载角色条目
-  static double levelListExtent(List<UserCharacterApiItem> items) {
+  /// [showLevelHeaders] 是否包含等级分组标题
+  static double listExtent(
+    List<UserCharacterApiItem> items, {
+    bool showLevelHeaders = false,
+  }) {
     if (items.isEmpty) {
       return 0;
+    }
+    if (!showLevelHeaders) {
+      return items.length * itemExtent;
     }
     var groupCount = 1;
     for (var index = 1; index < items.length; index += 1) {
@@ -116,6 +123,63 @@ class UserCharacterAssetSliverList extends StatelessWidget {
       }
     }
     return items.length * itemExtent + groupCount * levelHeaderExtent;
+  }
+
+  /// 计算角色条目在列表内容中的顶部位置
+  ///
+  /// [items] 当前列表角色条目
+  /// [itemIndex] 角色条目下标
+  /// [showLevelHeaders] 是否包含等级分组标题
+  static double itemOffsetForIndex(
+    List<UserCharacterApiItem> items,
+    int itemIndex, {
+    bool showLevelHeaders = false,
+  }) {
+    if (items.isEmpty) {
+      return 0;
+    }
+    final resolvedIndex = itemIndex.clamp(0, items.length - 1).toInt();
+    if (!showLevelHeaders) {
+      return resolvedIndex * itemExtent;
+    }
+
+    var headerCount = 1;
+    for (var index = 1; index <= resolvedIndex; index += 1) {
+      if (items[index].level != items[index - 1].level) {
+        headerCount += 1;
+      }
+    }
+    return resolvedIndex * itemExtent + headerCount * levelHeaderExtent;
+  }
+
+  /// 根据列表内容偏移量查找当前可视角色
+  ///
+  /// [items] 当前列表角色条目
+  /// [listOffset] 列表内容顶部相对视口的偏移量
+  /// [showLevelHeaders] 是否包含等级分组标题
+  static int? itemIndexAtListOffset(
+    List<UserCharacterApiItem> items,
+    double listOffset, {
+    bool showLevelHeaders = false,
+  }) {
+    if (items.isEmpty) {
+      return null;
+    }
+    final resolvedOffset = listOffset.clamp(0.0, double.infinity).toDouble();
+    var headerCount = showLevelHeaders ? 1 : 0;
+    for (var index = 0; index < items.length; index += 1) {
+      if (showLevelHeaders &&
+          index > 0 &&
+          items[index].level != items[index - 1].level) {
+        headerCount += 1;
+      }
+      final itemOffset = index * itemExtent +
+          (showLevelHeaders ? headerCount * levelHeaderExtent : 0);
+      if (resolvedOffset < itemOffset + itemExtent) {
+        return index;
+      }
+    }
+    return items.length - 1;
   }
 
   /// 计算目标角色所属等级分组的跳转位置
@@ -262,7 +326,7 @@ class UserIcoAssetSliverList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverFixedExtentList(
-      itemExtent: _CharacterAssetSliverListMetrics.itemExtent,
+      itemExtent: _IcoAssetSliverListMetrics.itemExtent,
       delegate: SliverChildBuilderDelegate(
         (context, index) {
           final item = items[index];
@@ -359,10 +423,10 @@ class _AssetListItem extends StatelessWidget {
   }
 }
 
-/// 用户角色资产 sliver 列表尺寸
-final class _CharacterAssetSliverListMetrics {
-  /// 禁止创建用户角色资产 sliver 列表尺寸实例
-  const _CharacterAssetSliverListMetrics._();
+/// 用户 ICO 资产 sliver 列表尺寸
+final class _IcoAssetSliverListMetrics {
+  /// 禁止创建用户 ICO 资产 sliver 列表尺寸实例
+  const _IcoAssetSliverListMetrics._();
 
   /// 列表条目高度
   static const double itemExtent = 68;

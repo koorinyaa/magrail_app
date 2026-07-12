@@ -6,7 +6,7 @@ import 'package:magrail_app/features/user/model/user_detail_profile.dart';
 import 'package:magrail_app/features/user/model/user_ico_api_item.dart';
 import 'package:magrail_app/features/user/model/user_link_api_item.dart';
 import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
-import 'package:magrail_app/features/user/widgets/user_chara_asset_carousel.dart';
+import 'package:magrail_app/features/user/widgets/user_asset_carousels.dart';
 import 'package:magrail_app/features/user/widgets/user_chara_overview_states.dart';
 import 'package:magrail_app/features/user/widgets/user_link_temple_overview_carousel.dart';
 

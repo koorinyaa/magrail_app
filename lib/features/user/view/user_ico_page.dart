@@ -6,7 +6,7 @@ import 'package:magrail_app/features/chara/widgets/character_asset_skeleton_sliv
 import 'package:magrail_app/features/user/controller/user_ico_page_controller.dart';
 import 'package:magrail_app/features/user/model/user_ico_api_item.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
-import 'package:magrail_app/features/user/widgets/user_chara_asset_sliver_list.dart';
+import 'package:magrail_app/features/user/widgets/user_asset_sliver_lists.dart';
 
 /// 用户 ICO 二级页面
 class UserIcoPage extends StatefulWidget {

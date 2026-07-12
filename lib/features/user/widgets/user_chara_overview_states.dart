@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
 import 'package:magrail_app/core/widgets/page_section_sliver.dart';
-import 'package:magrail_app/features/user/widgets/user_chara_asset_carousel.dart';
+import 'package:magrail_app/features/user/widgets/user_asset_carousels.dart';
 import 'package:magrail_app/features/user/widgets/user_link_temple_overview_carousel.dart';
 
 /// 用户角色资产预览骨架区

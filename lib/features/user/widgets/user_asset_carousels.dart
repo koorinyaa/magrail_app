@@ -7,7 +7,7 @@ import 'package:magrail_app/core/widgets/snapping_horizontal_list_view.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_hero.dart';
 import 'package:magrail_app/features/user/model/user_character_api_item.dart';
 import 'package:magrail_app/features/user/model/user_ico_api_item.dart';
-import 'package:magrail_app/features/user/widgets/user_chara_asset_row.dart';
+import 'package:magrail_app/features/user/widgets/user_asset_rows.dart';
 import 'package:magrail_app/features/chara/widgets/character_asset_row_skeleton.dart';
 
 /// 用户角色资产横向栏
@@ -40,7 +40,7 @@ class UserCharacterAssetCarousel extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return _CharacterAssetCarousel<UserCharacterApiItem>(
+    return _UserAssetCarousel<UserCharacterApiItem>(
       items: characters,
       isLoading: isLoading,
       emptyMessage: '暂无角色',
@@ -95,7 +95,7 @@ class UserIcoAssetCarousel extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return _CharacterAssetCarousel<UserIcoApiItem>(
+    return _UserAssetCarousel<UserIcoApiItem>(
       items: icos,
       isLoading: isLoading,
       emptyMessage: '暂无ICO',
@@ -123,8 +123,8 @@ class UserIcoAssetCarousel extends StatelessWidget {
 }
 
 /// 用户角色资产横向栏
-class _CharacterAssetCarousel<T> extends StatelessWidget {
-  /// 创建用户角色资产横向栏
+class _UserAssetCarousel<T> extends StatelessWidget {
+  /// 创建用户资产横向栏
   ///
   /// [items] 用户角色资产预览
   /// [isLoading] 是否正在加载
@@ -133,7 +133,7 @@ class _CharacterAssetCarousel<T> extends StatelessWidget {
   /// [showLevelSkeleton] 是否显示等级骨架
   /// [skeletonMetricCount] 数据项骨架数量
   /// [showTrailingSkeleton] 是否显示右侧胶囊骨架
-  const _CharacterAssetCarousel({
+  const _UserAssetCarousel({
     required this.items,
     required this.isLoading,
     required this.emptyMessage,
@@ -192,7 +192,7 @@ class _CharacterAssetCarousel<T> extends StatelessWidget {
               context,
               horizontal: 24,
             ),
-            child: _CharacterAssetInlineEmpty(message: emptyMessage),
+            child: _UserAssetInlineEmpty(message: emptyMessage),
           );
         }
 
@@ -255,11 +255,11 @@ class _CharacterAssetCarousel<T> extends StatelessWidget {
 }
 
 /// 用户角色资产行内空状态
-class _CharacterAssetInlineEmpty extends StatelessWidget {
-  /// 创建用户角色资产行内空状态
+class _UserAssetInlineEmpty extends StatelessWidget {
+  /// 创建用户资产行内空状态
   ///
   /// [message] 空状态文案
-  const _CharacterAssetInlineEmpty({
+  const _UserAssetInlineEmpty({
     required this.message,
   });
 

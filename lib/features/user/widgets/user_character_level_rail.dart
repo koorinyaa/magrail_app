@@ -33,7 +33,7 @@ class UserCharacterLevelRail extends StatefulWidget {
 
 /// 用户角色等级快速跳转轨道状态
 class _UserCharacterLevelRailState extends State<UserCharacterLevelRail> {
-  int? _lastLongPressedLevel;
+  int? _lastDraggedLevel;
 
   /// 构建等级快速跳转轨道
   ///
@@ -61,26 +61,26 @@ class _UserCharacterLevelRailState extends State<UserCharacterLevelRail> {
               onTapUp: (details) {
                 _selectAt(details.localPosition.dy, height);
               },
-              onLongPressStart: (details) {
-                _lastLongPressedLevel = null;
+              onVerticalDragStart: (details) {
+                _lastDraggedLevel = null;
                 _selectAt(
                   details.localPosition.dy,
                   height,
-                  deduplicateLongPress: true,
+                  deduplicateDrag: true,
                 );
               },
-              onLongPressMoveUpdate: (details) {
+              onVerticalDragUpdate: (details) {
                 _selectAt(
                   details.localPosition.dy,
                   height,
-                  deduplicateLongPress: true,
+                  deduplicateDrag: true,
                 );
               },
-              onLongPressEnd: (_) {
-                _lastLongPressedLevel = null;
+              onVerticalDragEnd: (_) {
+                _lastDraggedLevel = null;
               },
-              onLongPressCancel: () {
-                _lastLongPressedLevel = null;
+              onVerticalDragCancel: () {
+                _lastDraggedLevel = null;
               },
               child: Column(
                 children: [
@@ -113,11 +113,11 @@ class _UserCharacterLevelRailState extends State<UserCharacterLevelRail> {
   ///
   /// [dy] 轨道内纵向位置
   /// [height] 轨道高度
-  /// [deduplicateLongPress] 是否过滤长按过程中重复的等级
+  /// [deduplicateDrag] 是否过滤拖动过程中重复的等级
   void _selectAt(
     double dy,
     double height, {
-    bool deduplicateLongPress = false,
+    bool deduplicateDrag = false,
   }) {
     if (widget.positions.isEmpty || height <= 0) {
       return;
@@ -127,10 +127,10 @@ class _UserCharacterLevelRailState extends State<UserCharacterLevelRail> {
         .floor()
         .clamp(0, widget.positions.length - 1);
     final level = widget.positions[index].level;
-    if (deduplicateLongPress && _lastLongPressedLevel == level) {
+    if (deduplicateDrag && _lastDraggedLevel == level) {
       return;
     }
-    _lastLongPressedLevel = deduplicateLongPress ? level : null;
+    _lastDraggedLevel = deduplicateDrag ? level : null;
     unawaited(HapticFeedback.selectionClick());
     widget.onLevelSelected(level);
   }

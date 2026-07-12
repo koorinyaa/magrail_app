@@ -16,7 +16,7 @@ import 'package:magrail_app/features/user/controller/current_user_character_page
 import 'package:magrail_app/features/user/controller/other_user_character_page_controller.dart';
 import 'package:magrail_app/features/user/model/user_character_api_item.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
-import 'package:magrail_app/features/user/widgets/user_chara_asset_sliver_list.dart';
+import 'package:magrail_app/features/user/widgets/user_asset_sliver_lists.dart';
 import 'package:magrail_app/features/user/widgets/user_character_level_rail.dart';
 import 'package:magrail_app/features/user/widgets/user_character_sort_toolbar.dart';
 
@@ -86,7 +86,10 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
         ),
         username: widget.username,
         nickname: widget.nickname ?? '',
+        onAutomaticRefreshSucceeded: _showAutomaticRefreshSucceeded,
         onAutomaticRefreshFailed: _showAutomaticRefreshFailed,
+        readVisibleCharacterIndex: _readVisibleCharacterIndex,
+        onBeforeCharacterDataReplaced: _restoreVisibleCharacterPosition,
       );
       _currentUserController = controller;
       _controller = controller;
@@ -134,7 +137,7 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
       emptySliverBuilder: (context, controller) {
         return const PagedSliverState(
           title: '暂无角色',
-          message: '当前用户没有可展示的角色',
+          message: '该用户没有可展示的角色',
           icon: Icons.hourglass_empty_rounded,
         );
       },
@@ -268,6 +271,88 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
     _isProgrammaticLevelJump = false;
   }
 
+  /// 读取当前视口顶部角色在本地分页窗口中的下标
+  int? _readVisibleCharacterIndex() {
+    final controller = _currentUserController;
+    if (!mounted ||
+        controller == null ||
+        !_scrollController.hasClients ||
+        controller.items.isEmpty) {
+      return null;
+    }
+    final listOffset = _scrollController.offset
+        .clamp(0.0, double.infinity)
+        .toDouble();
+    final itemIndex = UserCharacterAssetSliverList.itemIndexAtListOffset(
+      controller.items,
+      listOffset,
+      showLevelHeaders: controller.sort == UserCharacterSnapshotSort.level,
+    );
+    if (itemIndex == null) {
+      return null;
+    }
+    return itemIndex;
+  }
+
+  /// 在分页替换前恢复当前数据位置
+  ///
+  /// [previousItemIndex] 旧分页窗口中的可视条目下标
+  /// [replacementItemIndex] 新分页窗口中的目标条目下标
+  /// [replacementItems] 即将提交的角色条目
+  void _restoreVisibleCharacterPosition(
+    int previousItemIndex,
+    int replacementItemIndex,
+    List<UserCharacterApiItem> replacementItems,
+  ) {
+    final controller = _currentUserController;
+    if (!mounted ||
+        controller == null ||
+        !_scrollController.hasClients ||
+        controller.items.isEmpty ||
+        replacementItems.isEmpty) {
+      return;
+    }
+    // 使分页加载完成后尚未执行的旧滚动校正失效
+    _scrollAdjustmentGeneration += 1;
+    _isLoadingPreviousPage = true;
+    try {
+      // 本地分页读取期间仍允许滚动，提交前以最新可视下标为准
+      final currentItemIndex =
+          _readVisibleCharacterIndex() ?? previousItemIndex;
+      final replacementIndexOffset =
+          replacementItemIndex - previousItemIndex;
+      final oldIndex = currentItemIndex
+          .clamp(0, controller.items.length - 1)
+          .toInt();
+      final newIndex = (currentItemIndex + replacementIndexOffset)
+          .clamp(0, replacementItems.length - 1)
+          .toInt();
+      final showLevelHeaders =
+          controller.sort == UserCharacterSnapshotSort.level;
+      final oldItemOffset = UserCharacterAssetSliverList.itemOffsetForIndex(
+        controller.items,
+        oldIndex,
+        showLevelHeaders: showLevelHeaders,
+      );
+      final newItemOffset = UserCharacterAssetSliverList.itemOffsetForIndex(
+        replacementItems,
+        newIndex,
+        showLevelHeaders: showLevelHeaders,
+      );
+      final position = _scrollController.position;
+      final correctedPixels = (position.pixels +
+              newItemOffset -
+              oldItemOffset)
+          .clamp(position.minScrollExtent, double.infinity)
+          .toDouble();
+      // 在分页状态提交前直接修正像素，避免先闪现新位置再滚回锚点
+      _scrollController.jumpTo(position.pixels);
+      position.correctPixels(correctedPixels);
+    } finally {
+      _isLoadingPreviousPage = false;
+    }
+  }
+
   /// 监听列表顶部并按需加载目标页前一页
   void _handleScroll() {
     final controller = _currentUserController;
@@ -290,9 +375,13 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
   Future<void> _loadPreviousPage(
     CurrentUserCharacterPageController controller,
   ) async {
-    final previousOffset = _scrollController.offset;
+    final showLevelHeaders =
+        controller.sort == UserCharacterSnapshotSort.level;
     final previousListExtent =
-        UserCharacterAssetSliverList.levelListExtent(controller.items);
+        UserCharacterAssetSliverList.listExtent(
+          controller.items,
+          showLevelHeaders: showLevelHeaders,
+        );
     final adjustmentGeneration = _scrollAdjustmentGeneration;
     late final int count;
     try {
@@ -309,14 +398,17 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
       return;
     }
     final currentListExtent =
-        UserCharacterAssetSliverList.levelListExtent(controller.items);
+        UserCharacterAssetSliverList.listExtent(
+          controller.items,
+          showLevelHeaders: showLevelHeaders,
+        );
     final prependedExtent = currentListExtent - previousListExtent;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted &&
           adjustmentGeneration == _scrollAdjustmentGeneration &&
           _scrollController.hasClients) {
         _scrollController.jumpTo(
-          previousOffset + prependedExtent,
+          _scrollController.offset + prependedExtent,
         );
       }
       if (adjustmentGeneration == _scrollAdjustmentGeneration) {
@@ -354,9 +446,20 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
     );
   }
 
+  /// 显示当前用户角色后台刷新成功提示
+  void _showAutomaticRefreshSucceeded() {
+    if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) {
+      return;
+    }
+    AppToast.info(
+      context,
+      text: '角色数据刷新成功',
+    );
+  }
+
   /// 显示当前用户角色后台刷新失败提示
   void _showAutomaticRefreshFailed() {
-    if (!mounted) {
+    if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) {
       return;
     }
     AppToast.error(
