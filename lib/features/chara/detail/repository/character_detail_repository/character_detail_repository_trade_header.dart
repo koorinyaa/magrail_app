@@ -2,31 +2,6 @@ part of '../character_detail_repository.dart';
 
 extension CharacterDetailRepositoryTradeHeaderQueries
     on CharacterDetailRepository {
-  /// 获取全部已上市角色头部资料
-  Future<List<CharacterDetailTradeHeader>>
-      fetchAllListedCharacterHeaders() async {
-    final json = await _apiClient.getJson<Map<String, Object?>>(
-      'chara/msrc/1/$_listedCharacterFetchLimit',
-    );
-    final response =
-        TinygrailResponse<List<CharacterDetailTradeHeader>>.fromJson(
-      json,
-      (value) {
-        return TinygrailResponseParser.asObjectList(
-          value,
-          CharacterDetailTradeHeader.fromJson,
-        );
-      },
-    );
-
-    final characters = response.value;
-    if (!response.isSuccess || characters == null) {
-      throw StateError(response.message ?? '获取全部角色资料失败');
-    }
-
-    return characters;
-  }
-
   /// 获取英灵殿角色持股数据
   ///
   /// [characterId] 角色 ID
@@ -101,6 +76,3 @@ extension CharacterDetailRepositoryTradeHeaderQueries
     }
   }
 }
-
-// 已上市角色接口使用足够大的页容量一次获取完整资料
-const int _listedCharacterFetchLimit = 999999;

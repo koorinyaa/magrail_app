@@ -11,7 +11,6 @@ import 'package:magrail_app/features/chara/detail/model/character_detail_sacrifi
 import 'package:magrail_app/features/chara/detail/model/character_detail_search_item.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_temple_item.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_trade_data.dart';
-import 'package:magrail_app/features/chara/detail/model/character_detail_trade_header.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_user_character.dart';
 
 part 'character_detail_repository/character_detail_repository_basic.dart';

@@ -3,8 +3,103 @@ part of 'user_asset_snapshot_database.dart';
 // 每批 500 行用于控制快照写入时的 SQLite 参数与内存占用
 const int _insertBatchSize = 500;
 
+/// 判断来源刷新结果是否仍可写入快照
+///
+/// [incomingUpdatedAtMilliseconds] 待写入批次完成时间戳
+/// [storedUpdatedAtMilliseconds] 已持久化批次完成时间戳
+bool _canApplySourceUpdate({
+  required int incomingUpdatedAtMilliseconds,
+  required int? storedUpdatedAtMilliseconds,
+}) {
+  return storedUpdatedAtMilliseconds == null ||
+      incomingUpdatedAtMilliseconds >= storedUpdatedAtMilliseconds;
+}
+
+/// 解析完整快照各来源的可写入状态
+///
+/// [current] 当前数据库状态
+/// [charactersUpdatedAtMilliseconds] 待写入用户角色完成时间戳
+/// [templesUpdatedAtMilliseconds] 待写入用户圣殿完成时间戳
+/// [characterContentHash] 待写入用户角色内容哈希
+/// [templeContentHash] 待写入用户圣殿内容哈希
+({
+  bool applyCharacters,
+  bool applyTemples,
+  bool characterChanged,
+  bool templeChanged,
+  int charactersUpdatedAtMilliseconds,
+  int templesUpdatedAtMilliseconds,
+  String characterContentHash,
+  String templeContentHash,
+}) _resolveSnapshotWrite({
+  required _StoredUserAssetSourceState? current,
+  required int charactersUpdatedAtMilliseconds,
+  required int templesUpdatedAtMilliseconds,
+  required String characterContentHash,
+  required String templeContentHash,
+}) {
+  // 较慢的旧刷新不得覆盖已由更新批次写入的同来源快照
+  final applyCharacters = _canApplySourceUpdate(
+    incomingUpdatedAtMilliseconds: charactersUpdatedAtMilliseconds,
+    storedUpdatedAtMilliseconds:
+        current?.sourceState.charactersUpdatedAtMilliseconds,
+  );
+  final applyTemples = _canApplySourceUpdate(
+    incomingUpdatedAtMilliseconds: templesUpdatedAtMilliseconds,
+    storedUpdatedAtMilliseconds:
+        current?.sourceState.templesUpdatedAtMilliseconds,
+  );
+  final resolvedCharacterContentHash = applyCharacters
+      ? characterContentHash
+      : current?.characterContentHash ?? '';
+  final resolvedTempleContentHash =
+      applyTemples ? templeContentHash : current?.templeContentHash ?? '';
+  return (
+    applyCharacters: applyCharacters,
+    applyTemples: applyTemples,
+    characterChanged: applyCharacters &&
+        current?.characterContentHash != resolvedCharacterContentHash,
+    templeChanged:
+        applyTemples && current?.templeContentHash != resolvedTempleContentHash,
+    charactersUpdatedAtMilliseconds: applyCharacters
+        ? charactersUpdatedAtMilliseconds
+        : current?.sourceState.charactersUpdatedAtMilliseconds ?? 0,
+    templesUpdatedAtMilliseconds: applyTemples
+        ? templesUpdatedAtMilliseconds
+        : current?.sourceState.templesUpdatedAtMilliseconds ?? 0,
+    characterContentHash: resolvedCharacterContentHash,
+    templeContentHash: resolvedTempleContentHash,
+  );
+}
+
 /// 用户资产快照数据库持久化操作
 extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
+  /// 生成写入后的原始数据状态
+  ///
+  /// [current] 当前数据库状态
+  /// [characterChanged] 用户角色是否变化
+  /// [templeChanged] 用户圣殿是否变化
+  /// [charactersUpdatedAtMilliseconds] 用户角色更新时间戳
+  /// [templesUpdatedAtMilliseconds] 用户圣殿更新时间戳
+  UserAssetSourceState _buildSourceState({
+    required _StoredUserAssetSourceState? current,
+    required bool characterChanged,
+    required bool templeChanged,
+    required int charactersUpdatedAtMilliseconds,
+    required int templesUpdatedAtMilliseconds,
+  }) {
+    final revisions = current?.sourceState.revisions;
+    return UserAssetSourceState(
+      revisions: UserAssetDataRevisions(
+        characters: _nextRevision(revisions?.characters, characterChanged),
+        temples: _nextRevision(revisions?.temples, templeChanged),
+        schemaVersion: userAssetSnapshotSchemaVersion,
+      ),
+      charactersUpdatedAtMilliseconds: charactersUpdatedAtMilliseconds,
+      templesUpdatedAtMilliseconds: templesUpdatedAtMilliseconds,
+    );
+  }
+
   /// 写入用户资产元数据
   Future<void> _upsertMetadata(
     sqflite.Transaction transaction, {
@@ -87,7 +182,7 @@ extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
   Future<void> _replaceTempleRows(
     sqflite.Transaction transaction, {
     required String username,
-    required List<UserAssetSnapshotPayload> rows,
+    required List<UserTempleSnapshotPayload> rows,
   }) async {
     await transaction.delete(
       _templeTableName,
@@ -103,7 +198,17 @@ extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
           'username': username,
           'temple_id': row.id,
           'row_order': index,
+          'character_id': row.characterId,
+          'name': row.name,
+          'assets': row.assets,
+          'sacrifices': row.sacrifices,
+          'character_level': row.characterLevel,
+          'damaged': row.damaged,
+          'single_dividend': row.singleDividend,
+          'total_dividend': row.totalDividend,
           'star_forces': row.starForces,
+          'refine': row.refine,
+          'create_value': row.create,
           'payload_json': row.payloadJson,
         });
       }
@@ -111,42 +216,13 @@ extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
     }
   }
 
-  /// 替换全部角色资料明细
-  Future<void> _replaceCharacterHeaderRows(
-    sqflite.Transaction transaction, {
-    required String username,
-    required List<UserCharacterHeaderSnapshotPayload> rows,
-  }) async {
-    await transaction.delete(
-      _characterHeaderTableName,
-      where: 'username = ?',
-      whereArgs: [username],
-    );
-    for (var start = 0; start < rows.length; start += _insertBatchSize) {
-      final batch = transaction.batch();
-      final end = (start + _insertBatchSize).clamp(0, rows.length);
-      for (var index = start; index < end; index += 1) {
-        final row = rows[index];
-        batch.insert(_characterHeaderTableName, {
-          'username': username,
-          'character_id': row.id,
-          'row_order': index,
-          'rank': row.rank,
-          'payload_json': row.payloadJson,
-        });
-      }
-      await batch.commit(noResult: true);
-    }
-  }
-
-  /// 写入三类原始数据状态
+  /// 写入两类原始数据状态
   Future<void> _writeSourceState(
     sqflite.Transaction transaction, {
     required String username,
     required UserAssetSourceState sourceState,
     required String characterContentHash,
     required String templeContentHash,
-    required String characterHeaderContentHash,
   }) {
     return transaction.insert(
       _sourceStateTableName,
@@ -155,22 +231,18 @@ extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
         'schema_version': sourceState.revisions.schemaVersion,
         'character_revision': sourceState.revisions.characters,
         'temple_revision': sourceState.revisions.temples,
-        'character_header_revision': sourceState.revisions.characterHeaders,
         'character_updated_at_milliseconds':
             sourceState.charactersUpdatedAtMilliseconds,
         'temple_updated_at_milliseconds':
             sourceState.templesUpdatedAtMilliseconds,
-        'character_header_updated_at_milliseconds':
-            sourceState.characterHeadersUpdatedAtMilliseconds,
         'character_content_hash': characterContentHash,
         'temple_content_hash': templeContentHash,
-        'character_header_content_hash': characterHeaderContentHash,
       },
       conflictAlgorithm: sqflite.ConflictAlgorithm.replace,
     );
   }
 
-  /// 读取三类原始数据持久化状态
+  /// 读取两类原始数据持久化状态
   Future<_StoredUserAssetSourceState?> _readStoredSourceState(
     sqflite.DatabaseExecutor executor,
     String username,
@@ -190,20 +262,15 @@ extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
         revisions: UserAssetDataRevisions(
           characters: _rowInt(row['character_revision']),
           temples: _rowInt(row['temple_revision']),
-          characterHeaders: _rowInt(row['character_header_revision']),
           schemaVersion: _rowInt(row['schema_version']),
         ),
         charactersUpdatedAtMilliseconds:
             _rowInt(row['character_updated_at_milliseconds']),
         templesUpdatedAtMilliseconds:
             _rowInt(row['temple_updated_at_milliseconds']),
-        characterHeadersUpdatedAtMilliseconds:
-            _rowInt(row['character_header_updated_at_milliseconds']),
       ),
       characterContentHash: row['character_content_hash'] as String? ?? '',
       templeContentHash: row['temple_content_hash'] as String? ?? '',
-      characterHeaderContentHash:
-          row['character_header_content_hash'] as String? ?? '',
     );
   }
 
@@ -245,48 +312,36 @@ extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
     );
   }
 
-  /// 读取通用快照明细
-  Future<List<UserAssetSnapshotPayload>> _readPayloadRows(
-    sqflite.DatabaseExecutor executor, {
-    required String tableName,
-    required String keyColumn,
-    required String username,
-  }) async {
-    final rows = await executor.query(
-      tableName,
-      columns: [keyColumn, 'payload_json'],
-      where: 'username = ?',
-      whereArgs: [username],
-      orderBy: 'row_order ASC',
-    );
-    return List<UserAssetSnapshotPayload>.unmodifiable(
-      rows.map(
-        (row) => UserAssetSnapshotPayload(
-          id: _rowInt(row[keyColumn]),
-          payloadJson: row['payload_json'] as String? ?? '',
-        ),
-      ),
-    );
-  }
-
-  /// 读取全部角色资料快照明细
-  Future<List<UserCharacterHeaderSnapshotPayload>> _readCharacterHeaderRows(
+  /// 读取用户圣殿快照明细
+  ///
+  /// [executor] SQLite 执行器
+  /// [username] 用户名
+  Future<List<UserTempleSnapshotPayload>> _readTempleRows(
     sqflite.DatabaseExecutor executor,
     String username,
   ) async {
     final rows = await executor.query(
-      _characterHeaderTableName,
-      columns: const ['character_id', 'rank', 'payload_json'],
+      _templeTableName,
       where: 'username = ?',
       whereArgs: [username],
       orderBy: 'row_order ASC',
     );
-    return List<UserCharacterHeaderSnapshotPayload>.unmodifiable(
+    return List<UserTempleSnapshotPayload>.unmodifiable(
       rows.map(
-        (row) => UserCharacterHeaderSnapshotPayload(
-          id: _rowInt(row['character_id']),
-          rank: _rowInt(row['rank']),
+        (row) => UserTempleSnapshotPayload(
+          id: _rowInt(row['temple_id']),
           payloadJson: row['payload_json'] as String? ?? '',
+          characterId: _rowInt(row['character_id']),
+          name: row['name'] as String? ?? '',
+          assets: _rowInt(row['assets']),
+          sacrifices: _rowInt(row['sacrifices']),
+          characterLevel: _rowInt(row['character_level']),
+          damaged: _rowInt(row['damaged']),
+          singleDividend: _rowDouble(row['single_dividend']),
+          totalDividend: _rowDouble(row['total_dividend']),
+          starForces: _rowInt(row['star_forces']),
+          refine: _rowInt(row['refine']),
+          create: row['create_value'] as String? ?? '',
         ),
       ),
     );
@@ -306,20 +361,18 @@ extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
   }
 }
 
-/// 三类原始数据持久化状态
+/// 两类原始数据持久化状态
 class _StoredUserAssetSourceState {
-  /// 创建三类原始数据持久化状态
+  /// 创建两类原始数据持久化状态
   const _StoredUserAssetSourceState({
     required this.sourceState,
     required this.characterContentHash,
     required this.templeContentHash,
-    required this.characterHeaderContentHash,
   });
 
   final UserAssetSourceState sourceState;
   final String characterContentHash;
   final String templeContentHash;
-  final String characterHeaderContentHash;
 }
 
 /// 生成下一来源版本

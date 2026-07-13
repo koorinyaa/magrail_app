@@ -87,7 +87,6 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
       final controller = CurrentUserCharacterPageController(
         snapshotRepository: UserAssetSnapshotRepository(
           userRepository: widget.repository,
-          characterDetailRepository: widget.characterDetailRepository,
           database: database,
         ),
         username: widget.username,
@@ -255,6 +254,8 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
       return;
     }
     final adjustmentGeneration = ++_scrollAdjustmentGeneration;
+    _levelJumpGeneration += 1;
+    _isProgrammaticLevelJump = false;
     _isLoadingPreviousPage = false;
     final success = await controller.selectSort(sort);
     if (!mounted || adjustmentGeneration != _scrollAdjustmentGeneration) {
@@ -305,10 +306,12 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
       }
       return;
     }
-    if (!mounted || !success || generation != _levelJumpGeneration) {
-      if (generation == _levelJumpGeneration) {
-        _isProgrammaticLevelJump = false;
-      }
+    if (!mounted || generation != _levelJumpGeneration) {
+      return;
+    }
+    if (!success) {
+      _isProgrammaticLevelJump = false;
+      AppToast.error(context, text: '等级跳转失败，请重试');
       return;
     }
     _isProgrammaticLevelJump = false;
@@ -457,7 +460,25 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
     final adjustmentGeneration = _scrollAdjustmentGeneration;
     late final int count;
     try {
-      count = await controller.loadPreviousPage();
+      count = await controller.loadPreviousPage(
+        beforeItemsPrepended: (items) {
+          if (!mounted ||
+              adjustmentGeneration != _scrollAdjustmentGeneration ||
+              !_scrollController.hasClients) {
+            return;
+          }
+          final currentListExtent = UserCharacterAssetSliverList.listExtent(
+            items,
+            showLevelHeaders: showLevelHeaders,
+          );
+          final position = _scrollController.position;
+          // 在分页状态提交前校正像素，避免先闪现前一页再滚回锚点
+          _scrollController.jumpTo(position.pixels);
+          position.correctPixels(
+            position.pixels + currentListExtent - previousListExtent,
+          );
+        },
+      );
     } catch (_) {
       _isLoadingPreviousPage = false;
       if (mounted) {
@@ -469,23 +490,9 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
       _isLoadingPreviousPage = false;
       return;
     }
-    final currentListExtent = UserCharacterAssetSliverList.listExtent(
-      controller.items,
-      showLevelHeaders: showLevelHeaders,
-    );
-    final prependedExtent = currentListExtent - previousListExtent;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted &&
-          adjustmentGeneration == _scrollAdjustmentGeneration &&
-          _scrollController.hasClients) {
-        _scrollController.jumpTo(
-          _scrollController.offset + prependedExtent,
-        );
-      }
-      if (adjustmentGeneration == _scrollAdjustmentGeneration) {
-        _isLoadingPreviousPage = false;
-      }
-    });
+    if (adjustmentGeneration == _scrollAdjustmentGeneration) {
+      _isLoadingPreviousPage = false;
+    }
   }
 
   /// 在布局更新后回到角色列表顶部

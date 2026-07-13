@@ -8,16 +8,14 @@ class UserAssetSnapshotRecord {
   /// [nickname] 用户昵称
   /// [characterRows] 用户角色快照明细
   /// [templeRows] 用户圣殿快照明细
-  /// [characterHeaderRows] 角色头部资料快照明细
   /// [characterTotalItems] 角色接口总数
   /// [templeTotalItems] 圣殿接口总数
-  /// [sourceState] 读取时返回的三类原始数据状态
+  /// [sourceState] 读取时返回的两类原始数据状态
   const UserAssetSnapshotRecord({
     required this.username,
     required this.nickname,
     required this.characterRows,
     required this.templeRows,
-    required this.characterHeaderRows,
     required this.characterTotalItems,
     required this.templeTotalItems,
     this.sourceState,
@@ -33,10 +31,7 @@ class UserAssetSnapshotRecord {
   final List<UserCharacterSnapshotPayload> characterRows;
 
   /// 用户圣殿快照明细
-  final List<UserAssetSnapshotPayload> templeRows;
-
-  /// 角色头部资料快照明细
-  final List<UserCharacterHeaderSnapshotPayload> characterHeaderRows;
+  final List<UserTempleSnapshotPayload> templeRows;
 
   /// 角色接口总数
   final int characterTotalItems;
@@ -44,7 +39,7 @@ class UserAssetSnapshotRecord {
   /// 圣殿接口总数
   final int templeTotalItems;
 
-  /// 读取时返回的三类原始数据状态
+  /// 读取时返回的两类原始数据状态
   final UserAssetSourceState? sourceState;
 }
 
@@ -69,6 +64,70 @@ class UserAssetSnapshotPayload {
 
   /// 角色或圣殿星之力
   final int starForces;
+}
+
+/// 用户圣殿快照数据库明细
+class UserTempleSnapshotPayload extends UserAssetSnapshotPayload {
+  /// 创建用户圣殿快照数据库明细
+  ///
+  /// [id] 圣殿 ID
+  /// [payloadJson] 圣殿 JSON
+  /// [characterId] 角色 ID
+  /// [name] 角色名称
+  /// [assets] 圣殿资产值
+  /// [sacrifices] 圣殿资产上限
+  /// [characterLevel] 角色等级
+  /// [damaged] 圣殿受损程度
+  /// [singleDividend] 修正后的圣殿单元股息
+  /// [totalDividend] 修正后的圣殿总息
+  /// [starForces] 圣殿星之力
+  /// [refine] 圣殿精炼等级
+  /// [create] 建塔日期
+  const UserTempleSnapshotPayload({
+    required super.id,
+    required super.payloadJson,
+    required this.characterId,
+    required this.name,
+    required this.assets,
+    required this.sacrifices,
+    required this.characterLevel,
+    required this.damaged,
+    required this.singleDividend,
+    required this.totalDividend,
+    required super.starForces,
+    required this.refine,
+    required this.create,
+  });
+
+  /// 角色 ID
+  final int characterId;
+
+  /// 角色名称
+  final String name;
+
+  /// 圣殿资产值
+  final int assets;
+
+  /// 圣殿资产上限
+  final int sacrifices;
+
+  /// 角色等级
+  final int characterLevel;
+
+  /// 圣殿受损程度
+  final int damaged;
+
+  /// 修正后的圣殿单元股息
+  final double singleDividend;
+
+  /// 修正后的圣殿总息
+  final double totalDividend;
+
+  /// 圣殿精炼等级
+  final int refine;
+
+  /// 建塔日期
+  final String create;
 }
 
 /// 用户角色快照数据库明细
@@ -163,21 +222,4 @@ class UserCharacterSnapshotPayload extends UserAssetSnapshotPayload {
 
   /// 角色持股总息
   final double totalDividend;
-}
-
-/// 全部角色资料快照数据库明细
-class UserCharacterHeaderSnapshotPayload extends UserAssetSnapshotPayload {
-  /// 创建全部角色资料快照数据库明细
-  ///
-  /// [id] 角色 ID
-  /// [payloadJson] 角色资料 JSON
-  /// [rank] 通天塔排名
-  const UserCharacterHeaderSnapshotPayload({
-    required super.id,
-    required super.payloadJson,
-    required this.rank,
-  });
-
-  /// 通天塔排名
-  final int rank;
 }

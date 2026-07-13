@@ -120,8 +120,6 @@ class UserAssetAnalysisRepository {
                 UserAssetAnalysisLoadKind.characters,
               UserAssetSnapshotLoadKind.temples =>
                 UserAssetAnalysisLoadKind.temples,
-              UserAssetSnapshotLoadKind.characterHeaders =>
-                UserAssetAnalysisLoadKind.characterHeaders,
             },
             label: progress.label,
             completedSteps: progress.completedSteps,
@@ -238,9 +236,6 @@ enum UserAssetAnalysisLoadKind {
 
   /// 用户圣殿加载
   temples,
-
-  /// 全部角色资料加载
-  characterHeaders,
 
   /// 分析计算与缓存
   analysis,

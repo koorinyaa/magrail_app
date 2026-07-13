@@ -72,7 +72,6 @@ List<RouteBase> buildUserRoutes(
         key: state.pageKey,
         child: UserAssetAnalysisPage(
           repository: dependencies.repositories.user,
-          characterDetailRepository: dependencies.repositories.characterDetail,
           username: state.uri.queryParameters['username'] ?? '',
           nickname: state.uri.queryParameters['nickname'],
         ),

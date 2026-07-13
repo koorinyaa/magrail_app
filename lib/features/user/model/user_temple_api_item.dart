@@ -14,11 +14,14 @@ class UserTempleApiItem {
   /// [assets] 圣殿资产值
   /// [sacrifices] 圣殿资产上限
   /// [rate] 基础股息
+  /// [characterRank] 通天塔排名
+  /// [characterStars] 角色星级
   /// [characterLevel] 角色等级
   /// [zeroCount] ST 等级
   /// [level] 圣殿等级
   /// [starForces] 圣殿星之力
   /// [refine] 精炼等级
+  /// [create] 建塔日期
   /// [link] LINK 另一侧圣殿
   const UserTempleApiItem({
     required this.id,
@@ -31,11 +34,14 @@ class UserTempleApiItem {
     required this.assets,
     required this.sacrifices,
     required this.rate,
+    this.characterRank = 0,
+    this.characterStars = 0,
     required this.characterLevel,
     required this.zeroCount,
     required this.level,
     required this.starForces,
     required this.refine,
+    this.create = '',
     this.link,
   });
 
@@ -69,6 +75,12 @@ class UserTempleApiItem {
   /// 基础股息
   final double rate;
 
+  /// 通天塔排名
+  final int characterRank;
+
+  /// 角色星级
+  final int characterStars;
+
   /// 角色等级
   final int characterLevel;
 
@@ -83,6 +95,9 @@ class UserTempleApiItem {
 
   /// 精炼等级
   final int refine;
+
+  /// 建塔日期
+  final String create;
 
   /// LINK 另一侧圣殿
   final UserTempleApiItem? link;
@@ -104,11 +119,14 @@ class UserTempleApiItem {
       assets: TinygrailResponseParser.asInt(json['Assets']),
       sacrifices: TinygrailResponseParser.asInt(json['Sacrifices']),
       rate: TinygrailResponseParser.asDouble(json['Rate']),
+      characterRank: TinygrailResponseParser.asInt(json['CharacterRank']),
+      characterStars: TinygrailResponseParser.asInt(json['CharacterStars']),
       characterLevel: TinygrailResponseParser.asInt(json['CharacterLevel']),
       zeroCount: TinygrailResponseParser.asInt(json['ZeroCount']),
       level: TinygrailResponseParser.asInt(json['Level']),
       starForces: TinygrailResponseParser.asInt(json['StarForces']),
       refine: TinygrailResponseParser.asInt(json['Refine']),
+      create: TinygrailResponseParser.asString(json['Create']),
       link: linkJson == null ? null : UserTempleApiItem.fromJson(linkJson),
     );
   }
@@ -126,11 +144,14 @@ class UserTempleApiItem {
       'Assets': assets,
       'Sacrifices': sacrifices,
       'Rate': rate,
+      'CharacterRank': characterRank,
+      'CharacterStars': characterStars,
       'CharacterLevel': characterLevel,
       'ZeroCount': zeroCount,
       'Level': level,
       'StarForces': starForces,
       'Refine': refine,
+      'Create': create,
       'Link': link?.toJson(),
     };
   }

@@ -125,6 +125,43 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
     );
   }
 
+  /// 合并同一用户正在进行的圣殿全量请求
+  ///
+  /// [username] 用户名
+  /// [requestGate] 服务器请求并发阀门
+  /// [onProgress] 拉取进度回调
+  Future<_AllTemplesResult> _fetchAllTemplesShared({
+    required String username,
+    required _UserAssetSnapshotRequestGate requestGate,
+    required void Function(UserAssetSnapshotLoadProgress progress) onProgress,
+  }) {
+    final operationKey = username.toLowerCase();
+    final existing =
+        UserAssetSnapshotRepository._templeFetchOperations[operationKey];
+    if (existing != null) {
+      return existing;
+    }
+
+    late final Future<_AllTemplesResult> operation;
+    operation = _fetchAllTemples(
+      username: username,
+      requestGate: requestGate,
+      onProgress: onProgress,
+    ).whenComplete(() {
+      if (identical(
+        UserAssetSnapshotRepository._templeFetchOperations[operationKey],
+        operation,
+      )) {
+        UserAssetSnapshotRepository._templeFetchOperations.remove(
+          operationKey,
+        );
+      }
+    });
+    UserAssetSnapshotRepository._templeFetchOperations[operationKey] =
+        operation;
+    return operation;
+  }
+
   /// 拉取全部用户圣殿
   ///
   /// [username] 用户名
@@ -209,44 +246,6 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
       items: List<UserTempleApiItem>.unmodifiable(items),
       totalItems: totalItems,
     );
-  }
-
-  /// 拉取全部角色头部资料
-  ///
-  /// [requestGate] 服务器请求并发阀门
-  /// [onProgress] 拉取进度回调
-  Future<List<CharacterDetailTradeHeader>> _fetchAllCharacterHeaders({
-    required _UserAssetSnapshotRequestGate requestGate,
-    required void Function(UserAssetSnapshotLoadProgress progress) onProgress,
-  }) async {
-    onProgress(
-      const UserAssetSnapshotLoadProgress(
-        kind: UserAssetSnapshotLoadKind.characterHeaders,
-        label: '正在获取角色资料',
-        completedSteps: 0,
-        totalSteps: 1,
-      ),
-    );
-    final fullItems = await requestGate.run(
-      _characterDetailRepository.fetchAllListedCharacterHeaders,
-    );
-    final items = <CharacterDetailTradeHeader>[];
-    final seenIds = <int>{};
-    for (final item in fullItems) {
-      if (seenIds.add(item.characterId)) {
-        items.add(item);
-      }
-    }
-    onProgress(
-      const UserAssetSnapshotLoadProgress(
-        kind: UserAssetSnapshotLoadKind.characterHeaders,
-        label: '正在整理角色资料',
-        completedSteps: 1,
-        totalSteps: 1,
-      ),
-    );
-
-    return List<CharacterDetailTradeHeader>.unmodifiable(items);
   }
 
   /// 拉取用户角色分页
@@ -382,9 +381,6 @@ enum UserAssetSnapshotLoadKind {
 
   /// 用户圣殿数据加载
   temples,
-
-  /// 全部角色资料加载
-  characterHeaders,
 }
 
 /// 用户资产快照加载进度

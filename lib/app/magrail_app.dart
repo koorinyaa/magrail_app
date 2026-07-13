@@ -152,8 +152,6 @@ class _MagrailAppState extends State<MagrailApp> {
 
       final snapshotRepository = UserAssetSnapshotRepository(
         userRepository: userRepository,
-        characterDetailRepository:
-            widget.dependencies.repositories.characterDetail,
         database: database,
       );
       await snapshotRepository.refreshSnapshot(

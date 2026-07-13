@@ -1,17 +1,17 @@
 import 'package:magrail_app/core/network/tinygrail_page.dart';
 import 'package:magrail_app/features/user/assets/model/user_character_snapshot_query.dart';
 import 'package:magrail_app/features/user/assets/model/user_asset_snapshot.dart';
+import 'package:magrail_app/features/user/assets/model/user_temple_snapshot_query.dart';
 import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_database_models.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
 part 'user_asset_snapshot_database_persistence.dart';
+part 'user_asset_snapshot_database_queries.dart';
 part 'user_asset_snapshot_database_schema.dart';
 
 const String _metaTableName = 'user_asset_snapshot_meta';
 const String _characterTableName = 'user_asset_snapshot_characters';
 const String _templeTableName = 'user_asset_snapshot_temples';
-const String _characterHeaderTableName =
-    'user_asset_snapshot_character_headers';
 const String _sourceStateTableName = 'user_asset_snapshot_source_state';
 
 /// 用户资产快照数据库
@@ -28,76 +28,68 @@ class UserAssetSnapshotDatabase {
   /// [record] 用户资产快照持久化记录
   /// [charactersUpdatedAtMilliseconds] 用户角色更新时间戳
   /// [templesUpdatedAtMilliseconds] 用户圣殿更新时间戳
-  /// [characterHeadersUpdatedAtMilliseconds] 全部角色资料更新时间戳
   /// [characterContentHash] 用户角色内容哈希
   /// [templeContentHash] 用户圣殿内容哈希
-  /// [characterHeaderContentHash] 全部角色资料内容哈希
   Future<UserAssetSourceState> upsertSnapshotRecord(
     UserAssetSnapshotRecord record, {
     required int charactersUpdatedAtMilliseconds,
     required int templesUpdatedAtMilliseconds,
-    required int characterHeadersUpdatedAtMilliseconds,
     required String characterContentHash,
     required String templeContentHash,
-    required String characterHeaderContentHash,
   }) async {
     final database = await _openDatabase();
     return database.transaction((transaction) async {
-      final current = await _readStoredSourceState(
-        transaction,
-        record.username,
-      );
-      final characterChanged =
-          current?.characterContentHash != characterContentHash;
-      final templeChanged = current?.templeContentHash != templeContentHash;
-      final headerChanged =
-          current?.characterHeaderContentHash != characterHeaderContentHash;
-      final sourceState = _buildSourceState(
+      final current =
+          await _readStoredSourceState(transaction, record.username);
+      final metadata = await _readMetadata(transaction, record.username);
+      final resolvedWrite = _resolveSnapshotWrite(
         current: current,
-        characterChanged: characterChanged,
-        templeChanged: templeChanged,
-        characterHeaderChanged: headerChanged,
         charactersUpdatedAtMilliseconds: charactersUpdatedAtMilliseconds,
         templesUpdatedAtMilliseconds: templesUpdatedAtMilliseconds,
-        characterHeadersUpdatedAtMilliseconds:
-            characterHeadersUpdatedAtMilliseconds,
+        characterContentHash: characterContentHash,
+        templeContentHash: templeContentHash,
+      );
+      final sourceState = _buildSourceState(
+        current: current,
+        characterChanged: resolvedWrite.characterChanged,
+        templeChanged: resolvedWrite.templeChanged,
+        charactersUpdatedAtMilliseconds:
+            resolvedWrite.charactersUpdatedAtMilliseconds,
+        templesUpdatedAtMilliseconds:
+            resolvedWrite.templesUpdatedAtMilliseconds,
       );
 
       await _upsertMetadata(
         transaction,
         username: record.username,
         nickname: record.nickname,
-        characterTotalItems: record.characterTotalItems,
-        templeTotalItems: record.templeTotalItems,
+        characterTotalItems: resolvedWrite.applyCharacters
+            ? record.characterTotalItems
+            : _rowInt(metadata?['character_total_items']),
+        templeTotalItems: resolvedWrite.applyTemples
+            ? record.templeTotalItems
+            : _rowInt(metadata?['temple_total_items']),
       );
-      if (characterChanged) {
+      if (resolvedWrite.characterChanged) {
         await _replaceCharacterRows(
           transaction,
           username: record.username,
           rows: record.characterRows,
         );
       }
-      if (templeChanged) {
+      if (resolvedWrite.templeChanged) {
         await _replaceTempleRows(
           transaction,
           username: record.username,
           rows: record.templeRows,
         );
       }
-      if (headerChanged) {
-        await _replaceCharacterHeaderRows(
-          transaction,
-          username: record.username,
-          rows: record.characterHeaderRows,
-        );
-      }
       await _writeSourceState(
         transaction,
         username: record.username,
         sourceState: sourceState,
-        characterContentHash: characterContentHash,
-        templeContentHash: templeContentHash,
-        characterHeaderContentHash: characterHeaderContentHash,
+        characterContentHash: resolvedWrite.characterContentHash,
+        templeContentHash: resolvedWrite.templeContentHash,
       );
       return sourceState;
     });
@@ -122,17 +114,21 @@ class UserAssetSnapshotDatabase {
     final database = await _openDatabase();
     return database.transaction((transaction) async {
       final current = await _readStoredSourceState(transaction, username);
+      if (!_canApplySourceUpdate(
+        incomingUpdatedAtMilliseconds: updatedAtMilliseconds,
+        storedUpdatedAtMilliseconds:
+            current?.sourceState.charactersUpdatedAtMilliseconds,
+      )) {
+        return false;
+      }
       final changed = current?.characterContentHash != contentHash;
       final sourceState = _buildSourceState(
         current: current,
         characterChanged: changed,
         templeChanged: false,
-        characterHeaderChanged: false,
         charactersUpdatedAtMilliseconds: updatedAtMilliseconds,
         templesUpdatedAtMilliseconds:
             current?.sourceState.templesUpdatedAtMilliseconds ?? 0,
-        characterHeadersUpdatedAtMilliseconds:
-            current?.sourceState.characterHeadersUpdatedAtMilliseconds ?? 0,
       );
       final metadata = await _readMetadata(transaction, username);
       await _upsertMetadata(
@@ -155,9 +151,69 @@ class UserAssetSnapshotDatabase {
         sourceState: sourceState,
         characterContentHash: contentHash,
         templeContentHash: current?.templeContentHash ?? '',
-        characterHeaderContentHash: current?.characterHeaderContentHash ?? '',
       );
       return changed;
+    });
+  }
+
+  /// 写入用户圣殿快照
+  ///
+  /// [username] 用户名
+  /// [nickname] 用户昵称
+  /// [templeRows] 用户圣殿快照明细
+  /// [templeTotalItems] 圣殿接口总数
+  /// [templesUpdatedAtMilliseconds] 用户圣殿更新时间戳
+  /// [templeContentHash] 用户圣殿内容哈希
+  Future<UserAssetSourceState> upsertTempleSnapshot({
+    required String username,
+    required String nickname,
+    required List<UserTempleSnapshotPayload> templeRows,
+    required int templeTotalItems,
+    required int templesUpdatedAtMilliseconds,
+    required String templeContentHash,
+  }) async {
+    final database = await _openDatabase();
+    return database.transaction((transaction) async {
+      final current = await _readStoredSourceState(transaction, username);
+      if (!_canApplySourceUpdate(
+        incomingUpdatedAtMilliseconds: templesUpdatedAtMilliseconds,
+        storedUpdatedAtMilliseconds:
+            current?.sourceState.templesUpdatedAtMilliseconds,
+      )) {
+        return current!.sourceState;
+      }
+      final templeChanged = current?.templeContentHash != templeContentHash;
+      final sourceState = _buildSourceState(
+        current: current,
+        characterChanged: false,
+        templeChanged: templeChanged,
+        charactersUpdatedAtMilliseconds:
+            current?.sourceState.charactersUpdatedAtMilliseconds ?? 0,
+        templesUpdatedAtMilliseconds: templesUpdatedAtMilliseconds,
+      );
+      final metadata = await _readMetadata(transaction, username);
+      await _upsertMetadata(
+        transaction,
+        username: username,
+        nickname: nickname,
+        characterTotalItems: _rowInt(metadata?['character_total_items']),
+        templeTotalItems: templeTotalItems,
+      );
+      if (templeChanged) {
+        await _replaceTempleRows(
+          transaction,
+          username: username,
+          rows: templeRows,
+        );
+      }
+      await _writeSourceState(
+        transaction,
+        username: username,
+        sourceState: sourceState,
+        characterContentHash: current?.characterContentHash ?? '',
+        templeContentHash: templeContentHash,
+      );
+      return sourceState;
     });
   }
 
@@ -266,6 +322,19 @@ class UserAssetSnapshotDatabase {
     );
   }
 
+  /// 标记用户圣殿快照失效
+  ///
+  /// [username] 用户名
+  Future<void> invalidateTempleSnapshot(String username) async {
+    final database = await _openDatabase();
+    await database.rawUpdate(
+      'UPDATE $_sourceStateTableName '
+      'SET temple_updated_at_milliseconds = 0, '
+      'temple_content_hash = ? WHERE username = ?',
+      ['', username],
+    );
+  }
+
   /// 读取等级排序下的快速跳转位置
   ///
   /// [username] 用户名
@@ -354,6 +423,134 @@ class UserAssetSnapshotDatabase {
     });
   }
 
+  /// 分页读取有效的用户圣殿快照
+  ///
+  /// [username] 用户名
+  /// [page] 页码
+  /// [pageSize] 每页圣殿数量
+  /// [sort] 排序字段
+  /// [direction] 排序方向
+  /// [searchKeyword] 角色 ID 或名称筛选词
+  Future<TinygrailPage<UserTempleSnapshotPayload>?> readTemplePage({
+    required String username,
+    required int page,
+    required int pageSize,
+    required UserTempleSnapshotSort sort,
+    required UserTempleSnapshotSortDirection direction,
+    required String searchKeyword,
+  }) async {
+    if (page <= 0 || pageSize <= 0) {
+      throw ArgumentError('用户圣殿分页参数无效');
+    }
+    final database = await _openDatabase();
+    return database.transaction((transaction) async {
+      final storedState = await _readStoredSourceState(transaction, username);
+      if (storedState == null ||
+          !storedState.sourceState.isTempleDataFreshAt(DateTime.now())) {
+        return null;
+      }
+      final storedTotalItems = await _countRows(
+        transaction,
+        tableName: _templeTableName,
+        username: username,
+      );
+      final metadata = await _readMetadata(transaction, username);
+      if (metadata == null ||
+          _rowInt(metadata['temple_total_items']) != storedTotalItems) {
+        await transaction.rawUpdate(
+          'UPDATE $_sourceStateTableName '
+          'SET temple_updated_at_milliseconds = 0, '
+          'temple_content_hash = ? WHERE username = ?',
+          ['', username],
+        );
+        return null;
+      }
+      final searchFilter = _templeSearchFilter(searchKeyword);
+      final totalItems = searchFilter.clause.isEmpty
+          ? storedTotalItems
+          : _rowInt(
+              (await transaction.rawQuery(
+                'SELECT COUNT(*) AS total_count FROM $_templeTableName t '
+                'WHERE t.username = ? ${searchFilter.clause}',
+                [username, ...searchFilter.arguments],
+              ))
+                  .firstOrNull?['total_count'],
+            );
+      final rows = await transaction.rawQuery(
+        'SELECT t.temple_id, t.character_id, t.name, t.assets, '
+        't.sacrifices, t.character_level, t.damaged, t.single_dividend, '
+        't.total_dividend, t.star_forces, t.refine, t.create_value, '
+        't.payload_json FROM $_templeTableName t '
+        'WHERE t.username = ? ${searchFilter.clause} '
+        'ORDER BY ${_templeOrderBy(sort, direction)} LIMIT ? OFFSET ?',
+        [
+          username,
+          ...searchFilter.arguments,
+          pageSize,
+          (page - 1) * pageSize,
+        ],
+      );
+      return TinygrailPage(
+        items: List<UserTempleSnapshotPayload>.unmodifiable(
+          rows.map(
+            (row) => UserTempleSnapshotPayload(
+              id: _rowInt(row['temple_id']),
+              payloadJson: row['payload_json'] as String? ?? '',
+              characterId: _rowInt(row['character_id']),
+              name: row['name'] as String? ?? '',
+              assets: _rowInt(row['assets']),
+              sacrifices: _rowInt(row['sacrifices']),
+              characterLevel: _rowInt(row['character_level']),
+              damaged: _rowInt(row['damaged']),
+              singleDividend: _rowDouble(row['single_dividend']),
+              totalDividend: _rowDouble(row['total_dividend']),
+              starForces: _rowInt(row['star_forces']),
+              refine: _rowInt(row['refine']),
+              create: row['create_value'] as String? ?? '',
+            ),
+          ),
+        ),
+        currentPage: page,
+        totalPages: totalItems == 0 ? 0 : (totalItems / pageSize).ceil(),
+        totalItems: totalItems,
+        itemsPerPage: pageSize,
+      );
+    });
+  }
+
+  /// 读取圣殿角色等级排序下的快速跳转位置
+  ///
+  /// [username] 用户名
+  /// [direction] 排序方向
+  /// [searchKeyword] 角色 ID 或名称筛选词
+  Future<List<UserTempleLevelPosition>> readTempleLevelPositions({
+    required String username,
+    required UserTempleSnapshotSortDirection direction,
+    required String searchKeyword,
+  }) async {
+    final database = await _openDatabase();
+    final searchFilter = _templeSearchFilter(searchKeyword);
+    final rows = await database.rawQuery(
+      'SELECT character_level, COUNT(*) AS item_count '
+      'FROM $_templeTableName t WHERE t.username = ? ${searchFilter.clause} '
+      'GROUP BY character_level ORDER BY character_level '
+      '${_templeSqlDirection(direction)}',
+      [username, ...searchFilter.arguments],
+    );
+    var absoluteIndex = 0;
+    final positions = <UserTempleLevelPosition>[];
+    for (final row in rows) {
+      positions.add(
+        UserTempleLevelPosition(
+          level: _rowInt(row['character_level']),
+          absoluteIndex: absoluteIndex,
+        ),
+      );
+      absoluteIndex += _rowInt(row['item_count']);
+    }
+    return List<UserTempleLevelPosition>.unmodifiable(positions);
+  }
+
   /// 读取用户资产快照持久化记录
   ///
   /// [username] 用户名
@@ -373,14 +570,7 @@ class UserAssetSnapshotDatabase {
         username: metadata['username'] as String? ?? '',
         nickname: metadata['nickname'] as String? ?? '',
         characterRows: await _readCharacterRows(transaction, username),
-        templeRows: await _readPayloadRows(
-          transaction,
-          tableName: _templeTableName,
-          keyColumn: 'temple_id',
-          username: username,
-        ),
-        characterHeaderRows:
-            await _readCharacterHeaderRows(transaction, username),
+        templeRows: await _readTempleRows(transaction, username),
         characterTotalItems: _rowInt(metadata['character_total_items']),
         templeTotalItems: _rowInt(metadata['temple_total_items']),
         sourceState: sourceState.sourceState,
@@ -397,7 +587,6 @@ class UserAssetSnapshotDatabase {
       for (final tableName in const [
         _characterTableName,
         _templeTableName,
-        _characterHeaderTableName,
         _sourceStateTableName,
         _metaTableName,
       ]) {
@@ -409,66 +598,4 @@ class UserAssetSnapshotDatabase {
       }
     });
   }
-
-  /// 生成写入后的原始数据状态
-  ///
-  /// [current] 当前数据库状态
-  /// [characterChanged] 用户角色是否变化
-  /// [templeChanged] 用户圣殿是否变化
-  /// [characterHeaderChanged] 全部角色资料是否变化
-  /// [charactersUpdatedAtMilliseconds] 用户角色更新时间戳
-  /// [templesUpdatedAtMilliseconds] 用户圣殿更新时间戳
-  /// [characterHeadersUpdatedAtMilliseconds] 全部角色资料更新时间戳
-  UserAssetSourceState _buildSourceState({
-    required _StoredUserAssetSourceState? current,
-    required bool characterChanged,
-    required bool templeChanged,
-    required bool characterHeaderChanged,
-    required int charactersUpdatedAtMilliseconds,
-    required int templesUpdatedAtMilliseconds,
-    required int characterHeadersUpdatedAtMilliseconds,
-  }) {
-    final revisions = current?.sourceState.revisions;
-    return UserAssetSourceState(
-      revisions: UserAssetDataRevisions(
-        characters: _nextRevision(revisions?.characters, characterChanged),
-        temples: _nextRevision(revisions?.temples, templeChanged),
-        characterHeaders: _nextRevision(
-          revisions?.characterHeaders,
-          characterHeaderChanged,
-        ),
-        schemaVersion: userAssetSnapshotSchemaVersion,
-      ),
-      charactersUpdatedAtMilliseconds: charactersUpdatedAtMilliseconds,
-      templesUpdatedAtMilliseconds: templesUpdatedAtMilliseconds,
-      characterHeadersUpdatedAtMilliseconds:
-          characterHeadersUpdatedAtMilliseconds,
-    );
-  }
-}
-
-/// 生成角色 ID 与名称筛选 SQL
-///
-/// [searchKeyword] 角色 ID 或名称筛选词
-({String clause, List<Object?> arguments}) _characterSearchFilter(
-  String searchKeyword,
-) {
-  final keyword = searchKeyword.trim();
-  if (keyword.isEmpty) {
-    return (clause: '', arguments: const <Object?>[]);
-  }
-  // 角色 ID 常用 #123 形式输入，仅纯数字编号去掉前缀参与模糊匹配
-  final normalizedKeyword =
-      RegExp(r'^#[0-9]+$').hasMatch(keyword) ? keyword.substring(1) : keyword;
-  // LIKE 通配符按字面量搜索，避免扩大筛选范围
-  final escapedKeyword = normalizedKeyword
-      .replaceAll(r'\', r'\\')
-      .replaceAll('%', r'\%')
-      .replaceAll('_', r'\_');
-  final searchPattern = '%$escapedKeyword%';
-  return (
-    clause: r"AND (CAST(c.character_id AS TEXT) LIKE ? ESCAPE '\' "
-        r"OR c.name LIKE ? ESCAPE '\')",
-    arguments: <Object?>[searchPattern, searchPattern],
-  );
 }

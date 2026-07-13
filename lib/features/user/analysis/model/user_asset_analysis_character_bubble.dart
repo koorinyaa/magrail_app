@@ -1,5 +1,4 @@
 import 'package:magrail_app/core/network/tinygrail_response.dart';
-import 'package:magrail_app/features/chara/detail/model/character_detail_trade_header.dart';
 import 'package:magrail_app/features/user/analysis/model/user_asset_analysis_calculations.dart';
 import 'package:magrail_app/features/user/model/user_character_api_item.dart';
 import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
@@ -8,41 +7,32 @@ import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
 ///
 /// [characters] 用户全部角色
 /// [temples] 用户全部圣殿
-/// [characterHeadersById] 角色头部资料索引
 List<UserAssetAnalysisCharacterBubble> buildUserAssetAnalysisCharacterBubbles({
   required List<UserCharacterApiItem> characters,
   required List<UserTempleApiItem> temples,
-  required Map<int, CharacterDetailTradeHeader> characterHeadersById,
 }) {
   final bubbles = <int, _MutableCharacterBubble>{};
   for (final character in characters) {
     if (character.characterId <= 0) {
       continue;
     }
-    final header = characterHeadersById[character.characterId];
     final bubble = bubbles.putIfAbsent(character.characterId, () {
       return _MutableCharacterBubble(character.characterId);
     });
-    bubble.applyCharacter(character, header);
-    bubble.characterDividend += userAssetAnalysisCharacterTotalDividend(
-      character,
-      header: header,
-    );
+    bubble.applyCharacter(character);
+    bubble.characterDividend +=
+        userAssetAnalysisCharacterTotalDividend(character);
     bubble.characterShares += character.userTotal;
   }
   for (final temple in temples) {
     if (temple.characterId <= 0) {
       continue;
     }
-    final header = characterHeadersById[temple.characterId];
     final bubble = bubbles.putIfAbsent(temple.characterId, () {
       return _MutableCharacterBubble(temple.characterId);
     });
-    bubble.applyTemple(temple, header);
-    bubble.templeDividend += userAssetAnalysisTempleTotalDividend(
-      temple,
-      header: header,
-    );
+    bubble.applyTemple(temple);
+    bubble.templeDividend += userAssetAnalysisTempleTotalDividend(temple);
     bubble.templeAssets += temple.assets;
   }
 
@@ -179,47 +169,30 @@ class _MutableCharacterBubble {
   /// 应用用户角色条目
   ///
   /// [item] 用户角色条目
-  /// [header] 角色头部资料
-  void applyCharacter(
-    UserCharacterApiItem item,
-    CharacterDetailTradeHeader? header,
-  ) {
+  void applyCharacter(UserCharacterApiItem item) {
     if (name.trim().isEmpty) {
-      name = item.name.trim().isNotEmpty ? item.name : header?.name ?? '';
+      name = item.name;
     }
     if (avatarUrl.trim().isEmpty) {
-      avatarUrl = item.icon.trim().isNotEmpty ? item.icon : header?.icon ?? '';
+      avatarUrl = item.icon;
     }
     if (item.level > 0) {
       level = item.level;
-      return;
-    }
-    if (level <= 0 && header != null) {
-      level = header.level;
     }
   }
 
   /// 应用用户圣殿条目
   ///
   /// [item] 用户圣殿条目
-  /// [header] 角色头部资料
-  void applyTemple(
-    UserTempleApiItem item,
-    CharacterDetailTradeHeader? header,
-  ) {
+  void applyTemple(UserTempleApiItem item) {
     if (name.trim().isEmpty) {
-      name = item.name.trim().isNotEmpty ? item.name : header?.name ?? '';
+      name = item.name;
     }
     if (avatarUrl.trim().isEmpty) {
-      avatarUrl =
-          item.avatar.trim().isNotEmpty ? item.avatar : header?.icon ?? '';
+      avatarUrl = item.avatar;
     }
     if (level <= 0 && item.characterLevel > 0) {
       level = item.characterLevel;
-      return;
-    }
-    if (level <= 0 && header != null) {
-      level = header.level;
     }
   }
 

@@ -1,32 +1,32 @@
-part of 'user_character_page.dart';
+part of 'user_temple_page.dart';
 
-// 角色筛选输入防抖，避免每次输入都重建分页窗口
-const Duration _userCharacterSearchDebounceDelay = Duration(milliseconds: 450);
+// 圣殿筛选输入防抖，避免每次输入都重建分页窗口
+const Duration _userTempleSearchDebounceDelay = Duration(milliseconds: 450);
 
-/// 用户角色二级页面搜索交互
-extension _UserCharacterPageSearch on _UserCharacterPageState {
-  /// 处理角色筛选输入变化
+/// 用户圣殿二级页面搜索交互
+extension _UserTemplePageSearch on _UserTemplePageState {
+  /// 处理圣殿筛选输入变化
   ///
   /// [keyword] 角色 ID 或名称筛选词
-  void _handleCharacterSearchChanged(String keyword) {
+  void _handleTempleSearchChanged(String keyword) {
     _searchDebounce?.cancel();
-    _searchDebounce = Timer(_userCharacterSearchDebounceDelay, () {
-      unawaited(_applyCharacterSearch(keyword));
+    _searchDebounce = Timer(_userTempleSearchDebounceDelay, () {
+      unawaited(_applyTempleSearch(keyword));
     });
   }
 
-  /// 提交角色筛选输入
+  /// 提交圣殿筛选输入
   ///
   /// [keyword] 角色 ID 或名称筛选词
-  void _submitCharacterSearch(String keyword) {
+  void _submitTempleSearch(String keyword) {
     _searchDebounce?.cancel();
-    unawaited(_applyCharacterSearch(keyword));
+    unawaited(_applyTempleSearch(keyword));
   }
 
-  /// 应用角色筛选并回到列表顶部
+  /// 应用圣殿筛选并回到页面顶部
   ///
   /// [keyword] 角色 ID 或名称筛选词
-  Future<void> _applyCharacterSearch(String keyword) async {
+  Future<void> _applyTempleSearch(String keyword) async {
     final controller = _currentUserController;
     if (controller == null) {
       return;
@@ -40,15 +40,15 @@ extension _UserCharacterPageSearch on _UserCharacterPageState {
       return;
     }
     if (!success) {
-      _restoreCharacterSearchInput();
+      _restoreTempleSearchInput();
       AppToast.error(context, text: '搜索失败，请重试');
       return;
     }
     _scrollToTopAfterLayout();
   }
 
-  /// 恢复控制器已提交的角色筛选词
-  void _restoreCharacterSearchInput() {
+  /// 恢复控制器已提交的圣殿筛选词
+  void _restoreTempleSearchInput() {
     final keyword = _currentUserController?.searchKeyword ?? '';
     _searchController.value = TextEditingValue(
       text: keyword,

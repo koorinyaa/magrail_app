@@ -15,6 +15,7 @@ class UserTempleCard extends StatelessWidget {
   /// [ownerLabel] 用户展示文案
   /// [width] 卡片宽度
   /// [heroTagPrefix] 图片 Hero 标识前缀
+  /// [sortValue] 当前排序字段的补充展示值
   /// [onCharacterTap] 角色区域点击回调
   /// [onAssetTap] 圣殿资产入口点击回调
   const UserTempleCard({
@@ -23,6 +24,7 @@ class UserTempleCard extends StatelessWidget {
     required this.ownerLabel,
     required this.width,
     this.heroTagPrefix = 'user-temple-cover',
+    this.sortValue,
     this.onCharacterTap,
     this.onAssetTap,
   });
@@ -39,6 +41,9 @@ class UserTempleCard extends StatelessWidget {
   /// 图片 Hero 标识前缀
   final String heroTagPrefix;
 
+  /// 当前排序字段的补充展示值
+  final UserTempleSortValue? sortValue;
+
   /// 角色区域点击回调
   final ValueChanged<UserTempleApiItem>? onCharacterTap;
 
@@ -48,8 +53,15 @@ class UserTempleCard extends StatelessWidget {
   /// 根据卡片宽度计算整体高度
   ///
   /// [width] 卡片宽度
-  static double heightForWidth(double width) {
-    return width / 3 * 4 + _TempleAssetProgress.height + 10;
+  /// [showSortValue] 是否预留排序字段补充行高度
+  static double heightForWidth(
+    double width, {
+    bool showSortValue = false,
+  }) {
+    return width / 3 * 4 +
+        _TempleAssetProgress.height +
+        10 +
+        (showSortValue ? _TempleSortValueLine.height + 4 : 0);
   }
 
   /// 构建用户圣殿卡片
@@ -82,6 +94,10 @@ class UserTempleCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           _TempleAssetProgress(item: item),
+          if (sortValue case final value?) ...[
+            const SizedBox(height: 4),
+            _TempleSortValueLine(value: value),
+          ],
         ],
       ),
     );
@@ -117,6 +133,85 @@ class UserTempleCard extends StatelessWidget {
   /// [temple] 用户圣殿接口条目
   String _heroTag(UserTempleApiItem temple) {
     return '$heroTagPrefix-${temple.id}-${temple.characterId}';
+  }
+}
+
+/// 用户圣殿排序字段补充展示值
+class UserTempleSortValue {
+  /// 创建用户圣殿排序字段补充展示值
+  ///
+  /// [label] 排序字段文案
+  /// [icon] 排序字段图标
+  /// [value] 排序字段格式化数值
+  const UserTempleSortValue({
+    this.label = '',
+    this.icon,
+    required this.value,
+  });
+
+  /// 排序字段文案
+  final String label;
+
+  /// 排序字段图标
+  final IconData? icon;
+
+  /// 排序字段格式化数值
+  final String value;
+}
+
+/// 用户圣殿排序字段补充行
+class _TempleSortValueLine extends StatelessWidget {
+  /// 创建用户圣殿排序字段补充行
+  ///
+  /// [value] 当前排序字段展示值
+  const _TempleSortValueLine({required this.value});
+
+  /// 补充行高度
+  static const double height = 16;
+
+  /// 当前排序字段展示值
+  final UserTempleSortValue value;
+
+  /// 构建用户圣殿排序字段补充行
+  ///
+  /// [context] 当前组件树上下文
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textStyle = TextStyle(
+      color: colorScheme.onSurfaceVariant,
+      fontSize: 11,
+      fontWeight: FontWeight.w600,
+      height: 1,
+    );
+    return SizedBox(
+      height: height,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Row(
+          children: [
+            if (value.icon case final icon?) ...[
+              Icon(
+                icon,
+                size: 12,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 3),
+            ],
+            Expanded(
+              child: Text(
+                value.label.isEmpty
+                    ? value.value
+                    : '${value.label} ${value.value}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: textStyle,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

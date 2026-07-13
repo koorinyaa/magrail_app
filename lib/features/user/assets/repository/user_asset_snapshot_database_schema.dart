@@ -101,19 +101,19 @@ extension _UserAssetSnapshotDatabaseSchema on UserAssetSnapshotDatabase {
         username TEXT NOT NULL,
         temple_id INTEGER NOT NULL,
         row_order INTEGER NOT NULL,
+        character_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        assets INTEGER NOT NULL,
+        sacrifices INTEGER NOT NULL,
+        character_level INTEGER NOT NULL,
+        damaged INTEGER NOT NULL,
+        single_dividend REAL NOT NULL,
+        total_dividend REAL NOT NULL,
         star_forces INTEGER NOT NULL,
+        refine INTEGER NOT NULL,
+        create_value TEXT NOT NULL,
         payload_json TEXT NOT NULL,
         PRIMARY KEY (username, temple_id)
-      )
-      ''');
-    await database.execute('''
-      CREATE TABLE $_characterHeaderTableName (
-        username TEXT NOT NULL,
-        character_id INTEGER NOT NULL,
-        row_order INTEGER NOT NULL,
-        rank INTEGER NOT NULL,
-        payload_json TEXT NOT NULL,
-        PRIMARY KEY (username, character_id)
       )
       ''');
     await database.execute('''
@@ -122,13 +122,10 @@ extension _UserAssetSnapshotDatabaseSchema on UserAssetSnapshotDatabase {
         schema_version INTEGER NOT NULL,
         character_revision INTEGER NOT NULL,
         temple_revision INTEGER NOT NULL,
-        character_header_revision INTEGER NOT NULL,
         character_updated_at_milliseconds INTEGER NOT NULL,
         temple_updated_at_milliseconds INTEGER NOT NULL,
-        character_header_updated_at_milliseconds INTEGER NOT NULL,
         character_content_hash TEXT NOT NULL,
-        temple_content_hash TEXT NOT NULL,
-        character_header_content_hash TEXT NOT NULL
+        temple_content_hash TEXT NOT NULL
       )
       ''');
     await database.execute(
@@ -212,12 +209,12 @@ extension _UserAssetSnapshotDatabaseSchema on UserAssetSnapshotDatabase {
       'ON $_templeTableName (username, star_forces)',
     );
     await database.execute(
-      'CREATE INDEX idx_asset_snapshot_character_header_order '
-      'ON $_characterHeaderTableName (username, row_order)',
+      'CREATE INDEX idx_asset_snapshot_temple_sacrifices '
+      'ON $_templeTableName (username, sacrifices DESC, row_order ASC)',
     );
     await database.execute(
-      'CREATE INDEX idx_asset_snapshot_character_header_rank '
-      'ON $_characterHeaderTableName (username, rank, character_id)',
+      'CREATE INDEX idx_asset_snapshot_temple_character_level '
+      'ON $_templeTableName (username, character_level DESC, row_order ASC)',
     );
   }
 }

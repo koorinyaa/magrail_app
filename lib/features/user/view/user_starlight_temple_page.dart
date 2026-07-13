@@ -84,7 +84,6 @@ class _UserStarlightTemplePageState extends State<UserStarlightTemplePage> {
     _controller = UserStarlightTemplePageController(
       snapshotRepository: UserAssetSnapshotRepository(
         userRepository: widget.userRepository,
-        characterDetailRepository: widget.characterDetailRepository,
         database: snapshotDatabase,
       ),
       username: widget.username,

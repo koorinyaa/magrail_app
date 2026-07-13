@@ -5,10 +5,10 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:magrail_app/core/network/tinygrail_page.dart';
 import 'package:magrail_app/core/network/tinygrail_response.dart';
-import 'package:magrail_app/features/chara/detail/model/character_detail_trade_header.dart';
-import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
+import 'package:magrail_app/features/user/analysis/model/user_asset_analysis_calculations.dart';
 import 'package:magrail_app/features/user/assets/model/user_character_snapshot_query.dart';
 import 'package:magrail_app/features/user/assets/model/user_asset_snapshot.dart';
+import 'package:magrail_app/features/user/assets/model/user_temple_snapshot_query.dart';
 import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_database.dart';
 import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_database_models.dart';
 import 'package:magrail_app/features/user/model/user_character_api_item.dart';
@@ -23,28 +23,28 @@ class UserAssetSnapshotRepository {
   /// 创建用户资产快照仓库
   ///
   /// [userRepository] 用户仓库
-  /// [characterDetailRepository] 角色详情仓库
   /// [database] 用户资产快照数据库
   const UserAssetSnapshotRepository({
     required UserRepository userRepository,
-    required CharacterDetailRepository characterDetailRepository,
     required UserAssetSnapshotDatabase database,
   })  : _userRepository = userRepository,
-        _characterDetailRepository = characterDetailRepository,
         _database = database;
 
   // 全量资产快照先用 1 条探测总数，再用总数一次取完整列表
   static const int _totalProbePageSize = 1;
 
-  // 角色、圣殿和角色资料共用请求阀门
-  static const int _maxServerConcurrency = 3;
+  // 角色和圣殿共用请求阀门
+  static const int _maxServerConcurrency = 2;
 
   // 同一用户的角色全量请求合并，避免启动刷新与页面刷新重复访问服务器
   static final Map<String, Future<_AllCharactersResult>>
       _characterFetchOperations = {};
 
+  // 同一用户的圣殿全量请求合并，避免启动刷新与页面刷新重复访问服务器
+  static final Map<String, Future<_AllTemplesResult>> _templeFetchOperations =
+      {};
+
   final UserRepository _userRepository;
-  final CharacterDetailRepository _characterDetailRepository;
   final UserAssetSnapshotDatabase _database;
 
   /// 刷新并缓存用户资产快照
@@ -67,7 +67,6 @@ class UserAssetSnapshotRepository {
     final requestGate = _UserAssetSnapshotRequestGate(maxServerConcurrency);
     late int charactersUpdatedAtMilliseconds;
     late int templesUpdatedAtMilliseconds;
-    late int characterHeadersUpdatedAtMilliseconds;
     final charactersFuture = _fetchAllCharactersShared(
       username: resolvedUsername,
       requestGate: requestGate,
@@ -76,7 +75,7 @@ class UserAssetSnapshotRepository {
       charactersUpdatedAtMilliseconds = DateTime.now().millisecondsSinceEpoch;
       return result;
     });
-    final templesFuture = _fetchAllTemples(
+    final templesFuture = _fetchAllTemplesShared(
       username: resolvedUsername,
       requestGate: requestGate,
       onProgress: onProgress,
@@ -84,27 +83,16 @@ class UserAssetSnapshotRepository {
       templesUpdatedAtMilliseconds = DateTime.now().millisecondsSinceEpoch;
       return result;
     });
-    final characterHeadersFuture = _fetchAllCharacterHeaders(
-      requestGate: requestGate,
-      onProgress: onProgress,
-    ).then((result) {
-      characterHeadersUpdatedAtMilliseconds =
-          DateTime.now().millisecondsSinceEpoch;
-      return result;
-    });
     final results = await Future.wait<Object>([
       charactersFuture,
       templesFuture,
-      characterHeadersFuture,
     ]);
     final characterResult = results[0] as _AllCharactersResult;
     final templeResult = results[1] as _AllTemplesResult;
-    final characterHeaders = results[2] as List<CharacterDetailTradeHeader>;
     final serializedRows = await _serializeSnapshotRows(
       _SnapshotRowsSerializeRequest(
         characters: characterResult.items,
         temples: templeResult.items,
-        characterHeaders: characterHeaders,
         characterTotalItems: characterResult.totalItems,
         templeTotalItems: templeResult.totalItems,
       ),
@@ -115,24 +103,29 @@ class UserAssetSnapshotRepository {
         nickname: nickname.trim(),
         characterRows: serializedRows.characterRows,
         templeRows: serializedRows.templeRows,
-        characterHeaderRows: serializedRows.characterHeaderRows,
         characterTotalItems: characterResult.totalItems,
         templeTotalItems: templeResult.totalItems,
       ),
       charactersUpdatedAtMilliseconds: charactersUpdatedAtMilliseconds,
       templesUpdatedAtMilliseconds: templesUpdatedAtMilliseconds,
-      characterHeadersUpdatedAtMilliseconds:
-          characterHeadersUpdatedAtMilliseconds,
       characterContentHash: serializedRows.characterContentHash,
       templeContentHash: serializedRows.templeContentHash,
-      characterHeaderContentHash: serializedRows.characterHeaderContentHash,
     );
+    if (sourceState.charactersUpdatedAtMilliseconds !=
+            charactersUpdatedAtMilliseconds ||
+        sourceState.templesUpdatedAtMilliseconds !=
+            templesUpdatedAtMilliseconds) {
+      // 旧批次被数据库拒绝时返回已持久化的新快照，避免分析结果与来源版本错位
+      final latestSnapshot = await readSnapshot(resolvedUsername);
+      if (latestSnapshot != null) {
+        return latestSnapshot;
+      }
+    }
     return UserAssetSnapshot(
       username: resolvedUsername,
       nickname: nickname.trim(),
       characters: characterResult.items,
       temples: templeResult.items,
-      characterHeaders: characterHeaders,
       characterTotalItems: characterResult.totalItems,
       templeTotalItems: templeResult.totalItems,
       sourceState: sourceState,
@@ -183,6 +176,39 @@ class UserAssetSnapshotRepository {
       totalItems: result.totalItems,
       updatedAtMilliseconds: DateTime.now().millisecondsSinceEpoch,
       contentHash: serialized.contentHash,
+    );
+  }
+
+  /// 刷新并缓存用户圣殿
+  ///
+  /// [username] 用户名
+  /// [nickname] 用户昵称
+  Future<UserAssetSourceState> refreshTemples({
+    required String username,
+    required String nickname,
+  }) async {
+    final resolvedUsername = username.trim();
+    if (resolvedUsername.isEmpty) {
+      throw StateError('缺少用户名');
+    }
+    final templeResult = await _fetchAllTemplesShared(
+      username: resolvedUsername,
+      requestGate: _UserAssetSnapshotRequestGate(1),
+      onProgress: _ignoreSnapshotProgress,
+    );
+    final serialized = await compute(
+      _serializeUserTempleSnapshotRows,
+      _TempleRowsSerializeRequest(
+        temples: templeResult.items,
+      ),
+    );
+    return _database.upsertTempleSnapshot(
+      username: resolvedUsername,
+      nickname: nickname.trim(),
+      templeRows: serialized.rows,
+      templeTotalItems: templeResult.totalItems,
+      templesUpdatedAtMilliseconds: DateTime.now().millisecondsSinceEpoch,
+      templeContentHash: serialized.templeContentHash,
     );
   }
 
@@ -280,9 +306,6 @@ class UserAssetSnapshotRepository {
         nickname: record.nickname,
         characters: List<UserCharacterApiItem>.unmodifiable(rows.characters),
         temples: List<UserTempleApiItem>.unmodifiable(rows.temples),
-        characterHeaders: List<CharacterDetailTradeHeader>.unmodifiable(
-          rows.characterHeaders,
-        ),
         characterTotalItems: record.characterTotalItems,
         templeTotalItems: record.templeTotalItems,
         sourceState: sourceState,
@@ -296,6 +319,77 @@ class UserAssetSnapshotRepository {
       }
       return null;
     }
+  }
+
+  /// 从本地圣殿快照分页读取当前用户圣殿
+  ///
+  /// [username] 用户名
+  /// [page] 页码
+  /// [pageSize] 每页圣殿数量
+  /// [sort] 排序字段
+  /// [direction] 排序方向
+  /// [searchKeyword] 角色 ID 或名称筛选词
+  Future<TinygrailPage<UserTempleSnapshotEntry>?> readTemplePage({
+    required String username,
+    required int page,
+    required int pageSize,
+    required UserTempleSnapshotSort sort,
+    required UserTempleSnapshotSortDirection direction,
+    required String searchKeyword,
+  }) async {
+    final payloadPage = await _database.readTemplePage(
+      username: username.trim(),
+      page: page,
+      pageSize: pageSize,
+      sort: sort,
+      direction: direction,
+      searchKeyword: searchKeyword,
+    );
+    if (payloadPage == null) {
+      return null;
+    }
+    try {
+      return TinygrailPage(
+        items: List<UserTempleSnapshotEntry>.unmodifiable(
+          payloadPage.items.map((row) {
+            final item = _decodeSnapshotRow(
+              row,
+              UserTempleApiItem.fromJson,
+              (value) => value.id,
+            );
+            return UserTempleSnapshotEntry(
+              item: item,
+              singleDividend: row.singleDividend,
+              totalDividend: row.totalDividend,
+            );
+          }),
+        ),
+        currentPage: payloadPage.currentPage,
+        totalPages: payloadPage.totalPages,
+        totalItems: payloadPage.totalItems,
+        itemsPerPage: payloadPage.itemsPerPage,
+      );
+    } on FormatException {
+      await _database.invalidateTempleSnapshot(username.trim());
+      return null;
+    }
+  }
+
+  /// 读取当前用户圣殿等级排序下的快速跳转位置
+  ///
+  /// [username] 用户名
+  /// [direction] 排序方向
+  /// [searchKeyword] 角色 ID 或名称筛选词
+  Future<List<UserTempleLevelPosition>> readTempleLevelPositions({
+    required String username,
+    required UserTempleSnapshotSortDirection direction,
+    required String searchKeyword,
+  }) {
+    return _database.readTempleLevelPositions(
+      username: username.trim(),
+      direction: direction,
+      searchKeyword: searchKeyword,
+    );
   }
 
   /// 从本地快照分页读取星光圣殿

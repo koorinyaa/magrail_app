@@ -30,8 +30,6 @@ class UserAssetAnalysisController extends ChangeNotifier {
   int _characterTotalSteps = 1;
   int _templeCompletedSteps = 0;
   int _templeTotalSteps = 1;
-  int _characterHeaderCompletedSteps = 0;
-  int _characterHeaderTotalSteps = 1;
   int _analysisCompletedSteps = 0;
   int _analysisTotalSteps = 1;
   bool _isInitialLoading = false;
@@ -222,9 +220,6 @@ class UserAssetAnalysisController extends ChangeNotifier {
       case UserAssetAnalysisLoadKind.temples:
         _templeCompletedSteps = progress.completedSteps;
         _templeTotalSteps = progress.totalSteps;
-      case UserAssetAnalysisLoadKind.characterHeaders:
-        _characterHeaderCompletedSteps = progress.completedSteps;
-        _characterHeaderTotalSteps = progress.totalSteps;
       case UserAssetAnalysisLoadKind.analysis:
         _analysisCompletedSteps = progress.completedSteps;
         _analysisTotalSteps = progress.totalSteps;
@@ -232,12 +227,9 @@ class UserAssetAnalysisController extends ChangeNotifier {
     _progressLabel = progress.label;
     final completedSteps = _characterCompletedSteps +
         _templeCompletedSteps +
-        _characterHeaderCompletedSteps +
         _analysisCompletedSteps;
-    final totalSteps = _characterTotalSteps +
-        _templeTotalSteps +
-        _characterHeaderTotalSteps +
-        _analysisTotalSteps;
+    final totalSteps =
+        _characterTotalSteps + _templeTotalSteps + _analysisTotalSteps;
     _progress = totalSteps <= 0
         ? 0
         : (completedSteps / totalSteps).clamp(0, 1).toDouble();
@@ -252,8 +244,6 @@ class UserAssetAnalysisController extends ChangeNotifier {
     _characterTotalSteps = 1;
     _templeCompletedSteps = 0;
     _templeTotalSteps = 1;
-    _characterHeaderCompletedSteps = 0;
-    _characterHeaderTotalSteps = 1;
     _analysisCompletedSteps = 0;
     _analysisTotalSteps = 2;
   }

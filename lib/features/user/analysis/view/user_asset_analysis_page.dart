@@ -8,7 +8,6 @@ import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:magrail_app/core/feedback/app_toast.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_hero.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
-import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
 import 'package:magrail_app/features/user/analysis/controller/user_asset_analysis_controller.dart';
 import 'package:magrail_app/features/user/analysis/model/user_asset_analysis.dart';
 import 'package:magrail_app/features/user/analysis/repository/user_asset_analysis_database.dart';
@@ -31,22 +30,17 @@ class UserAssetAnalysisPage extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [repository] 用户仓库
-  /// [characterDetailRepository] 角色详情仓库
   /// [username] 用户名
   /// [nickname] 用户昵称
   const UserAssetAnalysisPage({
     super.key,
     required this.repository,
-    required this.characterDetailRepository,
     required this.username,
     this.nickname,
   });
 
   /// 用户仓库
   final UserRepository repository;
-
-  /// 角色详情仓库
-  final CharacterDetailRepository characterDetailRepository;
 
   /// 用户名
   final String username;
@@ -78,7 +72,6 @@ class _UserAssetAnalysisPageState extends State<UserAssetAnalysisPage> {
       repository: UserAssetAnalysisRepository(
         snapshotRepository: UserAssetSnapshotRepository(
           userRepository: widget.repository,
-          characterDetailRepository: widget.characterDetailRepository,
           database: snapshotDatabase,
         ),
         database: _analysisDatabase,

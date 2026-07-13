@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:magrail_app/core/network/tinygrail_response.dart';
-import 'package:magrail_app/features/chara/detail/model/character_detail_trade_header.dart';
 import 'package:magrail_app/features/user/analysis/model/user_asset_analysis_calculations.dart';
 import 'package:magrail_app/features/user/analysis/model/user_asset_analysis_character_bubble.dart';
 import 'package:magrail_app/features/user/assets/model/user_asset_snapshot.dart';
@@ -46,7 +45,7 @@ class UserAssetAnalysis {
   /// [levelBuckets] 等级分布
   /// [characterBubbles] 角色圆图数据
   /// [templeCoverage] 圣殿覆盖率
-  /// [sourceRevisions] 计算使用的三类原始数据版本
+  /// [sourceRevisions] 计算使用的两类原始数据版本
   const UserAssetAnalysis({
     required this.username,
     required this.nickname,
@@ -95,7 +94,7 @@ class UserAssetAnalysis {
   /// 圣殿覆盖率
   final double templeCoverage;
 
-  /// 计算使用的三类原始数据版本
+  /// 计算使用的两类原始数据版本
   final UserAssetDataRevisions sourceRevisions;
 
   /// 分析更新时间
@@ -236,46 +235,22 @@ class _UserAssetAnalysisMetrics {
   factory _UserAssetAnalysisMetrics.fromSnapshot(UserAssetSnapshot snapshot) {
     final characters = snapshot.characters;
     final temples = snapshot.temples;
-    final characterHeadersById = _buildCharacterHeadersById(
-      snapshot.characterHeaders,
-    );
     final characterBubbles = buildUserAssetAnalysisCharacterBubbles(
       characters: characters,
       temples: temples,
-      characterHeadersById: characterHeadersById,
     );
 
     final characterDividend = _sumDouble(
-      characters.map((item) {
-        return userAssetAnalysisCharacterTotalDividend(
-          item,
-          header: characterHeadersById[item.characterId],
-        );
-      }),
+      characters.map(userAssetAnalysisCharacterTotalDividend),
     );
     final templeDividend = _sumDouble(
-      temples.map((item) {
-        return userAssetAnalysisTempleTotalDividend(
-          item,
-          header: characterHeadersById[item.characterId],
-        );
-      }),
+      temples.map(userAssetAnalysisTempleTotalDividend),
     );
     final starlightDividend = _sumDouble(
-          characters.map((item) {
-            return userAssetAnalysisCharacterStarlightDividend(
-              item,
-              header: characterHeadersById[item.characterId],
-            );
-          }),
+          characters.map(userAssetAnalysisCharacterStarlightDividend),
         ) +
         _sumDouble(
-          temples.map((item) {
-            return userAssetAnalysisTempleStarlightDividend(
-              item,
-              header: characterHeadersById[item.characterId],
-            );
-          }),
+          temples.map(userAssetAnalysisTempleStarlightDividend),
         );
     final totalDividend = characterDividend + templeDividend;
     final characterIds = {
@@ -312,7 +287,6 @@ class _UserAssetAnalysisMetrics {
       levelBuckets: _buildLevelBuckets(
         characters,
         temples,
-        characterHeadersById,
       ),
       characterBubbles: _buildCachedCharacterBubbles(characterBubbles),
       templeCoverage:
@@ -351,11 +325,9 @@ class _UserAssetAnalysisMetrics {
   ///
   /// [characters] 用户全部角色
   /// [temples] 用户全部圣殿
-  /// [characterHeadersById] 角色头部资料索引
   static List<UserAssetAnalysisLevelBucket> _buildLevelBuckets(
     List<UserCharacterApiItem> characters,
     List<UserTempleApiItem> temples,
-    Map<int, CharacterDetailTradeHeader> characterHeadersById,
   ) {
     final buckets = <int, _MutableLevelBucket>{};
     for (final character in characters) {
@@ -364,40 +336,20 @@ class _UserAssetAnalysisMetrics {
         return _MutableLevelBucket(level);
       });
       bucket.totalShares += character.userTotal;
-      bucket.characterDividend += userAssetAnalysisCharacterTotalDividend(
-        character,
-        header: characterHeadersById[character.characterId],
-      );
+      bucket.characterDividend +=
+          userAssetAnalysisCharacterTotalDividend(character);
     }
     for (final temple in temples) {
-      final header = characterHeadersById[temple.characterId];
-      final level = temple.characterLevel > 0
-          ? temple.characterLevel
-          : header?.level ?? 0;
+      final level = temple.characterLevel;
       final bucket = buckets.putIfAbsent(level, () {
         return _MutableLevelBucket(level);
       });
-      bucket.templeDividend += userAssetAnalysisTempleTotalDividend(
-        temple,
-        header: header,
-      );
+      bucket.templeDividend += userAssetAnalysisTempleTotalDividend(temple);
     }
 
     final result = buckets.values.map((bucket) => bucket.toBucket()).toList()
       ..sort((a, b) => b.totalDividend.compareTo(a.totalDividend));
     return List<UserAssetAnalysisLevelBucket>.unmodifiable(result);
-  }
-
-  /// 构建角色头部资料索引
-  ///
-  /// [headers] 角色头部资料列表
-  static Map<int, CharacterDetailTradeHeader> _buildCharacterHeadersById(
-    List<CharacterDetailTradeHeader> headers,
-  ) {
-    return {
-      for (final header in headers)
-        if (header.characterId > 0) header.characterId: header,
-    };
   }
 
   /// 累加整数

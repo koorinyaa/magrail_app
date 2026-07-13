@@ -286,8 +286,12 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
   /// 在当前分页窗口前插入指定页面
   ///
   /// [page] 目标页码
+  /// [beforeCommit] 提交分页窗口前接收合并后条目的同步回调
   @protected
-  Future<int> prependPage(int page) async {
+  Future<int> prependPage(
+    int page, {
+    void Function(List<ItemType> items)? beforeCommit,
+  }) async {
     if (_isDisposed || page <= 0 || _hasActiveRequest) {
       return 0;
     }
@@ -304,8 +308,12 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
         return 0;
       }
       final prependedItems = convertPageItems(result.items);
+      final combinedPages = <List<ItemType>>[prependedItems, ...pages];
+      beforeCommit?.call(
+        combinedPages.expand((items) => items).toList(growable: false),
+      );
       _pagingController.value = _pagingController.value.copyWith(
-        pages: <List<ItemType>>[prependedItems, ...pages],
+        pages: combinedPages,
         keys: <int>[page, ...keys],
         error: null,
       );
