@@ -458,9 +458,8 @@ class UserAssetSnapshotDatabase {
     return (clause: '', arguments: const <Object?>[]);
   }
   // 角色 ID 常用 #123 形式输入，仅纯数字编号去掉前缀参与模糊匹配
-  final normalizedKeyword = RegExp(r'^#[0-9]+$').hasMatch(keyword)
-      ? keyword.substring(1)
-      : keyword;
+  final normalizedKeyword =
+      RegExp(r'^#[0-9]+$').hasMatch(keyword) ? keyword.substring(1) : keyword;
   // LIKE 通配符按字面量搜索，避免扩大筛选范围
   final escapedKeyword = normalizedKeyword
       .replaceAll(r'\', r'\\')
@@ -468,8 +467,7 @@ class UserAssetSnapshotDatabase {
       .replaceAll('_', r'\_');
   final searchPattern = '%$escapedKeyword%';
   return (
-    clause:
-        r"AND (CAST(c.character_id AS TEXT) LIKE ? ESCAPE '\' "
+    clause: r"AND (CAST(c.character_id AS TEXT) LIKE ? ESCAPE '\' "
         r"OR c.name LIKE ? ESCAPE '\')",
     arguments: <Object?>[searchPattern, searchPattern],
   );

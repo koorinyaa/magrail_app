@@ -15,8 +15,10 @@ import 'theme/app_material_theme.dart';
 // 采用 Cupertino 支持集确保 Android 与 iOS 文本操作菜单都有对应翻译
 final List<Locale> _flutterSupportedLocales = <Locale>[
   const Locale('en'),
+  const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'),
+  const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
   for (final languageCode in kCupertinoSupportedLanguages)
-    if (languageCode != 'en') Locale(languageCode),
+    if (languageCode != 'en' && languageCode != 'zh') Locale(languageCode),
 ];
 
 /// Magrail 根组件

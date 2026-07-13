@@ -153,7 +153,8 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
         showTrailing: true,
       ),
       emptySliverBuilder: (context, controller) {
-        final isFiltering = currentController?.searchKeyword.isNotEmpty ?? false;
+        final isFiltering =
+            currentController?.searchKeyword.isNotEmpty ?? false;
         return PagedSliverState(
           title: isFiltering ? '未找到角色' : '暂无角色',
           message: isFiltering ? '没有符合搜索条件的角色' : '该用户没有可展示的角色',
@@ -176,9 +177,8 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
         ];
       },
       completedLabel: '没有更多角色了',
-      bottomContentPadding: currentController == null
-          ? 24
-          : CharacterSearchInputBar.height + 48,
+      bottomContentPadding:
+          currentController == null ? 24 : CharacterSearchInputBar.height + 48,
     );
     if (currentController == null) {
       return page;
@@ -194,9 +194,8 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
                 currentController.items.isNotEmpty;
         final mediaPadding = MediaQuery.paddingOf(context);
         final viewInsets = MediaQuery.viewInsetsOf(context);
-        final bottomInset = viewInsets.bottom > 0
-            ? viewInsets.bottom
-            : mediaPadding.bottom;
+        final bottomInset =
+            viewInsets.bottom > 0 ? viewInsets.bottom : mediaPadding.bottom;
         final railAreaTop = mediaPadding.top +
             SecondaryPageSliverAppBar.defaultToolbarHeight +
             UserCharacterSortToolbar.toolbarHeight +
