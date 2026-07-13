@@ -74,19 +74,18 @@ class UserStarlightTemplePage extends StatefulWidget {
 
 /// 用户星光圣殿二级页面状态
 class _UserStarlightTemplePageState extends State<UserStarlightTemplePage> {
-  late final UserAssetSnapshotDatabase _snapshotDatabase;
   late final UserStarlightTemplePageController _controller;
 
   /// 初始化用户星光圣殿二级页面状态
   @override
   void initState() {
     super.initState();
-    _snapshotDatabase = UserAssetSnapshotDatabase();
+    final snapshotDatabase = UserAssetSnapshotDatabase();
     _controller = UserStarlightTemplePageController(
       snapshotRepository: UserAssetSnapshotRepository(
         userRepository: widget.userRepository,
         characterDetailRepository: widget.characterDetailRepository,
-        database: _snapshotDatabase,
+        database: snapshotDatabase,
       ),
       username: widget.username,
     )..initialize();
@@ -96,7 +95,6 @@ class _UserStarlightTemplePageState extends State<UserStarlightTemplePage> {
   @override
   void dispose() {
     _controller.dispose();
-    unawaited(_snapshotDatabase.close());
     super.dispose();
   }
 

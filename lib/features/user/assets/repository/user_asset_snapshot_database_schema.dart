@@ -4,11 +4,11 @@ part of 'user_asset_snapshot_database.dart';
 extension _UserAssetSnapshotDatabaseSchema on UserAssetSnapshotDatabase {
   /// 打开用户资产快照数据库
   Future<sqflite.Database> _openDatabase() {
-    final database = _database;
+    final database = UserAssetSnapshotDatabase._database;
     if (database != null && database.isOpen) {
       return Future.value(database);
     }
-    final openingDatabase = _openingDatabase;
+    final openingDatabase = UserAssetSnapshotDatabase._openingDatabase;
     if (openingDatabase != null) {
       return openingDatabase;
     }
@@ -16,18 +16,18 @@ extension _UserAssetSnapshotDatabaseSchema on UserAssetSnapshotDatabase {
         .openDatabase(
       'user_assets.sqlite',
       version: userAssetSnapshotSchemaVersion,
-      singleInstance: false,
+      singleInstance: true,
       onCreate: _createSchema,
       onUpgrade: _recreateSchemaForVersionChange,
       onDowngrade: _recreateSchemaForVersionChange,
     )
         .then((database) {
-      _database = database;
+      UserAssetSnapshotDatabase._database = database;
       return database;
     });
-    _openingDatabase = nextOpeningDatabase;
+    UserAssetSnapshotDatabase._openingDatabase = nextOpeningDatabase;
     return nextOpeningDatabase.whenComplete(() {
-      _openingDatabase = null;
+      UserAssetSnapshotDatabase._openingDatabase = null;
     });
   }
 

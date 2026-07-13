@@ -52,7 +52,7 @@ extension _CurrentUserCharacterPageControllerRefresh
     }
     late final Future<bool> operation;
     operation = _refreshCharactersAndReloadVisibleWindow(
-      waitForSortChange: !blockPageLoading,
+      waitForQueryChange: !blockPageLoading,
     ).whenComplete(() {
       if (!identical(_characterRefreshOperation, operation)) {
         return;
@@ -69,17 +69,18 @@ extension _CurrentUserCharacterPageControllerRefresh
 
   /// 请求角色全量数据并从数据库替换当前分页窗口
   ///
-  /// [waitForSortChange] 是否等待当前排序任务完成
+  /// [waitForQueryChange] 是否等待当前排序或筛选任务完成
   Future<bool> _refreshCharactersAndReloadVisibleWindow({
-    required bool waitForSortChange,
+    required bool waitForQueryChange,
   }) async {
     try {
       await _snapshotRepository.refreshCharacters(
         username: _username,
         nickname: _nickname,
       );
-      while (!_isDisposed && waitForSortChange && _sortChangeOperation != null) {
-        await _sortChangeOperation;
+      while (
+          !_isDisposed && waitForQueryChange && _queryChangeOperation != null) {
+        await _queryChangeOperation;
       }
       return await _replaceWithLatestCharacterWindow();
     } catch (_) {
@@ -94,7 +95,7 @@ extension _CurrentUserCharacterPageControllerRefresh
       try {
         await initialOperation;
       } catch (_) {
-        // 排序流程将在本地分页替换时返回最终失败状态
+        // 查询流程将在本地分页替换时返回最终失败状态
       }
     }
     while (_isPageBlockingRefresh && !_isDisposed) {
@@ -116,7 +117,7 @@ extension _CurrentUserCharacterPageControllerRefresh
     _levelPositions = await _snapshotRepository.readCharacterLevelPositions(
       username: _username,
       direction: _direction,
+      searchKeyword: _searchKeyword,
     );
   }
-
 }

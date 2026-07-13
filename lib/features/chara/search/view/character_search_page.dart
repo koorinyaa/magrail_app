@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
-import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:magrail_app/core/feedback/app_toast.dart';
 import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 import 'package:magrail_app/core/utils/formatters.dart';
@@ -24,6 +23,7 @@ import 'package:magrail_app/features/chara/detail/character_detail_navigation.da
 import 'package:magrail_app/features/chara/detail/model/character_detail_basic_info.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_search_item.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
+import 'package:magrail_app/features/chara/search/widgets/character_search_input_bar.dart';
 import 'package:magrail_app/features/oos/repository/tinygrail_oos_repository.dart';
 import 'package:magrail_app/features/temple/model/temple_asset_dialog_source.dart';
 import 'package:magrail_app/features/temple/repository/temple_asset_magic_repository.dart';
@@ -405,9 +405,6 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
   ///
   /// [context] 当前组件树上下文
   Widget _buildSearchField(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    const searchFieldHeight = 44.0;
-
     return TextFieldTapRegion(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -417,41 +414,12 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
             onChanged: _handleSearchSourceChanged,
           ),
           const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: GlassTextField.search(
-                  controller: _searchController,
-                  autofocus: true,
-                  placeholder: _searchPlaceholder,
-                  prefixIcon: Icon(
-                    LucideIcons.search,
-                    size: 18,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  onSubmitted: (_) => _searchNow(),
-                  height: searchFieldHeight,
-                  useOwnLayer: true,
-                  quality: GlassQuality.minimal,
-                  interactionBehavior: GlassInteractionBehavior.glowOnly,
-                  textStyle: TextStyle(
-                    color: colorScheme.onSurface,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  placeholderStyle: TextStyle(
-                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.72),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              _CharacterSearchCloseButton(
-                size: searchFieldHeight,
-                onPressed: widget.onClose,
-              ),
-            ],
+          CharacterSearchInputBar(
+            controller: _searchController,
+            autofocus: true,
+            placeholder: _searchPlaceholder,
+            onSubmitted: (_) => _searchNow(),
+            onClose: widget.onClose,
           ),
         ],
       ),

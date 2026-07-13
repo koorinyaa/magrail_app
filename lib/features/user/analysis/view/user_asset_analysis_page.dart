@@ -61,7 +61,6 @@ class UserAssetAnalysisPage extends StatefulWidget {
 
 /// 用户资产分析二级页状态
 class _UserAssetAnalysisPageState extends State<UserAssetAnalysisPage> {
-  late final UserAssetSnapshotDatabase _snapshotDatabase;
   late final UserAssetAnalysisDatabase _analysisDatabase;
   late final UserAssetAnalysisController _controller;
   UserAssetAnalysisAssetProportionMode _assetProportionMode =
@@ -73,14 +72,14 @@ class _UserAssetAnalysisPageState extends State<UserAssetAnalysisPage> {
   @override
   void initState() {
     super.initState();
-    _snapshotDatabase = UserAssetSnapshotDatabase();
+    final snapshotDatabase = UserAssetSnapshotDatabase();
     _analysisDatabase = UserAssetAnalysisDatabase();
     _controller = UserAssetAnalysisController(
       repository: UserAssetAnalysisRepository(
         snapshotRepository: UserAssetSnapshotRepository(
           userRepository: widget.repository,
           characterDetailRepository: widget.characterDetailRepository,
-          database: _snapshotDatabase,
+          database: snapshotDatabase,
         ),
         database: _analysisDatabase,
       ),
@@ -94,23 +93,18 @@ class _UserAssetAnalysisPageState extends State<UserAssetAnalysisPage> {
   @override
   void dispose() {
     _controller.dispose();
-    unawaited(_closeDatabasesAfterOperations());
+    unawaited(_closeAnalysisDatabaseAfterOperations());
     super.dispose();
   }
 
-  /// 等待资产任务结束后关闭页面数据库
-  Future<void> _closeDatabasesAfterOperations() async {
+  /// 等待资产任务结束后关闭分析缓存数据库
+  Future<void> _closeAnalysisDatabaseAfterOperations() async {
     try {
       await _controller.waitForPendingOperations();
     } catch (_) {
       // 页面销毁后的任务异常已由刷新流程处理，清理阶段只负责释放数据库
     }
 
-    try {
-      await _snapshotDatabase.close();
-    } catch (_) {
-      // 页面销毁阶段不再向用户展示数据库关闭错误
-    }
     try {
       await _analysisDatabase.close();
     } catch (_) {

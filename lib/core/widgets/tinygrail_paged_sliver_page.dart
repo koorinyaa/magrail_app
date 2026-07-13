@@ -30,6 +30,7 @@ class TinygrailPagedSliverPage<T, R> extends StatefulWidget {
   /// [appBarActions] 顶部栏右侧操作组件
   /// [appBarBottom] 顶部栏下方的固定区域
   /// [scrollController] 页面滚动控制器
+  /// [bottomContentPadding] 页面底部额外留白
   /// [initialErrorMessage] 首屏加载失败说明
   /// [refreshErrorText] 下拉刷新失败提示
   const TinygrailPagedSliverPage({
@@ -43,6 +44,7 @@ class TinygrailPagedSliverPage<T, R> extends StatefulWidget {
     this.appBarActions,
     this.appBarBottom,
     this.scrollController,
+    this.bottomContentPadding = 24,
     this.initialErrorMessage = '请检查网络后重试',
     this.refreshErrorText = '刷新失败，请检查网络后重试',
   });
@@ -76,6 +78,9 @@ class TinygrailPagedSliverPage<T, R> extends StatefulWidget {
 
   /// 页面滚动控制器
   final ScrollController? scrollController;
+
+  /// 页面底部额外留白
+  final double bottomContentPadding;
 
   /// 首屏加载失败说明
   final String initialErrorMessage;
@@ -145,7 +150,8 @@ class _TinygrailPagedSliverPageState<T, R>
                 if (!isStateOnlyContent)
                   SliverToBoxAdapter(
                     child: SizedBox(
-                      height: 24 + MediaQuery.paddingOf(context).bottom,
+                      height: widget.bottomContentPadding +
+                          MediaQuery.paddingOf(context).bottom,
                     ),
                   ),
               ],

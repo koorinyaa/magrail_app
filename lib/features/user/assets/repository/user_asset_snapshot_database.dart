@@ -19,8 +19,9 @@ class UserAssetSnapshotDatabase {
   /// 创建用户资产快照数据库
   UserAssetSnapshotDatabase();
 
-  sqflite.Database? _database;
-  Future<sqflite.Database>? _openingDatabase;
+  // 用户资产快照在应用进程内共享单连接，避免页面与启动刷新并发打开数据库
+  static sqflite.Database? _database;
+  static Future<sqflite.Database>? _openingDatabase;
 
   /// 写入完整用户资产快照
   ///
@@ -175,12 +176,14 @@ class UserAssetSnapshotDatabase {
   /// [pageSize] 每页角色数量
   /// [sort] 排序字段
   /// [direction] 排序方向
+  /// [searchKeyword] 角色 ID 或名称筛选词
   Future<TinygrailPage<UserAssetSnapshotPayload>?> readCharacterPage({
     required String username,
     required int page,
     required int pageSize,
     required UserCharacterSnapshotSort sort,
     required UserCharacterSnapshotSortDirection direction,
+    required String searchKeyword,
   }) async {
     if (page <= 0 || pageSize <= 0) {
       throw ArgumentError('用户角色分页参数无效');
@@ -192,14 +195,14 @@ class UserAssetSnapshotDatabase {
           !sourceState.sourceState.isCharacterDataFreshAt(DateTime.now())) {
         return null;
       }
-      final totalItems = await _countRows(
+      final storedTotalItems = await _countRows(
         transaction,
         tableName: _characterTableName,
         username: username,
       );
       final metadata = await _readMetadata(transaction, username);
       if (metadata == null ||
-          _rowInt(metadata['character_total_items']) != totalItems) {
+          _rowInt(metadata['character_total_items']) != storedTotalItems) {
         await transaction.rawUpdate(
           'UPDATE $_sourceStateTableName '
           'SET character_updated_at_milliseconds = 0, '
@@ -208,13 +211,30 @@ class UserAssetSnapshotDatabase {
         );
         return null;
       }
+      final searchFilter = _characterSearchFilter(searchKeyword);
+      final totalItems = searchFilter.clause.isEmpty
+          ? storedTotalItems
+          : _rowInt(
+              (await transaction.rawQuery(
+                'SELECT COUNT(*) AS total_count '
+                'FROM $_characterTableName c '
+                'WHERE c.username = ? ${searchFilter.clause}',
+                [username, ...searchFilter.arguments],
+              ))
+                  .firstOrNull?['total_count'],
+            );
       final rows = await transaction.rawQuery(
         'SELECT c.character_id, c.payload_json '
         'FROM $_characterTableName c '
-        'WHERE c.username = ? '
+        'WHERE c.username = ? ${searchFilter.clause} '
         'ORDER BY ${_characterOrderBy(sort, direction)} '
         'LIMIT ? OFFSET ?',
-        [username, pageSize, (page - 1) * pageSize],
+        [
+          username,
+          ...searchFilter.arguments,
+          pageSize,
+          (page - 1) * pageSize,
+        ],
       );
       return TinygrailPage(
         items: List<UserAssetSnapshotPayload>.unmodifiable(
@@ -250,16 +270,20 @@ class UserAssetSnapshotDatabase {
   ///
   /// [username] 用户名
   /// [direction] 等级排序方向
+  /// [searchKeyword] 角色 ID 或名称筛选词
   Future<List<UserCharacterLevelPosition>> readCharacterLevelPositions({
     required String username,
     required UserCharacterSnapshotSortDirection direction,
+    required String searchKeyword,
   }) async {
     final database = await _openDatabase();
+    final searchFilter = _characterSearchFilter(searchKeyword);
     final rows = await database.rawQuery(
       'SELECT level, COUNT(*) AS item_count '
-      'FROM $_characterTableName WHERE username = ? '
+      'FROM $_characterTableName c '
+      'WHERE c.username = ? ${searchFilter.clause} '
       'GROUP BY level ORDER BY level ${_sqlDirection(direction)}',
-      [username],
+      [username, ...searchFilter.arguments],
     );
     var absoluteIndex = 0;
     final positions = <UserCharacterLevelPosition>[];
@@ -386,25 +410,6 @@ class UserAssetSnapshotDatabase {
     });
   }
 
-  /// 关闭用户资产快照数据库
-  Future<void> close() async {
-    var database = _database;
-    final openingDatabase = _openingDatabase;
-    if (database == null && openingDatabase != null) {
-      try {
-        database = await openingDatabase;
-      } catch (_) {
-        _openingDatabase = null;
-        return;
-      }
-    }
-    _database = null;
-    _openingDatabase = null;
-    if (database != null && database.isOpen) {
-      await database.close();
-    }
-  }
-
   /// 生成写入后的原始数据状态
   ///
   /// [current] 当前数据库状态
@@ -440,4 +445,32 @@ class UserAssetSnapshotDatabase {
           characterHeadersUpdatedAtMilliseconds,
     );
   }
+}
+
+/// 生成角色 ID 与名称筛选 SQL
+///
+/// [searchKeyword] 角色 ID 或名称筛选词
+({String clause, List<Object?> arguments}) _characterSearchFilter(
+  String searchKeyword,
+) {
+  final keyword = searchKeyword.trim();
+  if (keyword.isEmpty) {
+    return (clause: '', arguments: const <Object?>[]);
+  }
+  // 角色 ID 常用 #123 形式输入，仅纯数字编号去掉前缀参与模糊匹配
+  final normalizedKeyword = RegExp(r'^#[0-9]+$').hasMatch(keyword)
+      ? keyword.substring(1)
+      : keyword;
+  // LIKE 通配符按字面量搜索，避免扩大筛选范围
+  final escapedKeyword = normalizedKeyword
+      .replaceAll(r'\', r'\\')
+      .replaceAll('%', r'\%')
+      .replaceAll('_', r'\_');
+  final searchPattern = '%$escapedKeyword%';
+  return (
+    clause:
+        r"AND (CAST(c.character_id AS TEXT) LIKE ? ESCAPE '\' "
+        r"OR c.name LIKE ? ESCAPE '\')",
+    arguments: <Object?>[searchPattern, searchPattern],
+  );
 }

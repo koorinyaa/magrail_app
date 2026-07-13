@@ -333,45 +333,6 @@ class _CharacterSearchInlineWarning extends StatelessWidget {
   }
 }
 
-/// 角色搜索关闭按钮
-class _CharacterSearchCloseButton extends StatelessWidget {
-  /// 创建角色搜索关闭按钮
-  ///
-  /// [size] 按钮宽高
-  /// [onPressed] 点击回调
-  const _CharacterSearchCloseButton({
-    required this.size,
-    required this.onPressed,
-  });
-
-  /// 按钮宽高
-  final double size;
-
-  /// 点击回调
-  final VoidCallback onPressed;
-
-  /// 构建角色搜索关闭按钮
-  ///
-  /// [context] 当前组件树上下文
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return GlassIconButton(
-      icon: Icon(
-        LucideIcons.x,
-        color: colorScheme.onSurfaceVariant,
-      ),
-      iconSize: 18,
-      size: size,
-      onPressed: onPressed,
-      interactionScale: 1.0,
-      useOwnLayer: true,
-      quality: GlassQuality.minimal,
-    );
-  }
-}
-
 /// 圣殿搜索结果列表
 class _CharacterSearchTempleResultList extends StatelessWidget {
   /// 创建圣殿搜索结果列表

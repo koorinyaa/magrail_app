@@ -193,12 +193,14 @@ class UserAssetSnapshotRepository {
   /// [pageSize] 每页角色数量
   /// [sort] 排序字段
   /// [direction] 排序方向
+  /// [searchKeyword] 角色 ID 或名称筛选词
   Future<TinygrailPage<UserCharacterApiItem>?> readCharacterPage({
     required String username,
     required int page,
     required int pageSize,
     required UserCharacterSnapshotSort sort,
     required UserCharacterSnapshotSortDirection direction,
+    required String searchKeyword,
   }) async {
     final resolvedUsername = username.trim();
     final payloadPage = await _database.readCharacterPage(
@@ -207,6 +209,7 @@ class UserAssetSnapshotRepository {
       pageSize: pageSize,
       sort: sort,
       direction: direction,
+      searchKeyword: searchKeyword,
     );
     if (payloadPage == null) {
       return null;
@@ -237,13 +240,16 @@ class UserAssetSnapshotRepository {
   ///
   /// [username] 用户名
   /// [direction] 等级排序方向
+  /// [searchKeyword] 角色 ID 或名称筛选词
   Future<List<UserCharacterLevelPosition>> readCharacterLevelPositions({
     required String username,
     required UserCharacterSnapshotSortDirection direction,
+    required String searchKeyword,
   }) {
     return _database.readCharacterLevelPositions(
       username: username.trim(),
       direction: direction,
+      searchKeyword: searchKeyword,
     );
   }
 

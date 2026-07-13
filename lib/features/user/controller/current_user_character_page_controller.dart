@@ -20,6 +20,7 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
   /// [onAutomaticRefreshSucceeded] 后台刷新成功回调
   /// [onAutomaticRefreshFailed] 后台刷新失败回调
   /// [readVisibleCharacterIndex] 读取当前可视角色在窗口中的下标
+  /// [waitForScrollIdle] 等待列表滚动结束
   /// [onBeforeCharacterDataReplaced] 角色分页替换前的滚动位置校正回调
   /// [pageSize] 每页角色数量
   CurrentUserCharacterPageController({
@@ -29,6 +30,7 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
     required VoidCallback onAutomaticRefreshSucceeded,
     required VoidCallback onAutomaticRefreshFailed,
     required int? Function() readVisibleCharacterIndex,
+    required Future<void> Function() waitForScrollIdle,
     required void Function(
       int previousItemIndex,
       int replacementItemIndex,
@@ -41,6 +43,7 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
         _onAutomaticRefreshSucceeded = onAutomaticRefreshSucceeded,
         _onAutomaticRefreshFailed = onAutomaticRefreshFailed,
         _readVisibleCharacterIndex = readVisibleCharacterIndex,
+        _waitForScrollIdle = waitForScrollIdle,
         _onBeforeCharacterDataReplaced = onBeforeCharacterDataReplaced;
 
   /// 当前用户角色本地分页数量
@@ -52,6 +55,7 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
   final VoidCallback _onAutomaticRefreshSucceeded;
   final VoidCallback _onAutomaticRefreshFailed;
   final int? Function() _readVisibleCharacterIndex;
+  final Future<void> Function() _waitForScrollIdle;
   final void Function(
     int previousItemIndex,
     int replacementItemIndex,
@@ -60,24 +64,28 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
 
   bool _isDisposed = false;
   bool _isPageBlockingRefresh = false;
-  bool _isChangingSort = false;
+  bool _isChangingQuery = false;
   bool _initialPageRequested = false;
   bool _shouldLoadNextPageAfterBlockingRefresh = false;
   bool _suppressAutomaticRefreshFailure = false;
   Future<TinygrailPage<UserCharacterApiItem>>? _initialPageOperation;
   Future<bool>? _characterRefreshOperation;
   Future<bool>? _automaticRefreshOperation;
-  Future<bool>? _sortChangeOperation;
+  Future<bool>? _queryChangeOperation;
   Future<int>? _prependPageOperation;
+  // 当前交互查询与已提交查询分离，失败时回滚到已展示列表
   UserCharacterSnapshotSort _sort = UserCharacterSnapshotSort.holdings;
   UserCharacterSnapshotSortDirection _direction =
       UserCharacterSnapshotSortDirection.descending;
   UserCharacterSnapshotSort _committedSort = UserCharacterSnapshotSort.holdings;
   UserCharacterSnapshotSortDirection _committedDirection =
       UserCharacterSnapshotSortDirection.descending;
+  String _searchKeyword = '';
+  String _committedSearchKeyword = '';
   List<UserCharacterLevelPosition> _levelPositions = const [];
   List<UserCharacterLevelPosition> _committedLevelPositions = const [];
   int _windowFirstPage = 1;
+  // 查询代次用于丢弃搜索、排序和刷新期间的过期分页结果
   int _queryGeneration = 0;
 
   /// 当前排序字段
@@ -86,24 +94,27 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
   /// 当前排序方向
   UserCharacterSnapshotSortDirection get direction => _direction;
 
+  /// 当前角色 ID 或名称筛选词
+  String get searchKeyword => _searchKeyword;
+
   /// 等级快速跳转位置
   List<UserCharacterLevelPosition> get levelPositions => _levelPositions;
 
   /// 是否可以向前加载相邻页
   bool get canLoadPreviousPage =>
-      !_isChangingSort && !_isPageBlockingRefresh && _windowFirstPage > 1;
+      !_isChangingQuery && !_isPageBlockingRefresh && _windowFirstPage > 1;
 
   /// 首屏或主动刷新期间暂停下一页请求
   @override
-  bool get isNextPageLoadPaused => _isPageBlockingRefresh || _isChangingSort;
+  bool get isNextPageLoadPaused => _isPageBlockingRefresh || _isChangingQuery;
 
   /// 首屏或主动刷新期间显示底部分页加载状态
   @override
   bool get showPausedLoadMoreIndicator => _isPageBlockingRefresh;
 
-  /// 切换排序时显示原有首屏骨架
+  /// 切换排序或筛选时显示原有首屏骨架
   @override
-  bool get forceInitialLoading => _isChangingSort;
+  bool get forceInitialLoading => _isChangingQuery;
 
   /// 校验当前用户角色分页请求
   @override
@@ -149,31 +160,51 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
     _sort = nextSort;
     _direction = nextDirection;
     _levelPositions = const [];
+    return _startQueryChange();
+  }
+
+  /// 应用角色 ID 或名称筛选
+  ///
+  /// [keyword] 角色 ID 或名称筛选词
+  Future<bool> applySearchFilter(String keyword) {
+    final resolvedKeyword = keyword.trim();
+    if (resolvedKeyword == _searchKeyword) {
+      return _queryChangeOperation ?? Future<bool>.value(true);
+    }
+    _searchKeyword = resolvedKeyword;
+    _levelPositions = const [];
+    return _startQueryChange();
+  }
+
+  /// 提交最新排序与筛选查询
+  Future<bool> _startQueryChange() {
     final generation = ++_queryGeneration;
-    _setChangingSort(true);
-    final previousSortOperation = _sortChangeOperation;
+    _setChangingQuery(true);
+    final previousQueryOperation = _queryChangeOperation;
     late final Future<bool> operation;
-    operation = _applySortChange(
+    operation = _applyQueryChange(
       generation,
-      previousSortOperation,
+      previousQueryOperation,
     ).then((success) {
       if (!success && generation == _queryGeneration && !_isDisposed) {
         _sort = _committedSort;
         _direction = _committedDirection;
+        _searchKeyword = _committedSearchKeyword;
         _levelPositions = _committedLevelPositions;
         notifyListeners();
       } else if (success && generation == _queryGeneration && !_isDisposed) {
         _committedSort = _sort;
         _committedDirection = _direction;
+        _committedSearchKeyword = _searchKeyword;
         _committedLevelPositions = _levelPositions;
       }
       return success;
     }).whenComplete(() {
-      if (identical(_sortChangeOperation, operation)) {
-        _sortChangeOperation = null;
+      if (identical(_queryChangeOperation, operation)) {
+        _queryChangeOperation = null;
       }
     });
-    _sortChangeOperation = operation;
+    _queryChangeOperation = operation;
     return operation;
   }
 
@@ -289,42 +320,6 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
     }
   }
 
-  /// 等待当前页面持有的数据库任务结束
-  Future<void> waitForPendingOperations() async {
-    final initialOperation = _initialPageOperation;
-    if (initialOperation != null) {
-      try {
-        await initialOperation;
-      } catch (_) {
-        // 首屏异常由分页页面展示，销毁阶段只等待任务结束
-      }
-    }
-    final refreshOperation = _characterRefreshOperation;
-    if (refreshOperation != null) {
-      try {
-        await refreshOperation;
-      } catch (_) {
-        // 刷新异常由页面状态或后台提示处理
-      }
-    }
-    final sortChangeOperation = _sortChangeOperation;
-    if (sortChangeOperation != null) {
-      try {
-        await sortChangeOperation;
-      } catch (_) {
-        // 排序异常由调用方处理
-      }
-    }
-    final prependPageOperation = _prependPageOperation;
-    if (prependPageOperation != null) {
-      try {
-        await prependPageOperation;
-      } catch (_) {
-        // 前置分页异常由页面提示处理
-      }
-    }
-  }
-
   /// 释放当前用户角色控制器
   @override
   void dispose() {
@@ -344,6 +339,7 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
       pageSize: pageSize,
       sort: _sort,
       direction: _direction,
+      searchKeyword: _searchKeyword,
     );
     if (cached != null) {
       _scheduleAutomaticRefresh();
@@ -376,6 +372,7 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
       pageSize: pageSize,
       sort: _sort,
       direction: _direction,
+      searchKeyword: _searchKeyword,
     );
     if (result == null) {
       throw StateError('用户角色本地数据不可用');
@@ -383,7 +380,7 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
     return result;
   }
 
-  /// 使用最新排序替换当前可视分页窗口
+  /// 使用最新查询替换当前可视分页窗口
   Future<bool> _replaceWithLatestCharacterWindow() async {
     while (!_isDisposed) {
       await waitForPagingIdle();
@@ -397,17 +394,19 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
       final generation = _queryGeneration;
       final replacementSort = _sort;
       final replacementDirection = _direction;
+      final replacementSearchKeyword = _searchKeyword;
       final replacementCountPage = await _readRequiredPage(
         page: 1,
         pageSize: 1,
       );
-      final replacementLevelPositions = replacementSort ==
-              UserCharacterSnapshotSort.level
-          ? await _snapshotRepository.readCharacterLevelPositions(
-              username: _username,
-              direction: replacementDirection,
-            )
-          : const <UserCharacterLevelPosition>[];
+      final replacementLevelPositions =
+          replacementSort == UserCharacterSnapshotSort.level
+              ? await _snapshotRepository.readCharacterLevelPositions(
+                  username: _username,
+                  direction: replacementDirection,
+                  searchKeyword: replacementSearchKeyword,
+                )
+              : const <UserCharacterLevelPosition>[];
       await waitForPagingIdle();
       final latestPrependPageOperation = _prependPageOperation;
       if (latestPrependPageOperation != null) {
@@ -418,8 +417,20 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
       }
       if (generation != _queryGeneration ||
           replacementSort != _sort ||
-          replacementDirection != _direction) {
+          replacementDirection != _direction ||
+          replacementSearchKeyword != _searchKeyword) {
         // 交互查询变化后重新读取窗口，避免保留刷新前的等级跳转目录
+        continue;
+      }
+      // 列表停止滚动后再读取锚点，避免刷新提交时跳到拖动中的旧位置
+      await _waitForScrollIdle();
+      if (_isDisposed) {
+        return false;
+      }
+      if (generation != _queryGeneration ||
+          replacementSort != _sort ||
+          replacementDirection != _direction ||
+          replacementSearchKeyword != _searchKeyword) {
         continue;
       }
       final anchorItemIndex = _readVisibleCharacterIndex();
@@ -432,9 +443,8 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
               .clamp(0, replacementCountPage.totalItems - 1)
               .toInt();
       final anchorPage = anchorAbsoluteIndex ~/ pageSize + 1;
-      final firstPage = (anchorPage - _refreshAdjacentPageCount)
-          .clamp(1, anchorPage)
-          .toInt();
+      final firstPage =
+          (anchorPage - _refreshAdjacentPageCount).clamp(1, anchorPage).toInt();
       final lastPage = anchorPage + _refreshAdjacentPageCount;
       final followingPageCount = lastPage - firstPage;
       final success = await replaceFromPage(
@@ -444,7 +454,8 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
             !_isDisposed &&
             generation == _queryGeneration &&
             replacementSort == _sort &&
-            replacementDirection == _direction,
+            replacementDirection == _direction &&
+            replacementSearchKeyword == _searchKeyword,
         beforeCommit: anchorItemIndex == null
             ? null
             : (replacementItems) => _onBeforeCharacterDataReplaced(
@@ -459,7 +470,8 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
       if (!success) {
         final queryChanged = generation != _queryGeneration ||
             replacementSort != _sort ||
-            replacementDirection != _direction;
+            replacementDirection != _direction ||
+            replacementSearchKeyword != _searchKeyword;
         if (queryChanged) {
           continue;
         }
@@ -469,6 +481,7 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
       _windowFirstPage = firstPage;
       _committedSort = _sort;
       _committedDirection = _direction;
+      _committedSearchKeyword = _searchKeyword;
       _committedLevelPositions = _levelPositions;
       notifyListeners();
       return true;
@@ -500,19 +513,20 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
     });
   }
 
-  /// 应用最新排序并从第一页重新加载
+  /// 应用最新排序与筛选并从第一页重新加载
   ///
-  /// [generation] 排序请求代次
-  Future<bool> _applySortChange(
+  /// [generation] 查询请求代次
+  /// [previousQueryOperation] 前一次查询任务
+  Future<bool> _applyQueryChange(
     int generation,
-    Future<bool>? previousSortOperation,
+    Future<bool>? previousQueryOperation,
   ) async {
     try {
-      if (previousSortOperation != null) {
+      if (previousQueryOperation != null) {
         try {
-          await previousSortOperation;
+          await previousQueryOperation;
         } catch (_) {
-          // 前一次排序失败不阻止最新排序继续读取本地数据
+          // 前一次查询失败不阻止最新查询继续读取本地数据
         }
       }
       await _waitForInitialLoadAndBlockingRefresh();
@@ -540,19 +554,19 @@ class CurrentUserCharacterPageController extends TinygrailPagedListController<
       return false;
     } finally {
       if (generation == _queryGeneration) {
-        _setChangingSort(false);
+        _setChangingQuery(false);
       }
     }
   }
 
-  /// 更新排序切换加载状态
+  /// 更新排序或筛选切换加载状态
   ///
-  /// [value] 是否正在切换排序
-  void _setChangingSort(bool value) {
-    if (_isDisposed || _isChangingSort == value) {
+  /// [value] 是否正在切换查询条件
+  void _setChangingQuery(bool value) {
+    if (_isDisposed || _isChangingQuery == value) {
       return;
     }
-    _isChangingSort = value;
+    _isChangingQuery = value;
     notifyListeners();
   }
 

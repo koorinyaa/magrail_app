@@ -162,8 +162,6 @@ class _MagrailAppState extends State<MagrailApp> {
       );
     } catch (_) {
       // 启动静默刷新失败不影响应用正常使用
-    } finally {
-      await database.close();
     }
   }
 

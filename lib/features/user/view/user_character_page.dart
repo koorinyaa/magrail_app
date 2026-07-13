@@ -8,6 +8,7 @@ import 'package:magrail_app/core/widgets/secondary_page_sliver_app_bar.dart';
 import 'package:magrail_app/core/widgets/tinygrail_paged_sliver_page.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
+import 'package:magrail_app/features/chara/search/widgets/character_search_input_bar.dart';
 import 'package:magrail_app/features/chara/widgets/character_asset_skeleton_sliver_list.dart';
 import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_database.dart';
 import 'package:magrail_app/features/user/assets/model/user_character_snapshot_query.dart';
@@ -19,6 +20,8 @@ import 'package:magrail_app/features/user/repository/user_repository.dart';
 import 'package:magrail_app/features/user/widgets/user_asset_sliver_lists.dart';
 import 'package:magrail_app/features/user/widgets/user_character_level_rail.dart';
 import 'package:magrail_app/features/user/widgets/user_character_sort_toolbar.dart';
+
+part 'user_character_page_search.dart';
 
 /// 用户角色二级页面
 class UserCharacterPage extends StatefulWidget {
@@ -62,14 +65,18 @@ class UserCharacterPage extends StatefulWidget {
 /// 用户角色二级页面状态
 class _UserCharacterPageState extends State<UserCharacterPage> {
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
   late final TinygrailPagedListController<UserCharacterApiItem,
       UserCharacterApiItem> _controller;
-  UserAssetSnapshotDatabase? _snapshotDatabase;
   CurrentUserCharacterPageController? _currentUserController;
   bool _isLoadingPreviousPage = false;
   bool _isProgrammaticLevelJump = false;
   int _levelJumpGeneration = 0;
   int _scrollAdjustmentGeneration = 0;
+  Completer<void>? _scrollIdleCompleter;
+  VoidCallback? _scrollIdleListener;
+  ValueNotifier<bool>? _scrollIdleNotifier;
+  Timer? _searchDebounce;
 
   /// 初始化用户角色二级页面状态
   @override
@@ -77,7 +84,6 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
     super.initState();
     if (_isCurrentUser) {
       final database = UserAssetSnapshotDatabase();
-      _snapshotDatabase = database;
       final controller = CurrentUserCharacterPageController(
         snapshotRepository: UserAssetSnapshotRepository(
           userRepository: widget.repository,
@@ -89,6 +95,7 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
         onAutomaticRefreshSucceeded: _showAutomaticRefreshSucceeded,
         onAutomaticRefreshFailed: _showAutomaticRefreshFailed,
         readVisibleCharacterIndex: _readVisibleCharacterIndex,
+        waitForScrollIdle: _waitForScrollIdle,
         onBeforeCharacterDataReplaced: _restoreVisibleCharacterPosition,
       );
       _currentUserController = controller;
@@ -106,11 +113,21 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
   /// 释放用户角色二级页面状态
   @override
   void dispose() {
+    _searchDebounce?.cancel();
+    _searchController.dispose();
+    final scrollIdleListener = _scrollIdleListener;
+    final scrollIdleNotifier = _scrollIdleNotifier;
+    if (scrollIdleListener != null && scrollIdleNotifier != null) {
+      scrollIdleNotifier.removeListener(scrollIdleListener);
+    }
+    _scrollIdleListener = null;
+    _scrollIdleNotifier = null;
+    _scrollIdleCompleter?.complete();
+    _scrollIdleCompleter = null;
     _scrollController
       ..removeListener(_handleScroll)
       ..dispose();
     _controller.dispose();
-    unawaited(_closeSnapshotDatabase());
     super.dispose();
   }
 
@@ -119,13 +136,14 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
+    final currentController = _currentUserController;
     final page = TinygrailPagedSliverPage(
       controller: _controller,
       title: _title,
-      appBarBottom: _currentUserController == null
+      appBarBottom: currentController == null
           ? null
           : UserCharacterSortToolbar(
-              controller: _currentUserController!,
+              controller: currentController,
               onSortSelected: (sort) {
                 unawaited(_selectSort(sort));
               },
@@ -135,10 +153,13 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
         showTrailing: true,
       ),
       emptySliverBuilder: (context, controller) {
-        return const PagedSliverState(
-          title: '暂无角色',
-          message: '该用户没有可展示的角色',
-          icon: Icons.hourglass_empty_rounded,
+        final isFiltering = currentController?.searchKeyword.isNotEmpty ?? false;
+        return PagedSliverState(
+          title: isFiltering ? '未找到角色' : '暂无角色',
+          message: isFiltering ? '没有符合搜索条件的角色' : '该用户没有可展示的角色',
+          icon: isFiltering
+              ? Icons.search_off_rounded
+              : Icons.hourglass_empty_rounded,
         );
       },
       contentSliversBuilder: (context, items, onItemBuilt) {
@@ -155,8 +176,10 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
         ];
       },
       completedLabel: '没有更多角色了',
+      bottomContentPadding: currentController == null
+          ? 24
+          : CharacterSearchInputBar.height + 48,
     );
-    final currentController = _currentUserController;
     if (currentController == null) {
       return page;
     }
@@ -170,11 +193,16 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
                 !currentController.isInitialLoading &&
                 currentController.items.isNotEmpty;
         final mediaPadding = MediaQuery.paddingOf(context);
+        final viewInsets = MediaQuery.viewInsetsOf(context);
+        final bottomInset = viewInsets.bottom > 0
+            ? viewInsets.bottom
+            : mediaPadding.bottom;
         final railAreaTop = mediaPadding.top +
             SecondaryPageSliverAppBar.defaultToolbarHeight +
             UserCharacterSortToolbar.toolbarHeight +
             8;
-        final railAreaBottom = mediaPadding.bottom + 12;
+        final railAreaBottom =
+            bottomInset + CharacterSearchInputBar.height + 26;
         final availableRailHeight =
             (MediaQuery.sizeOf(context).height - railAreaTop - railAreaBottom)
                 .clamp(0.0, double.infinity);
@@ -198,6 +226,21 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
                   },
                 ),
               ),
+            // 等级索引显隐会改变 Stack 子节点位置，固定 Key 保持输入焦点
+            Positioned(
+              key: const ValueKey<String>('user-character-search-bar'),
+              left: mediaPadding.left + 20,
+              right: mediaPadding.right + 20,
+              bottom: bottomInset + 14,
+              child: TextFieldTapRegion(
+                child: CharacterSearchInputBar(
+                  controller: _searchController,
+                  placeholder: '搜索角色 ID 或名称',
+                  onChanged: _handleCharacterSearchChanged,
+                  onSubmitted: _submitCharacterSearch,
+                ),
+              ),
+            ),
           ],
         );
       },
@@ -219,6 +262,7 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
       return;
     }
     if (!success) {
+      _restoreCharacterSearchInput();
       AppToast.error(context, text: '排序失败，请重试');
       return;
     }
@@ -280,9 +324,8 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
         controller.items.isEmpty) {
       return null;
     }
-    final listOffset = _scrollController.offset
-        .clamp(0.0, double.infinity)
-        .toDouble();
+    final listOffset =
+        _scrollController.offset.clamp(0.0, double.infinity).toDouble();
     final itemIndex = UserCharacterAssetSliverList.itemIndexAtListOffset(
       controller.items,
       listOffset,
@@ -292,6 +335,42 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
       return null;
     }
     return itemIndex;
+  }
+
+  /// 等待角色列表拖动和惯性滚动结束
+  Future<void> _waitForScrollIdle() {
+    if (!_scrollController.hasClients) {
+      return Future<void>.value();
+    }
+    final scrollingNotifier = _scrollController.position.isScrollingNotifier;
+    if (!scrollingNotifier.value) {
+      return Future<void>.value();
+    }
+    final existingCompleter = _scrollIdleCompleter;
+    if (existingCompleter != null) {
+      return existingCompleter.future;
+    }
+
+    final completer = Completer<void>();
+    late final VoidCallback listener;
+    listener = () {
+      if (scrollingNotifier.value) {
+        return;
+      }
+      scrollingNotifier.removeListener(listener);
+      _scrollIdleListener = null;
+      _scrollIdleNotifier = null;
+      _scrollIdleCompleter = null;
+      if (!completer.isCompleted) {
+        completer.complete();
+      }
+    };
+    _scrollIdleCompleter = completer;
+    _scrollIdleListener = listener;
+    _scrollIdleNotifier = scrollingNotifier;
+    scrollingNotifier.addListener(listener);
+    listener();
+    return completer.future;
   }
 
   /// 在分页替换前恢复当前数据位置
@@ -319,11 +398,9 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
       // 本地分页读取期间仍允许滚动，提交前以最新可视下标为准
       final currentItemIndex =
           _readVisibleCharacterIndex() ?? previousItemIndex;
-      final replacementIndexOffset =
-          replacementItemIndex - previousItemIndex;
-      final oldIndex = currentItemIndex
-          .clamp(0, controller.items.length - 1)
-          .toInt();
+      final replacementIndexOffset = replacementItemIndex - previousItemIndex;
+      final oldIndex =
+          currentItemIndex.clamp(0, controller.items.length - 1).toInt();
       final newIndex = (currentItemIndex + replacementIndexOffset)
           .clamp(0, replacementItems.length - 1)
           .toInt();
@@ -340,9 +417,7 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
         showLevelHeaders: showLevelHeaders,
       );
       final position = _scrollController.position;
-      final correctedPixels = (position.pixels +
-              newItemOffset -
-              oldItemOffset)
+      final correctedPixels = (position.pixels + newItemOffset - oldItemOffset)
           .clamp(position.minScrollExtent, double.infinity)
           .toDouble();
       // 在分页状态提交前直接修正像素，避免先闪现新位置再滚回锚点
@@ -375,13 +450,11 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
   Future<void> _loadPreviousPage(
     CurrentUserCharacterPageController controller,
   ) async {
-    final showLevelHeaders =
-        controller.sort == UserCharacterSnapshotSort.level;
-    final previousListExtent =
-        UserCharacterAssetSliverList.listExtent(
-          controller.items,
-          showLevelHeaders: showLevelHeaders,
-        );
+    final showLevelHeaders = controller.sort == UserCharacterSnapshotSort.level;
+    final previousListExtent = UserCharacterAssetSliverList.listExtent(
+      controller.items,
+      showLevelHeaders: showLevelHeaders,
+    );
     final adjustmentGeneration = _scrollAdjustmentGeneration;
     late final int count;
     try {
@@ -397,11 +470,10 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
       _isLoadingPreviousPage = false;
       return;
     }
-    final currentListExtent =
-        UserCharacterAssetSliverList.listExtent(
-          controller.items,
-          showLevelHeaders: showLevelHeaders,
-        );
+    final currentListExtent = UserCharacterAssetSliverList.listExtent(
+      controller.items,
+      showLevelHeaders: showLevelHeaders,
+    );
     final prependedExtent = currentListExtent - previousListExtent;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted &&
@@ -466,20 +538,6 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
       context,
       text: '角色数据刷新失败',
     );
-  }
-
-  /// 等待当前用户角色任务结束后关闭数据库
-  Future<void> _closeSnapshotDatabase() async {
-    final database = _snapshotDatabase;
-    if (database == null) {
-      return;
-    }
-    await _currentUserController?.waitForPendingOperations();
-    try {
-      await database.close();
-    } catch (_) {
-      // 页面销毁阶段不再展示数据库关闭错误
-    }
   }
 
   /// 是否展示当前登录用户的本地角色快照

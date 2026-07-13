@@ -131,7 +131,7 @@ class _UserCharacterLevelRailState extends State<UserCharacterLevelRail> {
       return;
     }
     _lastDraggedLevel = deduplicateDrag ? level : null;
-    unawaited(HapticFeedback.selectionClick());
+    unawaited(HapticFeedback.lightImpact());
     widget.onLevelSelected(level);
   }
 }
