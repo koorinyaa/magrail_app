@@ -143,11 +143,12 @@ class UserAssetSnapshotRepository {
     return _database.readSourceState(resolvedUsername);
   }
 
-  /// 单独刷新并缓存当前用户角色
+  /// 单独刷新当前用户角色并判断是否需要重新读取页面
   ///
   /// [username] 用户名
   /// [nickname] 用户昵称
   /// [onProgress] 拉取进度回调
+  /// 返回是否需要重新读取快照窗口
   Future<bool> refreshCharacters({
     required String username,
     required String nickname,
@@ -179,11 +180,12 @@ class UserAssetSnapshotRepository {
     );
   }
 
-  /// 刷新并缓存用户圣殿
+  /// 刷新用户圣殿并判断是否需要重新读取页面
   ///
   /// [username] 用户名
   /// [nickname] 用户昵称
-  Future<UserAssetSourceState> refreshTemples({
+  /// 返回是否需要重新读取快照窗口
+  Future<bool> refreshTemples({
     required String username,
     required String nickname,
   }) async {
@@ -220,6 +222,7 @@ class UserAssetSnapshotRepository {
   /// [sort] 排序字段
   /// [direction] 排序方向
   /// [searchKeyword] 角色 ID 或名称筛选词
+  /// [expectedRevision] 必须匹配的角色快照版本
   Future<TinygrailPage<UserCharacterApiItem>?> readCharacterPage({
     required String username,
     required int page,
@@ -227,6 +230,7 @@ class UserAssetSnapshotRepository {
     required UserCharacterSnapshotSort sort,
     required UserCharacterSnapshotSortDirection direction,
     required String searchKeyword,
+    int? expectedRevision,
   }) async {
     final resolvedUsername = username.trim();
     final payloadPage = await _database.readCharacterPage(
@@ -236,6 +240,7 @@ class UserAssetSnapshotRepository {
       sort: sort,
       direction: direction,
       searchKeyword: searchKeyword,
+      expectedRevision: expectedRevision,
     );
     if (payloadPage == null) {
       return null;
@@ -262,17 +267,21 @@ class UserAssetSnapshotRepository {
     }
   }
 
-  /// 读取等级排序下的快速跳转位置
+  /// 读取等级排序下的快速跳转目录与角色快照版本
   ///
   /// [username] 用户名
   /// [direction] 等级排序方向
   /// [searchKeyword] 角色 ID 或名称筛选词
-  Future<List<UserCharacterLevelPosition>> readCharacterLevelPositions({
+  Future<
+      ({
+        List<UserCharacterLevelPosition> positions,
+        int revision,
+      })> readCharacterLevelIndex({
     required String username,
     required UserCharacterSnapshotSortDirection direction,
     required String searchKeyword,
   }) {
-    return _database.readCharacterLevelPositions(
+    return _database.readCharacterLevelIndex(
       username: username.trim(),
       direction: direction,
       searchKeyword: searchKeyword,
@@ -329,6 +338,7 @@ class UserAssetSnapshotRepository {
   /// [sort] 排序字段
   /// [direction] 排序方向
   /// [searchKeyword] 角色 ID 或名称筛选词
+  /// [expectedRevision] 必须匹配的圣殿快照版本
   Future<TinygrailPage<UserTempleSnapshotEntry>?> readTemplePage({
     required String username,
     required int page,
@@ -336,6 +346,7 @@ class UserAssetSnapshotRepository {
     required UserTempleSnapshotSort sort,
     required UserTempleSnapshotSortDirection direction,
     required String searchKeyword,
+    int? expectedRevision,
   }) async {
     final payloadPage = await _database.readTemplePage(
       username: username.trim(),
@@ -344,6 +355,7 @@ class UserAssetSnapshotRepository {
       sort: sort,
       direction: direction,
       searchKeyword: searchKeyword,
+      expectedRevision: expectedRevision,
     );
     if (payloadPage == null) {
       return null;
@@ -375,17 +387,21 @@ class UserAssetSnapshotRepository {
     }
   }
 
-  /// 读取当前用户圣殿等级排序下的快速跳转位置
+  /// 读取当前用户圣殿等级排序下的快速跳转目录与快照版本
   ///
   /// [username] 用户名
   /// [direction] 排序方向
   /// [searchKeyword] 角色 ID 或名称筛选词
-  Future<List<UserTempleLevelPosition>> readTempleLevelPositions({
+  Future<
+      ({
+        List<UserTempleLevelPosition> positions,
+        int revision,
+      })> readTempleLevelIndex({
     required String username,
     required UserTempleSnapshotSortDirection direction,
     required String searchKeyword,
   }) {
-    return _database.readTempleLevelPositions(
+    return _database.readTempleLevelIndex(
       username: username.trim(),
       direction: direction,
       searchKeyword: searchKeyword,

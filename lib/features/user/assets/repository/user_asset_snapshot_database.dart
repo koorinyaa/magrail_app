@@ -95,7 +95,7 @@ class UserAssetSnapshotDatabase {
     });
   }
 
-  /// 单独写入用户角色快照
+  /// 单独写入用户角色快照并判断是否需要重新读取页面
   ///
   /// [username] 用户名
   /// [nickname] 用户昵称
@@ -103,6 +103,7 @@ class UserAssetSnapshotDatabase {
   /// [totalItems] 角色接口总数
   /// [updatedAtMilliseconds] 用户角色更新时间戳
   /// [contentHash] 用户角色内容哈希
+  /// 返回是否需要重新读取快照窗口
   Future<bool> upsertCharacterSnapshot({
     required String username,
     required String nickname,
@@ -119,7 +120,7 @@ class UserAssetSnapshotDatabase {
         storedUpdatedAtMilliseconds:
             current?.sourceState.charactersUpdatedAtMilliseconds,
       )) {
-        return false;
+        return current?.characterContentHash != contentHash;
       }
       final changed = current?.characterContentHash != contentHash;
       final sourceState = _buildSourceState(
@@ -156,7 +157,7 @@ class UserAssetSnapshotDatabase {
     });
   }
 
-  /// 写入用户圣殿快照
+  /// 写入用户圣殿快照并判断是否需要重新读取页面
   ///
   /// [username] 用户名
   /// [nickname] 用户昵称
@@ -164,7 +165,8 @@ class UserAssetSnapshotDatabase {
   /// [templeTotalItems] 圣殿接口总数
   /// [templesUpdatedAtMilliseconds] 用户圣殿更新时间戳
   /// [templeContentHash] 用户圣殿内容哈希
-  Future<UserAssetSourceState> upsertTempleSnapshot({
+  /// 返回是否需要重新读取快照窗口
+  Future<bool> upsertTempleSnapshot({
     required String username,
     required String nickname,
     required List<UserTempleSnapshotPayload> templeRows,
@@ -180,7 +182,7 @@ class UserAssetSnapshotDatabase {
         storedUpdatedAtMilliseconds:
             current?.sourceState.templesUpdatedAtMilliseconds,
       )) {
-        return current!.sourceState;
+        return current?.templeContentHash != templeContentHash;
       }
       final templeChanged = current?.templeContentHash != templeContentHash;
       final sourceState = _buildSourceState(
@@ -213,7 +215,7 @@ class UserAssetSnapshotDatabase {
         characterContentHash: current?.characterContentHash ?? '',
         templeContentHash: templeContentHash,
       );
-      return sourceState;
+      return templeChanged;
     });
   }
 
@@ -233,6 +235,7 @@ class UserAssetSnapshotDatabase {
   /// [sort] 排序字段
   /// [direction] 排序方向
   /// [searchKeyword] 角色 ID 或名称筛选词
+  /// [expectedRevision] 必须匹配的角色快照版本
   Future<TinygrailPage<UserAssetSnapshotPayload>?> readCharacterPage({
     required String username,
     required int page,
@@ -240,6 +243,7 @@ class UserAssetSnapshotDatabase {
     required UserCharacterSnapshotSort sort,
     required UserCharacterSnapshotSortDirection direction,
     required String searchKeyword,
+    int? expectedRevision,
   }) async {
     if (page <= 0 || pageSize <= 0) {
       throw ArgumentError('用户角色分页参数无效');
@@ -247,7 +251,15 @@ class UserAssetSnapshotDatabase {
     final database = await _openDatabase();
     return database.transaction((transaction) async {
       final sourceState = await _readStoredSourceState(transaction, username);
-      if (sourceState == null ||
+      if (sourceState == null) {
+        return null;
+      }
+      if (expectedRevision != null &&
+          sourceState.sourceState.revisions.characters != expectedRevision) {
+        return null;
+      }
+      // 已展示窗口按版本继续读取，后台刷新完成后再整体替换
+      if (expectedRevision == null &&
           !sourceState.sourceState.isCharacterDataFreshAt(DateTime.now())) {
         return null;
       }
@@ -335,39 +347,6 @@ class UserAssetSnapshotDatabase {
     );
   }
 
-  /// 读取等级排序下的快速跳转位置
-  ///
-  /// [username] 用户名
-  /// [direction] 等级排序方向
-  /// [searchKeyword] 角色 ID 或名称筛选词
-  Future<List<UserCharacterLevelPosition>> readCharacterLevelPositions({
-    required String username,
-    required UserCharacterSnapshotSortDirection direction,
-    required String searchKeyword,
-  }) async {
-    final database = await _openDatabase();
-    final searchFilter = _characterSearchFilter(searchKeyword);
-    final rows = await database.rawQuery(
-      'SELECT level, COUNT(*) AS item_count '
-      'FROM $_characterTableName c '
-      'WHERE c.username = ? ${searchFilter.clause} '
-      'GROUP BY level ORDER BY level ${_sqlDirection(direction)}',
-      [username, ...searchFilter.arguments],
-    );
-    var absoluteIndex = 0;
-    final positions = <UserCharacterLevelPosition>[];
-    for (final row in rows) {
-      positions.add(
-        UserCharacterLevelPosition(
-          level: _rowInt(row['level']),
-          absoluteIndex: absoluteIndex,
-        ),
-      );
-      absoluteIndex += _rowInt(row['item_count']);
-    }
-    return List<UserCharacterLevelPosition>.unmodifiable(positions);
-  }
-
   /// 分页读取星光圣殿快照
   ///
   /// [username] 用户名
@@ -431,6 +410,7 @@ class UserAssetSnapshotDatabase {
   /// [sort] 排序字段
   /// [direction] 排序方向
   /// [searchKeyword] 角色 ID 或名称筛选词
+  /// [expectedRevision] 必须匹配的圣殿快照版本
   Future<TinygrailPage<UserTempleSnapshotPayload>?> readTemplePage({
     required String username,
     required int page,
@@ -438,6 +418,7 @@ class UserAssetSnapshotDatabase {
     required UserTempleSnapshotSort sort,
     required UserTempleSnapshotSortDirection direction,
     required String searchKeyword,
+    int? expectedRevision,
   }) async {
     if (page <= 0 || pageSize <= 0) {
       throw ArgumentError('用户圣殿分页参数无效');
@@ -445,7 +426,15 @@ class UserAssetSnapshotDatabase {
     final database = await _openDatabase();
     return database.transaction((transaction) async {
       final storedState = await _readStoredSourceState(transaction, username);
-      if (storedState == null ||
+      if (storedState == null) {
+        return null;
+      }
+      if (expectedRevision != null &&
+          storedState.sourceState.revisions.temples != expectedRevision) {
+        return null;
+      }
+      // 已展示窗口按版本继续读取，后台刷新完成后再整体替换
+      if (expectedRevision == null &&
           !storedState.sourceState.isTempleDataFreshAt(DateTime.now())) {
         return null;
       }
@@ -516,39 +505,6 @@ class UserAssetSnapshotDatabase {
         itemsPerPage: pageSize,
       );
     });
-  }
-
-  /// 读取圣殿角色等级排序下的快速跳转位置
-  ///
-  /// [username] 用户名
-  /// [direction] 排序方向
-  /// [searchKeyword] 角色 ID 或名称筛选词
-  Future<List<UserTempleLevelPosition>> readTempleLevelPositions({
-    required String username,
-    required UserTempleSnapshotSortDirection direction,
-    required String searchKeyword,
-  }) async {
-    final database = await _openDatabase();
-    final searchFilter = _templeSearchFilter(searchKeyword);
-    final rows = await database.rawQuery(
-      'SELECT character_level, COUNT(*) AS item_count '
-      'FROM $_templeTableName t WHERE t.username = ? ${searchFilter.clause} '
-      'GROUP BY character_level ORDER BY character_level '
-      '${_templeSqlDirection(direction)}',
-      [username, ...searchFilter.arguments],
-    );
-    var absoluteIndex = 0;
-    final positions = <UserTempleLevelPosition>[];
-    for (final row in rows) {
-      positions.add(
-        UserTempleLevelPosition(
-          level: _rowInt(row['character_level']),
-          absoluteIndex: absoluteIndex,
-        ),
-      );
-      absoluteIndex += _rowInt(row['item_count']);
-    }
-    return List<UserTempleLevelPosition>.unmodifiable(positions);
   }
 
   /// 读取用户资产快照持久化记录

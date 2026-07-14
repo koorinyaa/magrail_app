@@ -73,19 +73,164 @@ extension _CurrentUserTemplePageControllerRefresh
   Future<bool> _refreshTemplesAndReloadVisibleWindow({
     required bool waitForQueryChange,
   }) async {
+    var windowReplaced = false;
+    try {
+      final shouldReloadSnapshot = await _snapshotRepository.refreshTemples(
+        username: _username,
+        nickname: _nickname,
+      );
+      final sourceState = await _snapshotRepository.readSourceState(_username);
+      final snapshotRevision = sourceState?.revisions.temples;
+      if (snapshotRevision == null) {
+        return false;
+      }
+      if (!shouldReloadSnapshot && snapshotRevision == _windowRevision) {
+        _setRefreshSnapshotPending(false);
+        _resumeDeferredNextPageLoad();
+        return true;
+      }
+      if (waitForQueryChange) {
+        _setRefreshSnapshotPending(true);
+      }
+      try {
+        while (!_isDisposed &&
+            waitForQueryChange &&
+            _queryChangeOperation != null) {
+          await _queryChangeOperation;
+        }
+        windowReplaced = await _replaceWithLatestTempleWindow(
+          expectedRevision: snapshotRevision,
+        );
+        return windowReplaced;
+      } finally {
+        if (waitForQueryChange && windowReplaced) {
+          _setRefreshSnapshotPending(false);
+          _resumeDeferredNextPageLoad();
+        }
+      }
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// 加载当前用户圣殿第一页
+  ///
+  /// [pageSize] 每页圣殿数量
+  Future<TinygrailPage<UserTempleSnapshotEntry>> _loadInitialPage(
+    int pageSize,
+  ) async {
+    final sourceState = await _snapshotRepository.readSourceState(_username);
+    TinygrailPage<UserTempleSnapshotEntry>? cached;
+    if (sourceState?.isTempleDataFreshAt(DateTime.now()) ?? false) {
+      final revision = sourceState!.revisions.temples;
+      cached = await _snapshotRepository.readTemplePage(
+        username: _username,
+        page: 1,
+        pageSize: pageSize,
+        sort: _sort,
+        direction: _direction,
+        searchKeyword: _searchKeyword,
+        expectedRevision: revision,
+      );
+      if (cached != null) {
+        _windowRevision = revision;
+      }
+    }
+    if (cached != null) {
+      _scheduleAutomaticRefresh();
+      return cached;
+    }
+
+    _setPageBlockingRefresh(true);
     try {
       await _snapshotRepository.refreshTemples(
         username: _username,
         nickname: _nickname,
       );
-      while (
-          !_isDisposed && waitForQueryChange && _queryChangeOperation != null) {
-        await _queryChangeOperation;
-      }
-      return await _replaceWithLatestTempleWindow();
-    } catch (_) {
-      return false;
+    } finally {
+      _setPageBlockingRefresh(false);
     }
+    final refreshedState = await _snapshotRepository.readSourceState(_username);
+    final refreshedRevision = refreshedState?.revisions.temples;
+    if (refreshedRevision == null) {
+      throw StateError('用户圣殿本地数据不可用');
+    }
+    final firstPage = await _readRequiredPage(
+      page: 1,
+      pageSize: pageSize,
+      expectedRevision: refreshedRevision,
+    );
+    _windowRevision = refreshedRevision;
+    return firstPage;
+  }
+
+  /// 读取必须存在的当前用户圣殿分页
+  ///
+  /// [page] 页码
+  /// [pageSize] 每页圣殿数量
+  /// [expectedRevision] 必须匹配的圣殿快照版本
+  Future<TinygrailPage<UserTempleSnapshotEntry>> _readRequiredPage({
+    required int page,
+    required int pageSize,
+    int? expectedRevision,
+  }) async {
+    final result = await _snapshotRepository.readTemplePage(
+      username: _username,
+      page: page,
+      pageSize: pageSize,
+      sort: _sort,
+      direction: _direction,
+      searchKeyword: _searchKeyword,
+      expectedRevision: expectedRevision,
+    );
+    if (result == null) {
+      throw StateError('用户圣殿本地数据不可用');
+    }
+    return result;
+  }
+
+  /// 更新页面阻塞刷新状态
+  ///
+  /// [value] 是否暂停页面分页交互
+  void _setPageBlockingRefresh(bool value) {
+    if (_isDisposed || _isPageBlockingRefresh == value) {
+      return;
+    }
+    _isPageBlockingRefresh = value;
+    _notifyRefreshStateChanged();
+  }
+
+  /// 更新刷新快照待提交状态
+  ///
+  /// [value] 新快照是否尚未提交到页面窗口
+  void _setRefreshSnapshotPending(bool value) {
+    if (_isDisposed || _isRefreshSnapshotPending == value) {
+      return;
+    }
+    _isRefreshSnapshotPending = value;
+    _notifyRefreshStateChanged();
+  }
+
+  /// 在没有活动刷新时恢复普通分页
+  void _resumePagingAfterIndependentWindowCommit() {
+    if (_templeRefreshOperation != null) {
+      return;
+    }
+    _setRefreshSnapshotPending(false);
+    _resumeDeferredNextPageLoad();
+  }
+
+  /// 恢复刷新期间暂缓的下一页加载
+  void _resumeDeferredNextPageLoad() {
+    if (_isDisposed || !_shouldLoadNextPageAfterRefreshPause) {
+      return;
+    }
+    _shouldLoadNextPageAfterRefreshPause = false;
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (!_isDisposed) {
+        unawaited(loadNextPage());
+      }
+    });
   }
 
   /// 等待首屏加载与页面阻塞刷新任务
@@ -112,12 +257,15 @@ extension _CurrentUserTemplePageControllerRefresh
   Future<void> _refreshLevelPositions() async {
     if (_sort != UserTempleSnapshotSort.characterLevel || _isDisposed) {
       _levelPositions = const [];
+      _levelIndexRevision = null;
       return;
     }
-    _levelPositions = await _snapshotRepository.readTempleLevelPositions(
+    final levelIndex = await _snapshotRepository.readTempleLevelIndex(
       username: _username,
       direction: _direction,
       searchKeyword: _searchKeyword,
     );
+    _levelPositions = levelIndex.positions;
+    _levelIndexRevision = levelIndex.revision;
   }
 }

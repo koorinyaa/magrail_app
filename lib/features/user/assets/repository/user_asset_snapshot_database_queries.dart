@@ -1,5 +1,94 @@
 part of 'user_asset_snapshot_database.dart';
 
+/// 用户资产等级快速跳转目录查询
+extension UserAssetSnapshotDatabaseLevelIndex on UserAssetSnapshotDatabase {
+  /// 读取等级排序下的快速跳转目录与角色快照版本
+  ///
+  /// [username] 用户名
+  /// [direction] 等级排序方向
+  /// [searchKeyword] 角色 ID 或名称筛选词
+  Future<
+      ({
+        List<UserCharacterLevelPosition> positions,
+        int revision,
+      })> readCharacterLevelIndex({
+    required String username,
+    required UserCharacterSnapshotSortDirection direction,
+    required String searchKeyword,
+  }) async {
+    final database = await _openDatabase();
+    return database.transaction((transaction) async {
+      final storedState = await _readStoredSourceState(transaction, username);
+      final searchFilter = _characterSearchFilter(searchKeyword);
+      final rows = await transaction.rawQuery(
+        'SELECT level, COUNT(*) AS item_count '
+        'FROM $_characterTableName c '
+        'WHERE c.username = ? ${searchFilter.clause} '
+        'GROUP BY level ORDER BY level ${_sqlDirection(direction)}',
+        [username, ...searchFilter.arguments],
+      );
+      var absoluteIndex = 0;
+      final positions = <UserCharacterLevelPosition>[];
+      for (final row in rows) {
+        positions.add(
+          UserCharacterLevelPosition(
+            level: _rowInt(row['level']),
+            absoluteIndex: absoluteIndex,
+          ),
+        );
+        absoluteIndex += _rowInt(row['item_count']);
+      }
+      return (
+        positions: List<UserCharacterLevelPosition>.unmodifiable(positions),
+        revision: storedState?.sourceState.revisions.characters ?? 0,
+      );
+    });
+  }
+
+  /// 读取圣殿角色等级排序下的快速跳转目录与快照版本
+  ///
+  /// [username] 用户名
+  /// [direction] 排序方向
+  /// [searchKeyword] 角色 ID 或名称筛选词
+  Future<
+      ({
+        List<UserTempleLevelPosition> positions,
+        int revision,
+      })> readTempleLevelIndex({
+    required String username,
+    required UserTempleSnapshotSortDirection direction,
+    required String searchKeyword,
+  }) async {
+    final database = await _openDatabase();
+    return database.transaction((transaction) async {
+      final storedState = await _readStoredSourceState(transaction, username);
+      final searchFilter = _templeSearchFilter(searchKeyword);
+      final rows = await transaction.rawQuery(
+        'SELECT character_level, COUNT(*) AS item_count '
+        'FROM $_templeTableName t WHERE t.username = ? ${searchFilter.clause} '
+        'GROUP BY character_level ORDER BY character_level '
+        '${_templeSqlDirection(direction)}',
+        [username, ...searchFilter.arguments],
+      );
+      var absoluteIndex = 0;
+      final positions = <UserTempleLevelPosition>[];
+      for (final row in rows) {
+        positions.add(
+          UserTempleLevelPosition(
+            level: _rowInt(row['character_level']),
+            absoluteIndex: absoluteIndex,
+          ),
+        );
+        absoluteIndex += _rowInt(row['item_count']);
+      }
+      return (
+        positions: List<UserTempleLevelPosition>.unmodifiable(positions),
+        revision: storedState?.sourceState.revisions.temples ?? 0,
+      );
+    });
+  }
+}
+
 /// 生成角色 ID 与名称筛选 SQL
 ///
 /// [searchKeyword] 角色 ID 或名称筛选词

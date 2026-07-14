@@ -216,17 +216,28 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
   /// [followingPageCount] 一并预取的后续页数
   /// [shouldCommit] 数据读取完成后是否仍应提交本次分页窗口
   /// [beforeCommit] 提交分页窗口前接收新条目的同步回调
+  /// [pageLoader] 本次替换使用的分页读取函数
   @protected
   Future<bool> replaceFromPage(
     int page, {
     int followingPageCount = 0,
     bool Function()? shouldCommit,
     void Function(List<ItemType> items)? beforeCommit,
+    Future<TinygrailPage<RawItemType>> Function({
+      required int page,
+      required int pageSize,
+    })? pageLoader,
   }) async {
-    if (_isDisposed ||
-        page <= 0 ||
-        followingPageCount < 0 ||
-        _hasActiveRequest) {
+    if (_isDisposed || page <= 0 || followingPageCount < 0) {
+      return false;
+    }
+    while (_hasActiveRequest) {
+      if (_isDisposed || !(shouldCommit?.call() ?? true)) {
+        return false;
+      }
+      await waitForPagingIdle();
+    }
+    if (_isDisposed || !(shouldCommit?.call() ?? true)) {
       return false;
     }
     final validationError = validatePageRequest();
@@ -248,7 +259,9 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
       var nextPage = page;
       for (var index = 0; index <= followingPageCount; index += 1) {
         replacementKeys.add(nextPage);
-        replacementPages.add(await _fetchDisplayPageBatch(nextPage));
+        replacementPages.add(
+          await _fetchDisplayPageBatch(nextPage, pageLoader: pageLoader),
+        );
         if (_isDisposed || !(shouldCommit?.call() ?? true)) {
           _nextPage = previousNextPage;
           _canLoadMore = previousCanLoadMore;
@@ -442,7 +455,14 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
   /// 请求并转换一批可展示条目
   ///
   /// [page] 起始页码
-  Future<List<ItemType>> _fetchDisplayPageBatch(int page) async {
+  /// [pageLoader] 本次读取使用的分页函数
+  Future<List<ItemType>> _fetchDisplayPageBatch(
+    int page, {
+    Future<TinygrailPage<RawItemType>> Function({
+      required int page,
+      required int pageSize,
+    })? pageLoader,
+  }) async {
     final previousNextPage = _nextPage;
     final previousCanLoadMore = _canLoadMore;
     final batchItems = <ItemType>[];
@@ -452,7 +472,7 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
     try {
       do {
         scannedPageCount += 1;
-        final result = await requestPage(
+        final result = await (pageLoader ?? requestPage)(
           page: nextPage,
           pageSize: pageSize,
         );
