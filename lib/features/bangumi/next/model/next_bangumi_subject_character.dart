@@ -31,11 +31,13 @@ final class NextBangumiSubjectCharacterItem {
   /// [name] 原名
   /// [nameCn] 中文名
   /// [avatarUrl] 小尺寸头像地址
+  /// [type] 角色出演类型
   const NextBangumiSubjectCharacterItem({
     required this.characterId,
     required this.name,
     required this.nameCn,
     required this.avatarUrl,
+    required this.type,
   });
 
   /// 角色 ID
@@ -49,6 +51,9 @@ final class NextBangumiSubjectCharacterItem {
 
   /// 小尺寸头像地址
   final String avatarUrl;
+
+  /// 角色出演类型
+  final int type;
 
   /// 展示名称
   String get displayName {
@@ -75,6 +80,7 @@ final class NextBangumiSubjectCharacterItem {
       name: TinygrailResponseParser.asString(character?['name']),
       nameCn: TinygrailResponseParser.asString(character?['nameCN']),
       avatarUrl: TinygrailResponseParser.asString(images?['small']),
+      type: TinygrailResponseParser.asInt(json['type']),
     );
   }
 }

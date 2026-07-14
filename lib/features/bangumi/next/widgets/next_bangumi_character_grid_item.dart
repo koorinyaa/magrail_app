@@ -50,6 +50,12 @@ class NextBangumiCharacterGridItem extends StatelessWidget {
       source: heroSource ?? item,
     );
     final name = TinygrailFormatters.decodeHtmlEntities(item.displayName);
+    final castTypeLabel = switch (item.type) {
+      1 => '主角',
+      2 => '配角',
+      3 => '客串',
+      _ => null,
+    };
     final avatar = CharacterAvatar(
       imageUrl: avatarUrl,
       size: 48,
@@ -97,18 +103,20 @@ class NextBangumiCharacterGridItem extends StatelessWidget {
                       _NextBangumiCharacterStatusBadge(status: status),
                     ],
                   ),
-                  const SizedBox(height: 5),
-                  Text(
-                    '#${item.characterId}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: colorScheme.onSurfaceVariant,
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w700,
-                      height: 1,
+                  if (castTypeLabel != null) ...[
+                    const SizedBox(height: 5),
+                    Text(
+                      castTypeLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w700,
+                        height: 1,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
