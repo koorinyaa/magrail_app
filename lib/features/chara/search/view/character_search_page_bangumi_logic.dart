@@ -110,7 +110,11 @@ extension _CharacterSearchPageBangumiLogic on _CharacterSearchPageState {
 
   /// 立即执行小圣杯搜索
   Future<void> _searchTinygrailNow() async {
-    final keyword = _searchController.text.trim();
+    final rawKeyword = _searchController.text.trim();
+    // 角色 ID 常用 #123 形式输入，仅纯数字编号去掉前缀参与搜索
+    final keyword = RegExp(r'^#[0-9]+$').hasMatch(rawKeyword)
+        ? rawKeyword.substring(1)
+        : rawKeyword;
     final requestId = ++_requestId;
     final cachedUsername = _cachedCurrentUserName;
     final shouldSearchTemples = keyword.isNotEmpty && cachedUsername.isNotEmpty;
