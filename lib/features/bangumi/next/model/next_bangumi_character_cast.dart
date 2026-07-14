@@ -1,5 +1,23 @@
 import 'package:magrail_app/features/bangumi/next/model/next_bangumi_subject_search_item.dart';
 
+/// Next Bangumi 角色出演作品条目
+final class NextBangumiCharacterCastItem {
+  /// 创建 Next Bangumi 角色出演作品条目
+  ///
+  /// [subject] 出演作品资料
+  /// [type] 角色出演类型
+  const NextBangumiCharacterCastItem({
+    required this.subject,
+    required this.type,
+  });
+
+  /// 出演作品资料
+  final NextBangumiSubjectSearchItem subject;
+
+  /// 角色出演类型
+  final int type;
+}
+
 /// Next Bangumi 角色出演作品分页结果
 final class NextBangumiCharacterCastPage {
   /// 创建 Next Bangumi 角色出演作品分页结果
@@ -14,7 +32,7 @@ final class NextBangumiCharacterCastPage {
   });
 
   /// 出演作品列表
-  final List<NextBangumiSubjectSearchItem> items;
+  final List<NextBangumiCharacterCastItem> items;
 
   /// 接口返回的原始总数
   final int total;

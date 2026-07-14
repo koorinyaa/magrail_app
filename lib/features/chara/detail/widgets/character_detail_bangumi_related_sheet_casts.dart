@@ -28,8 +28,8 @@ class _CharacterBangumiCastsSheetState
     extends State<_CharacterBangumiCastsSheet> {
   late final NextBangumiRepository _repository;
 
-  List<NextBangumiSubjectSearchItem> _items =
-      const <NextBangumiSubjectSearchItem>[];
+  List<NextBangumiCharacterCastItem> _items =
+      const <NextBangumiCharacterCastItem>[];
   var _isInitialLoading = true;
   var _initialError = '';
   var _isLoadingMore = false;
@@ -125,10 +125,16 @@ class _CharacterBangumiCastsSheetState
         final item = _items[index];
         _handleItemBuilt(index);
         return NextBangumiSubjectSearchRow(
-          item: item,
+          item: item.subject,
+          thirdLineTags: switch (item.type) {
+            1 => const ['主角'],
+            2 => const ['配角'],
+            3 => const ['客串'],
+            _ => const [],
+          },
           onTap: () => openNextBangumiSubject(
             context,
-            subjectId: item.subjectId,
+            subjectId: item.subject.subjectId,
           ),
         );
       },
@@ -152,7 +158,7 @@ class _CharacterBangumiCastsSheetState
     if (reset) {
       _resetPagination();
       setState(() {
-        _items = const <NextBangumiSubjectSearchItem>[];
+        _items = const <NextBangumiCharacterCastItem>[];
         _isInitialLoading = true;
         _initialError = '';
       });
@@ -180,7 +186,7 @@ class _CharacterBangumiCastsSheetState
           _items = page.items;
           _isInitialLoading = false;
         } else {
-          _items = <NextBangumiSubjectSearchItem>[..._items, ...page.items];
+          _items = <NextBangumiCharacterCastItem>[..._items, ...page.items];
           _isLoadingMore = false;
         }
         _syncPagination(

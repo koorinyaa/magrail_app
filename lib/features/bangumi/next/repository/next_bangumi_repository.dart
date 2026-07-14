@@ -259,10 +259,10 @@ class NextBangumiRepository {
             responseJson['data'],
             _castSubjectFromJson,
           ) ??
-          const <NextBangumiSubjectSearchItem>[];
+          const <NextBangumiCharacterCastItem>[];
       return NextBangumiCharacterCastPage(
         items: rawItems
-            .where((item) => item.subjectId > 0)
+            .where((item) => item.subject.subjectId > 0)
             .toList(growable: false),
         total: TinygrailResponseParser.asInt(responseJson['total']),
         rawItemCount: rawItems.length,
@@ -352,9 +352,14 @@ class NextBangumiRepository {
 /// 从出演作品 JSON 读取条目资料
 ///
 /// [json] 原始出演作品 JSON
-NextBangumiSubjectSearchItem _castSubjectFromJson(Map<String, Object?> json) {
+NextBangumiCharacterCastItem _castSubjectFromJson(
+  Map<String, Object?> json,
+) {
   final subject = TinygrailResponseParser.asObjectMap(json['subject']);
-  return NextBangumiSubjectSearchItem.fromSubjectJson(
-    subject ?? const <String, Object?>{},
+  return NextBangumiCharacterCastItem(
+    subject: NextBangumiSubjectSearchItem.fromSubjectJson(
+      subject ?? const <String, Object?>{},
+    ),
+    type: TinygrailResponseParser.asInt(json['type']),
   );
 }

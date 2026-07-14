@@ -13,15 +13,20 @@ class NextBangumiSubjectSearchRow extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [item] Bangumi 条目
+  /// [thirdLineTags] 第三行胶囊文案覆盖
   /// [onTap] 点击回调
   const NextBangumiSubjectSearchRow({
     super.key,
     required this.item,
+    this.thirdLineTags,
     required this.onTap,
   });
 
   /// Bangumi 条目
   final NextBangumiSubjectSearchItem item;
+
+  /// 第三行胶囊文案覆盖
+  final List<String>? thirdLineTags;
 
   /// 点击回调
   final VoidCallback onTap;
@@ -35,6 +40,7 @@ class NextBangumiSubjectSearchRow extends StatelessWidget {
     final rawTitle = item.nameCn.trim().isNotEmpty ? item.nameCn : item.name;
     final title = TinygrailFormatters.decodeHtmlEntities(rawTitle).trim();
     final info = TinygrailFormatters.decodeHtmlEntities(item.info).trim();
+    final resolvedThirdLineTags = thirdLineTags ?? item.metaTags;
 
     return Material(
       color: Colors.transparent,
@@ -69,7 +75,7 @@ class NextBangumiSubjectSearchRow extends StatelessWidget {
                         const SizedBox(height: 5),
                         Text(
                           info,
-                          maxLines: item.metaTags.isEmpty ? 2 : 1,
+                          maxLines: resolvedThirdLineTags.isEmpty ? 2 : 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             color: colorScheme.onSurfaceVariant,
@@ -79,9 +85,11 @@ class NextBangumiSubjectSearchRow extends StatelessWidget {
                           ),
                         ),
                       ],
-                      if (item.metaTags.isNotEmpty) ...[
+                      if (resolvedThirdLineTags.isNotEmpty) ...[
                         const Spacer(),
-                        _BangumiSubjectMetaTagList(tags: item.metaTags),
+                        _BangumiSubjectMetaTagList(
+                          tags: resolvedThirdLineTags,
+                        ),
                       ],
                     ],
                   ),
