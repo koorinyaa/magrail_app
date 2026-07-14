@@ -8,6 +8,8 @@ import 'package:magrail_app/core/network/tinygrail_page.dart';
 import 'package:magrail_app/core/network/tinygrail_response.dart';
 import 'package:magrail_app/core/storage/app_preferences.dart';
 import 'package:magrail_app/features/chara/auction/repository/auction_repository.dart';
+import 'package:magrail_app/features/user/analysis/repository/user_asset_analysis_database.dart';
+import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_database.dart';
 import 'package:magrail_app/features/user/model/user_auction_api_item.dart';
 import 'package:magrail_app/features/user/model/user_assets_fetch_result.dart';
 import 'package:magrail_app/features/user/model/user_balance_log_api_item.dart';
@@ -430,6 +432,24 @@ class UserRepository with _UserRepositoryPageQueries {
       _preferences.clearCurrentUserAssetsCache(),
       _preferences.clearCurrentUserCharaOverviewCache(),
     ]);
+  }
+
+  /// 清除退出用户的资料缓存、完整资产快照和资产分析缓存
+  Future<void> clearCurrentUserDataOnSignOut() async {
+    final username = readCachedCurrentUserAssets()?.name.trim() ?? '';
+    if (username.isNotEmpty) {
+      final analysisDatabase = UserAssetAnalysisDatabase();
+      try {
+        await Future.wait([
+          UserAssetSnapshotDatabase().deleteSnapshot(username),
+          analysisDatabase.deleteEntry(username),
+        ]);
+      } finally {
+        await analysisDatabase.close();
+      }
+    }
+
+    await clearCurrentUserAssetsCache();
   }
 
   /// 获取当前用户委托订单分页数据

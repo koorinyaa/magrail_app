@@ -477,7 +477,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
     try {
       // 退出登录先清理本地会话和缓存，避免继续展示旧登录用户
       await widget.authRepository.clearSession();
-      await widget.userRepository.clearCurrentUserAssetsCache();
+      await widget.userRepository.clearCurrentUserDataOnSignOut();
     } catch (_) {
       if (rootNavigator.mounted) {
         rootNavigator.pop();
