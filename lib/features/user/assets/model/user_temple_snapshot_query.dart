@@ -6,10 +6,10 @@ enum UserTempleSnapshotSort {
   assets('资产值'),
 
   /// 按角色等级排序
-  characterLevel('角色等级'),
+  characterLevel('等级'),
 
   /// 按圣殿受损程度排序
-  damaged('受损程度'),
+  damaged('受损度'),
 
   /// 按圣殿单元股息排序
   singleDividend('股息'),
@@ -21,7 +21,7 @@ enum UserTempleSnapshotSort {
   starForces('星之力'),
 
   /// 按圣殿精炼等级排序
-  refine('精炼等级'),
+  refine('精炼'),
 
   /// 按圣殿建塔日期排序
   create('建塔日期');

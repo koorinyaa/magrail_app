@@ -189,6 +189,7 @@ class _TempleSortValueLine extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             if (value.icon case final icon?) ...[
               Icon(
