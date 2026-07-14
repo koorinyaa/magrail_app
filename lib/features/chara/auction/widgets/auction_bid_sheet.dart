@@ -242,7 +242,8 @@ class _AuctionBidSheetState extends State<AuctionBidSheet> {
                             keyboardType: TextInputType.number,
                           ),
                           const SizedBox(height: 8),
-                          _AuctionQuickAmountButtons(
+                          _AuctionQuickInputButtons(
+                            onFillBasePrice: controller.fillBasePrice,
                             onFillRemaining: controller.fillRemainingAmount,
                             onFillMaxAmount: controller.fillMaxAmount,
                           ),

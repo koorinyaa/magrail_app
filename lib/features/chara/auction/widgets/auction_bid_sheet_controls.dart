@@ -205,16 +205,21 @@ class _AuctionBidTextField extends StatelessWidget {
   }
 }
 
-/// 拍卖快捷数量按钮组
-class _AuctionQuickAmountButtons extends StatelessWidget {
-  /// 创建拍卖快捷数量按钮组
+/// 拍卖快捷输入按钮组
+class _AuctionQuickInputButtons extends StatelessWidget {
+  /// 创建拍卖快捷输入按钮组
   ///
+  /// [onFillBasePrice] 底价回调
   /// [onFillRemaining] 拍满回调
   /// [onFillMaxAmount] 英灵殿回调
-  const _AuctionQuickAmountButtons({
+  const _AuctionQuickInputButtons({
+    required this.onFillBasePrice,
     required this.onFillRemaining,
     required this.onFillMaxAmount,
   });
+
+  /// 底价回调
+  final VoidCallback onFillBasePrice;
 
   /// 拍满回调
   final VoidCallback onFillRemaining;
@@ -222,7 +227,7 @@ class _AuctionQuickAmountButtons extends StatelessWidget {
   /// 英灵殿回调
   final VoidCallback onFillMaxAmount;
 
-  /// 构建拍卖快捷数量按钮组
+  /// 构建拍卖快捷输入按钮组
   ///
   /// [context] 当前组件树上下文
   @override
@@ -231,26 +236,30 @@ class _AuctionQuickAmountButtons extends StatelessWidget {
       spacing: 8,
       runSpacing: 8,
       children: [
-        _AuctionQuickAmountButton(
+        _AuctionQuickInputButton(
           text: '拍满',
           onPressed: onFillRemaining,
         ),
-        _AuctionQuickAmountButton(
+        _AuctionQuickInputButton(
           text: '英灵殿',
           onPressed: onFillMaxAmount,
+        ),
+        _AuctionQuickInputButton(
+          text: '底价',
+          onPressed: onFillBasePrice,
         ),
       ],
     );
   }
 }
 
-/// 拍卖快捷数量按钮
-class _AuctionQuickAmountButton extends StatelessWidget {
-  /// 创建拍卖快捷数量按钮
+/// 拍卖快捷输入按钮
+class _AuctionQuickInputButton extends StatelessWidget {
+  /// 创建拍卖快捷输入按钮
   ///
   /// [text] 按钮文本
   /// [onPressed] 点击回调
-  const _AuctionQuickAmountButton({
+  const _AuctionQuickInputButton({
     required this.text,
     required this.onPressed,
   });
@@ -261,7 +270,7 @@ class _AuctionQuickAmountButton extends StatelessWidget {
   /// 点击回调
   final VoidCallback onPressed;
 
-  /// 构建拍卖快捷数量按钮
+  /// 构建拍卖快捷输入按钮
   ///
   /// [context] 当前组件树上下文
   @override

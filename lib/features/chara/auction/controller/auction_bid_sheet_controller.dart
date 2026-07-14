@@ -146,6 +146,16 @@ class AuctionBidSheetController extends ChangeNotifier {
     _notifyListeners();
   }
 
+  /// 设置拍卖底价
+  void fillBasePrice() {
+    _setPriceText(_formatInputPrice(_minPrice));
+    if (_lockTotal && _lockedTotal > 0 && _minPrice > 0) {
+      final nextAmount = (_lockedTotal / _minPrice).ceil();
+      _setAmountText(nextAmount.toString());
+    }
+    _notifyListeners();
+  }
+
   /// 设置拍满数量
   void fillRemainingAmount() {
     final auctionedAmount = _auction?.type ?? 0;
