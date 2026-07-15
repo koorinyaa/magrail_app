@@ -150,54 +150,11 @@ class _VoteKillSheetHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
-    return Row(
-      children: [
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: colorScheme.error.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Icon(
-            LucideIcons.trash2,
-            size: 24,
-            color: colorScheme.error,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '投票删除',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontSize: 19,
-                  fontWeight: FontWeight.w900,
-                  height: 1.1,
-                ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                '满三票删除角色，且无法再次上市',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  height: 1.15,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return AppBottomSheetHeader(
+      icon: LucideIcons.trash2,
+      title: '投票删除',
+      subtitle: '满三票删除角色，且无法再次上市',
+      iconColor: colorScheme.error,
     );
   }
 }

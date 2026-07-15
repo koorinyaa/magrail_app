@@ -16,6 +16,7 @@ import 'package:magrail_app/features/chara/detail/model/character_detail_sacrifi
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
 import 'package:magrail_app/features/chara/detail/widgets/character_detail_sacrifice_result_panel.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
+import 'package:magrail_app/shared/widgets/app_bottom_sheet_header.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 part 'sacrifice_sheet/character_detail_sacrifice_sheet_layout.dart';

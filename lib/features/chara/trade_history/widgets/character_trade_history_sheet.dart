@@ -10,6 +10,7 @@ import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
 import 'package:magrail_app/features/chara/trade_history/controller/character_trade_history_sheet_controller.dart';
 import 'package:magrail_app/features/chara/trade_history/model/character_trade_history_item.dart';
 import 'package:magrail_app/features/chara/trade_history/repository/character_trade_history_repository.dart';
+import 'package:magrail_app/shared/widgets/app_bottom_sheet_header.dart';
 
 part 'character_trade_history_sheet_content.dart';
 part 'character_trade_history_sheet_states.dart';

@@ -15,55 +15,10 @@ class _ScratchHeader extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Row(
-      children: [
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: colorScheme.primary.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Icon(
-            Icons.casino_outlined,
-            color: colorScheme.primary,
-            size: 24,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '彩票抽奖',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontSize: 19,
-                  fontWeight: FontWeight.w900,
-                  height: 1.1,
-                ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                '选择一种刮刮乐抽取',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  height: 1.15,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return const AppBottomSheetHeader(
+      icon: Icons.casino_outlined,
+      title: '彩票抽奖',
+      subtitle: '选择一种刮刮乐抽取',
     );
   }
 }

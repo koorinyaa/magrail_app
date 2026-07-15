@@ -172,67 +172,32 @@ class _BotMagicCharacterSearchHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
-    return Row(
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(14),
-          child: SizedBox.square(
-            dimension: 40,
-            child: Transform.scale(
-              scale: 1.24,
-              child: Image.asset(
-                imageAsset,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: colorScheme.primary.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(
-                      fallbackIcon,
-                      size: 20,
-                      color: colorScheme.primary,
-                    ),
-                  );
-                },
-              ),
-            ),
+    return AppBottomSheetHeader.customLeading(
+      leading: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: Transform.scale(
+          scale: 1.24,
+          child: Image.asset(
+            imageAsset,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return DecoratedBox(
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  fallbackIcon,
+                  size: 20,
+                  color: colorScheme.primary,
+                ),
+              );
+            },
           ),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
-                  height: 1.12,
-                ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                '选择目标角色',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  height: 1,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+      ),
+      title: title,
+      subtitle: '选择目标角色',
     );
   }
 }

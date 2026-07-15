@@ -10,6 +10,7 @@ import 'package:magrail_app/core/widgets/app_bottom_sheet_drag_handle.dart';
 import 'package:magrail_app/features/chara/auction/controller/auction_bid_sheet_controller.dart';
 import 'package:magrail_app/features/chara/auction/model/auction_api_item.dart';
 import 'package:magrail_app/features/chara/auction/repository/auction_repository.dart';
+import 'package:magrail_app/shared/widgets/app_bottom_sheet_header.dart';
 
 part 'auction_bid_sheet_controls.dart';
 part 'auction_bid_sheet_sections.dart';

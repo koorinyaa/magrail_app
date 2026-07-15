@@ -22,56 +22,11 @@ class _CharacterTradeHistoryHeader extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final displayName = _displayName;
-
-    return Row(
-      children: [
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: colorScheme.primary.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Icon(
-            LucideIcons.clipboardClock,
-            color: colorScheme.primary,
-            size: 24,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '交易记录',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontSize: 19,
-                  fontWeight: FontWeight.w900,
-                  height: 1.1,
-                ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                '#$characterId 「$displayName」',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  height: 1,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return AppBottomSheetHeader(
+      icon: LucideIcons.clipboardClock,
+      title: '交易记录',
+      subtitle: '#$characterId 「$displayName」',
     );
   }
 

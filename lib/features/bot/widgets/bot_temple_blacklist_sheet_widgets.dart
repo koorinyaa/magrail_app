@@ -39,83 +39,41 @@ class _BotTempleBlacklistHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final iconColor = useErrorColor ? colorScheme.error : colorScheme.primary;
-
-    return Row(
-      children: [
-        if (imageAsset.trim().isEmpty)
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Icon(
-                icon,
-                size: 20,
-                color: iconColor,
-              ),
-            ),
-          )
-        else
-          ClipRRect(
-            borderRadius: BorderRadius.circular(14),
-            child: SizedBox.square(
-              dimension: 40,
-              child: Transform.scale(
-                scale: 1.24,
-                child: Image.asset(
-                  imageAsset,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: iconColor.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Icon(
-                        icon,
-                        size: 20,
-                        color: iconColor,
-                      ),
-                    );
-                  },
+    final resolvedImageAsset = imageAsset.trim();
+    if (resolvedImageAsset.isEmpty) {
+      return AppBottomSheetHeader(
+        icon: icon,
+        title: title,
+        subtitle: subtitle,
+        iconColor: iconColor,
+      );
+    }
+    return AppBottomSheetHeader.customLeading(
+      leading: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: Transform.scale(
+          scale: 1.24,
+          child: Image.asset(
+            resolvedImageAsset,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return DecoratedBox(
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-              ),
-            ),
-          ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
-                  height: 1.12,
+                child: Icon(
+                  icon,
+                  size: 20,
+                  color: iconColor,
                 ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                subtitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  height: 1,
-                ),
-              ),
-            ],
+              );
+            },
           ),
         ),
-      ],
+      ),
+      title: title,
+      subtitle: subtitle,
     );
   }
 }

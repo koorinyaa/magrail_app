@@ -12,6 +12,7 @@ import 'package:magrail_app/features/chara/detail/controller/character_detail_tr
 import 'package:magrail_app/features/chara/detail/model/character_detail_trade_data.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_trade_header.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
+import 'package:magrail_app/shared/widgets/app_bottom_sheet_header.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 

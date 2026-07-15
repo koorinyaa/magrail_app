@@ -17,59 +17,13 @@ class _TempleAssetLinkSheetHeader extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final resolvedCharacterName = data.characterName.trim().isEmpty
         ? '角色名称'
         : TinygrailFormatters.decodeHtmlEntities(data.characterName.trim());
-
-    return Row(
-      children: [
-        DecoratedBox(
-          decoration: BoxDecoration(
-            color: colorScheme.primary.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Icon(
-              LucideIcons.link,
-              size: 20,
-              color: colorScheme.primary,
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'LINK',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
-                  height: 1.12,
-                ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                '#${data.characterId} 「$resolvedCharacterName」',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  height: 1,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return AppBottomSheetHeader(
+      icon: LucideIcons.link,
+      title: 'LINK',
+      subtitle: '#${data.characterId} 「$resolvedCharacterName」',
     );
   }
 }

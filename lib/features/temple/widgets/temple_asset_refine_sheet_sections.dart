@@ -4,6 +4,7 @@ import 'package:magrail_app/core/utils/formatters.dart';
 import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
 import 'package:magrail_app/core/widgets/temple_cover_image.dart';
 import 'package:magrail_app/features/temple/model/temple_asset_card_data.dart';
+import 'package:magrail_app/shared/widgets/app_bottom_sheet_header.dart';
 
 /// 圣殿资产精炼标题
 class TempleAssetRefineHeader extends StatelessWidget {
@@ -23,58 +24,12 @@ class TempleAssetRefineHeader extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final characterName =
         data.characterName.trim().isEmpty ? '角色名称' : data.characterName.trim();
-
-    return Row(
-      children: [
-        DecoratedBox(
-          decoration: BoxDecoration(
-            color: colorScheme.primary.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Icon(
-              LucideIcons.sparkles,
-              size: 20,
-              color: colorScheme.primary,
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '精炼',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
-                  height: 1.12,
-                ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                '#${data.characterId} 「$characterName」',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  height: 1,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return AppBottomSheetHeader(
+      icon: LucideIcons.sparkles,
+      title: '精炼',
+      subtitle: '#${data.characterId} 「$characterName」',
     );
   }
 }

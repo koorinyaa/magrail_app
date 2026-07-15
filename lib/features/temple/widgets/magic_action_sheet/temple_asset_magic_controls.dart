@@ -111,44 +111,11 @@ class _TempleAssetMagicSheetHeader extends StatelessWidget {
         ),
     };
 
-    final titleContent = Row(
-      children: [
-        iconWidget,
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                _label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
-                  height: 1.12,
-                ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                subtitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  height: 1,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return AppBottomSheetHeader.customLeading(
+      leading: iconWidget,
+      title: _label,
+      subtitle: subtitle,
     );
-
-    return titleContent;
   }
 
   /// 标题文案

@@ -12,6 +12,7 @@ import 'package:magrail_app/features/chara/detail/repository/character_detail_re
 import 'package:magrail_app/features/chara/model/tinygrail_character_reward_item.dart';
 import 'package:magrail_app/features/scratch_ticket/repository/scratch_ticket_repository.dart';
 import 'package:magrail_app/features/scratch_ticket/widgets/scratch_ticket_result_sheet.dart';
+import 'package:magrail_app/shared/widgets/app_bottom_sheet_header.dart';
 
 part 'scratch_ticket_sheet_content.dart';
 

@@ -22,6 +22,7 @@ import 'package:magrail_app/features/temple/controller/temple_asset_magic_action
 import 'package:magrail_app/features/temple/model/temple_asset_card_data.dart';
 import 'package:magrail_app/features/temple/model/temple_asset_magic_assets.dart';
 import 'package:magrail_app/features/temple/widgets/temple_asset_magic_character_search_panel.dart';
+import 'package:magrail_app/shared/widgets/app_bottom_sheet_header.dart';
 
 part 'magic_action_sheet/temple_asset_magic_confirm_contents.dart';
 part 'magic_action_sheet/temple_asset_magic_stardust_confirm_contents.dart';

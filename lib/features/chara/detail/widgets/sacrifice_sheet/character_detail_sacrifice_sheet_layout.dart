@@ -87,7 +87,6 @@ class _SacrificeSheetHeader extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final header = controller.header;
     final characterName = TinygrailFormatters.decodeHtmlEntities(
       header?.name ?? '',
@@ -100,53 +99,10 @@ class _SacrificeSheetHeader extends StatelessWidget {
     final title =
         titleMode == CharacterDetailSacrificeMode.financing ? '股权融资' : '资产重组';
 
-    return Row(
-      children: [
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: colorScheme.primary.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Icon(
-            LucideIcons.repeat2,
-            size: 24,
-            color: colorScheme.primary,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
-                  height: 1.12,
-                ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                characterSubtitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  height: 1,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return AppBottomSheetHeader(
+      icon: LucideIcons.repeat2,
+      title: title,
+      subtitle: characterSubtitle,
     );
   }
 }

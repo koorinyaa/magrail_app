@@ -16,6 +16,7 @@ import 'package:magrail_app/core/widgets/app_loading_dialog.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_trade_header.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
 import 'package:magrail_app/features/oos/repository/tinygrail_oos_repository.dart';
+import 'package:magrail_app/shared/widgets/app_bottom_sheet_header.dart';
 import 'package:mime/mime.dart';
 
 part 'character_detail_avatar_update_sheet_image.dart';
@@ -428,59 +429,13 @@ class _CharacterAvatarUpdateHeader extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final name = TinygrailFormatters.decodeHtmlEntities(header.name).trim();
-
-    return Row(
-      children: [
-        DecoratedBox(
-          decoration: BoxDecoration(
-            color: colorScheme.primary.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Icon(
-              LucideIcons.imageUp,
-              size: 20,
-              color: colorScheme.primary,
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '更换头像',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                  height: 1.1,
-                ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                name.isEmpty
-                    ? '#${header.characterId}'
-                    : '#${header.characterId} $name',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  height: 1,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return AppBottomSheetHeader(
+      icon: LucideIcons.imageUp,
+      title: '更换头像',
+      subtitle: name.isEmpty
+          ? '#${header.characterId}'
+          : '#${header.characterId} $name',
     );
   }
 }
