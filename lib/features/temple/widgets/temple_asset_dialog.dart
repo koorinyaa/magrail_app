@@ -6,8 +6,6 @@ import 'package:magrail_app/core/utils/formatters.dart';
 import 'package:magrail_app/core/utils/tinygrail_formatters.dart';
 import 'package:magrail_app/core/utils/user_error_message.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
-import 'package:magrail_app/features/chara/detail/model/character_detail_basic_info.dart';
-import 'package:magrail_app/features/chara/detail/model/character_detail_trade_header.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_trade_data.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
 import 'package:magrail_app/features/oos/repository/tinygrail_oos_repository.dart';
@@ -16,6 +14,7 @@ import 'package:magrail_app/features/temple/model/temple_asset_dialog_source.dar
 import 'package:magrail_app/features/temple/repository/temple_asset_magic_repository.dart';
 import 'package:magrail_app/features/temple/repository/temple_repository.dart';
 import 'package:magrail_app/features/temple/widgets/temple_asset_card.dart';
+import 'package:magrail_app/features/user/analysis/model/user_asset_analysis_calculations.dart';
 import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
 
@@ -251,8 +250,6 @@ class _TempleAssetSourceDialogContentState
   /// 加载圣殿资产弹窗数据
   Future<TempleAssetCardData> _loadData() async {
     final results = await Future.wait<Object?>([
-      widget.characterRepository
-          .fetchCharacterBasicInfo(widget.source.characterId),
       widget.userRepository.fetchUserTemplePage(
         username: widget.source.ownerName.trim(),
         page: 1,
@@ -265,17 +262,14 @@ class _TempleAssetSourceDialogContentState
       else
         Future<CharacterDetailUserTrading?>.value(),
     ]);
-    final info = results[0] as CharacterDetailBasicInfo;
-    final templePage = results[1] as TinygrailPage<UserTempleApiItem>;
-    final trading = results[2] as CharacterDetailUserTrading?;
-    final header = info.tradeHeader;
-    if (header == null) {
-      throw StateError('角色未上市，无法计算圣殿资产');
-    }
+    final templePage = results[0] as TinygrailPage<UserTempleApiItem>;
+    final trading = results[1] as CharacterDetailUserTrading?;
 
     final temple = _findTemple(templePage.items);
+    if (temple == null) {
+      throw StateError('圣殿不存在或已失效');
+    }
     return _buildData(
-      header: header,
       temple: temple,
       trading: trading,
     );
@@ -296,23 +290,15 @@ class _TempleAssetSourceDialogContentState
 
   /// 构建圣殿资产卡片数据
   ///
-  /// [header] 角色详情已上市头部资料
-  /// [temple] 用户圣殿接口条目，未创建圣殿时为空
+  /// [temple] 用户圣殿接口条目
+  /// [trading] 当前用户交易资料
   TempleAssetCardData _buildData({
-    required CharacterDetailTradeHeader header,
-    required UserTempleApiItem? temple,
+    required UserTempleApiItem temple,
     required CharacterDetailUserTrading? trading,
   }) {
-    final characterName = TinygrailFormatters.decodeHtmlEntities(header.name);
-    final templeDividend = temple == null
-        ? null
-        : _calculateTempleDividend(
-            header: header,
-            temple: temple,
-          );
-    final templeTotalDividend = temple == null || templeDividend == null
-        ? null
-        : templeDividend * temple.assets;
+    final characterName = TinygrailFormatters.decodeHtmlEntities(temple.name);
+    final templeDividend = userAssetAnalysisTempleSingleDividend(temple);
+    final templeTotalDividend = userAssetAnalysisTempleTotalDividend(temple);
     final ownerNickname = TinygrailFormatters.decodeHtmlEntities(
       widget.source.ownerNickname.trim(),
     );
@@ -320,59 +306,50 @@ class _TempleAssetSourceDialogContentState
     final watermarkText = ownerNickname.isNotEmpty ? ownerNickname : ownerName;
 
     return TempleAssetCardData(
-      templeId: temple?.id,
-      userId: temple?.userId ?? 0,
-      characterId: header.characterId,
+      templeId: temple.id,
+      userId: temple.userId,
+      characterId: temple.characterId,
       characterName: characterName,
-      avatar: header.icon,
-      cover: temple?.cover ?? '',
-      line: temple?.line ?? '',
-      hasLink: temple?.link != null,
-      linkCover: temple?.link?.cover ?? '',
-      linkAvatar: temple?.link?.avatar ?? '',
-      assets: temple?.assets ?? 0,
-      sacrifices: temple?.sacrifices ?? 0,
-      characterLevel: header.level,
-      zeroCount: header.zeroCount,
-      level: temple?.level ?? 0,
-      starForces: temple?.starForces ?? 0,
-      refine: temple?.refine ?? 0,
+      avatar: temple.avatar,
+      cover: temple.cover,
+      line: temple.line,
+      hasLink: temple.link != null,
+      linkCover: temple.link?.cover ?? '',
+      linkAvatar: temple.link?.avatar ?? '',
+      assets: temple.assets,
+      sacrifices: temple.sacrifices,
+      characterLevel: temple.characterLevel,
+      zeroCount: temple.zeroCount,
+      level: temple.level,
+      starForces: temple.starForces,
+      refine: temple.refine,
       primaryValue: characterName,
-      primaryLabel: '#${header.characterId}',
+      primaryLabel: '#${temple.characterId}',
       showPrimaryLevelBadge: true,
       tags: [
         TempleAssetCardTagData(
           label: '圣殿股息',
-          value: templeDividend == null
-              ? '--'
-              : Formatters.tinygrailCurrency(templeDividend),
-          muted: templeDividend == null,
+          value: Formatters.tinygrailCurrency(templeDividend),
         ),
         TempleAssetCardTagData(
           label: '圣殿总息',
-          value: templeTotalDividend == null
-              ? '--'
-              : Formatters.tinygrailCompactValue(
-                  templeTotalDividend,
-                  prefix: '₵',
-                ),
-          muted: templeTotalDividend == null,
+          value: Formatters.tinygrailCompactValue(
+            templeTotalDividend,
+            prefix: '₵',
+          ),
         ),
         TempleAssetCardTagData(
           label: '星之力',
-          value: temple == null
-              ? '--'
-              : Formatters.tinygrailCompactValue(temple.starForces),
-          muted: temple == null,
+          value: Formatters.tinygrailCompactValue(temple.starForces),
           showStarIcon: true,
-          starHighlighted: (temple?.starForces ?? 0) >= 10000,
+          starHighlighted: temple.starForces >= 10000,
         ),
       ],
       watermarkText: watermarkText,
-      showActions: _shouldShowActions && temple != null,
-      hasTemple: temple != null,
-      canResetCover: temple != null && _canResetCover,
-      actionContext: temple != null && _hasVisibleActions
+      showActions: _shouldShowActions,
+      hasTemple: true,
+      canResetCover: _canResetCover,
+      actionContext: _hasVisibleActions
           ? TempleAssetCardActionContext(
               characterRepository: widget.characterRepository,
               templeRepository: widget.templeRepository,
@@ -384,9 +361,7 @@ class _TempleAssetSourceDialogContentState
               onActionCompleted: _reloadAfterAction,
             )
           : null,
-      heroTag: temple == null
-          ? null
-          : 'temple-asset-source-dialog-${temple.id}-${header.characterId}',
+      heroTag: 'temple-asset-source-dialog-${temple.id}-${temple.characterId}',
     );
   }
 
@@ -411,20 +386,6 @@ class _TempleAssetSourceDialogContentState
   /// [error] 加载异常
   String _messageForError(Object? error) {
     return resolveUserErrorMessage(error, fallback: '圣殿资产加载失败');
-  }
-
-  /// 计算圣殿单期股息
-  ///
-  /// [header] 角色详情已上市头部资料
-  /// [temple] 用户圣殿接口条目
-  double _calculateTempleDividend({
-    required CharacterDetailTradeHeader header,
-    required UserTempleApiItem temple,
-  }) {
-    return header.templeDividend(
-      characterLevel: temple.characterLevel,
-      refine: temple.refine,
-    );
   }
 }
 
