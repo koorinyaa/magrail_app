@@ -92,28 +92,19 @@ class UserOverviewMessage extends StatelessWidget {
 
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 22),
-      decoration: BoxDecoration(
-        color: colorScheme.surface.withValues(
-          alpha: colorScheme.brightness == Brightness.dark ? 0.72 : 0.82,
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: colorScheme.onSurfaceVariant,
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-            ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 22),
+        child: Text(
+          message,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: colorScheme.onSurfaceVariant,
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
           ),
-        ],
+        ),
       ),
     );
   }

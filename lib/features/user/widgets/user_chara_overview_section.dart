@@ -186,9 +186,9 @@ class UserCharaOverviewSection extends StatelessWidget {
         child: Padding(
           padding: AppSafeAreaInsets.fromLTRB(
             context,
-            left: 24,
+            left: 10,
             top: 18,
-            right: 24,
+            right: 10,
             bottom: 0,
           ),
           child: const UserOverviewMessage(message: '暂无角色资产'),
