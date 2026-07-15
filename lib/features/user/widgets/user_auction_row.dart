@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 import 'package:magrail_app/core/utils/formatters.dart';
 import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
@@ -166,7 +165,7 @@ class UserAuctionRow extends StatelessWidget {
                                           _resolveInfoColor(colorScheme),
                                     ),
                                     _AuctionIconMetricData(
-                                      icon: LucideIcons.gavel,
+                                      icon: Icons.gavel_rounded,
                                       value: _resolvePrivacyText(
                                         _formatOptionalCount(detail?.type),
                                       ),
