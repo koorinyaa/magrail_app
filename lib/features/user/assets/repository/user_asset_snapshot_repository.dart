@@ -214,6 +214,41 @@ class UserAssetSnapshotRepository {
     );
   }
 
+  /// 获取受损圣殿补塔需要的完整原始数据
+  ///
+  /// [username] 用户名
+  Future<
+      ({
+        List<UserTempleApiItem> temples,
+        List<UserCharacterApiItem> characters,
+      })> fetchTempleRepairSource({
+    required String username,
+  }) async {
+    final resolvedUsername = username.trim();
+    if (resolvedUsername.isEmpty) {
+      throw StateError('缺少用户名');
+    }
+    final requestGate = _UserAssetSnapshotRequestGate(_maxServerConcurrency);
+    final results = await Future.wait<Object>([
+      _fetchAllTemplesShared(
+        username: resolvedUsername,
+        requestGate: requestGate,
+        onProgress: _ignoreSnapshotProgress,
+      ),
+      _fetchAllCharactersShared(
+        username: resolvedUsername,
+        requestGate: requestGate,
+        onProgress: _ignoreSnapshotProgress,
+      ),
+    ]);
+    final templeResult = results[0] as _AllTemplesResult;
+    final characterResult = results[1] as _AllCharactersResult;
+    return (
+      temples: templeResult.items,
+      characters: characterResult.items,
+    );
+  }
+
   /// 从本地快照分页读取有效的用户角色
   ///
   /// [username] 用户名

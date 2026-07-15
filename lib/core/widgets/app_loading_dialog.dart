@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:magrail_app/core/theme/app_blur_style.dart';
 
@@ -5,15 +6,20 @@ import 'package:magrail_app/core/theme/app_blur_style.dart';
 ///
 /// [context] 当前组件树上下文
 /// [message] 加载提示文案
+/// [messageListenable] 动态加载提示文案
 Future<void> showAppLoadingDialog(
   BuildContext context, {
   required String message,
+  ValueListenable<String>? messageListenable,
 }) {
   return showDialog<void>(
     context: context,
     barrierDismissible: false,
     builder: (context) {
-      return AppLoadingDialog(message: message);
+      return AppLoadingDialog(
+        message: message,
+        messageListenable: messageListenable,
+      );
     },
   );
 }
@@ -24,13 +30,18 @@ class AppLoadingDialog extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [message] 加载提示文案
+  /// [messageListenable] 动态加载提示文案
   const AppLoadingDialog({
     super.key,
     required this.message,
+    this.messageListenable,
   });
 
   /// 加载提示文案
   final String message;
+
+  /// 动态加载提示文案
+  final ValueListenable<String>? messageListenable;
 
   /// 构建应用通用加载弹窗
   ///
@@ -39,6 +50,12 @@ class AppLoadingDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
+    final messageStyle = TextStyle(
+      color: colorScheme.onSurface,
+      fontSize: 13,
+      fontWeight: FontWeight.w700,
+      height: 1.2,
+    );
 
     return PopScope(
       canPop: false,
@@ -73,14 +90,28 @@ class AppLoadingDialog extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Text(
-                        message,
-                        style: TextStyle(
-                          color: colorScheme.onSurface,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          height: 1.2,
-                        ),
+                      Flexible(
+                        child: messageListenable != null
+                            ? ValueListenableBuilder<String>(
+                                valueListenable: messageListenable!,
+                                builder: (context, value, _) {
+                                  final resolvedValue = value.trim();
+                                  return Text(
+                                    resolvedValue.isEmpty
+                                        ? message
+                                        : resolvedValue,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: messageStyle,
+                                  );
+                                },
+                              )
+                            : Text(
+                                message,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: messageStyle,
+                              ),
                       ),
                     ],
                   ),

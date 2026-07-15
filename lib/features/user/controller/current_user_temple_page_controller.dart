@@ -104,6 +104,9 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
   /// 当前角色等级快速跳转位置
   List<UserTempleLevelPosition> get levelPositions => _levelPositions;
 
+  /// 当前页面使用的圣殿快照版本
+  int? get templeSnapshotRevision => _windowRevision;
+
   /// 是否可以向前加载相邻页
   bool get canLoadPreviousPage =>
       !_isChangingQuery &&

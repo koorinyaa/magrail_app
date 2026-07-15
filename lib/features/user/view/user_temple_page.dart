@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:magrail_app/core/feedback/app_toast.dart';
 import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 import 'package:magrail_app/core/utils/formatters.dart';
@@ -27,6 +28,7 @@ import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
 import 'package:magrail_app/features/user/widgets/user_character_level_rail.dart';
 import 'package:magrail_app/features/user/widgets/user_temple_card.dart';
+import 'package:magrail_app/features/user/widgets/user_temple_repair_sheet.dart';
 import 'package:magrail_app/features/user/widgets/user_temple_responsive_grid.dart';
 import 'package:magrail_app/features/user/widgets/user_temple_sort_toolbar.dart';
 
@@ -93,6 +95,7 @@ class _UserTemplePageState extends State<UserTemplePage> {
   final TextEditingController _searchController = TextEditingController();
   UserTemplePageController? _otherUserController;
   CurrentUserTemplePageController? _currentUserController;
+  UserAssetSnapshotRepository? _snapshotRepository;
   bool _isLoadingPreviousPage = false;
   bool _isProgrammaticLevelJump = false;
   int _levelJumpGeneration = 0;
@@ -107,11 +110,13 @@ class _UserTemplePageState extends State<UserTemplePage> {
   void initState() {
     super.initState();
     if (_isCurrentUser) {
+      final snapshotRepository = UserAssetSnapshotRepository(
+        userRepository: widget.repository,
+        database: UserAssetSnapshotDatabase(),
+      );
+      _snapshotRepository = snapshotRepository;
       final controller = CurrentUserTemplePageController(
-        snapshotRepository: UserAssetSnapshotRepository(
-          userRepository: widget.repository,
-          database: UserAssetSnapshotDatabase(),
-        ),
+        snapshotRepository: snapshotRepository,
         username: widget.username,
         nickname: widget.nickname ?? '',
         onAutomaticRefreshSucceeded: _showAutomaticRefreshSucceeded,
@@ -205,6 +210,20 @@ class _UserTemplePageState extends State<UserTemplePage> {
         UserTempleSnapshotEntry>(
       controller: controller,
       title: _title,
+      appBarActions: [
+        SizedBox(
+          width: kToolbarHeight,
+          child: Center(
+            child: IconButton(
+              onPressed: _openTempleRepairSheet,
+              icon: const Icon(
+                LucideIcons.wrench,
+                size: 22,
+              ),
+            ),
+          ),
+        ),
+      ],
       appBarBottom: UserTempleSortToolbar(
         controller: controller,
         onSortSelected: (sort) {
@@ -420,6 +439,24 @@ class _UserTemplePageState extends State<UserTemplePage> {
         oosRepository: widget.oosRepository,
         userRepository: widget.repository,
         currentUserName: widget.currentUserName,
+      ),
+    );
+  }
+
+  /// 打开受损圣殿批量补塔抽屉
+  void _openTempleRepairSheet() {
+    final snapshotRepository = _snapshotRepository;
+    final pageController = _currentUserController;
+    if (snapshotRepository == null || pageController == null) {
+      return;
+    }
+    unawaited(
+      showUserTempleRepairSheet(
+        context,
+        snapshotRepository: snapshotRepository,
+        characterRepository: widget.characterDetailRepository,
+        pageController: pageController,
+        username: widget.username,
       ),
     );
   }
