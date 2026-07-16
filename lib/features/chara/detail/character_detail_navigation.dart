@@ -36,13 +36,13 @@ void openCharacterDetail(
   final router = GoRouter.of(context);
   final currentRouteName = _currentRouteName(router);
 
-  // 当前已在角色详情页时替换栈顶，避免连续打开不同角色时叠加详情页
+  // 当前已在角色详情页时复用页面 Key，由页面内部切换角色并避免新页面动画
   if (currentRouteName == _characterDetailRouteName) {
     if (_currentCharacterDetailId(router) == characterId) {
       return;
     }
 
-    context.pushReplacementNamed(
+    context.replaceNamed(
       _characterDetailRouteName,
       queryParameters: queryParameters,
     );

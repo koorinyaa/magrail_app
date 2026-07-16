@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:magrail_app/core/auth/tinygrail_auth_repository.dart';
@@ -5,6 +7,7 @@ import 'package:magrail_app/core/storage/app_preferences.dart';
 import 'package:magrail_app/core/widgets/app_soft_background.dart';
 import 'package:magrail_app/features/auth/view/tinygrail_auth_page.dart';
 import 'package:magrail_app/features/chara/auction/repository/auction_repository.dart';
+import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
 import 'package:magrail_app/features/chara/detail/controller/character_detail_controller.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_basic_info.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_history_item.dart';
@@ -139,6 +142,30 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
     )..initialize();
   }
 
+  /// 同步路由切换后的当前角色
+  ///
+  /// [oldWidget] 切换前的角色详情页配置
+  @override
+  void didUpdateWidget(covariant CharacterDetailPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final characterId = widget.characterId;
+    if (characterId == null ||
+        characterId <= 0 ||
+        characterId == oldWidget.characterId) {
+      return;
+    }
+
+    unawaited(
+      _switchToCharacter(
+        CharacterDetailHistoryItem(
+          characterId: characterId,
+          name: widget.initialName?.trim() ?? '',
+          avatarUrl: widget.initialAvatarUrl?.trim() ?? '',
+        ),
+      ),
+    );
+  }
+
   /// 释放角色详情页状态
   @override
   void dispose() {
@@ -212,7 +239,7 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
                             selectedCharacterId: current?.characterId,
                             selectedAvatarHeroTag:
                                 _controller.currentAvatarHeroTag,
-                            onItemPressed: _selectHistoryItem,
+                            onItemPressed: _openHistoryItem,
                           ),
                         ),
                       CharacterDetailPageBody(
@@ -306,10 +333,24 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
     );
   }
 
-  /// 平滑切换历史角色并恢复顶部浏览位置
+  /// 通过当前路由打开历史角色
   ///
-  /// [item] 历史角色条目
-  Future<void> _selectHistoryItem(CharacterDetailHistoryItem item) async {
+  /// [item] 目标历史角色
+  void _openHistoryItem(CharacterDetailHistoryItem item) {
+    openCharacterDetail(
+      context,
+      characterId: item.characterId,
+      name: item.name,
+      avatarUrl: item.avatarUrl,
+    );
+  }
+
+  /// 平滑切换角色并恢复顶部浏览位置
+  ///
+  /// [item] 目标角色
+  Future<void> _switchToCharacter(CharacterDetailHistoryItem item) async {
+    _controller.selectHistoryItem(item);
+
     if (_scrollController.hasClients && _scrollController.offset > 0) {
       if (MediaQuery.disableAnimationsOf(context)) {
         _scrollController.jumpTo(0);
@@ -321,12 +362,6 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
         );
       }
     }
-
-    if (!mounted) {
-      return;
-    }
-
-    _controller.selectHistoryItem(item);
   }
 
   /// 根据滚动位置更新顶部浮层状态
