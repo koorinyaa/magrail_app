@@ -161,8 +161,8 @@ class _CharacterDetailLinksPageState extends State<CharacterDetailLinksPage> {
                     fallbackCharacterName: widget.characterName,
                     onCharacterTap: _openCharacter,
                     onOwnerTap: _openOwner,
-                    onLeftAssetTap: _openTempleAssetCard,
-                    onRightAssetTap: _openLinkedTempleAssetCard,
+                    onTempleAssetTap: _openTempleAssetCard,
+                    onLinkedAssetTap: _openLinkedTempleAssetCard,
                   ),
                 ],
               if (!isStateOnlyContent)
@@ -320,7 +320,7 @@ class _CharacterDetailLinksPageState extends State<CharacterDetailLinksPage> {
   /// 打开右侧圣殿资产卡片弹窗
   ///
   /// [ownerItem] 拥有者字段来源条目
-  /// [linkedItem] LINK 右侧圣殿条目
+  /// [linkedItem] LINK 圣殿条目
   void _openLinkedTempleAssetCard(
     CharacterDetailTempleItem ownerItem,
     CharacterDetailTempleItem linkedItem,

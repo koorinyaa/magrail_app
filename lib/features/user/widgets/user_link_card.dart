@@ -16,6 +16,7 @@ class UserLinkCard extends StatelessWidget {
   /// [item] 用户连接接口条目
   /// [width] 卡片宽度
   /// [heroTagPrefix] 图片 Hero 标识前缀
+  /// [showConnectionValue] 是否显示连接值
   /// [onCharacterTap] 角色名称点击回调
   /// [onAssetTap] 圣殿资产入口点击回调
   const UserLinkCard({
@@ -23,6 +24,7 @@ class UserLinkCard extends StatelessWidget {
     required this.item,
     this.width = defaultWidth,
     this.heroTagPrefix = 'user-link-cover',
+    this.showConnectionValue = true,
     this.onCharacterTap,
     this.onAssetTap,
   });
@@ -36,11 +38,24 @@ class UserLinkCard extends StatelessWidget {
   /// 卡片整体高度
   static const double totalHeight = 256;
 
+  /// 生成用户连接封面的 Hero 标识
+  ///
+  /// [prefix] Hero 标识前缀
+  /// [temple] 用户圣殿接口条目
+  static String heroTagFor(String prefix, UserTempleApiItem temple) {
+    return '$prefix-${temple.id}-${temple.characterId}';
+  }
+
   /// 根据卡片宽度计算卡片高度
   ///
   /// [width] 卡片宽度
-  static double heightForWidth(double width) {
-    return imageHeight * width / defaultWidth + (totalHeight - imageHeight);
+  /// [showConnectionValue] 是否预留连接值区域
+  static double heightForWidth(
+    double width, {
+    bool showConnectionValue = true,
+  }) {
+    return imageHeight * width / defaultWidth +
+        (showConnectionValue ? totalHeight - imageHeight : 0);
   }
 
   /// 用户连接接口条目
@@ -51,6 +66,9 @@ class UserLinkCard extends StatelessWidget {
 
   /// 图片 Hero 标识前缀
   final String heroTagPrefix;
+
+  /// 是否显示连接值
+  final bool showConnectionValue;
 
   /// 角色名称点击回调
   final ValueChanged<UserTempleApiItem>? onCharacterTap;
@@ -68,7 +86,10 @@ class UserLinkCard extends StatelessWidget {
 
     return SizedBox(
       width: width,
-      height: heightForWidth(width),
+      height: heightForWidth(
+        width,
+        showConnectionValue: showConnectionValue,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -79,8 +100,8 @@ class UserLinkCard extends StatelessWidget {
             leftCharacterName: TinygrailFormatters.decodeHtmlEntities(
               left.name,
             ),
-            leftHeroTag: _heroTag(left, 'left'),
-            onLeftCoverTap: () => _openImageViewer(context, left, 'left'),
+            leftHeroTag: heroTagFor(heroTagPrefix, left),
+            onLeftCoverTap: () => _openImageViewer(context, left),
             onLeftCharacterTap:
                 onCharacterTap == null ? null : () => onCharacterTap!(left),
             onLeftAssetTap: onAssetTap == null ? null : () => onAssetTap!(left),
@@ -89,27 +110,29 @@ class UserLinkCard extends StatelessWidget {
             rightCharacterName: TinygrailFormatters.decodeHtmlEntities(
               right.name,
             ),
-            rightHeroTag: _heroTag(right, 'right'),
-            onRightCoverTap: () => _openImageViewer(context, right, 'right'),
+            rightHeroTag: heroTagFor(heroTagPrefix, right),
+            onRightCoverTap: () => _openImageViewer(context, right),
             onRightCharacterTap:
                 onCharacterTap == null ? null : () => onCharacterTap!(right),
             onRightAssetTap:
                 onAssetTap == null ? null : () => onAssetTap!(right),
           ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.only(left: 4),
-            child: Row(
-              children: [
-                TempleLinkValueChip(
-                  valueLabel: Formatters.tinygrailCompactValue(
-                    item.connectionValue,
-                    prefix: '+',
+          if (showConnectionValue) ...[
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: Row(
+                children: [
+                  TempleLinkValueChip(
+                    valueLabel: Formatters.tinygrailCompactValue(
+                      item.connectionValue,
+                      prefix: '+',
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -119,11 +142,9 @@ class UserLinkCard extends StatelessWidget {
   ///
   /// [context] 当前组件树上下文
   /// [temple] 用户圣殿接口条目
-  /// [side] 连接卡片左右位置
   void _openImageViewer(
     BuildContext context,
     UserTempleApiItem temple,
-    String side,
   ) {
     final coverUrl = TinygrailAssetUrls.getLargeCover(temple.cover);
     final avatarUrl = TinygrailAssetUrls.normalizeAvatar(temple.avatar);
@@ -138,18 +159,10 @@ class UserLinkCard extends StatelessWidget {
         pageBuilder: (context, animation, secondaryAnimation) {
           return FullscreenImageViewerPage(
             imageUrl: imageUrl,
-            heroTag: _heroTag(temple, side),
+            heroTag: heroTagFor(heroTagPrefix, temple),
           );
         },
       ),
     );
-  }
-
-  /// 解析图片 Hero 标识
-  ///
-  /// [temple] 用户圣殿接口条目
-  /// [side] 连接卡片左右位置
-  String _heroTag(UserTempleApiItem temple, String side) {
-    return '$heroTagPrefix-$side-${temple.id}-${temple.characterId}';
   }
 }

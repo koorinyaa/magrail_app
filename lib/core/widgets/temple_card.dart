@@ -24,6 +24,7 @@ class TempleCard extends StatelessWidget {
   /// [onCharacterTap] 角色名称和等级点击回调
   /// [onUserTap] 用户昵称点击回调
   /// [onAssetTap] 圣殿资产入口点击回调
+  /// [onLinkTap] 圣殿 LINK 入口点击回调
   const TempleCard({
     super.key,
     required this.coverUrl,
@@ -43,6 +44,7 @@ class TempleCard extends StatelessWidget {
     this.onCharacterTap,
     this.onUserTap,
     this.onAssetTap,
+    this.onLinkTap,
   });
 
   /// 卡片宽度
@@ -95,6 +97,9 @@ class TempleCard extends StatelessWidget {
 
   /// 圣殿资产入口点击回调
   final VoidCallback? onAssetTap;
+
+  /// 圣殿 LINK 入口点击回调
+  final VoidCallback? onLinkTap;
 
   /// 构建圣殿卡片
   ///
@@ -149,12 +154,25 @@ class TempleCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (onAssetTap != null)
+                if (onAssetTap != null || onLinkTap != null)
                   Positioned(
                     top: 8,
                     right: 8,
-                    child: _TempleCardAssetEntryButton(
-                      onPressed: onAssetTap!,
+                    child: Column(
+                      children: [
+                        if (onAssetTap case final callback?)
+                          _TempleCardEntryButton(
+                            icon: LucideIcons.walletCards,
+                            onPressed: callback,
+                          ),
+                        if (onAssetTap != null && onLinkTap != null)
+                          const SizedBox(height: 8),
+                        if (onLinkTap case final callback?)
+                          _TempleCardEntryButton(
+                            icon: LucideIcons.link,
+                            onPressed: callback,
+                          ),
+                      ],
                     ),
                   ),
                 _buildRoleInfo(),
@@ -317,19 +335,24 @@ class TempleCard extends StatelessWidget {
   }
 }
 
-/// 圣殿资产入口按钮
-class _TempleCardAssetEntryButton extends StatelessWidget {
-  /// 创建圣殿资产入口按钮
+/// 圣殿卡片入口按钮
+class _TempleCardEntryButton extends StatelessWidget {
+  /// 创建圣殿卡片入口按钮
   ///
+  /// [icon] 入口图标
   /// [onPressed] 点击回调
-  const _TempleCardAssetEntryButton({
+  const _TempleCardEntryButton({
+    required this.icon,
     required this.onPressed,
   });
+
+  /// 入口图标
+  final IconData icon;
 
   /// 点击回调
   final VoidCallback onPressed;
 
-  /// 构建圣殿资产入口按钮
+  /// 构建圣殿卡片入口按钮
   ///
   /// [context] 当前组件树上下文
   @override
@@ -342,10 +365,10 @@ class _TempleCardAssetEntryButton extends StatelessWidget {
         customBorder: const CircleBorder(),
         splashColor: Colors.white.withValues(alpha: 0.12),
         highlightColor: Colors.white.withValues(alpha: 0.06),
-        child: const SizedBox.square(
+        child: SizedBox.square(
           dimension: 28,
           child: Icon(
-            LucideIcons.walletCards,
+            icon,
             size: 14,
             color: Colors.white,
           ),

@@ -17,6 +17,7 @@ class CharacterDetailTempleGrid extends StatelessWidget {
   /// [onCharacterTap] 角色点击回调
   /// [onOwnerTap] 拥有者点击回调
   /// [onAssetTap] 圣殿资产卡片入口回调
+  /// [onLinkedAssetTap] LINK 圣殿资产卡片入口回调
   const CharacterDetailTempleGrid({
     super.key,
     required this.items,
@@ -24,6 +25,7 @@ class CharacterDetailTempleGrid extends StatelessWidget {
     this.onCharacterTap,
     this.onOwnerTap,
     this.onAssetTap,
+    this.onLinkedAssetTap,
   });
 
   static const double _horizontalPadding = 12;
@@ -45,6 +47,12 @@ class CharacterDetailTempleGrid extends StatelessWidget {
 
   /// 圣殿资产卡片入口回调
   final ValueChanged<CharacterDetailTempleItem>? onAssetTap;
+
+  /// LINK 圣殿资产卡片入口回调
+  final void Function(
+    CharacterDetailTempleItem ownerItem,
+    CharacterDetailTempleItem linkedItem,
+  )? onLinkedAssetTap;
 
   /// 构建角色详情固定资产自适应网格
   ///
@@ -83,6 +91,7 @@ class CharacterDetailTempleGrid extends StatelessWidget {
                   onCharacterTap: onCharacterTap,
                   onOwnerTap: onOwnerTap,
                   onAssetTap: onAssetTap,
+                  onLinkedAssetTap: onLinkedAssetTap,
                 );
               },
               childCount: items.length,
@@ -103,16 +112,16 @@ class CharacterDetailLinkGrid extends StatelessWidget {
   /// [fallbackCharacterName] 当前角色名称兜底文案
   /// [onCharacterTap] 角色点击回调
   /// [onOwnerTap] 拥有者点击回调
-  /// [onLeftAssetTap] 左侧圣殿资产入口回调
-  /// [onRightAssetTap] 右侧圣殿资产入口回调
+  /// [onTempleAssetTap] 当前角色圣殿资产入口回调
+  /// [onLinkedAssetTap] LINK 圣殿资产入口回调
   const CharacterDetailLinkGrid({
     super.key,
     required this.items,
     required this.fallbackCharacterName,
     this.onCharacterTap,
     this.onOwnerTap,
-    this.onLeftAssetTap,
-    this.onRightAssetTap,
+    this.onTempleAssetTap,
+    this.onLinkedAssetTap,
   });
 
   static const double _horizontalPadding = 12;
@@ -134,14 +143,14 @@ class CharacterDetailLinkGrid extends StatelessWidget {
   /// 拥有者点击回调
   final ValueChanged<CharacterDetailTempleItem>? onOwnerTap;
 
-  /// 左侧圣殿资产入口回调
-  final ValueChanged<CharacterDetailTempleItem>? onLeftAssetTap;
+  /// 当前角色圣殿资产入口回调
+  final ValueChanged<CharacterDetailTempleItem>? onTempleAssetTap;
 
-  /// 右侧圣殿资产入口回调
+  /// LINK 圣殿资产入口回调
   final void Function(
     CharacterDetailTempleItem ownerItem,
     CharacterDetailTempleItem linkedItem,
-  )? onRightAssetTap;
+  )? onLinkedAssetTap;
 
   /// 构建角色详情 LINK 自适应网格
   ///
@@ -182,8 +191,8 @@ class CharacterDetailLinkGrid extends StatelessWidget {
                     heroTagPrefix: 'character-link-page-cover-$index',
                     onCharacterTap: onCharacterTap,
                     onOwnerTap: onOwnerTap,
-                    onLeftAssetTap: onLeftAssetTap,
-                    onRightAssetTap: onRightAssetTap,
+                    onTempleAssetTap: onTempleAssetTap,
+                    onLinkedAssetTap: onLinkedAssetTap,
                   ),
                 );
               },

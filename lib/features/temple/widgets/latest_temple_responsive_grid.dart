@@ -15,6 +15,7 @@ class LatestTempleResponsiveGrid extends StatelessWidget {
   /// [onUserTap] 用户区域点击回调
   /// [onItemBuilt] 条目构建回调
   /// [onAssetTap] 圣殿资产入口点击回调
+  /// [onLinkedAssetTap] LINK 圣殿资产入口点击回调
   const LatestTempleResponsiveGrid({
     super.key,
     required this.items,
@@ -22,6 +23,7 @@ class LatestTempleResponsiveGrid extends StatelessWidget {
     required this.onUserTap,
     this.onItemBuilt,
     this.onAssetTap,
+    this.onLinkedAssetTap,
   });
 
   static const double _horizontalPadding = 12;
@@ -43,6 +45,10 @@ class LatestTempleResponsiveGrid extends StatelessWidget {
 
   /// 圣殿资产入口点击回调
   final ValueChanged<TempleApiItem>? onAssetTap;
+
+  /// LINK 圣殿资产入口点击回调
+  final void Function(TempleApiItem ownerItem, TempleApiItem linkedItem)?
+      onLinkedAssetTap;
 
   /// 构建最新圣殿自适应瀑布网格
   ///
@@ -81,6 +87,7 @@ class LatestTempleResponsiveGrid extends StatelessWidget {
                   onCharacterTap: onCharacterTap,
                   onUserTap: onUserTap,
                   onAssetTap: onAssetTap,
+                  onLinkedAssetTap: onLinkedAssetTap,
                 );
               },
               childCount: items.length,

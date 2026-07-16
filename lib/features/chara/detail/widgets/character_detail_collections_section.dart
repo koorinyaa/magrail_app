@@ -162,8 +162,8 @@ class _CharacterDetailCollectionsSectionState
           heroTagPrefix: 'character-link-preview-$index',
           onCharacterTap: _openCharacter,
           onOwnerTap: _openOwner,
-          onLeftAssetTap: _openTempleAssetCard,
-          onRightAssetTap: _openLinkedTempleAssetCard,
+          onTempleAssetTap: _openTempleAssetCard,
+          onLinkedAssetTap: _openLinkedTempleAssetCard,
         );
       },
     );
@@ -208,6 +208,7 @@ class _CharacterDetailCollectionsSectionState
           onCharacterTap: _openCharacter,
           onOwnerTap: _openOwner,
           onAssetTap: _openTempleAssetCard,
+          onLinkedAssetTap: _openLinkedTempleAssetCard,
         );
       },
     );
@@ -276,10 +277,10 @@ class _CharacterDetailCollectionsSectionState
     );
   }
 
-  /// 打开 LINK 右侧圣殿资产卡片弹窗
+  /// 打开 LINK 圣殿资产卡片弹窗
   ///
   /// [ownerItem] 拥有者字段来源条目
-  /// [linkedItem] LINK 右侧圣殿条目
+  /// [linkedItem] LINK 圣殿条目
   void _openLinkedTempleAssetCard(
     CharacterDetailTempleItem ownerItem,
     CharacterDetailTempleItem linkedItem,

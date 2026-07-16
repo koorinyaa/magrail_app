@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:magrail_app/core/network/tinygrail_response.dart';
+import 'package:magrail_app/core/utils/tinygrail_temple_link_order.dart';
 import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
 
 /// 用户连接接口条目
@@ -36,7 +37,7 @@ class UserLinkApiItem {
   /// 左侧展示圣殿
   UserTempleApiItem get left {
     final linked = link;
-    if (linked == null || temple.sacrifices >= linked.sacrifices) {
+    if (linked == null || _keepsTempleOnLeft(linked)) {
       return temple;
     }
 
@@ -46,11 +47,23 @@ class UserLinkApiItem {
   /// 右侧展示圣殿
   UserTempleApiItem get right {
     final linked = link;
-    if (linked == null || temple.sacrifices >= linked.sacrifices) {
+    if (linked == null || _keepsTempleOnLeft(linked)) {
       return linked ?? temple;
     }
 
     return temple;
+  }
+
+  /// 判断当前圣殿是否保留在左侧
+  ///
+  /// [linked] LINK 另一侧圣殿
+  bool _keepsTempleOnLeft(UserTempleApiItem linked) {
+    return TinygrailTempleLinkOrder.keepsFirstOnLeft(
+      firstSacrifices: temple.sacrifices,
+      firstCreate: temple.create,
+      secondSacrifices: linked.sacrifices,
+      secondCreate: linked.create,
+    );
   }
 
   /// 从 JSON 创建用户连接接口条目

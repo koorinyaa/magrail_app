@@ -99,6 +99,7 @@ class _LatestTemplePageState extends State<LatestTemplePage> {
             onUserTap: _openUser,
             onItemBuilt: onItemBuilt,
             onAssetTap: _openTempleAssetDialog,
+            onLinkedAssetTap: _openLinkedTempleAssetDialog,
           ),
         ];
       },
@@ -138,6 +139,32 @@ class _LatestTemplePageState extends State<LatestTemplePage> {
           ownerName: item.name,
           ownerNickname: item.nickname,
           characterId: item.characterId,
+        ),
+        characterRepository: widget.characterDetailRepository,
+        templeRepository: widget.repository,
+        magicRepository: widget.magicRepository,
+        oosRepository: widget.oosRepository,
+        userRepository: widget.userRepository,
+        currentUserName: _currentUserName,
+      ),
+    );
+  }
+
+  /// 打开 LINK 圣殿资产弹窗
+  ///
+  /// [ownerItem] 提供拥有者字段的最新圣殿条目
+  /// [linkedItem] 提供角色字段的 LINK 圣殿条目
+  void _openLinkedTempleAssetDialog(
+    TempleApiItem ownerItem,
+    TempleApiItem linkedItem,
+  ) {
+    unawaited(
+      showTempleAssetCardDialogFromSource(
+        context,
+        source: TempleAssetDialogSource(
+          ownerName: ownerItem.name,
+          ownerNickname: ownerItem.nickname,
+          characterId: linkedItem.characterId,
         ),
         characterRepository: widget.characterDetailRepository,
         templeRepository: widget.repository,

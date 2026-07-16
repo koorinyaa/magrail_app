@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
 import 'package:magrail_app/core/utils/tinygrail_formatters.dart';
+import 'package:magrail_app/core/utils/tinygrail_temple_link_order.dart';
 import 'package:magrail_app/core/viewer/fullscreen_image_viewer_page.dart';
 import 'package:magrail_app/core/widgets/temple_card.dart';
+import 'package:magrail_app/core/widgets/temple_link_card.dart';
+import 'package:magrail_app/core/widgets/temple_link_dialog.dart';
+import 'package:magrail_app/core/widgets/temple_linked_cover_stack.dart';
 import 'package:magrail_app/features/temple/model/temple_api_item.dart';
 
 /// 最新圣殿条目卡片
@@ -15,6 +19,7 @@ class LatestTempleCard extends StatelessWidget {
   /// [onCharacterTap] 角色区域点击回调
   /// [onUserTap] 用户区域点击回调
   /// [onAssetTap] 圣殿资产入口点击回调
+  /// [onLinkedAssetTap] LINK 圣殿资产入口点击回调
   const LatestTempleCard({
     super.key,
     required this.item,
@@ -23,6 +28,7 @@ class LatestTempleCard extends StatelessWidget {
     this.onCharacterTap,
     this.onUserTap,
     this.onAssetTap,
+    this.onLinkedAssetTap,
   });
 
   /// 最新圣殿条目
@@ -43,13 +49,21 @@ class LatestTempleCard extends StatelessWidget {
   /// 圣殿资产入口点击回调
   final ValueChanged<TempleApiItem>? onAssetTap;
 
+  /// LINK 圣殿资产入口点击回调
+  final void Function(TempleApiItem ownerItem, TempleApiItem linkedItem)?
+      onLinkedAssetTap;
+
   /// 构建最新圣殿条目卡片
   ///
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return TempleCard(
-      width: width,
+    final linkedTemple = item.link;
+    final coverWidth = linkedTemple == null
+        ? width
+        : TempleLinkedCoverStack.coverWidthFor(width);
+    final mainCard = TempleCard(
+      width: coverWidth,
       coverUrl: TinygrailAssetUrls.getSmallCover(item.cover),
       avatarUrl: TinygrailAssetUrls.normalizeAvatar(item.avatar),
       characterName: TinygrailFormatters.decodeHtmlEntities(
@@ -66,6 +80,80 @@ class LatestTempleCard extends StatelessWidget {
       onCharacterTap: () => onCharacterTap?.call(item),
       onUserTap: () => onUserTap?.call(item),
       onAssetTap: onAssetTap == null ? null : () => onAssetTap!(item),
+      onLinkTap: linkedTemple == null ? null : () => _openLinkDialog(context),
+    );
+    if (linkedTemple == null) {
+      return mainCard;
+    }
+
+    return TempleLinkedCoverStack(
+      width: width,
+      frontCover: mainCard,
+      linkedCover: TempleLinkedCover(
+        width: coverWidth,
+        coverUrl: TinygrailAssetUrls.getSmallCover(linkedTemple.cover),
+        avatarUrl: TinygrailAssetUrls.normalizeAvatar(linkedTemple.avatar),
+      ),
+    );
+  }
+
+  /// 打开最新圣殿 LINK 弹窗
+  ///
+  /// [context] 当前组件树上下文
+  void _openLinkDialog(BuildContext context) {
+    final linkedTemple = item.link;
+    if (linkedTemple == null) {
+      return;
+    }
+    final currentOnLeft = TinygrailTempleLinkOrder.keepsFirstOnLeft(
+      firstSacrifices: item.sacrifices,
+      firstCreate: item.create,
+      secondSacrifices: linkedTemple.sacrifices,
+      secondCreate: linkedTemple.create,
+    );
+    final leftTemple = currentOnLeft ? item : linkedTemple;
+    final rightTemple = currentOnLeft ? linkedTemple : item;
+
+    showTempleLinkDialog(
+      context,
+      cardBuilder: (cardWidth) {
+        return TempleLinkCard(
+          width: cardWidth,
+          leftCoverUrl: TinygrailAssetUrls.getSmallCover(leftTemple.cover),
+          leftAvatarUrl: TinygrailAssetUrls.normalizeAvatar(
+            leftTemple.avatar,
+          ),
+          leftCharacterName: TinygrailFormatters.decodeHtmlEntities(
+            leftTemple.characterName,
+          ),
+          onLeftCoverTap: () => _openImageViewer(context, leftTemple),
+          onLeftCharacterTap:
+              onCharacterTap == null ? null : () => onCharacterTap!(leftTemple),
+          onLeftAssetTap: currentOnLeft
+              ? (onAssetTap == null ? null : () => onAssetTap!(item))
+              : (onLinkedAssetTap == null
+                  ? null
+                  : () => onLinkedAssetTap!(item, linkedTemple)),
+          rightCoverUrl: TinygrailAssetUrls.getSmallCover(
+            rightTemple.cover,
+          ),
+          rightAvatarUrl: TinygrailAssetUrls.normalizeAvatar(
+            rightTemple.avatar,
+          ),
+          rightCharacterName: TinygrailFormatters.decodeHtmlEntities(
+            rightTemple.characterName,
+          ),
+          onRightCoverTap: () => _openImageViewer(context, rightTemple),
+          onRightCharacterTap: onCharacterTap == null
+              ? null
+              : () => onCharacterTap!(rightTemple),
+          onRightAssetTap: currentOnLeft
+              ? (onLinkedAssetTap == null
+                  ? null
+                  : () => onLinkedAssetTap!(item, linkedTemple))
+              : (onAssetTap == null ? null : () => onAssetTap!(item)),
+        );
+      },
     );
   }
 

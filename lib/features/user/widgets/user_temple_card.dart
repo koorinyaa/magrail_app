@@ -4,7 +4,11 @@ import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
 import 'package:magrail_app/core/utils/tinygrail_formatters.dart';
 import 'package:magrail_app/core/viewer/fullscreen_image_viewer_page.dart';
 import 'package:magrail_app/core/widgets/temple_card.dart';
+import 'package:magrail_app/core/widgets/temple_linked_cover_stack.dart';
+import 'package:magrail_app/features/user/model/user_link_api_item.dart';
 import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
+import 'package:magrail_app/features/user/widgets/user_link_card.dart';
+import 'package:magrail_app/features/user/widgets/user_temple_link_dialog.dart';
 
 /// 用户圣殿卡片
 class UserTempleCard extends StatelessWidget {
@@ -69,29 +73,47 @@ class UserTempleCard extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
+    final linkedTemple = item.link;
+    final stackedWidth = TempleLinkedCoverStack.coverWidthFor(width);
+    final mainCard = TempleCard(
+      width: linkedTemple == null ? width : stackedWidth,
+      coverUrl: TinygrailAssetUrls.getSmallCover(item.cover),
+      avatarUrl: TinygrailAssetUrls.normalizeAvatar(item.avatar),
+      characterName: TinygrailFormatters.decodeHtmlEntities(item.name),
+      characterLevel: item.characterLevel,
+      zeroCount: item.zeroCount,
+      ownerLabel: ownerLabel,
+      templeLevel: item.level,
+      refine: item.refine,
+      starForces: item.starForces,
+      heroTag: _coverHeroTag(item),
+      onTap: () => _openImageViewer(context, item),
+      onCharacterTap:
+          onCharacterTap == null ? null : () => onCharacterTap!(item),
+      onAssetTap: onAssetTap == null ? null : () => onAssetTap!(item),
+      onLinkTap: linkedTemple == null ? null : () => _openLinkDialog(context),
+    );
+    final cover = linkedTemple == null
+        ? mainCard
+        : TempleLinkedCoverStack(
+            width: width,
+            frontCover: mainCard,
+            linkedCover: TempleLinkedCover(
+              width: stackedWidth,
+              coverUrl: TinygrailAssetUrls.getSmallCover(linkedTemple.cover),
+              avatarUrl: TinygrailAssetUrls.normalizeAvatar(
+                linkedTemple.avatar,
+              ),
+              heroTag: _coverHeroTag(linkedTemple),
+            ),
+          );
     return SizedBox(
       width: width,
       height: heightForWidth(width),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TempleCard(
-            width: width,
-            coverUrl: TinygrailAssetUrls.getSmallCover(item.cover),
-            avatarUrl: TinygrailAssetUrls.normalizeAvatar(item.avatar),
-            characterName: TinygrailFormatters.decodeHtmlEntities(item.name),
-            characterLevel: item.characterLevel,
-            zeroCount: item.zeroCount,
-            ownerLabel: ownerLabel,
-            templeLevel: item.level,
-            refine: item.refine,
-            starForces: item.starForces,
-            heroTag: _heroTag(item),
-            onTap: () => _openImageViewer(context, item),
-            onCharacterTap:
-                onCharacterTap == null ? null : () => onCharacterTap!(item),
-            onAssetTap: onAssetTap == null ? null : () => onAssetTap!(item),
-          ),
+          cover,
           const SizedBox(height: 8),
           _TempleAssetProgress(item: item),
           if (sortValue case final value?) ...[
@@ -121,7 +143,7 @@ class UserTempleCard extends StatelessWidget {
         pageBuilder: (context, animation, secondaryAnimation) {
           return FullscreenImageViewerPage(
             imageUrl: imageUrl,
-            heroTag: _heroTag(temple),
+            heroTag: _coverHeroTag(temple),
           );
         },
       ),
@@ -133,6 +155,40 @@ class UserTempleCard extends StatelessWidget {
   /// [temple] 用户圣殿接口条目
   String _heroTag(UserTempleApiItem temple) {
     return '$heroTagPrefix-${temple.id}-${temple.characterId}';
+  }
+
+  /// 解析当前封面的 Hero 标识
+  ///
+  /// [temple] 用户圣殿接口条目
+  String _coverHeroTag(UserTempleApiItem temple) {
+    if (item.link == null) {
+      return _heroTag(temple);
+    }
+
+    return UserLinkCard.heroTagFor(_linkHeroTagPrefix, temple);
+  }
+
+  /// LINK 弹窗封面 Hero 标识前缀
+  String get _linkHeroTagPrefix {
+    return '$heroTagPrefix-link-${item.id}-${item.characterId}';
+  }
+
+  /// 打开用户圣殿 LINK 弹窗
+  ///
+  /// [context] 当前组件树上下文
+  void _openLinkDialog(BuildContext context) {
+    final linkedTemple = item.link;
+    if (linkedTemple == null) {
+      return;
+    }
+
+    showUserTempleLinkDialog(
+      context,
+      item: UserLinkApiItem(temple: item, link: linkedTemple),
+      heroTagPrefix: _linkHeroTagPrefix,
+      onCharacterTap: onCharacterTap,
+      onAssetTap: onAssetTap,
+    );
   }
 }
 

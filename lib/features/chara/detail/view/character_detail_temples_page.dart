@@ -135,6 +135,7 @@ class _CharacterDetailTemplesPageState
                   onCharacterTap: _openCharacter,
                   onOwnerTap: _openOwner,
                   onAssetTap: _openTempleAssetCard,
+                  onLinkedAssetTap: _openLinkedTempleAssetCard,
                 ),
               if (!isStateOnlyContent)
                 SliverToBoxAdapter(
@@ -206,17 +207,46 @@ class _CharacterDetailTemplesPageState
     );
   }
 
+  /// 打开 LINK 圣殿资产卡片弹窗
+  ///
+  /// [ownerItem] 提供拥有者字段的角色圣殿条目
+  /// [linkedItem] 提供角色字段的 LINK 圣殿条目
+  void _openLinkedTempleAssetCard(
+    CharacterDetailTempleItem ownerItem,
+    CharacterDetailTempleItem linkedItem,
+  ) {
+    unawaited(
+      showTempleAssetCardDialogFromSource(
+        context,
+        source: _sourceForTemple(
+          ownerItem,
+          characterId: linkedItem.characterId,
+        ),
+        characterRepository: widget.repository,
+        templeRepository: widget.templeRepository,
+        magicRepository: widget.magicRepository,
+        oosRepository: widget.oosRepository,
+        userRepository: widget.userRepository,
+        currentUserName: widget.currentUserName,
+      ),
+    );
+  }
+
   /// 创建圣殿资产弹窗入口数据
   ///
   /// [item] 角色详情圣殿条目
-  TempleAssetDialogSource _sourceForTemple(CharacterDetailTempleItem item) {
-    final characterId =
-        item.characterId > 0 ? item.characterId : widget.characterId;
+  /// [characterId] 覆盖打开的角色 ID
+  TempleAssetDialogSource _sourceForTemple(
+    CharacterDetailTempleItem item, {
+    int? characterId,
+  }) {
+    final resolvedCharacterId = characterId ??
+        (item.characterId > 0 ? item.characterId : widget.characterId);
 
     return TempleAssetDialogSource(
       ownerName: item.ownerName,
       ownerNickname: item.ownerNickname,
-      characterId: characterId,
+      characterId: resolvedCharacterId,
     );
   }
 

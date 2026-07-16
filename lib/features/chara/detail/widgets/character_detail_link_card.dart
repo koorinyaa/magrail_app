@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:magrail_app/core/utils/formatters.dart';
 import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
 import 'package:magrail_app/core/utils/tinygrail_formatters.dart';
+import 'package:magrail_app/core/utils/tinygrail_temple_link_order.dart';
 import 'package:magrail_app/core/viewer/fullscreen_image_viewer_page.dart';
 import 'package:magrail_app/core/widgets/temple_link_card.dart';
 import 'package:magrail_app/core/widgets/temple_link_value_chip.dart';
@@ -18,8 +19,8 @@ class CharacterDetailLinkCard extends StatelessWidget {
   /// [heroTagPrefix] 图片 Hero 标识前缀
   /// [onCharacterTap] 角色点击回调
   /// [onOwnerTap] 拥有者点击回调
-  /// [onLeftAssetTap] 左侧圣殿资产入口回调
-  /// [onRightAssetTap] 右侧圣殿资产入口回调
+  /// [onTempleAssetTap] 当前角色圣殿资产入口回调
+  /// [onLinkedAssetTap] LINK 圣殿资产入口回调
   const CharacterDetailLinkCard({
     super.key,
     required this.item,
@@ -28,8 +29,8 @@ class CharacterDetailLinkCard extends StatelessWidget {
     this.heroTagPrefix = 'character-link-cover',
     this.onCharacterTap,
     this.onOwnerTap,
-    this.onLeftAssetTap,
-    this.onRightAssetTap,
+    this.onTempleAssetTap,
+    this.onLinkedAssetTap,
   });
 
   /// 默认卡片宽度
@@ -59,14 +60,14 @@ class CharacterDetailLinkCard extends StatelessWidget {
   /// 拥有者点击回调
   final ValueChanged<CharacterDetailTempleItem>? onOwnerTap;
 
-  /// 左侧圣殿资产入口回调
-  final ValueChanged<CharacterDetailTempleItem>? onLeftAssetTap;
+  /// 当前角色圣殿资产入口回调
+  final ValueChanged<CharacterDetailTempleItem>? onTempleAssetTap;
 
-  /// 右侧圣殿资产入口回调
+  /// LINK 圣殿资产入口回调
   final void Function(
     CharacterDetailTempleItem ownerItem,
     CharacterDetailTempleItem linkedItem,
-  )? onRightAssetTap;
+  )? onLinkedAssetTap;
 
   /// 根据卡片宽度计算卡片高度
   ///
@@ -84,6 +85,14 @@ class CharacterDetailLinkCard extends StatelessWidget {
     if (linked == null) {
       return const SizedBox.shrink();
     }
+    final currentOnLeft = TinygrailTempleLinkOrder.keepsFirstOnLeft(
+      firstSacrifices: item.sacrifices,
+      firstCreate: item.create,
+      secondSacrifices: linked.sacrifices,
+      secondCreate: linked.create,
+    );
+    final left = currentOnLeft ? item : linked;
+    final right = currentOnLeft ? linked : item;
 
     return SizedBox(
       width: width,
@@ -93,29 +102,42 @@ class CharacterDetailLinkCard extends StatelessWidget {
         children: [
           TempleLinkCard(
             width: width,
-            leftCoverUrl: TinygrailAssetUrls.getSmallCover(item.cover),
-            leftAvatarUrl: TinygrailAssetUrls.normalizeAvatar(item.avatar),
+            leftCoverUrl: TinygrailAssetUrls.getSmallCover(left.cover),
+            leftAvatarUrl: TinygrailAssetUrls.normalizeAvatar(left.avatar),
             leftCharacterName: TinygrailFormatters.decodeHtmlEntities(
-              item.displayCharacterName(fallbackCharacterName),
+              left.displayCharacterName(
+                currentOnLeft ? fallbackCharacterName : '连接角色',
+              ),
             ),
-            leftHeroTag: _heroTag(item, 'left'),
-            onLeftCoverTap: () => _openImageViewer(context, item, 'left'),
+            leftHeroTag: _heroTag(left, 'left'),
+            onLeftCoverTap: () => _openImageViewer(context, left, 'left'),
             onLeftCharacterTap:
-                onCharacterTap == null ? null : () => onCharacterTap!(item),
-            onLeftAssetTap:
-                onLeftAssetTap == null ? null : () => onLeftAssetTap!(item),
-            rightCoverUrl: TinygrailAssetUrls.getSmallCover(linked.cover),
-            rightAvatarUrl: TinygrailAssetUrls.normalizeAvatar(linked.avatar),
+                onCharacterTap == null ? null : () => onCharacterTap!(left),
+            onLeftAssetTap: currentOnLeft
+                ? (onTempleAssetTap == null
+                    ? null
+                    : () => onTempleAssetTap!(item))
+                : (onLinkedAssetTap == null
+                    ? null
+                    : () => onLinkedAssetTap!(item, linked)),
+            rightCoverUrl: TinygrailAssetUrls.getSmallCover(right.cover),
+            rightAvatarUrl: TinygrailAssetUrls.normalizeAvatar(right.avatar),
             rightCharacterName: TinygrailFormatters.decodeHtmlEntities(
-              linked.displayCharacterName('连接角色'),
+              right.displayCharacterName(
+                currentOnLeft ? '连接角色' : fallbackCharacterName,
+              ),
             ),
-            rightHeroTag: _heroTag(linked, 'right'),
-            onRightCoverTap: () => _openImageViewer(context, linked, 'right'),
+            rightHeroTag: _heroTag(right, 'right'),
+            onRightCoverTap: () => _openImageViewer(context, right, 'right'),
             onRightCharacterTap:
-                onCharacterTap == null ? null : () => onCharacterTap!(linked),
-            onRightAssetTap: onRightAssetTap == null
-                ? null
-                : () => onRightAssetTap!(item, linked),
+                onCharacterTap == null ? null : () => onCharacterTap!(right),
+            onRightAssetTap: currentOnLeft
+                ? (onLinkedAssetTap == null
+                    ? null
+                    : () => onLinkedAssetTap!(item, linked))
+                : (onTempleAssetTap == null
+                    ? null
+                    : () => onTempleAssetTap!(item)),
           ),
           const SizedBox(height: 8),
           Padding(

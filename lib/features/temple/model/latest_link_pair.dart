@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:magrail_app/core/utils/tinygrail_formatters.dart';
+import 'package:magrail_app/core/utils/tinygrail_temple_link_order.dart';
 import 'package:magrail_app/features/temple/model/latest_link_api_item.dart';
 
 /// 最新连接展示组
@@ -104,20 +104,12 @@ class LatestLinkPair {
     LatestLinkApiItem first,
     LatestLinkApiItem second,
   ) {
-    if (first.sacrifices != second.sacrifices) {
-      return first.sacrifices > second.sacrifices
-          ? (first, second)
-          : (second, first);
-    }
-
-    final firstCreate = TinygrailFormatters.parseServerTime(first.create);
-    final secondCreate = TinygrailFormatters.parseServerTime(second.create);
-    if (firstCreate != null &&
-        secondCreate != null &&
-        firstCreate.isBefore(secondCreate)) {
-      return (second, first);
-    }
-
-    return (first, second);
+    final keepsFirstOnLeft = TinygrailTempleLinkOrder.keepsFirstOnLeft(
+      firstSacrifices: first.sacrifices,
+      firstCreate: first.create,
+      secondSacrifices: second.sacrifices,
+      secondCreate: second.create,
+    );
+    return keepsFirstOnLeft ? (first, second) : (second, first);
   }
 }

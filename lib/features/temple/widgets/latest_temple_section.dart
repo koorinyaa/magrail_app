@@ -136,6 +136,13 @@ class LatestTempleCarousel extends StatelessWidget {
             );
           },
           onAssetTap: (item) => _openTempleAssetDialog(context, item),
+          onLinkedAssetTap: (ownerItem, linkedItem) {
+            _openLinkedTempleAssetDialog(
+              context,
+              ownerItem,
+              linkedItem,
+            );
+          },
         );
       },
     );
@@ -153,6 +160,34 @@ class LatestTempleCarousel extends StatelessWidget {
           ownerName: item.name,
           ownerNickname: item.nickname,
           characterId: item.characterId,
+        ),
+        characterRepository: characterDetailRepository,
+        templeRepository: templeRepository,
+        magicRepository: magicRepository,
+        oosRepository: oosRepository,
+        userRepository: userRepository,
+        currentUserName: _currentUserName,
+      ),
+    );
+  }
+
+  /// 打开 LINK 圣殿资产弹窗
+  ///
+  /// [context] 当前组件树上下文
+  /// [ownerItem] 提供拥有者字段的最新圣殿条目
+  /// [linkedItem] 提供角色字段的 LINK 圣殿条目
+  void _openLinkedTempleAssetDialog(
+    BuildContext context,
+    TempleApiItem ownerItem,
+    TempleApiItem linkedItem,
+  ) {
+    unawaited(
+      showTempleAssetCardDialogFromSource(
+        context,
+        source: TempleAssetDialogSource(
+          ownerName: ownerItem.name,
+          ownerNickname: ownerItem.nickname,
+          characterId: linkedItem.characterId,
         ),
         characterRepository: characterDetailRepository,
         templeRepository: templeRepository,

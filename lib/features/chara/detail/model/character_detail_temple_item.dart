@@ -23,6 +23,7 @@ class CharacterDetailTempleItem {
   /// [level] 圣殿等级
   /// [starForces] 圣殿星之力
   /// [refine] 精炼等级
+  /// [create] 圣殿创建时间
   /// [link] LINK 另一侧圣殿
   const CharacterDetailTempleItem({
     required this.id,
@@ -41,6 +42,7 @@ class CharacterDetailTempleItem {
     required this.level,
     required this.starForces,
     required this.refine,
+    required this.create,
     this.link,
   });
 
@@ -91,6 +93,9 @@ class CharacterDetailTempleItem {
 
   /// 精炼等级
   final int refine;
+
+  /// 圣殿创建时间
+  final String create;
 
   /// LINK 另一侧圣殿
   final CharacterDetailTempleItem? link;
@@ -173,6 +178,7 @@ class CharacterDetailTempleItem {
       level: TinygrailResponseParser.asInt(json['Level']),
       starForces: TinygrailResponseParser.asInt(json['StarForces']),
       refine: TinygrailResponseParser.asInt(json['Refine']),
+      create: TinygrailResponseParser.asString(json['Create']),
       link: linkJson == null
           ? null
           : CharacterDetailTempleItem._fromJson(
