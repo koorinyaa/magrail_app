@@ -170,7 +170,6 @@ class _CharacterDetailTemplesPageState
       context,
       characterId: item.characterId,
       name: _routeCharacterName(item),
-      avatarUrl: item.avatar,
     );
   }
 

@@ -161,7 +161,6 @@ class _UserStarlightTemplePageState extends State<UserStarlightTemplePage> {
       context,
       characterId: item.characterId,
       name: item.name,
-      avatarUrl: item.avatar,
     );
   }
 

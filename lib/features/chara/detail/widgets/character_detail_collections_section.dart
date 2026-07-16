@@ -255,7 +255,6 @@ class _CharacterDetailCollectionsSectionState
       context,
       characterId: item.characterId,
       name: item.displayCharacterName(widget.header.name),
-      avatarUrl: item.avatar,
     );
   }
 

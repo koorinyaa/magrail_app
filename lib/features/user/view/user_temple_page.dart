@@ -417,7 +417,6 @@ class _UserTemplePageState extends State<UserTemplePage> {
       context,
       characterId: item.characterId,
       name: item.name,
-      avatarUrl: item.avatar,
     );
   }
 

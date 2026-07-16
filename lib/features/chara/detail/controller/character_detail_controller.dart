@@ -293,6 +293,33 @@ class CharacterDetailController extends ChangeNotifier {
     _openCharacter(item);
   }
 
+  /// 合并当前角色入口提供的非空历史字段
+  ///
+  /// [item] 当前角色入口提供的角色资料
+  void mergeCurrentHistoryItem(CharacterDetailHistoryItem item) {
+    final current = _current;
+    if (current == null || current.characterId != item.characterId) {
+      return;
+    }
+
+    final mergedItem = item.mergeWith(current);
+    if (mergedItem.name == current.name &&
+        mergedItem.avatarUrl == current.avatarUrl) {
+      return;
+    }
+
+    _current = mergedItem;
+    _history = List<CharacterDetailHistoryItem>.unmodifiable(
+      _history.map(
+        (historyItem) => historyItem.characterId == item.characterId
+            ? mergedItem
+            : historyItem,
+      ),
+    );
+    _CharacterDetailControllerHistory(this)._persistHistory();
+    _notifyIfActive();
+  }
+
   /// 投票删除当前角色
   ///
   /// [reason] 删除理由

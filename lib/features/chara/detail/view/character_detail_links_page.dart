@@ -280,7 +280,6 @@ class _CharacterDetailLinksPageState extends State<CharacterDetailLinksPage> {
       context,
       characterId: item.characterId,
       name: _routeCharacterName(item),
-      avatarUrl: item.avatar,
     );
   }
 

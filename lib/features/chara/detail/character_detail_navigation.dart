@@ -22,7 +22,7 @@ void openCharacterDetail(
   final resolvedName =
       TinygrailFormatters.decodeHtmlEntities(name ?? '').trim();
   final trimmedAvatarUrl = avatarUrl?.trim();
-  final resolvedAvatarUrl = trimmedAvatarUrl == null
+  final resolvedAvatarUrl = trimmedAvatarUrl == null || trimmedAvatarUrl.isEmpty
       ? ''
       : TinygrailAssetUrls.normalizeAvatar(trimmedAvatarUrl);
   final resolvedAvatarHeroTag = avatarHeroTag?.trim() ?? '';
@@ -38,7 +38,9 @@ void openCharacterDetail(
 
   // 当前已在角色详情页时复用页面 Key，由页面内部切换角色并避免新页面动画
   if (currentRouteName == _characterDetailRouteName) {
-    if (_currentCharacterDetailId(router) == characterId) {
+    if (_currentCharacterDetailId(router) == characterId &&
+        resolvedName.isEmpty &&
+        resolvedAvatarUrl.isEmpty) {
       return;
     }
 

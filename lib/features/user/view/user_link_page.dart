@@ -166,7 +166,6 @@ class _UserLinkPageState extends State<UserLinkPage> {
       context,
       characterId: item.characterId,
       name: item.name,
-      avatarUrl: item.avatar,
     );
   }
 

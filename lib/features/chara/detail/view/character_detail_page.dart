@@ -149,20 +149,22 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
   void didUpdateWidget(covariant CharacterDetailPage oldWidget) {
     super.didUpdateWidget(oldWidget);
     final characterId = widget.characterId;
-    if (characterId == null ||
-        characterId <= 0 ||
-        characterId == oldWidget.characterId) {
+    if (characterId == null || characterId <= 0) {
+      return;
+    }
+
+    final item = CharacterDetailHistoryItem(
+      characterId: characterId,
+      name: widget.initialName?.trim() ?? '',
+      avatarUrl: widget.initialAvatarUrl?.trim() ?? '',
+    );
+    if (characterId == oldWidget.characterId) {
+      _controller.mergeCurrentHistoryItem(item);
       return;
     }
 
     unawaited(
-      _switchToCharacter(
-        CharacterDetailHistoryItem(
-          characterId: characterId,
-          name: widget.initialName?.trim() ?? '',
-          avatarUrl: widget.initialAvatarUrl?.trim() ?? '',
-        ),
-      ),
+      _switchToCharacter(item),
     );
   }
 

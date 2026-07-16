@@ -222,7 +222,6 @@ extension _UserDetailPageNavigation on _UserDetailPageState {
       context,
       characterId: item.characterId,
       name: item.name,
-      avatarUrl: item.avatar,
     );
   }
 
