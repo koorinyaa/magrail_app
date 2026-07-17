@@ -3,7 +3,7 @@ import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
 import 'package:magrail_app/core/widgets/pagination_footer_sliver.dart';
-import 'package:magrail_app/core/widgets/secondary_page_sliver_app_bar.dart';
+import 'package:magrail_app/core/widgets/secondary_page_refresh_view.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_hero.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
 import 'package:magrail_app/features/chara/tower/controller/tower_ranking_page_controller.dart';
@@ -77,58 +77,53 @@ class _TowerRankingPageState extends State<TowerRankingPage> {
           final isStateOnlyContent = !_controller.isInitialLoading &&
               (_controller.initialError != null || entries.isEmpty);
 
-          return RefreshIndicator(
+          return SecondaryPageRefreshView(
+            title: '通天塔(β)',
+            bottom: TowerRankingRangeHeader(
+              selectedIndex: _controller.selectedSegmentIndex,
+              segmentCount: _controller.segmentCount,
+              onSelected: _selectSegment,
+            ),
             onRefresh: _controller.refresh,
-            child: CustomScrollView(
-              controller: _scrollController,
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                SecondaryPageSliverAppBar(
-                  title: '通天塔(β)',
-                  bottom: TowerRankingRangeHeader(
-                    selectedIndex: _controller.selectedSegmentIndex,
-                    segmentCount: _controller.segmentCount,
-                    onSelected: _selectSegment,
+            scrollController: _scrollController,
+            slivers: [
+              if (_controller.isInitialLoading)
+                const _TowerRankingSkeletonList()
+              else if (_controller.initialError != null)
+                AppLoadFailedSliver(
+                  message: '请检查网络后重试',
+                  onActionPressed: () {
+                    _controller.loadPage(
+                      _controller.selectedStartPage,
+                      force: true,
+                    );
+                  },
+                )
+              else if (entries.isEmpty)
+                const _TowerRankingStateSliver(
+                  title: '暂无通天塔数据',
+                  message: '当前没有可展示的榜单角色',
+                  icon: Icons.hourglass_empty_rounded,
+                )
+              else ...[
+                SliverFixedExtentList(
+                  itemExtent: _listItemExtent,
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      return _TowerRankingEntryItem(entry: entries[index]);
+                    },
+                    childCount: entries.length,
                   ),
                 ),
-                if (_controller.isInitialLoading)
-                  const _TowerRankingSkeletonList()
-                else if (_controller.initialError != null)
-                  AppLoadFailedSliver(
-                    message: '请检查网络后重试',
-                    onActionPressed: () {
-                      _controller.loadPage(
-                        _controller.selectedStartPage,
-                        force: true,
-                      );
-                    },
-                  )
-                else if (entries.isEmpty)
-                  const _TowerRankingStateSliver(
-                    title: '暂无通天塔数据',
-                    message: '当前没有可展示的榜单角色',
-                    icon: Icons.hourglass_empty_rounded,
-                  )
-                else ...[
-                  SliverFixedExtentList(
-                    itemExtent: _listItemExtent,
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return _TowerRankingEntryItem(entry: entries[index]);
-                      },
-                      childCount: entries.length,
-                    ),
-                  ),
-                  _TowerRankingFooter(controller: _controller),
-                ],
-                if (!isStateOnlyContent)
-                  SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: 24 + MediaQuery.paddingOf(context).bottom,
-                    ),
-                  ),
+                _TowerRankingFooter(controller: _controller),
               ],
-            ),
+              if (!isStateOnlyContent)
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 24 + MediaQuery.paddingOf(context).bottom,
+                  ),
+                ),
+            ],
           );
         },
       ),

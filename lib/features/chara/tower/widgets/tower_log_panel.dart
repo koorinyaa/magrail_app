@@ -8,7 +8,7 @@ import 'package:magrail_app/core/utils/tinygrail_formatters.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
 import 'package:magrail_app/core/widgets/character_avatar.dart';
 import 'package:magrail_app/core/widgets/pagination_footer.dart';
-import 'package:magrail_app/core/widgets/secondary_page_sliver_app_bar.dart';
+import 'package:magrail_app/core/widgets/secondary_page_refresh_view.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_hero.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
 import 'package:magrail_app/features/chara/tower/controller/tower_log_controller.dart';
@@ -63,11 +63,11 @@ class TowerLogPanel extends StatelessWidget {
                     controller.historyItems.isEmpty &&
                     !controller.hasLargeRealtimeUpdate));
 
-        return CustomScrollView(
-          controller: scrollController,
-          physics: const AlwaysScrollableScrollPhysics(),
+        return SecondaryPageRefreshView(
+          title: '通天塔日志',
+          onRefresh: controller.refreshLatest,
+          scrollController: scrollController,
           slivers: [
-            const SecondaryPageSliverAppBar(title: '通天塔日志'),
             if (controller.hasLargeRealtimeUpdate)
               SliverToBoxAdapter(
                 child: Padding(

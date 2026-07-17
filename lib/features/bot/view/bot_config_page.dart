@@ -14,6 +14,7 @@ import 'package:magrail_app/core/widgets/app_confirm_dialog.dart';
 import 'package:magrail_app/core/widgets/app_loading_dialog.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
 import 'package:magrail_app/core/widgets/character_avatar.dart';
+import 'package:magrail_app/core/widgets/secondary_page_refresh_view.dart';
 import 'package:magrail_app/core/widgets/secondary_page_sliver_app_bar.dart';
 import 'package:magrail_app/core/widgets/temple_cover_image.dart';
 import 'package:magrail_app/features/bot/controller/bot_config_controller.dart';
@@ -128,42 +129,37 @@ class _BotConfigPageState extends State<BotConfigPage> {
           onPopInvokedWithResult: _handlePopInvoked,
           child: Scaffold(
             backgroundColor: colorScheme.surfaceContainerLowest,
-            body: RefreshIndicator(
+            body: SecondaryPageRefreshView(
+              title: 'Bot配置',
+              actions: _buildAppBarActions(config),
               onRefresh: _refresh,
-              child: CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                slivers: [
-                  SecondaryPageSliverAppBar(
-                    title: 'Bot配置',
-                    actions: _buildAppBarActions(config),
-                  ),
-                  if (_controller.isLoading && config == null)
-                    const SliverFillRemaining(
-                      hasScrollBody: false,
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  else if (config == null)
-                    AppLoadFailedSliver(
-                      message: _controller.errorMessage ?? '获取 Bot 配置失败，请稍后重试',
-                      onActionPressed: _retry,
-                    )
-                  else
-                    SliverToBoxAdapter(
-                      child: SafeArea(
-                        top: false,
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(
-                            16,
-                            16,
-                            16,
-                            24 + MediaQuery.paddingOf(context).bottom,
-                          ),
-                          child: _buildConfigContent(context, config),
+              slivers: [
+                if (_controller.isLoading && config == null)
+                  const SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (config == null)
+                  AppLoadFailedSliver(
+                    message: _controller.errorMessage ?? '获取 Bot 配置失败，请稍后重试',
+                    onActionPressed: _retry,
+                  )
+                else
+                  SliverToBoxAdapter(
+                    child: SafeArea(
+                      top: false,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          16,
+                          16,
+                          16,
+                          24 + MediaQuery.paddingOf(context).bottom,
                         ),
+                        child: _buildConfigContent(context, config),
                       ),
                     ),
-                ],
-              ),
+                  ),
+              ],
             ),
           ),
         );

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:magrail_app/core/feedback/app_toast.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
 import 'package:magrail_app/core/widgets/paged_sliver_state.dart';
-import 'package:magrail_app/core/widgets/secondary_page_sliver_app_bar.dart';
+import 'package:magrail_app/core/widgets/secondary_page_refresh_view.dart';
 import 'package:magrail_app/features/user/controller/user_item_page_controller.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
 import 'package:magrail_app/features/user/widgets/user_asset_record_sliver_list.dart';
@@ -63,36 +63,33 @@ class _UserItemPageState extends State<UserItemPage> {
           final isStateOnlyContent =
               !_controller.isLoading && _controller.items.isEmpty;
 
-          return RefreshIndicator(
+          return SecondaryPageRefreshView(
+            title: '我的道具',
             onRefresh: _refresh,
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                const SecondaryPageSliverAppBar(title: '我的道具'),
-                if (_controller.isLoading)
-                  const UserItemSkeletonSliverList()
-                else if (_controller.errorMessage != null &&
-                    _controller.items.isEmpty)
-                  AppLoadFailedSliver(
-                    message: _controller.errorMessage ?? '请检查网络后重试',
-                    onActionPressed: _retry,
-                  )
-                else if (_controller.items.isEmpty)
-                  const PagedSliverState(
-                    title: '暂无道具',
-                    message: '当前没有可展示的道具',
-                    icon: Icons.inventory_2_outlined,
-                  )
-                else
-                  UserItemSliverList(items: _controller.items),
-                if (!isStateOnlyContent)
-                  SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: 24 + MediaQuery.paddingOf(context).bottom,
-                    ),
+            slivers: [
+              if (_controller.isLoading)
+                const UserItemSkeletonSliverList()
+              else if (_controller.errorMessage != null &&
+                  _controller.items.isEmpty)
+                AppLoadFailedSliver(
+                  message: _controller.errorMessage ?? '请检查网络后重试',
+                  onActionPressed: _retry,
+                )
+              else if (_controller.items.isEmpty)
+                const PagedSliverState(
+                  title: '暂无道具',
+                  message: '当前没有可展示的道具',
+                  icon: Icons.inventory_2_outlined,
+                )
+              else
+                UserItemSliverList(items: _controller.items),
+              if (!isStateOnlyContent)
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 24 + MediaQuery.paddingOf(context).bottom,
                   ),
-              ],
-            ),
+                ),
+            ],
           );
         },
       ),

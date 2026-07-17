@@ -3,7 +3,7 @@ import 'package:magrail_app/core/controller/tinygrail_paged_list_controller.dart
 import 'package:magrail_app/core/feedback/app_toast.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
 import 'package:magrail_app/core/widgets/pagination_footer_sliver.dart';
-import 'package:magrail_app/core/widgets/secondary_page_sliver_app_bar.dart';
+import 'package:magrail_app/core/widgets/secondary_page_refresh_view.dart';
 
 /// Tinygrail 分页页面内容构建器
 ///
@@ -113,49 +113,44 @@ class _TinygrailPagedSliverPageState<T, R>
           final isStateOnlyContent = !widget.controller.isInitialLoading &&
               (widget.controller.initialError != null || items.isEmpty);
 
-          return RefreshIndicator(
+          return SecondaryPageRefreshView(
+            title: widget.title,
+            actions: widget.appBarActions,
+            bottom: widget.appBarBottom,
             onRefresh: _refresh,
-            child: CustomScrollView(
-              controller: widget.scrollController,
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                SecondaryPageSliverAppBar(
-                  title: widget.title,
-                  actions: widget.appBarActions,
-                  bottom: widget.appBarBottom,
+            scrollController: widget.scrollController,
+            slivers: [
+              if (widget.controller.isInitialLoading)
+                widget.loadingSliver
+              else if (widget.controller.initialError != null)
+                AppLoadFailedSliver(
+                  message: widget.initialErrorMessage,
+                  onActionPressed: widget.controller.refresh,
+                )
+              else if (items.isEmpty)
+                widget.emptySliverBuilder(context, widget.controller)
+              else ...[
+                ...widget.contentSliversBuilder(
+                  context,
+                  items,
+                  _handleItemBuilt,
                 ),
-                if (widget.controller.isInitialLoading)
-                  widget.loadingSliver
-                else if (widget.controller.initialError != null)
-                  AppLoadFailedSliver(
-                    message: widget.initialErrorMessage,
-                    onActionPressed: widget.controller.refresh,
-                  )
-                else if (items.isEmpty)
-                  widget.emptySliverBuilder(context, widget.controller)
-                else ...[
-                  ...widget.contentSliversBuilder(
-                    context,
-                    items,
-                    _handleItemBuilt,
-                  ),
-                  PaginationFooterSliver(
-                    isLoadingMore: widget.controller.isLoadingMore,
-                    hasLoadMoreError: widget.controller.loadMoreError != null,
-                    canLoadMore: widget.controller.canLoadMore,
-                    completedLabel: widget.completedLabel,
-                    onRetry: widget.controller.loadNextPage,
-                  ),
-                ],
-                if (!isStateOnlyContent)
-                  SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: widget.bottomContentPadding +
-                          MediaQuery.paddingOf(context).bottom,
-                    ),
-                  ),
+                PaginationFooterSliver(
+                  isLoadingMore: widget.controller.isLoadingMore,
+                  hasLoadMoreError: widget.controller.loadMoreError != null,
+                  canLoadMore: widget.controller.canLoadMore,
+                  completedLabel: widget.completedLabel,
+                  onRetry: widget.controller.loadNextPage,
+                ),
               ],
-            ),
+              if (!isStateOnlyContent)
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: widget.bottomContentPadding +
+                        MediaQuery.paddingOf(context).bottom,
+                  ),
+                ),
+            ],
           );
         },
       ),

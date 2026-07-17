@@ -53,13 +53,10 @@ class _TowerLogPageState extends State<TowerLogPage> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      body: RefreshIndicator(
-        onRefresh: _controller.refreshLatest,
-        child: TowerLogPanel(
-          controller: _controller,
-          scrollController: _scrollController,
-          onHistoryItemBuilt: _handleHistoryItemBuilt,
-        ),
+      body: TowerLogPanel(
+        controller: _controller,
+        scrollController: _scrollController,
+        onHistoryItemBuilt: _handleHistoryItemBuilt,
       ),
     );
   }
