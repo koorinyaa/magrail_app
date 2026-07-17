@@ -185,12 +185,6 @@ class _UserMarketOrderSkeletonRow extends StatelessWidget {
                   ),
                   SizedBox(height: 6),
                   Bone.text(width: 92, fontSize: 11),
-                  SizedBox(height: 4),
-                  Bone(
-                    width: 104,
-                    height: 15,
-                    borderRadius: BorderRadius.all(Radius.circular(999)),
-                  ),
                 ],
               ),
             ),

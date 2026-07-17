@@ -36,9 +36,6 @@ class UserMarketOrderRow extends StatelessWidget {
   /// 条目点击回调
   final VoidCallback? onTap;
 
-  static const Color _increaseColor = Color(0xFFFF5A91);
-  static const Color _decreaseColor = Color(0xFF38A8E8);
-
   /// 构建用户委托订单行
   ///
   /// [context] 当前组件树上下文
@@ -119,15 +116,6 @@ class UserMarketOrderRow extends StatelessWidget {
                         height: 1.05,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: _UserMarketOrderPricePill(
-                        currentText: _currentPriceText,
-                        fluctuationText: _fluctuationText,
-                        accentColor: _resolveFluctuationColor(),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -154,34 +142,6 @@ class UserMarketOrderRow extends StatelessWidget {
       UserMarketOrderSide.bid => '买单数量',
       UserMarketOrderSide.ask => '卖单数量',
     };
-  }
-
-  /// 当前价文案
-  String get _currentPriceText {
-    return Formatters.tinygrailCurrency(item.current);
-  }
-
-  /// 涨跌幅文案
-  String get _fluctuationText {
-    final fluctuation = item.fluctuation;
-    return switch (fluctuation) {
-      > 0 => '+${Formatters.groupedNumber(fluctuation * 100)}%',
-      < 0 => '${Formatters.groupedNumber(fluctuation * 100)}%',
-      _ => '--',
-    };
-  }
-
-  /// 解析涨跌幅颜色
-  Color? _resolveFluctuationColor() {
-    if (item.fluctuation > 0) {
-      return _increaseColor;
-    }
-
-    if (item.fluctuation < 0) {
-      return _decreaseColor;
-    }
-
-    return null;
   }
 }
 
@@ -221,85 +181,6 @@ class _UserMarketOrderAvatar extends StatelessWidget {
       tag: resolvedHeroTag,
       transitionOnUserGestures: true,
       child: avatar,
-    );
-  }
-}
-
-/// 用户委托订单价格变动胶囊
-class _UserMarketOrderPricePill extends StatelessWidget {
-  /// 创建用户委托订单价格变动胶囊
-  ///
-  /// [currentText] 当前价文案
-  /// [fluctuationText] 涨跌幅文案
-  /// [accentColor] 强调色
-  const _UserMarketOrderPricePill({
-    required this.currentText,
-    required this.fluctuationText,
-    this.accentColor,
-  });
-
-  /// 当前价文案
-  final String currentText;
-
-  /// 涨跌幅文案
-  final String fluctuationText;
-
-  /// 强调色
-  final Color? accentColor;
-
-  /// 构建用户委托订单价格变动胶囊
-  ///
-  /// [context] 当前组件树上下文
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = colorScheme.brightness == Brightness.dark;
-    final backgroundColor = accentColor ??
-        colorScheme.onSurfaceVariant.withValues(alpha: isDark ? 0.16 : 0.10);
-    final foregroundColor =
-        accentColor == null ? colorScheme.onSurfaceVariant : Colors.white;
-
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 160),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(999),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Flexible(
-                child: Text(
-                  currentText,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: foregroundColor,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w800,
-                    height: 1,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 5),
-              Text(
-                fluctuationText,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: foregroundColor,
-                  fontSize: 9,
-                  fontWeight: FontWeight.w800,
-                  height: 1,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
