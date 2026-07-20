@@ -55,13 +55,11 @@ class _BangumiCharacterSearchRow extends StatelessWidget {
   /// [item] Bangumi 搜索结果角色
   /// [status] 小圣杯角色状态
   /// [avatarUrl] 合并后头像地址
-  /// [avatarHeroTag] 头像转场标识
   /// [onTap] 点击回调
   const _BangumiCharacterSearchRow({
     required this.item,
     required this.status,
     required this.avatarUrl,
-    required this.avatarHeroTag,
     required this.onTap,
   });
 
@@ -73,9 +71,6 @@ class _BangumiCharacterSearchRow extends StatelessWidget {
 
   /// 合并后头像地址
   final String avatarUrl;
-
-  /// 头像转场标识
-  final String? avatarHeroTag;
 
   /// 点击回调
   final VoidCallback onTap;
@@ -93,7 +88,6 @@ class _BangumiCharacterSearchRow extends StatelessWidget {
       size: 38,
       borderRadius: 14,
     );
-    final resolvedAvatarHeroTag = avatarHeroTag?.trim();
 
     return Material(
       color: Colors.transparent,
@@ -104,15 +98,7 @@ class _BangumiCharacterSearchRow extends StatelessWidget {
           child: Row(
             children: [
               const SizedBox(width: 4),
-              if (resolvedAvatarHeroTag == null ||
-                  resolvedAvatarHeroTag.isEmpty)
-                avatar
-              else
-                Hero(
-                  tag: resolvedAvatarHeroTag,
-                  transitionOnUserGestures: true,
-                  child: avatar,
-                ),
+              avatar,
               const SizedBox(width: 10),
               Expanded(
                 child: Column(

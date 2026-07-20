@@ -61,7 +61,7 @@ class _CharacterSearchRoutePage extends StatelessWidget {
           magicRepository: magicRepository,
           oosRepository: oosRepository,
           userRepository: userRepository,
-          onClose: () => Navigator.of(context).pop(),
+          onClose: () => Navigator.of(context).pop<Object?>(),
         ),
       ),
     );

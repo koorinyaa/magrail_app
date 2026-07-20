@@ -39,18 +39,13 @@ class _CharacterSearchRow extends StatelessWidget {
   ///
   /// [item] 搜索结果角色
   /// [onTap] 点击回调
-  /// [avatarHeroTag] 头像转场标识
   const _CharacterSearchRow({
     required this.item,
-    required this.avatarHeroTag,
     required this.onTap,
   });
 
   /// 搜索结果角色
   final CharacterDetailSearchItem item;
-
-  /// 头像转场标识
-  final String? avatarHeroTag;
 
   /// 点击回调
   final VoidCallback onTap;
@@ -68,7 +63,6 @@ class _CharacterSearchRow extends StatelessWidget {
       size: 38,
       borderRadius: 14,
     );
-    final resolvedAvatarHeroTag = avatarHeroTag?.trim();
 
     return Material(
       color: Colors.transparent,
@@ -79,15 +73,7 @@ class _CharacterSearchRow extends StatelessWidget {
           child: Row(
             children: [
               const SizedBox(width: 4),
-              if (resolvedAvatarHeroTag == null ||
-                  resolvedAvatarHeroTag.isEmpty)
-                avatar
-              else
-                Hero(
-                  tag: resolvedAvatarHeroTag,
-                  transitionOnUserGestures: true,
-                  child: avatar,
-                ),
+              avatar,
               const SizedBox(width: 10),
               Expanded(
                 child: Column(

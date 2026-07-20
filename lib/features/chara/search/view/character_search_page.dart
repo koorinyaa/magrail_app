@@ -18,9 +18,9 @@ import 'package:magrail_app/features/bangumi/next/model/next_bangumi_character_s
 import 'package:magrail_app/features/bangumi/next/model/next_bangumi_subject_search_item.dart';
 import 'package:magrail_app/features/bangumi/next/repository/next_bangumi_repository.dart';
 import 'package:magrail_app/features/bangumi/next/widgets/next_bangumi_subject_search_row.dart';
-import 'package:magrail_app/features/chara/detail/character_detail_hero.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_basic_info.dart';
+import 'package:magrail_app/features/chara/detail/model/character_detail_history_item.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_search_item.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
 import 'package:magrail_app/features/chara/search/widgets/character_search_input_bar.dart';
@@ -43,8 +43,8 @@ const Duration _characterSearchDebounceDelay = Duration(milliseconds: 450);
 const int _bangumiSearchPageSize = 20;
 // 底部控件包含来源切换器和搜索框，列表需要预留防遮挡空间
 const double _characterSearchBottomContentPadding = 128;
-// 角色搜索页在同一个导航栈内只保留一个实例
-PageRoute<void>? _activeCharacterSearchRoute;
+// 角色搜索页在应用内只保留一个活动路由
+PageRoute<Object?>? _activeCharacterSearchRoute;
 
 /// 角色搜索来源
 enum _CharacterSearchSource {
@@ -60,8 +60,9 @@ enum _CharacterSearchSource {
 
 /// 显示角色搜索页
 ///
-/// 已存在角色搜索页时置顶已有页面
+/// 已存在角色搜索页时忽略重复打开请求
 /// 未授权时只弹出提示，不打开搜索页
+/// 选择角色或 Bangumi 条目后关闭搜索页并由来源页面继续打开详情
 ///
 /// [context] 当前组件树上下文
 /// [repository] 角色详情仓库
@@ -76,22 +77,22 @@ Future<void> showCharacterSearchPage(
   required TempleAssetMagicRepository magicRepository,
   required TinygrailOosRepository oosRepository,
   required UserRepository userRepository,
-}) {
+}) async {
   final currentUsername =
       userRepository.readCachedCurrentUserAssets()?.name.trim() ?? '';
   if (currentUsername.isEmpty) {
     AppToast.error(context, text: '该功能需要授权后才能使用');
-    return Future<void>.value();
+    return;
   }
 
   final navigator = Navigator.of(context);
   final activeRoute = _activeCharacterSearchRoute;
-  if (activeRoute != null && activeRoute.navigator == navigator) {
-    navigator.popUntil((route) => identical(route, activeRoute));
-    return activeRoute.popped.then<void>((_) {});
+  if (activeRoute != null) {
+    // 活动搜索路由存活期间忽略重复入口，避免通过弹栈破坏来源页面
+    return;
   }
 
-  final route = PageRouteBuilder<void>(
+  final route = PageRouteBuilder<Object?>(
     opaque: false,
     transitionDuration: const Duration(milliseconds: 240),
     reverseTransitionDuration: const Duration(milliseconds: 180),
@@ -110,11 +111,35 @@ Future<void> showCharacterSearchPage(
     },
   );
   _activeCharacterSearchRoute = route;
-  return navigator.push<void>(route).whenComplete(() {
+  Object? selectedResult;
+  try {
+    selectedResult = await navigator.push<Object?>(route);
+    // Navigator.push 的 Future 在开始退出时完成，等待 completed 才能保证搜索页已移除
+    await route.completed;
+  } finally {
     if (identical(_activeCharacterSearchRoute, route)) {
       _activeCharacterSearchRoute = null;
     }
-  });
+  }
+
+  if (!context.mounted || selectedResult == null) {
+    return;
+  }
+
+  // 搜索页完整退出后再由来源页面处理选中的详情目标
+  if (selectedResult is CharacterDetailHistoryItem) {
+    openCharacterDetail(
+      context,
+      characterId: selectedResult.characterId,
+      name: selectedResult.name,
+      avatarUrl: selectedResult.avatarUrl,
+    );
+    return;
+  }
+
+  if (selectedResult is NextBangumiSubjectSearchItem) {
+    openNextBangumiSubjectFromSearchItem(context, selectedResult);
+  }
 }
 
 /// 角色搜索页
@@ -168,6 +193,8 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
   late final NextBangumiRepository _bangumiRepository = NextBangumiRepository();
 
   Timer? _searchDebounce;
+  // 关闭动画期间禁止重复提交返回结果
+  var _isClosing = false;
   var _searchSource = _CharacterSearchSource.tinygrail;
   var _requestId = 0;
   var _lastSearchText = '';
@@ -383,16 +410,10 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
             Builder(
               builder: (context) {
                 final item = _results[index];
-                final avatarHeroTag = createCharacterDetailAvatarHeroTag(
-                  characterId: item.characterId,
-                  avatarUrl: item.icon,
-                  source: item,
-                );
 
                 return _CharacterSearchRow(
                   item: item,
-                  avatarHeroTag: avatarHeroTag,
-                  onTap: () => _selectCharacter(item, avatarHeroTag),
+                  onTap: () => _selectCharacter(item),
                 );
               },
             ),
@@ -419,7 +440,7 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
             autofocus: true,
             placeholder: _searchPlaceholder,
             onSubmitted: (_) => _searchNow(),
-            onClose: widget.onClose,
+            onClose: () => _closeSearch(),
           ),
         ],
       ),
@@ -463,20 +484,17 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
   /// 选择搜索结果角色
   ///
   /// [item] 搜索结果角色
-  void _selectCharacter(
-    CharacterDetailSearchItem item,
-    String? avatarHeroTag,
-  ) {
+  void _selectCharacter(CharacterDetailSearchItem item) {
     if (item.characterId <= 0) {
       return;
     }
 
-    openCharacterDetail(
-      context,
-      characterId: item.characterId,
-      name: item.name,
-      avatarUrl: item.icon,
-      avatarHeroTag: avatarHeroTag,
+    _closeSearch(
+      CharacterDetailHistoryItem(
+        characterId: item.characterId,
+        name: item.name,
+        avatarUrl: item.icon,
+      ),
     );
   }
 
@@ -511,7 +529,28 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
   ///
   /// [item] Bangumi 条目搜索结果
   void _selectBangumiSubject(NextBangumiSubjectSearchItem item) {
-    openNextBangumiSubjectFromSearchItem(context, item);
+    if (item.subjectId <= 0) {
+      return;
+    }
+
+    _closeSearch(item);
+  }
+
+  /// 关闭搜索页并返回选择结果
+  ///
+  /// [result] 返回给来源页面的搜索结果
+  void _closeSearch([Object? result]) {
+    if (_isClosing) {
+      return;
+    }
+
+    _isClosing = true;
+    if (result == null) {
+      widget.onClose();
+      return;
+    }
+
+    Navigator.of(context).pop<Object?>(result);
   }
 
   /// 当前来源搜索框占位文案

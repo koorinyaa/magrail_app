@@ -54,21 +54,14 @@ extension _CharacterSearchPageBangumiLogic on _CharacterSearchPageState {
         final item = _bangumiResults[itemIndex];
         final status = _bangumiStatuses[item.characterId];
         final avatarUrl = _avatarUrlForBangumiCharacter(item, status);
-        final avatarHeroTag = createCharacterDetailAvatarHeroTag(
-          characterId: item.characterId,
-          avatarUrl: avatarUrl,
-          source: item,
-        );
 
         return _BangumiCharacterSearchRow(
           item: item,
           status: status,
           avatarUrl: avatarUrl,
-          avatarHeroTag: avatarHeroTag,
           onTap: () => _selectBangumiCharacter(
             item,
             avatarUrl,
-            avatarHeroTag,
           ),
         );
       },
@@ -409,23 +402,21 @@ extension _CharacterSearchPageBangumiLogic on _CharacterSearchPageState {
   ///
   /// [item] Bangumi 搜索结果角色
   /// [avatarUrl] 合并后头像地址
-  /// [avatarHeroTag] 头像转场标识
   void _selectBangumiCharacter(
     NextBangumiCharacterSearchItem item,
     String avatarUrl,
-    String? avatarHeroTag,
   ) {
     if (item.characterId <= 0) {
       return;
     }
 
     final name = item.nameCn.trim().isNotEmpty ? item.nameCn : item.name;
-    openCharacterDetail(
-      context,
-      characterId: item.characterId,
-      name: name,
-      avatarUrl: avatarUrl,
-      avatarHeroTag: avatarHeroTag,
+    _closeSearch(
+      CharacterDetailHistoryItem(
+        characterId: item.characterId,
+        name: name,
+        avatarUrl: avatarUrl,
+      ),
     );
   }
 
