@@ -274,17 +274,19 @@ class _TempleAssetMagicQuickButtons extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 7,
-      runSpacing: 7,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        for (final button in buttons)
-          _TempleAssetMagicQuickButton(
-            text: button.text,
-            onPressed: button.onPressed,
-          ),
-      ],
+    return TextFieldTapRegion(
+      child: Wrap(
+        spacing: 7,
+        runSpacing: 7,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          for (final button in buttons)
+            _TempleAssetMagicQuickButton(
+              text: button.text,
+              onPressed: button.onPressed,
+            ),
+        ],
+      ),
     );
   }
 }
@@ -340,6 +342,7 @@ class _TempleAssetMagicQuickButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(999),
       child: InkWell(
         borderRadius: BorderRadius.circular(999),
+        canRequestFocus: false,
         onTap: onPressed,
         child: DecoratedBox(
           decoration: BoxDecoration(

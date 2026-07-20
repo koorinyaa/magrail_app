@@ -288,32 +288,35 @@ class _IcoInvestQuickButton extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
 
-    return Material(
-      color: colorScheme.surfaceContainerHighest.withValues(
-        alpha: isDark ? 0.22 : 0.46,
-      ),
-      borderRadius: BorderRadius.circular(999),
-      child: InkWell(
+    return TextFieldTapRegion(
+      child: Material(
+        color: colorScheme.surfaceContainerHighest.withValues(
+          alpha: isDark ? 0.22 : 0.46,
+        ),
         borderRadius: BorderRadius.circular(999),
-        onTap: onPressed,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(
-              color: colorScheme.outlineVariant.withValues(
-                alpha: isDark ? 0.22 : 0.42,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(999),
+          canRequestFocus: false,
+          onTap: onPressed,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(
+                color: colorScheme.outlineVariant.withValues(
+                  alpha: isDark ? 0.22 : 0.42,
+                ),
               ),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: Text(
-              text,
-              style: TextStyle(
-                color: colorScheme.onSurfaceVariant,
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                height: 1,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              child: Text(
+                text,
+                style: TextStyle(
+                  color: colorScheme.onSurfaceVariant,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  height: 1,
+                ),
               ),
             ),
           ),

@@ -127,11 +127,13 @@ class _SacrificeQuickButtons extends StatelessWidget {
       ]);
     }
 
-    return Wrap(
-      spacing: 7,
-      runSpacing: 7,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: children,
+    return TextFieldTapRegion(
+      child: Wrap(
+        spacing: 7,
+        runSpacing: 7,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: children,
+      ),
     );
   }
 }
@@ -168,6 +170,7 @@ class _SacrificeQuickButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(999),
       child: InkWell(
         borderRadius: BorderRadius.circular(999),
+        canRequestFocus: false,
         onTap: onPressed,
         child: DecoratedBox(
           decoration: BoxDecoration(

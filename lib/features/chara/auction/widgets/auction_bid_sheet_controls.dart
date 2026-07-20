@@ -232,23 +232,25 @@ class _AuctionQuickInputButtons extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        _AuctionQuickInputButton(
-          text: '拍满',
-          onPressed: onFillRemaining,
-        ),
-        _AuctionQuickInputButton(
-          text: '英灵殿',
-          onPressed: onFillMaxAmount,
-        ),
-        _AuctionQuickInputButton(
-          text: '底价',
-          onPressed: onFillBasePrice,
-        ),
-      ],
+    return TextFieldTapRegion(
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          _AuctionQuickInputButton(
+            text: '拍满',
+            onPressed: onFillRemaining,
+          ),
+          _AuctionQuickInputButton(
+            text: '英灵殿',
+            onPressed: onFillMaxAmount,
+          ),
+          _AuctionQuickInputButton(
+            text: '底价',
+            onPressed: onFillBasePrice,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -285,6 +287,7 @@ class _AuctionQuickInputButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(999),
       child: InkWell(
         borderRadius: BorderRadius.circular(999),
+        canRequestFocus: false,
         onTap: onPressed,
         child: DecoratedBox(
           decoration: BoxDecoration(
