@@ -32,6 +32,9 @@ extension _UserDetailPageActions on _UserDetailPageState {
     UserActionEntry action,
   ) {
     switch (action.type) {
+      case UserActionType.syncRate:
+        _openSyncRate(context);
+        return;
       case UserActionType.balanceLog:
         _openUserBalanceLogs();
         return;
@@ -75,6 +78,23 @@ extension _UserDetailPageActions on _UserDetailPageState {
         _openUserTradeLogs();
         return;
     }
+  }
+
+  /// 打开用户资产同步率弹窗
+  ///
+  /// [context] 当前组件树上下文
+  void _openSyncRate(BuildContext context) {
+    final syncRate = _controller.syncRate;
+    if (syncRate == null) {
+      return;
+    }
+
+    unawaited(
+      showUserSyncRateDialog(
+        context,
+        syncRate: syncRate,
+      ),
+    );
   }
 
   /// 打开股息预测底部抽屉

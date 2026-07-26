@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:magrail_app/features/user/model/user_action_entry.dart';
+import 'package:magrail_app/features/user/model/user_sync_rate.dart';
 import 'package:magrail_app/shared/widgets/paged_action_grid.dart';
 
 /// 用户菜单网格卡片
@@ -9,15 +10,20 @@ class UserActionGridCard extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [actions] 用户菜单入口列表
+  /// [syncRate] 当前查看用户与登录用户的资产同步率
   /// [onActionPressed] 菜单入口点击回调
   const UserActionGridCard({
     super.key,
     required this.actions,
+    required this.syncRate,
     required this.onActionPressed,
   });
 
   /// 用户菜单入口列表
   final List<UserActionEntry> actions;
+
+  /// 当前查看用户与登录用户的资产同步率
+  final UserSyncRate? syncRate;
 
   /// 菜单入口点击回调
   final ValueChanged<UserActionEntry> onActionPressed;
@@ -50,6 +56,7 @@ class UserActionGridCard extends StatelessWidget {
           final action = actions[index];
           return _UserActionGridItem(
             action: action,
+            syncRate: action.type == UserActionType.syncRate ? syncRate : null,
             onPressed: () => onActionPressed(action),
           );
         },
@@ -63,14 +70,19 @@ class _UserActionGridItem extends StatelessWidget {
   /// 创建用户菜单网格项
   ///
   /// [action] 用户菜单入口
+  /// [syncRate] 同步率入口展示数据
   /// [onPressed] 入口点击回调
   const _UserActionGridItem({
     required this.action,
+    required this.syncRate,
     required this.onPressed,
   });
 
   /// 用户菜单入口
   final UserActionEntry action;
+
+  /// 同步率入口展示数据
+  final UserSyncRate? syncRate;
 
   /// 入口点击回调
   final VoidCallback onPressed;
@@ -95,11 +107,7 @@ class _UserActionGridItem extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              _iconForType(action.type),
-              size: 22,
-              color: foregroundColor,
-            ),
+            _buildActionIcon(colorScheme, foregroundColor),
             const SizedBox(height: 6),
             Text(
               action.label,
@@ -115,6 +123,33 @@ class _UserActionGridItem extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  /// 构建菜单入口图标
+  ///
+  /// [colorScheme] 当前主题色板
+  /// [foregroundColor] 普通入口前景色
+  Widget _buildActionIcon(
+    ColorScheme colorScheme,
+    Color foregroundColor,
+  ) {
+    final icon = _iconForType(action.type);
+    if (icon != null) {
+      return Icon(
+        icon,
+        size: 22,
+        color: foregroundColor,
+      );
+    }
+
+    final syncRate = this.syncRate;
+    if (syncRate == null) {
+      return const SizedBox.square(dimension: 22);
+    }
+    return _UserSyncRateIndicator(
+      syncRate: syncRate,
+      colorScheme: colorScheme,
     );
   }
 
@@ -140,11 +175,12 @@ class _UserActionGridItem extends StatelessWidget {
     return colorScheme.primary;
   }
 
-  /// 获取菜单入口图标
+  /// 获取菜单入口固定图标，同步率入口返回空
   ///
   /// [type] 用户菜单入口类型
-  IconData _iconForType(UserActionType type) {
+  IconData? _iconForType(UserActionType type) {
     return switch (type) {
+      UserActionType.syncRate => null,
       UserActionType.scratch => Icons.casino_outlined,
       UserActionType.weeklyBonus => Icons.monetization_on_outlined,
       UserActionType.dailyBonus => Icons.event_available_outlined,
@@ -160,5 +196,56 @@ class _UserActionGridItem extends StatelessWidget {
       UserActionType.block => Icons.block_rounded,
       UserActionType.unblock => Icons.lock_open_rounded,
     };
+  }
+}
+
+/// 用户菜单同步率环形进度
+class _UserSyncRateIndicator extends StatelessWidget {
+  /// 创建用户菜单同步率环形进度
+  ///
+  /// [syncRate] 当前查看用户与登录用户的资产同步率
+  /// [colorScheme] 当前主题色板
+  const _UserSyncRateIndicator({
+    required this.syncRate,
+    required this.colorScheme,
+  });
+
+  /// 当前查看用户与登录用户的资产同步率
+  final UserSyncRate syncRate;
+
+  /// 当前主题色板
+  final ColorScheme colorScheme;
+
+  /// 构建用户菜单同步率环形进度
+  ///
+  /// [context] 当前组件树上下文
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.square(
+      dimension: 22,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          CircularProgressIndicator(
+            value: syncRate.progress,
+            strokeWidth: 2.4,
+            backgroundColor: colorScheme.surfaceContainerHighest,
+            color: colorScheme.primary,
+          ),
+          Center(
+            child: Text(
+              '${syncRate.roundedPercentage}',
+              maxLines: 1,
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: 8,
+                fontWeight: FontWeight.w800,
+                height: 1,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

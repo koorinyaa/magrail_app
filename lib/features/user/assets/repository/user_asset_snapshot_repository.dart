@@ -208,41 +208,6 @@ class UserAssetSnapshotRepository {
     );
   }
 
-  /// 执行单次角色全量刷新
-  ///
-  /// [username] 用户名
-  /// [nickname] 用户昵称
-  /// [onProgress] 拉取进度回调
-  /// [totalItemsHint] 开始请求前最后一次确认的角色总数
-  Future<bool> _refreshCharactersNow({
-    required String username,
-    required String nickname,
-    required void Function(UserAssetSnapshotLoadProgress progress)? onProgress,
-    required int? totalItemsHint,
-  }) async {
-    final result = await _fetchAllCharactersShared(
-      username: username,
-      requestGate: _UserAssetSnapshotRequestGate(1),
-      onProgress: onProgress ?? _ignoreSnapshotProgress,
-      totalItemsHint: totalItemsHint,
-    );
-    final serialized = await compute(
-      _serializeUserCharacterSnapshotRows,
-      _CharacterRowsSerializeRequest(
-        characters: result.items,
-        totalItems: result.totalItems,
-      ),
-    );
-    return _database.upsertCharacterSnapshot(
-      username: username,
-      nickname: nickname.trim(),
-      rows: serialized.rows,
-      totalItems: result.totalItems,
-      updatedAtMilliseconds: DateTime.now().millisecondsSinceEpoch,
-      contentHash: serialized.contentHash,
-    );
-  }
-
   /// 刷新用户圣殿并判断是否需要重新读取页面
   ///
   /// [username] 用户名
@@ -273,40 +238,6 @@ class UserAssetSnapshotRepository {
         onProgress: onProgress,
         totalItemsHint: latestTotalItemsHint,
       ),
-    );
-  }
-
-  /// 执行单次圣殿全量刷新
-  ///
-  /// [username] 用户名
-  /// [nickname] 用户昵称
-  /// [onProgress] 拉取进度回调
-  /// [totalItemsHint] 开始请求前最后一次确认的圣殿总数
-  Future<bool> _refreshTemplesNow({
-    required String username,
-    required String nickname,
-    required void Function(UserAssetSnapshotLoadProgress progress)? onProgress,
-    required int? totalItemsHint,
-  }) async {
-    final templeResult = await _fetchAllTemplesShared(
-      username: username,
-      requestGate: _UserAssetSnapshotRequestGate(1),
-      onProgress: onProgress ?? _ignoreSnapshotProgress,
-      totalItemsHint: totalItemsHint,
-    );
-    final serialized = await compute(
-      _serializeUserTempleSnapshotRows,
-      _TempleRowsSerializeRequest(
-        temples: templeResult.items,
-      ),
-    );
-    return _database.upsertTempleSnapshot(
-      username: username,
-      nickname: nickname.trim(),
-      templeRows: serialized.rows,
-      templeTotalItems: templeResult.totalItems,
-      templesUpdatedAtMilliseconds: DateTime.now().millisecondsSinceEpoch,
-      templeContentHash: serialized.templeContentHash,
     );
   }
 
@@ -450,6 +381,13 @@ class UserAssetSnapshotRepository {
       }
       return null;
     }
+  }
+
+  /// 从本地读取有效完整快照中的资产标识
+  ///
+  /// [username] 用户名
+  Future<UserAssetIdSnapshot?> readIdSnapshot(String username) {
+    return _database.readIdSnapshot(username.trim());
   }
 
   /// 从本地圣殿快照分页读取当前用户圣殿

@@ -248,7 +248,7 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
     if (key.isEmpty) {
       return;
     }
-    final usage = _touchOtherUser(key);
+    final usage = _touchOtherUser(username);
     usage.retainCount += 1;
     unawaited(_evictOtherUsers());
   }
@@ -293,29 +293,39 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
     required UserAssetSnapshotRefreshPriority priority,
     required bool force,
   }) async {
-    final kinds = characterTotalItems != null &&
-            templeTotalItems != null &&
-            templeTotalItems < characterTotalItems
-        ? const [
-            UserAssetSnapshotKind.temples,
-            UserAssetSnapshotKind.characters
-          ]
-        : const [
-            UserAssetSnapshotKind.characters,
-            UserAssetSnapshotKind.temples
-          ];
-    for (final kind in kinds) {
-      await _refreshKind(
-        username: username,
-        nickname: nickname,
-        isCurrentUser: isCurrentUser,
-        kind: kind,
-        totalItemsHint: kind == UserAssetSnapshotKind.characters
-            ? characterTotalItems
-            : templeTotalItems,
-        priority: priority,
-        force: force,
-      );
+    if (!isCurrentUser) {
+      // 避免临时快照被提前淘汰
+      retainOtherUser(username);
+    }
+    try {
+      final kinds = characterTotalItems != null &&
+              templeTotalItems != null &&
+              templeTotalItems < characterTotalItems
+          ? const [
+              UserAssetSnapshotKind.temples,
+              UserAssetSnapshotKind.characters
+            ]
+          : const [
+              UserAssetSnapshotKind.characters,
+              UserAssetSnapshotKind.temples
+            ];
+      for (final kind in kinds) {
+        await _refreshKind(
+          username: username,
+          nickname: nickname,
+          isCurrentUser: isCurrentUser,
+          kind: kind,
+          totalItemsHint: kind == UserAssetSnapshotKind.characters
+              ? characterTotalItems
+              : templeTotalItems,
+          priority: priority,
+          force: force,
+        );
+      }
+    } finally {
+      if (!isCurrentUser) {
+        releaseOtherUser(username);
+      }
     }
   }
 

@@ -11,6 +11,7 @@ import 'package:magrail_app/features/user/model/user_chara_overview_cache.dart';
 import 'package:magrail_app/features/user/model/user_detail_profile.dart';
 import 'package:magrail_app/features/user/model/user_ico_api_item.dart';
 import 'package:magrail_app/features/user/model/user_link_api_item.dart';
+import 'package:magrail_app/features/user/model/user_sync_rate.dart';
 import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
 
@@ -30,7 +31,9 @@ class UserDetailController extends ChangeNotifier {
         _charaOverviewLoader = UserCharaOverviewLoader(
           repository: repository,
         ),
-        _username = username;
+        _username = username {
+    _snapshotCoordinator.addListener(_handleSnapshotCoordinatorChanged);
+  }
 
   final UserRepository _repository;
   final UserAssetSnapshotCoordinator _snapshotCoordinator;
@@ -49,6 +52,7 @@ class UserDetailController extends ChangeNotifier {
   int? _templeTotalItems;
   int? _characterTotalItems;
   int? _icoTotalItems;
+  UserSyncRate? _syncRate;
   String? _errorMessage;
   bool _isLoading = false;
   bool _isRefreshing = false;
@@ -60,6 +64,7 @@ class UserDetailController extends ChangeNotifier {
   int _failureNotificationToken = 0;
   // 用户资料失效或重新加载时递增，用于丢弃旧资产预览响应
   int _charaLoadGeneration = 0;
+  int _syncRateLoadGeneration = 0;
   String? _retainedOtherUsername;
 
   /// 用户资产资料
@@ -88,6 +93,9 @@ class UserDetailController extends ChangeNotifier {
 
   /// 用户 ICO 总数
   int? get icoTotalItems => _icoTotalItems;
+
+  /// 当前查看用户与登录用户的资产同步率
+  UserSyncRate? get syncRate => _syncRate;
 
   /// 加载错误文案
   String? get errorMessage => _errorMessage;
@@ -192,6 +200,10 @@ class UserDetailController extends ChangeNotifier {
         }
       }
 
+      if (previousProfileName != nextProfile.name) {
+        _syncRateLoadGeneration += 1;
+        _syncRate = null;
+      }
       _profile = nextProfile;
       _errorMessage = null;
       _isAuthExpired = false;
@@ -204,6 +216,7 @@ class UserDetailController extends ChangeNotifier {
         _restoreCachedCharaOverview(nextProfile.name);
       }
       _notifyIfActive();
+      unawaited(_refreshSyncRate());
       await _loadCharaOverview(
         nextProfile.name,
         showSkeleton: _hasNoCharaOverview,
@@ -239,6 +252,7 @@ class UserDetailController extends ChangeNotifier {
       profile: profile,
       cachedUser: cachedUser,
       isCurrentUserRequest: isCurrentUserRequest,
+      showSyncRate: _syncRate != null,
     );
   }
 
@@ -259,11 +273,101 @@ class UserDetailController extends ChangeNotifier {
   @override
   void dispose() {
     _isDisposed = true;
+    _syncRateLoadGeneration += 1;
+    _snapshotCoordinator.removeListener(_handleSnapshotCoordinatorChanged);
     final retainedOtherUsername = _retainedOtherUsername;
     if (retainedOtherUsername != null) {
       _snapshotCoordinator.releaseOtherUser(retainedOtherUsername);
     }
     super.dispose();
+  }
+
+  /// 响应用户资产快照任务完成事件
+  void _handleSnapshotCoordinatorChanged() {
+    if (_isDisposed || isCurrentUser) {
+      return;
+    }
+
+    final profile = _profile;
+    final currentUser = _repository.readCachedCurrentUserAssets();
+    final event = _snapshotCoordinator.lastEvent;
+    if (profile == null || currentUser == null || event == null) {
+      return;
+    }
+    final eventUsername = event.username.trim().toLowerCase();
+    final isRelevant = eventUsername == profile.name.trim().toLowerCase() ||
+        eventUsername == currentUser.name.trim().toLowerCase();
+    if (isRelevant) {
+      unawaited(_refreshSyncRate());
+    }
+  }
+
+  /// 从已有完整快照刷新同步率
+  Future<void> _refreshSyncRate() async {
+    final loadGeneration = ++_syncRateLoadGeneration;
+    final profile = _profile;
+    final currentUser = _repository.readCachedCurrentUserAssets();
+    final isSameUser = profile != null &&
+        currentUser != null &&
+        profile.name.trim().toLowerCase() ==
+            currentUser.name.trim().toLowerCase();
+    if (_isDisposed || profile == null || currentUser == null || isSameUser) {
+      _replaceSyncRate(loadGeneration, null);
+      return;
+    }
+
+    UserSyncRate? nextSyncRate;
+    // 同步率只消费现有快照，不触发新的全量请求
+    try {
+      final otherSnapshot = await _snapshotCoordinator
+          .repositoryFor(isCurrentUser: false)
+          .readIdSnapshot(profile.name);
+      if (_isDisposed || loadGeneration != _syncRateLoadGeneration) {
+        return;
+      }
+      if (otherSnapshot == null) {
+        _replaceSyncRate(loadGeneration, null);
+        return;
+      }
+
+      final currentSnapshot = await _snapshotCoordinator
+          .repositoryFor(isCurrentUser: true)
+          .readIdSnapshot(currentUser.name);
+      if (_isDisposed || loadGeneration != _syncRateLoadGeneration) {
+        return;
+      }
+      if (currentSnapshot != null) {
+        nextSyncRate = UserSyncRate.calculate(
+          currentUser: currentSnapshot,
+          otherUser: otherSnapshot,
+        );
+      }
+    } catch (_) {
+      // 本地快照缺失或不可读时隐藏同步率入口
+    }
+    _replaceSyncRate(loadGeneration, nextSyncRate);
+  }
+
+  /// 替换当前同步率并通知页面
+  ///
+  /// [loadGeneration] 本次同步率读取世代
+  /// [nextSyncRate] 最新同步率
+  void _replaceSyncRate(
+    int loadGeneration,
+    UserSyncRate? nextSyncRate,
+  ) {
+    if (_isDisposed || loadGeneration != _syncRateLoadGeneration) {
+      return;
+    }
+    final previous = _syncRate;
+    if (previous?.commonCharacterCount == nextSyncRate?.commonCharacterCount &&
+        previous?.commonTempleCount == nextSyncRate?.commonTempleCount &&
+        previous?.progress == nextSyncRate?.progress) {
+      return;
+    }
+
+    _syncRate = nextSyncRate;
+    _notifyIfActive();
   }
 
   /// 加载用户角色资产预览
@@ -433,7 +537,9 @@ class UserDetailController extends ChangeNotifier {
   /// 清空已加载的用户资料和角色资产预览
   void _clearLoadedUserData() {
     _charaLoadGeneration += 1;
+    _syncRateLoadGeneration += 1;
     _profile = null;
+    _syncRate = null;
     _isAuthExpired = false;
     _clearCharaOverview(resetGeneration: false);
   }

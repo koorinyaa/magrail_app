@@ -1,7 +1,76 @@
 part of 'user_asset_snapshot_repository.dart';
 
-/// 用户资产快照网络拉取实现
+/// 用户资产快照刷新与网络拉取实现
 extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
+  /// 执行单次角色全量刷新
+  ///
+  /// [username] 用户名
+  /// [nickname] 用户昵称
+  /// [onProgress] 拉取进度回调
+  /// [totalItemsHint] 开始请求前最后一次确认的角色总数
+  Future<bool> _refreshCharactersNow({
+    required String username,
+    required String nickname,
+    required void Function(UserAssetSnapshotLoadProgress progress)? onProgress,
+    required int? totalItemsHint,
+  }) async {
+    final result = await _fetchAllCharactersShared(
+      username: username,
+      requestGate: _UserAssetSnapshotRequestGate(1),
+      onProgress: onProgress ?? _ignoreSnapshotProgress,
+      totalItemsHint: totalItemsHint,
+    );
+    final serialized = await compute(
+      _serializeUserCharacterSnapshotRows,
+      _CharacterRowsSerializeRequest(
+        characters: result.items,
+        totalItems: result.totalItems,
+      ),
+    );
+    return _database.upsertCharacterSnapshot(
+      username: username,
+      nickname: nickname.trim(),
+      rows: serialized.rows,
+      totalItems: result.totalItems,
+      updatedAtMilliseconds: DateTime.now().millisecondsSinceEpoch,
+      contentHash: serialized.contentHash,
+    );
+  }
+
+  /// 执行单次圣殿全量刷新
+  ///
+  /// [username] 用户名
+  /// [nickname] 用户昵称
+  /// [onProgress] 拉取进度回调
+  /// [totalItemsHint] 开始请求前最后一次确认的圣殿总数
+  Future<bool> _refreshTemplesNow({
+    required String username,
+    required String nickname,
+    required void Function(UserAssetSnapshotLoadProgress progress)? onProgress,
+    required int? totalItemsHint,
+  }) async {
+    final templeResult = await _fetchAllTemplesShared(
+      username: username,
+      requestGate: _UserAssetSnapshotRequestGate(1),
+      onProgress: onProgress ?? _ignoreSnapshotProgress,
+      totalItemsHint: totalItemsHint,
+    );
+    final serialized = await compute(
+      _serializeUserTempleSnapshotRows,
+      _TempleRowsSerializeRequest(
+        temples: templeResult.items,
+      ),
+    );
+    return _database.upsertTempleSnapshot(
+      username: username,
+      nickname: nickname.trim(),
+      templeRows: serialized.rows,
+      templeTotalItems: templeResult.totalItems,
+      templesUpdatedAtMilliseconds: DateTime.now().millisecondsSinceEpoch,
+      templeContentHash: serialized.templeContentHash,
+    );
+  }
+
   /// 合并同一用户正在进行的角色全量请求
   ///
   /// [username] 用户名

@@ -1,5 +1,8 @@
 /// 用户菜单入口类型
 enum UserActionType {
+  /// 同步率入口
+  syncRate,
+
   /// 刮刮乐入口
   scratch,
 

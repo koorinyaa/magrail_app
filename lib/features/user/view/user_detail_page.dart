@@ -36,6 +36,7 @@ import 'package:magrail_app/features/user/widgets/user_detail_top_actions.dart';
 import 'package:magrail_app/features/user/widgets/user_profile_card.dart';
 import 'package:magrail_app/features/user/widgets/user_red_packet_send_sheet.dart';
 import 'package:magrail_app/features/user/widgets/user_share_bonus_forecast_sheet.dart';
+import 'package:magrail_app/features/user/widgets/user_sync_rate_dialog.dart';
 import 'package:magrail_app/features/user/view/user_settings_page.dart';
 
 part 'user_detail_page_actions.dart';
@@ -365,6 +366,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
               const SizedBox(height: 12),
               UserActionGridCard(
                 actions: actions,
+                syncRate: _controller.syncRate,
                 onActionPressed: (action) =>
                     _handleActionPressed(context, action),
               ),
@@ -476,6 +478,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
         case UserActionType.myAuction:
         case UserActionType.marketOrder:
         case UserActionType.myItems:
+        case UserActionType.syncRate:
         case UserActionType.scratch:
         case UserActionType.dividendForecast:
         case UserActionType.assetAnalysis:

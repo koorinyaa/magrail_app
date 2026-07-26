@@ -487,6 +487,61 @@ class UserAssetSnapshotDatabase {
     });
   }
 
+  /// 从本地读取有效完整快照中的资产标识
+  ///
+  /// [username] 用户名
+  Future<UserAssetIdSnapshot?> readIdSnapshot(String username) async {
+    final resolvedUsername = username.trim();
+    if (resolvedUsername.isEmpty) {
+      return null;
+    }
+
+    final database = await _openDatabase();
+    return database.transaction((transaction) async {
+      final storedState = await _readStoredSourceState(
+        transaction,
+        resolvedUsername,
+      );
+      if (storedState == null ||
+          !storedState.sourceState.isFreshAt(
+            DateTime.now(),
+            lifetime: _cacheLifetime,
+          )) {
+        return null;
+      }
+
+      final metadata = await _readMetadata(transaction, resolvedUsername);
+      if (metadata == null) {
+        return null;
+      }
+      final characterRows = await transaction.query(
+        _characterTableName,
+        columns: const ['character_id'],
+        where: 'username = ?',
+        whereArgs: [resolvedUsername],
+      );
+      final templeRows = await transaction.query(
+        _templeTableName,
+        columns: const ['character_id'],
+        where: 'username = ?',
+        whereArgs: [resolvedUsername],
+      );
+      if (characterRows.length != _rowInt(metadata['character_total_items']) ||
+          templeRows.length != _rowInt(metadata['temple_total_items'])) {
+        return null;
+      }
+
+      return UserAssetIdSnapshot(
+        characterIds: characterRows
+            .map((row) => _rowInt(row['character_id']))
+            .where((id) => id > 0),
+        templeCharacterIds: templeRows
+            .map((row) => _rowInt(row['character_id']))
+            .where((id) => id > 0),
+      );
+    });
+  }
+
   /// 删除用户资产原始数据
   ///
   /// [username] 用户名

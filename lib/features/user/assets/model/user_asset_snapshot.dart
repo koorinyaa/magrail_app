@@ -57,6 +57,25 @@ class UserAssetSnapshot {
   UserAssetDataRevisions get revisions => sourceState.revisions;
 }
 
+/// 用户资产标识快照
+final class UserAssetIdSnapshot {
+  /// 创建用户资产标识快照
+  ///
+  /// [characterIds] 用户持有的角色 ID
+  /// [templeCharacterIds] 用户圣殿对应的角色 ID
+  UserAssetIdSnapshot({
+    required Iterable<int> characterIds,
+    required Iterable<int> templeCharacterIds,
+  })  : characterIds = Set<int>.unmodifiable(characterIds),
+        templeCharacterIds = Set<int>.unmodifiable(templeCharacterIds);
+
+  /// 用户持有的唯一角色 ID
+  final Set<int> characterIds;
+
+  /// 用户圣殿对应的唯一角色 ID
+  final Set<int> templeCharacterIds;
+}
+
 /// 用户资产两类原始数据版本
 class UserAssetDataRevisions {
   /// 创建用户资产原始数据版本

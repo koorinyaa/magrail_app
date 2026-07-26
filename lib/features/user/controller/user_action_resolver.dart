@@ -11,10 +11,12 @@ class UserActionResolver {
   /// [profile] 当前展示的用户资料
   /// [cachedUser] 当前登录用户缓存资料
   /// [isCurrentUserRequest] 是否为当前登录用户入口
+  /// [showSyncRate] 是否显示同步率入口
   List<UserActionEntry> resolve({
     required UserDetailProfile profile,
     required UserDetailProfile? cachedUser,
     required bool isCurrentUserRequest,
+    required bool showSyncRate,
   }) {
     // 当前用户入口不依赖本地缓存判断，避免缓存失效时隐藏自己的操作区
     final isSelf = isCurrentUserRequest || cachedUser?.name == profile.name;
@@ -54,20 +56,23 @@ class UserActionResolver {
       ];
     }
 
-    if (cachedUser?.isGameMaster != true) {
-      return const [];
-    }
-
     return [
-      const UserActionEntry(
-        type: UserActionType.dividendForecast,
-        label: '股息预测',
-      ),
-      const UserActionEntry(type: UserActionType.tradeLog, label: '交易记录'),
-      if (profile.isBanned)
-        const UserActionEntry(type: UserActionType.unblock, label: '解封')
-      else
-        const UserActionEntry(type: UserActionType.block, label: '封禁'),
+      if (showSyncRate)
+        const UserActionEntry(
+          type: UserActionType.syncRate,
+          label: '同步率',
+        ),
+      if (cachedUser?.isGameMaster == true) ...[
+        const UserActionEntry(
+          type: UserActionType.dividendForecast,
+          label: '股息预测',
+        ),
+        const UserActionEntry(type: UserActionType.tradeLog, label: '交易记录'),
+        if (profile.isBanned)
+          const UserActionEntry(type: UserActionType.unblock, label: '解封')
+        else
+          const UserActionEntry(type: UserActionType.block, label: '封禁'),
+      ],
     ];
   }
 }
