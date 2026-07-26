@@ -34,14 +34,18 @@ jobs:
 
       - name: Package unsigned IPA
         run: |
-          rm -rf Payload Magrail-sideload.ipa
+          APP_VERSION="$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml)"
+          IPA_NAME="MaGrail_${APP_VERSION}.ipa"
+          rm -rf Payload
+          rm -f MaGrail_*.ipa
           test -d build/ios/iphoneos/Runner.app
           mkdir Payload
           cp -R build/ios/iphoneos/Runner.app Payload/
-          zip -qry Magrail-sideload.ipa Payload
+          zip -qry "${IPA_NAME}" Payload
+          echo "IPA_NAME=${IPA_NAME}" >> "$GITHUB_ENV"
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
           name: magrail-ios-sideload-ipa
-          path: Magrail-sideload.ipa
+          path: ${{ env.IPA_NAME }}

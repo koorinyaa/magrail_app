@@ -83,3 +83,49 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+gradle.projectsEvaluated {
+    tasks.named("assembleRelease").configure {
+        doLast {
+            val outputDirectory = layout.buildDirectory.dir("outputs/flutter-apk").get().asFile
+            if (!outputDirectory.exists()) {
+                return@doLast
+            }
+
+            val releaseVersion = "${flutter.versionName}+${flutter.versionCode}"
+            val splitPerAbi =
+                project.findProperty("split-per-abi")?.toString()?.toBoolean() == true
+            val splitApkPattern =
+                Regex("""app-(armeabi-v7a|arm64-v8a|x86_64)-release\.apk""")
+
+            // Flutter 需要保留默认产物名用于构建结果校验，另行生成发布用文件
+            outputDirectory
+                .listFiles { file ->
+                    file.isFile && file.name.startsWith("MaGrail_") && file.extension == "apk"
+                }.orEmpty()
+                .forEach { it.delete() }
+
+            if (splitPerAbi) {
+                outputDirectory.listFiles().orEmpty().forEach { sourceFile ->
+                    val splitMatch = splitApkPattern.matchEntire(sourceFile.name)
+                    if (splitMatch != null) {
+                        sourceFile.copyTo(
+                            outputDirectory.resolve(
+                                "MaGrail_${releaseVersion}_${splitMatch.groupValues[1]}.apk",
+                            ),
+                            overwrite = true,
+                        )
+                    }
+                }
+            } else {
+                val universalApk = outputDirectory.resolve("app-release.apk")
+                if (universalApk.exists()) {
+                    universalApk.copyTo(
+                        outputDirectory.resolve("MaGrail_${releaseVersion}_universal.apk"),
+                        overwrite = true,
+                    )
+                }
+            }
+        }
+    }
+}
