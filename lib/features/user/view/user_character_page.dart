@@ -18,6 +18,8 @@ import 'package:magrail_app/features/user/controller/other_user_character_page_c
 import 'package:magrail_app/features/user/model/user_character_api_item.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
 import 'package:magrail_app/features/user/widgets/user_asset_sliver_lists.dart';
+import 'package:magrail_app/features/user/widgets/user_asset_level_sliver_controller.dart';
+import 'package:magrail_app/features/user/widgets/user_character_level_virtual_sliver.dart';
 import 'package:magrail_app/features/user/widgets/user_character_level_rail.dart';
 import 'package:magrail_app/features/user/widgets/user_character_sort_toolbar.dart';
 
@@ -66,6 +68,8 @@ class UserCharacterPage extends StatefulWidget {
 class _UserCharacterPageState extends State<UserCharacterPage> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
+  final UserAssetLevelSliverController _levelSliverController =
+      UserAssetLevelSliverController();
   late final TinygrailPagedListController<UserCharacterApiItem,
       UserCharacterApiItem> _controller;
   CurrentUserCharacterPageController? _currentUserController;
@@ -96,6 +100,7 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
         readVisibleCharacterIndex: _readVisibleCharacterIndex,
         waitForScrollIdle: _waitForScrollIdle,
         onBeforeCharacterDataReplaced: _restoreVisibleCharacterPosition,
+        onRestoreCharacterLevelAnchor: _restoreCharacterLevelAnchor,
       );
       _currentUserController = controller;
       _controller = controller;
@@ -126,6 +131,7 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
     _scrollController
       ..removeListener(_handleScroll)
       ..dispose();
+    _levelSliverController.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -163,6 +169,16 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
         );
       },
       contentSliversBuilder: (context, items, onItemBuilt) {
+        if (currentController?.usesVirtualLevelList ?? false) {
+          return [
+            UserCharacterLevelVirtualSliver(
+              controller: currentController!,
+              scrollController: _scrollController,
+              levelSliverController: _levelSliverController,
+              onCharacterTap: _openCharacterDetail,
+            ),
+          ];
+        }
         return [
           UserCharacterAssetSliverList(
             items: items,
@@ -176,6 +192,8 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
         ];
       },
       completedLabel: '没有更多角色了',
+      showPaginationFooter: () =>
+          !(currentController?.usesVirtualLevelList ?? false),
       bottomContentPadding:
           currentController == null ? 24 : CharacterSearchInputBar.height + 48,
     );
@@ -257,6 +275,7 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
     _levelJumpGeneration += 1;
     _isProgrammaticLevelJump = false;
     _isLoadingPreviousPage = false;
+    _levelSliverController.reset();
     final success = await controller.selectSort(sort);
     if (!mounted || adjustmentGeneration != _scrollAdjustmentGeneration) {
       return;
@@ -277,28 +296,9 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
     _scrollAdjustmentGeneration += 1;
     _isLoadingPreviousPage = false;
     _isProgrammaticLevelJump = true;
-    bool success;
+    int? absoluteIndex;
     try {
-      success = await _currentUserController?.jumpToLevel(
-            level,
-            beforeItemsReplaced: (itemIndex, items) {
-              if (!mounted ||
-                  generation != _levelJumpGeneration ||
-                  !_scrollController.hasClients) {
-                return;
-              }
-              final position = _scrollController.position;
-              // 先停止旧列表滚动，再静默校正像素，使新窗口首帧直接位于目标等级
-              _scrollController.jumpTo(position.pixels);
-              position.correctPixels(
-                UserCharacterAssetSliverList.levelGroupOffsetForItem(
-                  items,
-                  itemIndex,
-                ),
-              );
-            },
-          ) ??
-          false;
+      absoluteIndex = await _currentUserController?.prepareLevelJump(level);
     } catch (_) {
       if (mounted && generation == _levelJumpGeneration) {
         _isProgrammaticLevelJump = false;
@@ -309,15 +309,19 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
     if (!mounted || generation != _levelJumpGeneration) {
       return;
     }
-    if (!success) {
+    if (absoluteIndex == null) {
       _isProgrammaticLevelJump = false;
       AppToast.error(context, text: '等级跳转失败，请重试');
       return;
     }
+    _levelSliverController.jumpToLevel(
+      level,
+      _scrollController,
+    );
     _isProgrammaticLevelJump = false;
   }
 
-  /// 读取当前视口顶部角色在本地分页窗口中的下标
+  /// 读取当前视口顶部角色在当前排序中的下标
   int? _readVisibleCharacterIndex() {
     final controller = _currentUserController;
     if (!mounted ||
@@ -325,6 +329,9 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
         !_scrollController.hasClients ||
         controller.items.isEmpty) {
       return null;
+    }
+    if (controller.usesVirtualLevelList) {
+      return _levelSliverController.visibleAbsoluteIndex;
     }
     final listOffset =
         _scrollController.offset.clamp(0.0, double.infinity).toDouble();
@@ -430,10 +437,21 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
     }
   }
 
+  /// 在等级快照刷新后恢复顶部角色
+  ///
+  /// [absoluteIndex] 新快照中的角色绝对下标
+  void _restoreCharacterLevelAnchor(int absoluteIndex) {
+    if (!mounted) {
+      return;
+    }
+    _levelSliverController.restoreAfterNextLayout(absoluteIndex);
+  }
+
   /// 监听列表顶部并按需加载目标页前一页
   void _handleScroll() {
     final controller = _currentUserController;
     if (controller == null ||
+        controller.usesVirtualLevelList ||
         _isProgrammaticLevelJump ||
         _isLoadingPreviousPage ||
         !_scrollController.hasClients ||

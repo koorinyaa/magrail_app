@@ -213,6 +213,10 @@ extension _UserAssetSnapshotDatabaseSchema on UserAssetSnapshotDatabase {
       'ON $_templeTableName (username, sacrifices DESC, row_order ASC)',
     );
     await database.execute(
+      'CREATE INDEX idx_asset_snapshot_temple_character_level_asc '
+      'ON $_templeTableName (username, character_level ASC, row_order ASC)',
+    );
+    await database.execute(
       'CREATE INDEX idx_asset_snapshot_temple_character_level '
       'ON $_templeTableName (username, character_level DESC, row_order ASC)',
     );

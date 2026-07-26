@@ -323,6 +323,29 @@ class UserAssetSnapshotRepository {
     );
   }
 
+  /// 读取角色在等级排序结果中的绝对下标
+  ///
+  /// [username] 用户名
+  /// [characterId] 角色 ID
+  /// [direction] 等级排序方向
+  /// [searchKeyword] 角色 ID 或名称筛选词
+  /// [expectedRevision] 必须匹配的角色快照版本
+  Future<int?> readCharacterLevelAbsoluteIndex({
+    required String username,
+    required int characterId,
+    required UserCharacterSnapshotSortDirection direction,
+    required String searchKeyword,
+    required int expectedRevision,
+  }) {
+    return _database.readCharacterLevelAbsoluteIndex(
+      username: username.trim(),
+      characterId: characterId,
+      direction: direction,
+      searchKeyword: searchKeyword,
+      expectedRevision: expectedRevision,
+    );
+  }
+
   /// 从本地原始数据读取有效的用户资产快照
   ///
   /// [username] 用户名
@@ -440,6 +463,29 @@ class UserAssetSnapshotRepository {
       username: username.trim(),
       direction: direction,
       searchKeyword: searchKeyword,
+    );
+  }
+
+  /// 读取圣殿在角色等级排序结果中的绝对下标
+  ///
+  /// [username] 用户名
+  /// [templeId] 圣殿 ID
+  /// [direction] 等级排序方向
+  /// [searchKeyword] 角色 ID 或名称筛选词
+  /// [expectedRevision] 必须匹配的圣殿快照版本
+  Future<int?> readTempleLevelAbsoluteIndex({
+    required String username,
+    required int templeId,
+    required UserTempleSnapshotSortDirection direction,
+    required String searchKeyword,
+    required int expectedRevision,
+  }) {
+    return _database.readTempleLevelAbsoluteIndex(
+      username: username.trim(),
+      templeId: templeId,
+      direction: direction,
+      searchKeyword: searchKeyword,
+      expectedRevision: expectedRevision,
     );
   }
 

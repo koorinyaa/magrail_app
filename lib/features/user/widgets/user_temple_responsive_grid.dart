@@ -31,10 +31,17 @@ class UserTempleResponsiveGrid extends StatelessWidget {
     this.onAssetTap,
   });
 
-  static const double _horizontalPadding = 12;
-  static const double _topPadding = 10;
-  static const double _mainAxisSpacing = 10;
-  static const double _crossAxisSpacing = 10;
+  /// 网格横向内边距
+  static const double horizontalPadding = 12;
+
+  /// 网格顶部内边距
+  static const double topPadding = 10;
+
+  /// 网格纵向间距
+  static const double mainAxisSpacing = 10;
+
+  /// 网格横向间距
+  static const double crossAxisSpacing = 10;
   static const double _minCardWidth = 156;
 
   /// 等级分组标题固定高度
@@ -87,9 +94,9 @@ class UserTempleResponsiveGrid extends StatelessWidget {
         return SliverPadding(
           padding: AppSafeAreaInsets.fromLTRB(
             context,
-            left: _horizontalPadding,
-            top: _topPadding,
-            right: _horizontalPadding + rightContentInset,
+            left: horizontalPadding,
+            top: topPadding,
+            right: horizontalPadding + rightContentInset,
             bottom: 0,
           ),
           sliver: groups == null
@@ -98,7 +105,7 @@ class UserTempleResponsiveGrid extends StatelessWidget {
                   slivers: [
                     for (final group in groups) ...[
                       SliverToBoxAdapter(
-                        child: _UserTempleLevelHeader(level: group.level),
+                        child: UserTempleLevelHeader(level: group.level),
                       ),
                       _buildGrid(
                         context,
@@ -129,8 +136,8 @@ class UserTempleResponsiveGrid extends StatelessWidget {
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: metrics.crossAxisCount,
-        mainAxisSpacing: _mainAxisSpacing,
-        crossAxisSpacing: _crossAxisSpacing,
+        mainAxisSpacing: mainAxisSpacing,
+        crossAxisSpacing: crossAxisSpacing,
         childAspectRatio: metrics.childAspectRatio,
       ),
       delegate: SliverChildBuilderDelegate(
@@ -168,11 +175,11 @@ class UserTempleResponsiveGrid extends StatelessWidget {
     final contentWidth = math.max(
       0.0,
       crossAxisExtent -
-          _horizontalPadding * 2 -
+          horizontalPadding * 2 -
           horizontalSafeArea -
           rightContentInset,
     );
-    if (contentWidth <= _crossAxisSpacing) {
+    if (contentWidth <= crossAxisSpacing) {
       final cardWidth = math.max(contentWidth, 1.0);
       return UserTempleGridMetrics(
         crossAxisCount: 1,
@@ -184,14 +191,13 @@ class UserTempleResponsiveGrid extends StatelessWidget {
       );
     }
 
-    final rawCount = ((contentWidth + _crossAxisSpacing) /
-            (_minCardWidth + _crossAxisSpacing))
-        .floor();
+    final rawCount =
+        ((contentWidth + crossAxisSpacing) / (_minCardWidth + crossAxisSpacing))
+            .floor();
     final crossAxisCount = rawCount.clamp(1, 6).toInt();
     final cardWidth = math.max(
       0.0,
-      (contentWidth - _crossAxisSpacing * (crossAxisCount - 1)) /
-          crossAxisCount,
+      (contentWidth - crossAxisSpacing * (crossAxisCount - 1)) / crossAxisCount,
     );
     return UserTempleGridMetrics(
       crossAxisCount: crossAxisCount,
@@ -217,9 +223,9 @@ class UserTempleResponsiveGrid extends StatelessWidget {
       return 0;
     }
     if (!showLevelHeaders) {
-      return _topPadding + metrics.gridExtent(items.length);
+      return topPadding + metrics.gridExtent(items.length);
     }
-    var extent = _topPadding;
+    var extent = topPadding;
     for (final group in _resolveLevelGroups(items)) {
       extent += levelHeaderExtent + metrics.gridExtent(group.length);
     }
@@ -243,10 +249,10 @@ class UserTempleResponsiveGrid extends StatelessWidget {
     }
     final resolvedIndex = itemIndex.clamp(0, items.length - 1).toInt();
     if (!showLevelHeaders) {
-      return _topPadding +
+      return topPadding +
           (resolvedIndex ~/ metrics.crossAxisCount) * metrics.rowExtent;
     }
-    var offset = _topPadding;
+    var offset = topPadding;
     for (final group in _resolveLevelGroups(items)) {
       if (resolvedIndex < group.end) {
         final localIndex = resolvedIndex - group.start;
@@ -276,11 +282,10 @@ class UserTempleResponsiveGrid extends StatelessWidget {
     }
     final resolvedOffset = contentOffset.clamp(0.0, double.infinity);
     if (!showLevelHeaders) {
-      final row =
-          math.max(0, resolvedOffset - _topPadding) ~/ metrics.rowExtent;
+      final row = math.max(0, resolvedOffset - topPadding) ~/ metrics.rowExtent;
       return (row * metrics.crossAxisCount).clamp(0, items.length - 1).toInt();
     }
-    var offset = _topPadding;
+    var offset = topPadding;
     for (final group in _resolveLevelGroups(items)) {
       final gridTop = offset + levelHeaderExtent;
       final gridBottom = gridTop + metrics.gridExtent(group.length);
@@ -296,30 +301,6 @@ class UserTempleResponsiveGrid extends StatelessWidget {
       offset = gridBottom;
     }
     return items.length - 1;
-  }
-
-  /// 计算目标圣殿所属等级分组的跳转位置
-  ///
-  /// [items] 当前分页窗口圣殿条目
-  /// [itemIndex] 目标圣殿在分页窗口内的下标
-  /// [metrics] 当前网格布局参数
-  static double levelGroupOffsetForItem(
-    List<UserTempleApiItem> items,
-    int itemIndex,
-    UserTempleGridMetrics metrics,
-  ) {
-    if (items.isEmpty) {
-      return 0;
-    }
-    final resolvedIndex = itemIndex.clamp(0, items.length - 1).toInt();
-    var offset = _topPadding;
-    for (final group in _resolveLevelGroups(items)) {
-      if (resolvedIndex < group.end) {
-        return offset;
-      }
-      offset += levelHeaderExtent + metrics.gridExtent(group.length);
-    }
-    return offset;
   }
 }
 
@@ -349,8 +330,7 @@ class UserTempleGridMetrics {
   double get childAspectRatio => cardWidth / cardHeight;
 
   /// 单行网格跨度
-  double get rowExtent =>
-      cardHeight + UserTempleResponsiveGrid._mainAxisSpacing;
+  double get rowExtent => cardHeight + UserTempleResponsiveGrid.mainAxisSpacing;
 
   /// 计算指定条目数量的网格高度
   ///
@@ -361,7 +341,7 @@ class UserTempleGridMetrics {
     }
     final rowCount = (itemCount / crossAxisCount).ceil();
     return rowCount * cardHeight +
-        math.max(0, rowCount - 1) * UserTempleResponsiveGrid._mainAxisSpacing;
+        math.max(0, rowCount - 1) * UserTempleResponsiveGrid.mainAxisSpacing;
   }
 }
 
@@ -420,11 +400,12 @@ List<_UserTempleLevelGroup> _resolveLevelGroups(
 }
 
 /// 用户圣殿角色等级分组标题
-class _UserTempleLevelHeader extends StatelessWidget {
+class UserTempleLevelHeader extends StatelessWidget {
   /// 创建用户圣殿角色等级分组标题
   ///
+  /// [key] Flutter 组件标识
   /// [level] 角色等级
-  const _UserTempleLevelHeader({required this.level});
+  const UserTempleLevelHeader({super.key, required this.level});
 
   /// 角色等级
   final int level;
@@ -485,20 +466,20 @@ class UserTempleSkeletonGrid extends StatelessWidget {
         return SliverPadding(
           padding: AppSafeAreaInsets.fromLTRB(
             context,
-            left: UserTempleResponsiveGrid._horizontalPadding,
-            top: UserTempleResponsiveGrid._topPadding,
-            right: UserTempleResponsiveGrid._horizontalPadding,
+            left: UserTempleResponsiveGrid.horizontalPadding,
+            top: UserTempleResponsiveGrid.topPadding,
+            right: UserTempleResponsiveGrid.horizontalPadding,
             bottom: 0,
           ),
           sliver: SliverGrid(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: metrics.crossAxisCount,
-              mainAxisSpacing: UserTempleResponsiveGrid._mainAxisSpacing,
-              crossAxisSpacing: UserTempleResponsiveGrid._crossAxisSpacing,
+              mainAxisSpacing: UserTempleResponsiveGrid.mainAxisSpacing,
+              crossAxisSpacing: UserTempleResponsiveGrid.crossAxisSpacing,
               childAspectRatio: metrics.childAspectRatio,
             ),
             delegate: SliverChildBuilderDelegate(
-              (context, index) => const _UserTempleSkeletonCard(),
+              (context, index) => const UserTempleCardSkeleton(),
               childCount: itemCount,
             ),
           ),
@@ -509,9 +490,11 @@ class UserTempleSkeletonGrid extends StatelessWidget {
 }
 
 /// 用户圣殿骨架卡片
-class _UserTempleSkeletonCard extends StatelessWidget {
+class UserTempleCardSkeleton extends StatelessWidget {
   /// 创建用户圣殿骨架卡片
-  const _UserTempleSkeletonCard();
+  ///
+  /// [key] Flutter 组件标识
+  const UserTempleCardSkeleton({super.key});
 
   /// 构建用户圣殿骨架卡片
   ///

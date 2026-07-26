@@ -10,31 +10,9 @@ extension _UserTemplePageScroll on _UserTemplePageState {
     _scrollAdjustmentGeneration += 1;
     _isLoadingPreviousPage = false;
     _isProgrammaticLevelJump = true;
-    bool success;
+    int? absoluteIndex;
     try {
-      success = await _currentUserController?.jumpToLevel(
-            level,
-            beforeItemsReplaced: (itemIndex, entries) {
-              if (!mounted ||
-                  generation != _levelJumpGeneration ||
-                  !_scrollController.hasClients) {
-                return;
-              }
-              final metrics = _resolveGridMetrics();
-              final items = [for (final entry in entries) entry.item];
-              final position = _scrollController.position;
-              // 先停止旧网格滚动，再静默校正像素使目标等级首帧到位
-              _scrollController.jumpTo(position.pixels);
-              position.correctPixels(
-                UserTempleResponsiveGrid.levelGroupOffsetForItem(
-                  items,
-                  itemIndex,
-                  metrics,
-                ),
-              );
-            },
-          ) ??
-          false;
+      absoluteIndex = await _currentUserController?.prepareLevelJump(level);
     } catch (_) {
       if (mounted && generation == _levelJumpGeneration) {
         _isProgrammaticLevelJump = false;
@@ -45,15 +23,19 @@ extension _UserTemplePageScroll on _UserTemplePageState {
     if (!mounted || generation != _levelJumpGeneration) {
       return;
     }
-    if (!success) {
+    if (absoluteIndex == null) {
       _isProgrammaticLevelJump = false;
       AppToast.error(context, text: '等级跳转失败，请重试');
       return;
     }
+    _levelSliverController.jumpToLevel(
+      level,
+      _scrollController,
+    );
     _isProgrammaticLevelJump = false;
   }
 
-  /// 读取当前视口顶部圣殿在本地分页窗口中的下标
+  /// 读取当前视口顶部圣殿在当前排序中的下标
   int? _readVisibleTempleIndex() {
     final controller = _currentUserController;
     if (!mounted ||
@@ -61,6 +43,9 @@ extension _UserTemplePageScroll on _UserTemplePageState {
         !_scrollController.hasClients ||
         controller.items.isEmpty) {
       return null;
+    }
+    if (controller.usesVirtualLevelGrid) {
+      return _levelSliverController.visibleAbsoluteIndex;
     }
     final items = [for (final entry in controller.items) entry.item];
     return UserTempleResponsiveGrid.itemIndexAtContentOffset(
@@ -165,10 +150,21 @@ extension _UserTemplePageScroll on _UserTemplePageState {
     }
   }
 
+  /// 在等级快照刷新后恢复顶部圣殿
+  ///
+  /// [absoluteIndex] 新快照中的圣殿绝对下标
+  void _restoreTempleLevelAnchor(int absoluteIndex) {
+    if (!mounted) {
+      return;
+    }
+    _levelSliverController.restoreAfterNextLayout(absoluteIndex);
+  }
+
   /// 监听网格顶部并按需加载目标页前一页
   void _handleScroll() {
     final controller = _currentUserController;
     if (controller == null ||
+        controller.usesVirtualLevelGrid ||
         _isProgrammaticLevelJump ||
         _isLoadingPreviousPage ||
         !_scrollController.hasClients ||

@@ -27,6 +27,7 @@ class TinygrailPagedSliverPage<T, R> extends StatefulWidget {
   /// [emptySliverBuilder] 空状态构建器
   /// [contentSliversBuilder] 内容 sliver 构建器
   /// [completedLabel] 全部加载完成文案
+  /// [showPaginationFooter] 是否显示分页底部状态
   /// [appBarActions] 顶部栏右侧操作组件
   /// [appBarBottom] 顶部栏下方的固定区域
   /// [scrollController] 页面滚动控制器
@@ -41,6 +42,7 @@ class TinygrailPagedSliverPage<T, R> extends StatefulWidget {
     required this.emptySliverBuilder,
     required this.contentSliversBuilder,
     required this.completedLabel,
+    this.showPaginationFooter,
     this.appBarActions,
     this.appBarBottom,
     this.scrollController,
@@ -69,6 +71,9 @@ class TinygrailPagedSliverPage<T, R> extends StatefulWidget {
 
   /// 全部加载完成文案
   final String completedLabel;
+
+  /// 分页底部状态显示判断
+  final bool Function()? showPaginationFooter;
 
   /// 顶部栏右侧操作组件
   final List<Widget>? appBarActions;
@@ -135,13 +140,14 @@ class _TinygrailPagedSliverPageState<T, R>
                   items,
                   _handleItemBuilt,
                 ),
-                PaginationFooterSliver(
-                  isLoadingMore: widget.controller.isLoadingMore,
-                  hasLoadMoreError: widget.controller.loadMoreError != null,
-                  canLoadMore: widget.controller.canLoadMore,
-                  completedLabel: widget.completedLabel,
-                  onRetry: widget.controller.loadNextPage,
-                ),
+                if (widget.showPaginationFooter?.call() ?? true)
+                  PaginationFooterSliver(
+                    isLoadingMore: widget.controller.isLoadingMore,
+                    hasLoadMoreError: widget.controller.loadMoreError != null,
+                    canLoadMore: widget.controller.canLoadMore,
+                    completedLabel: widget.completedLabel,
+                    onRetry: widget.controller.loadNextPage,
+                  ),
               ],
               if (!isStateOnlyContent)
                 SliverToBoxAdapter(

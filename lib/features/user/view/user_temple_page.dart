@@ -27,7 +27,9 @@ import 'package:magrail_app/features/user/controller/user_temple_page_controller
 import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
 import 'package:magrail_app/features/user/widgets/user_character_level_rail.dart';
+import 'package:magrail_app/features/user/widgets/user_asset_level_sliver_controller.dart';
 import 'package:magrail_app/features/user/widgets/user_temple_card.dart';
+import 'package:magrail_app/features/user/widgets/user_temple_level_virtual_sliver.dart';
 import 'package:magrail_app/features/user/widgets/user_temple_repair_sheet.dart';
 import 'package:magrail_app/features/user/widgets/user_temple_responsive_grid.dart';
 import 'package:magrail_app/features/user/widgets/user_temple_sort_toolbar.dart';
@@ -93,6 +95,8 @@ class UserTemplePage extends StatefulWidget {
 class _UserTemplePageState extends State<UserTemplePage> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
+  final UserAssetLevelSliverController _levelSliverController =
+      UserAssetLevelSliverController();
   UserTemplePageController? _otherUserController;
   CurrentUserTemplePageController? _currentUserController;
   UserAssetSnapshotRepository? _snapshotRepository;
@@ -124,6 +128,7 @@ class _UserTemplePageState extends State<UserTemplePage> {
         readVisibleTempleIndex: _readVisibleTempleIndex,
         waitForScrollIdle: _waitForScrollIdle,
         onBeforeTempleDataReplaced: _restoreVisibleTemplePosition,
+        onRestoreTempleLevelAnchor: _restoreTempleLevelAnchor,
       );
       _currentUserController = controller;
       controller.initialize();
@@ -155,6 +160,7 @@ class _UserTemplePageState extends State<UserTemplePage> {
     _scrollController
       ..removeListener(_handleScroll)
       ..dispose();
+    _levelSliverController.dispose();
     _currentUserController?.dispose();
     _otherUserController?.dispose();
     super.dispose();
@@ -243,6 +249,18 @@ class _UserTemplePageState extends State<UserTemplePage> {
         );
       },
       contentSliversBuilder: (context, entries, onItemBuilt) {
+        if (controller.usesVirtualLevelGrid) {
+          return [
+            UserTempleLevelVirtualSliver(
+              controller: controller,
+              scrollController: _scrollController,
+              levelSliverController: _levelSliverController,
+              ownerLabel: _ownerLabel,
+              onCharacterTap: _openCharacterDetail,
+              onAssetTap: _openTempleAssetDialog,
+            ),
+          ];
+        }
         final items = [for (final entry in entries) entry.item];
         final showLevelHeaders =
             controller.sort == UserTempleSnapshotSort.characterLevel;
@@ -262,6 +280,7 @@ class _UserTemplePageState extends State<UserTemplePage> {
         ];
       },
       completedLabel: '没有更多圣殿了',
+      showPaginationFooter: () => !controller.usesVirtualLevelGrid,
       bottomContentPadding: CharacterSearchInputBar.height + 48,
     );
     return ListenableBuilder(
@@ -305,6 +324,7 @@ class _UserTemplePageState extends State<UserTemplePage> {
                       UserCharacterLevelPosition(
                         level: position.level,
                         absoluteIndex: position.absoluteIndex,
+                        itemCount: position.itemCount,
                       ),
                   ],
                   onLevelSelected: (level) {
@@ -344,6 +364,7 @@ class _UserTemplePageState extends State<UserTemplePage> {
     _levelJumpGeneration += 1;
     _isProgrammaticLevelJump = false;
     _isLoadingPreviousPage = false;
+    _levelSliverController.reset();
     final success = await controller.selectSort(sort);
     if (!mounted || adjustmentGeneration != _scrollAdjustmentGeneration) {
       return;

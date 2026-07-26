@@ -48,9 +48,11 @@ class UserCharacterLevelPosition {
   ///
   /// [level] 角色等级
   /// [absoluteIndex] 当前排序下的起始下标
+  /// [itemCount] 当前等级角色数量
   const UserCharacterLevelPosition({
     required this.level,
     required this.absoluteIndex,
+    required this.itemCount,
   });
 
   /// 角色等级
@@ -58,4 +60,7 @@ class UserCharacterLevelPosition {
 
   /// 当前排序下的起始下标
   final int absoluteIndex;
+
+  /// 当前等级角色数量
+  final int itemCount;
 }

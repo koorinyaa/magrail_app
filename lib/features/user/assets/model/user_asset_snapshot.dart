@@ -6,7 +6,7 @@ import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
 const Duration userAssetCacheLifetime = Duration(days: 7);
 
 /// 用户资产快照当前结构版本
-const int userAssetSnapshotSchemaVersion = 11;
+const int userAssetSnapshotSchemaVersion = 12;
 
 /// 圣殿星之力达到该值时点亮星星
 const int starlightTempleStarForcesThreshold = 10000;

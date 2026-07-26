@@ -87,7 +87,7 @@ class UserCharacterAssetSliverList extends StatelessWidget {
       slivers: [
         for (final group in groups) ...[
           SliverToBoxAdapter(
-            child: _CharacterLevelHeader(level: group.level),
+            child: UserCharacterLevelHeader(level: group.level),
           ),
           SliverFixedExtentList(
             itemExtent: itemExtent,
@@ -182,82 +182,107 @@ class UserCharacterAssetSliverList extends StatelessWidget {
     return items.length - 1;
   }
 
-  /// 计算目标角色所属等级分组的跳转位置
-  ///
-  /// [items] 当前分页窗口角色条目
-  /// [itemIndex] 目标角色在分页窗口内的下标
-  static double levelGroupOffsetForItem(
-    List<UserCharacterApiItem> items,
-    int itemIndex,
-  ) {
-    if (items.isEmpty) {
-      return 0;
-    }
-    final resolvedIndex = itemIndex.clamp(0, items.length - 1);
-    var groupStart = resolvedIndex;
-    while (groupStart > 0 &&
-        items[groupStart - 1].level == items[resolvedIndex].level) {
-      groupStart -= 1;
-    }
-    if (groupStart == 0) {
-      return 0;
-    }
-    var precedingHeaderCount = 1;
-    for (var index = 1; index < groupStart; index += 1) {
-      if (items[index].level != items[index - 1].level) {
-        precedingHeaderCount += 1;
-      }
-    }
-    return groupStart * itemExtent + precedingHeaderCount * levelHeaderExtent;
-  }
-
   /// 构建用户角色资产条目
   ///
   /// [context] 当前组件树上下文
   /// [index] 角色条目下标
   Widget _buildCharacterItem(BuildContext context, int index) {
     final item = items[index];
+    onItemBuilt?.call(index);
+    return UserCharacterAssetListItem(
+      item: item,
+      sort: sort,
+      reserveLevelRail: showLevelHeaders,
+      showDivider: index < items.length - 1,
+      onCharacterTap: onCharacterTap,
+    );
+  }
+}
+
+/// 用户角色资产列表条目
+class UserCharacterAssetListItem extends StatelessWidget {
+  /// 创建用户角色资产列表条目
+  ///
+  /// [key] Flutter 组件标识
+  /// [item] 用户角色条目
+  /// [sort] 当前排序字段
+  /// [reserveLevelRail] 是否为等级轨道预留右侧宽度
+  /// [showDivider] 是否显示底部分割线
+  /// [onCharacterTap] 角色条目点击回调
+  const UserCharacterAssetListItem({
+    super.key,
+    required this.item,
+    required this.sort,
+    this.reserveLevelRail = false,
+    this.showDivider = true,
+    this.onCharacterTap,
+  });
+
+  /// 用户角色条目
+  final UserCharacterApiItem item;
+
+  /// 当前排序字段
+  final UserCharacterSnapshotSort sort;
+
+  /// 是否为等级轨道预留右侧宽度
+  final bool reserveLevelRail;
+
+  /// 是否显示底部分割线
+  final bool showDivider;
+
+  /// 角色条目点击回调
+  final void Function(UserCharacterApiItem item, String? avatarHeroTag)?
+      onCharacterTap;
+
+  /// 构建用户角色资产列表条目
+  ///
+  /// [context] 当前组件树上下文
+  @override
+  Widget build(BuildContext context) {
     final avatarUrl = TinygrailAssetUrls.normalizeAvatar(item.icon);
     final avatarHeroTag = createCharacterDetailAvatarHeroTag(
       characterId: item.characterId,
       avatarUrl: avatarUrl,
       source: item,
     );
-
-    onItemBuilt?.call(index);
-    final contentTrailingInset =
-        showLevelHeaders ? _levelContentTrailingInset : _contentTrailingInset;
-    return _AssetListItem(
-      fullWidth: true,
-      showDivider: index < items.length - 1,
-      dividerLeadingInset: _textLeadingInset,
-      dividerTrailingInset: contentTrailingInset,
-      child: UserCharacterAssetRow(
-        item: item,
-        avatarHeroTag: avatarHeroTag,
-        sort: sort,
-        contentPadding: AppSafeAreaInsets.fromLTRB(
-          context,
-          left: _contentLeadingInset,
-          top: 0,
-          right: contentTrailingInset,
-          bottom: 0,
+    final contentTrailingInset = reserveLevelRail
+        ? UserCharacterAssetSliverList._levelContentTrailingInset
+        : UserCharacterAssetSliverList._contentTrailingInset;
+    return SizedBox(
+      height: UserCharacterAssetSliverList.itemExtent,
+      child: _AssetListItem(
+        fullWidth: true,
+        showDivider: showDivider,
+        dividerLeadingInset: UserCharacterAssetSliverList._textLeadingInset,
+        dividerTrailingInset: contentTrailingInset,
+        child: UserCharacterAssetRow(
+          item: item,
+          avatarHeroTag: avatarHeroTag,
+          sort: sort,
+          contentPadding: AppSafeAreaInsets.fromLTRB(
+            context,
+            left: UserCharacterAssetSliverList._contentLeadingInset,
+            top: 0,
+            right: contentTrailingInset,
+            bottom: 0,
+          ),
+          tapBorderRadius: BorderRadius.zero,
+          onTap: onCharacterTap == null
+              ? null
+              : () => onCharacterTap?.call(item, avatarHeroTag),
         ),
-        tapBorderRadius: BorderRadius.zero,
-        onTap: onCharacterTap == null
-            ? null
-            : () => onCharacterTap?.call(item, avatarHeroTag),
       ),
     );
   }
 }
 
 /// 用户角色等级分组标题
-class _CharacterLevelHeader extends StatelessWidget {
+class UserCharacterLevelHeader extends StatelessWidget {
   /// 创建用户角色等级分组标题
   ///
+  /// [key] Flutter 组件标识
   /// [level] 角色等级
-  const _CharacterLevelHeader({required this.level});
+  const UserCharacterLevelHeader({super.key, required this.level});
 
   /// 角色等级
   final int level;

@@ -3,10 +3,13 @@ import 'dart:async';
 import 'package:flutter/scheduler.dart';
 import 'package:magrail_app/core/controller/tinygrail_paged_list_controller.dart';
 import 'package:magrail_app/core/network/tinygrail_page.dart';
+import 'package:magrail_app/features/user/assets/model/user_asset_level_layout.dart';
 import 'package:magrail_app/features/user/assets/model/user_temple_snapshot_query.dart';
 import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_repository.dart';
+import 'package:magrail_app/features/user/controller/user_asset_sparse_page_cache.dart';
 
 part 'current_user_temple_page_controller_refresh.dart';
+part 'current_user_temple_page_controller_level.dart';
 
 /// 当前用户圣殿二级页面控制器
 class CurrentUserTemplePageController extends TinygrailPagedListController<
@@ -18,9 +21,10 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
   /// [nickname] 用户昵称
   /// [onAutomaticRefreshSucceeded] 后台刷新成功回调
   /// [onAutomaticRefreshFailed] 后台刷新失败回调
-  /// [readVisibleTempleIndex] 读取当前可视圣殿在窗口中的下标
+  /// [readVisibleTempleIndex] 读取当前可视圣殿下标，等级排序使用绝对下标
   /// [waitForScrollIdle] 等待列表滚动结束
   /// [onBeforeTempleDataReplaced] 圣殿分页替换前的滚动位置校正回调
+  /// [onRestoreTempleLevelAnchor] 等级刷新后的圣殿位置恢复回调
   /// [pageSize] 每页圣殿数量
   CurrentUserTemplePageController({
     required UserAssetSnapshotRepository snapshotRepository,
@@ -35,6 +39,7 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
       int replacementItemIndex,
       List<UserTempleSnapshotEntry> items,
     ) onBeforeTempleDataReplaced,
+    required void Function(int absoluteIndex) onRestoreTempleLevelAnchor,
     super.pageSize = defaultPageSize,
   })  : _snapshotRepository = snapshotRepository,
         _username = username.trim(),
@@ -43,7 +48,8 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
         _onAutomaticRefreshFailed = onAutomaticRefreshFailed,
         _readVisibleTempleIndex = readVisibleTempleIndex,
         _waitForScrollIdle = waitForScrollIdle,
-        _onBeforeTempleDataReplaced = onBeforeTempleDataReplaced;
+        _onBeforeTempleDataReplaced = onBeforeTempleDataReplaced,
+        _onRestoreTempleLevelAnchor = onRestoreTempleLevelAnchor;
 
   /// 当前用户圣殿本地分页数量
   static const int defaultPageSize = 50;
@@ -60,6 +66,7 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
     int replacementItemIndex,
     List<UserTempleSnapshotEntry> items,
   ) _onBeforeTempleDataReplaced;
+  final void Function(int absoluteIndex) _onRestoreTempleLevelAnchor;
 
   bool _isDisposed = false;
   bool _isPageBlockingRefresh = false;
@@ -87,6 +94,11 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
   // 等级目录版本用于确保快速跳转下标与目标分页来自同一快照
   int? _levelIndexRevision;
   int? _committedLevelIndexRevision;
+  final UserAssetSparsePageCache<UserTempleSnapshotEntry> _levelPageCache =
+      UserAssetSparsePageCache<UserTempleSnapshotEntry>(
+    pageSize: defaultPageSize,
+  );
+  int _levelLayoutVersion = 0;
   // 可视分页版本用于判断哈希一致时页面是否仍需同步
   int? _windowRevision;
   int _windowFirstPage = 1;
@@ -103,6 +115,26 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
 
   /// 当前角色等级快速跳转位置
   List<UserTempleLevelPosition> get levelPositions => _levelPositions;
+
+  /// 等级排序虚拟布局分组
+  List<UserAssetLevelGroup> get levelGroups => [
+        for (final position in _levelPositions)
+          UserAssetLevelGroup(
+            level: position.level,
+            absoluteIndex: position.absoluteIndex,
+            itemCount: position.itemCount,
+          ),
+      ];
+
+  /// 等级排序虚拟布局版本
+  int get levelLayoutVersion => _levelLayoutVersion;
+
+  /// 等级排序条目总数
+  int get levelItemCount => _levelPageCache.totalItems;
+
+  /// 是否使用等级虚拟网格
+  bool get usesVirtualLevelGrid =>
+      _sort == UserTempleSnapshotSort.characterLevel;
 
   /// 当前页面使用的圣殿快照版本
   int? get templeSnapshotRevision => _windowRevision;
@@ -187,77 +219,6 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
     _levelPositions = const [];
     _levelIndexRevision = null;
     return _startQueryChange();
-  }
-
-  /// 跳转到指定角色等级
-  ///
-  /// [level] 目标角色等级
-  /// [beforeItemsReplaced] 目标分页窗口提交前的滚动位置校正回调
-  Future<bool> jumpToLevel(
-    int level, {
-    required void Function(
-      int itemIndex,
-      List<UserTempleSnapshotEntry> items,
-    ) beforeItemsReplaced,
-  }) async {
-    if (_sort != UserTempleSnapshotSort.characterLevel || _isDisposed) {
-      return false;
-    }
-    final generation = ++_queryGeneration;
-    var committedGeneration = generation;
-    await _waitForInitialLoadAndBlockingRefresh();
-    while (!_isDisposed && generation == _queryGeneration) {
-      await waitForPagingIdle();
-      if (_isDisposed || generation != _queryGeneration) {
-        return false;
-      }
-      final snapshotRevision = _levelIndexRevision;
-      final position =
-          _levelPositions.where((item) => item.level == level).firstOrNull;
-      if (snapshotRevision == null || position == null) {
-        return false;
-      }
-      final targetPage = position.absoluteIndex ~/ pageSize + 1;
-      final firstPage = (targetPage - 1).clamp(1, targetPage).toInt();
-      final itemIndex = position.absoluteIndex % pageSize +
-          (targetPage - firstPage) * pageSize;
-      final success = await replaceFromPage(
-        firstPage,
-        // 以目标页为中心读取前后相邻页，首尾页按实际可用页数加载
-        followingPageCount: 2,
-        shouldCommit: () => !_isDisposed && generation == _queryGeneration,
-        beforeCommit: (items) {
-          beforeItemsReplaced(itemIndex, items);
-          // 使已捕获旧可视锚点的刷新重新按跳转后窗口计算
-          committedGeneration = ++_queryGeneration;
-        },
-        pageLoader: ({required page, required pageSize}) => _readRequiredPage(
-          page: page,
-          pageSize: pageSize,
-          expectedRevision: snapshotRevision,
-        ),
-      );
-      if (_isDisposed || committedGeneration != _queryGeneration) {
-        return false;
-      }
-      if (success) {
-        _windowFirstPage = firstPage;
-        _windowRevision = snapshotRevision;
-        _resumePagingAfterIndependentWindowCommit();
-        notifyListeners();
-        return true;
-      }
-      final sourceState = await _snapshotRepository.readSourceState(_username);
-      if (_isDisposed || generation != _queryGeneration) {
-        return false;
-      }
-      if (sourceState?.revisions.temples == snapshotRevision) {
-        return false;
-      }
-      // 刷新事务切换快照后重读等级目录，避免旧下标命中新分页
-      await _refreshLevelPositions();
-    }
-    return false;
   }
 
   /// 向当前窗口前方加载相邻页
@@ -420,14 +381,42 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
         continue;
       }
       final anchorItemIndex = _readVisibleTempleIndex();
-      final visibleAbsoluteIndex = anchorItemIndex == null
-          ? (_windowFirstPage - 1) * pageSize
-          : (_windowFirstPage - 1) * pageSize + anchorItemIndex;
-      final anchorAbsoluteIndex = replacementCountPage.totalItems <= 0
+      final isVirtualLevelGrid =
+          replacementSort == UserTempleSnapshotSort.characterLevel;
+      final previousAnchorEntry = isVirtualLevelGrid && anchorItemIndex != null
+          ? levelItemAt(anchorItemIndex)
+          : null;
+      final previousAnchorLevel = previousAnchorEntry?.item.level ??
+          (isVirtualLevelGrid ? _levelAtAbsoluteIndex(anchorItemIndex) : null);
+      final visibleAbsoluteIndex = isVirtualLevelGrid
+          ? anchorItemIndex ?? 0
+          : anchorItemIndex == null
+              ? (_windowFirstPage - 1) * pageSize
+              : (_windowFirstPage - 1) * pageSize + anchorItemIndex;
+      var anchorAbsoluteIndex = replacementCountPage.totalItems <= 0
           ? 0
           : visibleAbsoluteIndex
               .clamp(0, replacementCountPage.totalItems - 1)
               .toInt();
+      if (isVirtualLevelGrid && replacementCountPage.totalItems > 0) {
+        final persistedAnchorIndex = previousAnchorEntry == null
+            ? null
+            : await _snapshotRepository.readTempleLevelAbsoluteIndex(
+                username: _username,
+                templeId: previousAnchorEntry.item.id,
+                direction: replacementDirection,
+                searchKeyword: replacementSearchKeyword,
+                expectedRevision: targetRevision,
+              );
+        anchorAbsoluteIndex = persistedAnchorIndex ??
+            _fallbackLevelAbsoluteIndex(
+              replacementLevelIndex?.positions ??
+                  const <UserTempleLevelPosition>[],
+              previousLevel: previousAnchorLevel,
+              previousAbsoluteIndex: visibleAbsoluteIndex,
+              totalItems: replacementCountPage.totalItems,
+            );
+      }
       final anchorPage = anchorAbsoluteIndex ~/ pageSize + 1;
       final firstPage =
           (anchorPage - _refreshAdjacentPageCount).clamp(1, anchorPage).toInt();
@@ -442,7 +431,7 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
             replacementSort == _sort &&
             replacementDirection == _direction &&
             replacementSearchKeyword == _searchKeyword,
-        beforeCommit: anchorItemIndex == null
+        beforeCommit: anchorItemIndex == null || isVirtualLevelGrid
             ? null
             : (replacementItems) => _onBeforeTempleDataReplaced(
                   anchorItemIndex,
@@ -481,12 +470,16 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
       _levelIndexRevision = replacementLevelIndex?.revision;
       _windowFirstPage = firstPage;
       _windowRevision = targetRevision;
+      _commitLevelPageCache();
       _committedSort = _sort;
       _committedDirection = _direction;
       _committedSearchKeyword = _searchKeyword;
       _committedLevelPositions = _levelPositions;
       _committedLevelIndexRevision = _levelIndexRevision;
       notifyListeners();
+      if (isVirtualLevelGrid && replacementCountPage.totalItems > 0) {
+        _onRestoreTempleLevelAnchor(anchorAbsoluteIndex);
+      }
       return true;
     }
     return false;
@@ -527,6 +520,7 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
       }
       if (success) {
         _windowFirstPage = 1;
+        _commitLevelPageCache();
       }
       return success;
     } catch (_) {

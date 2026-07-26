@@ -39,6 +39,7 @@ dependencies:
   signalr_netcore:
   skeletonizer:
   sqflite:
+  super_sliver_list: ^0.4.1
   url_launcher:
   webview_flutter:
   liquid_glass_widgets: ^0.19.1

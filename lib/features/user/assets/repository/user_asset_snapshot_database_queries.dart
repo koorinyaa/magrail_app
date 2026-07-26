@@ -2,6 +2,96 @@ part of 'user_asset_snapshot_database.dart';
 
 /// 用户资产等级快速跳转目录查询
 extension UserAssetSnapshotDatabaseLevelIndex on UserAssetSnapshotDatabase {
+  /// 读取角色在等级排序结果中的绝对下标
+  ///
+  /// [username] 用户名
+  /// [characterId] 角色 ID
+  /// [direction] 等级排序方向
+  /// [searchKeyword] 角色 ID 或名称筛选词
+  /// [expectedRevision] 必须匹配的角色快照版本
+  Future<int?> readCharacterLevelAbsoluteIndex({
+    required String username,
+    required int characterId,
+    required UserCharacterSnapshotSortDirection direction,
+    required String searchKeyword,
+    required int expectedRevision,
+  }) async {
+    final database = await _openDatabase();
+    return database.transaction((transaction) async {
+      final storedState = await _readStoredSourceState(transaction, username);
+      if (storedState?.sourceState.revisions.characters != expectedRevision) {
+        return null;
+      }
+      final searchFilter = _characterSearchFilter(searchKeyword);
+      final anchorRows = await transaction.rawQuery(
+        'SELECT c.level, c.row_order FROM $_characterTableName c '
+        'WHERE c.username = ? AND c.character_id = ? '
+        '${searchFilter.clause} LIMIT 1',
+        [username, characterId, ...searchFilter.arguments],
+      );
+      if (anchorRows.isEmpty) {
+        return null;
+      }
+      final level = _rowInt(anchorRows.first['level']);
+      final rowOrder = _rowInt(anchorRows.first['row_order']);
+      final comparison =
+          direction == UserCharacterSnapshotSortDirection.ascending ? '<' : '>';
+      final countRows = await transaction.rawQuery(
+        'SELECT COUNT(*) AS item_count FROM $_characterTableName c '
+        'WHERE c.username = ? ${searchFilter.clause} '
+        'AND (c.level $comparison ? '
+        'OR (c.level = ? AND c.row_order < ?))',
+        [username, ...searchFilter.arguments, level, level, rowOrder],
+      );
+      return _rowInt(countRows.firstOrNull?['item_count']);
+    });
+  }
+
+  /// 读取圣殿在角色等级排序结果中的绝对下标
+  ///
+  /// [username] 用户名
+  /// [templeId] 圣殿 ID
+  /// [direction] 等级排序方向
+  /// [searchKeyword] 角色 ID 或名称筛选词
+  /// [expectedRevision] 必须匹配的圣殿快照版本
+  Future<int?> readTempleLevelAbsoluteIndex({
+    required String username,
+    required int templeId,
+    required UserTempleSnapshotSortDirection direction,
+    required String searchKeyword,
+    required int expectedRevision,
+  }) async {
+    final database = await _openDatabase();
+    return database.transaction((transaction) async {
+      final storedState = await _readStoredSourceState(transaction, username);
+      if (storedState?.sourceState.revisions.temples != expectedRevision) {
+        return null;
+      }
+      final searchFilter = _templeSearchFilter(searchKeyword);
+      final anchorRows = await transaction.rawQuery(
+        'SELECT t.character_level, t.row_order FROM $_templeTableName t '
+        'WHERE t.username = ? AND t.temple_id = ? '
+        '${searchFilter.clause} LIMIT 1',
+        [username, templeId, ...searchFilter.arguments],
+      );
+      if (anchorRows.isEmpty) {
+        return null;
+      }
+      final level = _rowInt(anchorRows.first['character_level']);
+      final rowOrder = _rowInt(anchorRows.first['row_order']);
+      final comparison =
+          direction == UserTempleSnapshotSortDirection.ascending ? '<' : '>';
+      final countRows = await transaction.rawQuery(
+        'SELECT COUNT(*) AS item_count FROM $_templeTableName t '
+        'WHERE t.username = ? ${searchFilter.clause} '
+        'AND (t.character_level $comparison ? '
+        'OR (t.character_level = ? AND t.row_order < ?))',
+        [username, ...searchFilter.arguments, level, level, rowOrder],
+      );
+      return _rowInt(countRows.firstOrNull?['item_count']);
+    });
+  }
+
   /// 读取等级排序下的快速跳转目录与角色快照版本
   ///
   /// [username] 用户名
@@ -30,13 +120,15 @@ extension UserAssetSnapshotDatabaseLevelIndex on UserAssetSnapshotDatabase {
       var absoluteIndex = 0;
       final positions = <UserCharacterLevelPosition>[];
       for (final row in rows) {
+        final itemCount = _rowInt(row['item_count']);
         positions.add(
           UserCharacterLevelPosition(
             level: _rowInt(row['level']),
             absoluteIndex: absoluteIndex,
+            itemCount: itemCount,
           ),
         );
-        absoluteIndex += _rowInt(row['item_count']);
+        absoluteIndex += itemCount;
       }
       return (
         positions: List<UserCharacterLevelPosition>.unmodifiable(positions),
@@ -73,13 +165,15 @@ extension UserAssetSnapshotDatabaseLevelIndex on UserAssetSnapshotDatabase {
       var absoluteIndex = 0;
       final positions = <UserTempleLevelPosition>[];
       for (final row in rows) {
+        final itemCount = _rowInt(row['item_count']);
         positions.add(
           UserTempleLevelPosition(
             level: _rowInt(row['character_level']),
             absoluteIndex: absoluteIndex,
+            itemCount: itemCount,
           ),
         );
-        absoluteIndex += _rowInt(row['item_count']);
+        absoluteIndex += itemCount;
       }
       return (
         positions: List<UserTempleLevelPosition>.unmodifiable(positions),
