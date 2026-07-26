@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 import 'package:magrail_app/features/user/assets/model/user_asset_level_layout.dart';
-import 'package:magrail_app/features/user/controller/current_user_temple_page_controller.dart';
+import 'package:magrail_app/features/user/controller/user_temple_snapshot_page_controller.dart';
 import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
 import 'package:magrail_app/features/user/widgets/user_asset_level_sliver_controller.dart';
 import 'package:magrail_app/features/user/widgets/user_temple_card.dart';
@@ -13,7 +13,7 @@ class UserTempleLevelVirtualSliver extends StatelessWidget {
   /// 创建用户圣殿等级虚拟网格
   ///
   /// [key] Flutter 组件标识
-  /// [controller] 当前用户圣殿页面控制器
+  /// [controller] 用户圣殿快照页面控制器
   /// [scrollController] 页面滚动控制器
   /// [levelSliverController] 等级虚拟列表滚动控制器
   /// [ownerLabel] 用户展示文案
@@ -29,8 +29,8 @@ class UserTempleLevelVirtualSliver extends StatelessWidget {
     this.onAssetTap,
   });
 
-  /// 当前用户圣殿页面控制器
-  final CurrentUserTemplePageController controller;
+  /// 用户圣殿快照页面控制器
+  final UserTempleSnapshotPageController controller;
 
   /// 页面滚动控制器
   final ScrollController scrollController;
@@ -121,7 +121,7 @@ class _TempleLevelRow extends StatelessWidget {
   ///
   /// [entry] 当前虚拟布局行
   /// [metrics] 当前网格尺寸
-  /// [controller] 当前用户圣殿页面控制器
+  /// [controller] 用户圣殿快照页面控制器
   /// [ownerLabel] 用户展示文案
   /// [onCharacterTap] 角色区域点击回调
   /// [onAssetTap] 圣殿资产入口点击回调
@@ -140,8 +140,8 @@ class _TempleLevelRow extends StatelessWidget {
   /// 当前网格尺寸
   final UserTempleGridMetrics metrics;
 
-  /// 当前用户圣殿页面控制器
-  final CurrentUserTemplePageController controller;
+  /// 用户圣殿快照页面控制器
+  final UserTempleSnapshotPageController controller;
 
   /// 用户展示文案
   final String ownerLabel;

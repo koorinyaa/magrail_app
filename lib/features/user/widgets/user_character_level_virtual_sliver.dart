@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:magrail_app/features/chara/widgets/character_asset_row_skeleton.dart';
 import 'package:magrail_app/features/user/assets/model/user_asset_level_layout.dart';
 import 'package:magrail_app/features/user/assets/model/user_character_snapshot_query.dart';
-import 'package:magrail_app/features/user/controller/current_user_character_page_controller.dart';
+import 'package:magrail_app/features/user/controller/user_character_snapshot_page_controller.dart';
 import 'package:magrail_app/features/user/model/user_character_api_item.dart';
 import 'package:magrail_app/features/user/widgets/user_asset_level_sliver_controller.dart';
 import 'package:magrail_app/features/user/widgets/user_asset_sliver_lists.dart';
@@ -13,7 +13,7 @@ class UserCharacterLevelVirtualSliver extends StatelessWidget {
   /// 创建用户角色等级虚拟列表
   ///
   /// [key] Flutter 组件标识
-  /// [controller] 当前用户角色页面控制器
+  /// [controller] 用户角色快照页面控制器
   /// [scrollController] 页面滚动控制器
   /// [levelSliverController] 等级虚拟列表滚动控制器
   /// [onCharacterTap] 角色条目点击回调
@@ -25,8 +25,8 @@ class UserCharacterLevelVirtualSliver extends StatelessWidget {
     this.onCharacterTap,
   });
 
-  /// 当前用户角色页面控制器
-  final CurrentUserCharacterPageController controller;
+  /// 用户角色快照页面控制器
+  final UserCharacterSnapshotPageController controller;
 
   /// 页面滚动控制器
   final ScrollController scrollController;

@@ -27,7 +27,7 @@ extension _UserTemplePageSearch on _UserTemplePageState {
   ///
   /// [keyword] 角色 ID 或名称筛选词
   Future<void> _applyTempleSearch(String keyword) async {
-    final controller = _currentUserController;
+    final controller = _snapshotController;
     if (controller == null) {
       return;
     }
@@ -49,7 +49,7 @@ extension _UserTemplePageSearch on _UserTemplePageState {
 
   /// 恢复控制器已提交的圣殿筛选词
   void _restoreTempleSearchInput() {
-    final keyword = _currentUserController?.searchKeyword ?? '';
+    final keyword = _snapshotController?.searchKeyword ?? '';
     _searchController.value = TextEditingValue(
       text: keyword,
       selection: TextSelection.collapsed(offset: keyword.length),

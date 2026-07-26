@@ -1,4 +1,4 @@
-/// 当前用户角色本地排序字段
+/// 用户角色本地排序字段
 enum UserCharacterSnapshotSort {
   /// 持股数量
   holdings('持股'),
@@ -24,7 +24,7 @@ enum UserCharacterSnapshotSort {
   /// 当前价格
   currentPrice('当前价');
 
-  /// 创建当前用户角色本地排序字段
+  /// 创建用户角色本地排序字段
   ///
   /// [label] 界面文案
   const UserCharacterSnapshotSort(this.label);
@@ -33,7 +33,7 @@ enum UserCharacterSnapshotSort {
   final String label;
 }
 
-/// 当前用户角色本地排序方向
+/// 用户角色本地排序方向
 enum UserCharacterSnapshotSortDirection {
   /// 升序
   ascending,
@@ -42,9 +42,9 @@ enum UserCharacterSnapshotSortDirection {
   descending,
 }
 
-/// 当前用户角色等级跳转位置
+/// 用户角色等级跳转位置
 class UserCharacterLevelPosition {
-  /// 创建当前用户角色等级跳转位置
+  /// 创建用户角色等级跳转位置
   ///
   /// [level] 角色等级
   /// [absoluteIndex] 当前排序下的起始下标

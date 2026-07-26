@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 import 'package:magrail_app/features/user/assets/model/user_temple_snapshot_query.dart';
-import 'package:magrail_app/features/user/controller/current_user_temple_page_controller.dart';
+import 'package:magrail_app/features/user/controller/user_temple_snapshot_page_controller.dart';
 
-/// 当前用户圣殿排序工具栏
+/// 用户圣殿排序工具栏
 class UserTempleSortToolbar extends StatelessWidget
     implements PreferredSizeWidget {
   /// 排序工具栏高度
   static const double toolbarHeight = 44;
 
-  /// 创建当前用户圣殿排序工具栏
+  /// 创建用户圣殿排序工具栏
   ///
   /// [key] Flutter 组件标识
-  /// [controller] 当前用户圣殿控制器
+  /// [controller] 用户圣殿快照控制器
   /// [onSortSelected] 排序选择回调
   const UserTempleSortToolbar({
     super.key,
@@ -21,8 +21,8 @@ class UserTempleSortToolbar extends StatelessWidget
     required this.onSortSelected,
   });
 
-  /// 当前用户圣殿控制器
-  final CurrentUserTemplePageController controller;
+  /// 用户圣殿快照控制器
+  final UserTempleSnapshotPageController controller;
 
   /// 排序选择回调
   final ValueChanged<UserTempleSnapshotSort> onSortSelected;
@@ -31,7 +31,7 @@ class UserTempleSortToolbar extends StatelessWidget
   @override
   Size get preferredSize => const Size.fromHeight(toolbarHeight);
 
-  /// 构建当前用户圣殿排序工具栏
+  /// 构建用户圣殿排序工具栏
   ///
   /// [context] 当前组件树上下文
   @override
@@ -51,29 +51,32 @@ class UserTempleSortToolbar extends StatelessWidget
           listenable: controller,
           builder: (context, child) {
             final sort = controller.sort;
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: AppSafeAreaInsets.fromLTRB(
-                context,
-                left: 12,
-                top: 6,
-                right: 12,
-                bottom: 8,
-              ),
-              child: Row(
-                children: [
-                  for (final option in UserTempleSnapshotSort.values) ...[
-                    if (option != UserTempleSnapshotSort.values.first)
-                      const SizedBox(width: 6),
-                    _UserTempleSortChip(
-                      label: option.label,
-                      isSelected: sort == option,
-                      direction: controller.direction,
-                      showDirection: sort == option,
-                      onPressed: () => onSortSelected(option),
-                    ),
+            return Align(
+              alignment: Alignment.centerLeft,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: AppSafeAreaInsets.fromLTRB(
+                  context,
+                  left: 12,
+                  top: 6,
+                  right: 12,
+                  bottom: 8,
+                ),
+                child: Row(
+                  children: [
+                    for (final option in UserTempleSnapshotSort.values) ...[
+                      if (option != UserTempleSnapshotSort.values.first)
+                        const SizedBox(width: 6),
+                      _UserTempleSortChip(
+                        label: option.label,
+                        isSelected: sort == option,
+                        direction: controller.direction,
+                        showDirection: sort == option,
+                        onPressed: () => onSortSelected(option),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             );
           },
@@ -83,9 +86,9 @@ class UserTempleSortToolbar extends StatelessWidget
   }
 }
 
-/// 当前用户圣殿排序选择项
+/// 用户圣殿排序选择项
 class _UserTempleSortChip extends StatelessWidget {
-  /// 创建当前用户圣殿排序选择项
+  /// 创建用户圣殿排序选择项
   ///
   /// [label] 选择项文案
   /// [isSelected] 是否选中
@@ -106,7 +109,7 @@ class _UserTempleSortChip extends StatelessWidget {
   final bool showDirection;
   final VoidCallback onPressed;
 
-  /// 构建当前用户圣殿排序选择项
+  /// 构建用户圣殿排序选择项
   ///
   /// [context] 当前组件树上下文
   @override

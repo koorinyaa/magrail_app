@@ -27,7 +27,7 @@ extension _UserCharacterPageSearch on _UserCharacterPageState {
   ///
   /// [keyword] 角色 ID 或名称筛选词
   Future<void> _applyCharacterSearch(String keyword) async {
-    final controller = _currentUserController;
+    final controller = _snapshotController;
     if (controller == null) {
       return;
     }
@@ -49,7 +49,7 @@ extension _UserCharacterPageSearch on _UserCharacterPageState {
 
   /// 恢复控制器已提交的角色筛选词
   void _restoreCharacterSearchInput() {
-    final keyword = _currentUserController?.searchKeyword ?? '';
+    final keyword = _snapshotController?.searchKeyword ?? '';
     _searchController.value = TextEditingValue(
       text: keyword,
       selection: TextSelection.collapsed(offset: keyword.length),

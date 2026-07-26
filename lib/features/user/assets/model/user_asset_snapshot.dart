@@ -151,38 +151,53 @@ class UserAssetSourceState {
   /// 两类原始数据是否仍在有效期内
   ///
   /// [now] 有效期判断基准时间
-  bool isFreshAt(DateTime now) {
+  /// [lifetime] 当前存储范围的有效期
+  bool isFreshAt(
+    DateTime now, {
+    Duration lifetime = userAssetCacheLifetime,
+  }) {
     if (!revisions.isComplete) {
       return false;
     }
     return _isTimestampFresh(
           charactersUpdatedAtMilliseconds,
           now.millisecondsSinceEpoch,
+          lifetime,
         ) &&
-        isTempleDataFreshAt(now);
+        isTempleDataFreshAt(now, lifetime: lifetime);
   }
 
   /// 用户角色数据是否仍在有效期内
   ///
   /// [now] 有效期判断基准时间
-  bool isCharacterDataFreshAt(DateTime now) {
+  /// [lifetime] 当前存储范围的有效期
+  bool isCharacterDataFreshAt(
+    DateTime now, {
+    Duration lifetime = userAssetCacheLifetime,
+  }) {
     return revisions.characters > 0 &&
         revisions.schemaVersion == userAssetSnapshotSchemaVersion &&
         _isTimestampFresh(
           charactersUpdatedAtMilliseconds,
           now.millisecondsSinceEpoch,
+          lifetime,
         );
   }
 
   /// 用户圣殿数据是否仍在有效期内
   ///
   /// [now] 有效期判断基准时间
-  bool isTempleDataFreshAt(DateTime now) {
+  /// [lifetime] 当前存储范围的有效期
+  bool isTempleDataFreshAt(
+    DateTime now, {
+    Duration lifetime = userAssetCacheLifetime,
+  }) {
     return revisions.temples > 0 &&
         revisions.schemaVersion == userAssetSnapshotSchemaVersion &&
         _isTimestampFresh(
           templesUpdatedAtMilliseconds,
           now.millisecondsSinceEpoch,
+          lifetime,
         );
   }
 
@@ -190,15 +205,17 @@ class UserAssetSourceState {
   ///
   /// [updatedAtMilliseconds] 原始数据更新时间戳
   /// [nowMilliseconds] 有效期判断基准时间戳
+  /// [lifetime] 当前存储范围的有效期
   bool _isTimestampFresh(
     int updatedAtMilliseconds,
     int nowMilliseconds,
+    Duration lifetime,
   ) {
     if (updatedAtMilliseconds <= 0) {
       return false;
     }
     final elapsedMilliseconds = nowMilliseconds - updatedAtMilliseconds;
     return elapsedMilliseconds >= 0 &&
-        elapsedMilliseconds < userAssetCacheLifetime.inMilliseconds;
+        elapsedMilliseconds < lifetime.inMilliseconds;
   }
 }

@@ -13,7 +13,7 @@ import 'package:magrail_app/core/widgets/app_loading_dialog.dart';
 import 'package:magrail_app/core/widgets/temple_cover_image.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
 import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_repository.dart';
-import 'package:magrail_app/features/user/controller/current_user_temple_page_controller.dart';
+import 'package:magrail_app/features/user/controller/user_temple_snapshot_page_controller.dart';
 import 'package:magrail_app/features/user/controller/user_temple_repair_sheet_controller.dart';
 import 'package:magrail_app/features/user/model/user_temple_repair_entry.dart';
 import 'package:magrail_app/shared/widgets/app_bottom_sheet_header.dart';
@@ -31,7 +31,7 @@ Future<void> showUserTempleRepairSheet(
   BuildContext context, {
   required UserAssetSnapshotRepository snapshotRepository,
   required CharacterDetailRepository characterRepository,
-  required CurrentUserTemplePageController pageController,
+  required UserTempleSnapshotPageController pageController,
   required String username,
 }) {
   return showModalBottomSheet<void>(
@@ -88,7 +88,7 @@ class UserTempleRepairSheet extends StatefulWidget {
   final CharacterDetailRepository characterRepository;
 
   /// 当前用户圣殿页面控制器
-  final CurrentUserTemplePageController pageController;
+  final UserTempleSnapshotPageController pageController;
 
   /// 当前登录用户名
   final String username;

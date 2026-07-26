@@ -4,69 +4,80 @@ import 'package:flutter/scheduler.dart';
 import 'package:magrail_app/core/controller/tinygrail_paged_list_controller.dart';
 import 'package:magrail_app/core/network/tinygrail_page.dart';
 import 'package:magrail_app/features/user/assets/model/user_asset_level_layout.dart';
-import 'package:magrail_app/features/user/assets/model/user_temple_snapshot_query.dart';
+import 'package:magrail_app/features/user/assets/model/user_character_snapshot_query.dart';
 import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_repository.dart';
 import 'package:magrail_app/features/user/controller/user_asset_sparse_page_cache.dart';
+import 'package:magrail_app/features/user/model/user_character_api_item.dart';
 
-part 'current_user_temple_page_controller_refresh.dart';
-part 'current_user_temple_page_controller_level.dart';
+part 'user_character_snapshot_page_controller_refresh.dart';
+part 'user_character_snapshot_page_controller_level.dart';
+part 'user_character_snapshot_page_controller_query.dart';
 
-/// 当前用户圣殿二级页面控制器
-class CurrentUserTemplePageController extends TinygrailPagedListController<
-    UserTempleSnapshotEntry, UserTempleSnapshotEntry> {
-  /// 创建当前用户圣殿二级页面控制器
+/// 用户角色快照二级页面控制器
+class UserCharacterSnapshotPageController extends TinygrailPagedListController<
+    UserCharacterApiItem, UserCharacterApiItem> {
+  /// 创建用户角色快照二级页面控制器
   ///
   /// [snapshotRepository] 用户资产快照仓库
   /// [username] 用户名
   /// [nickname] 用户昵称
   /// [onAutomaticRefreshSucceeded] 后台刷新成功回调
   /// [onAutomaticRefreshFailed] 后台刷新失败回调
-  /// [readVisibleTempleIndex] 读取当前可视圣殿下标，等级排序使用绝对下标
+  /// [readVisibleCharacterIndex] 读取当前可视角色下标，等级排序使用绝对下标
   /// [waitForScrollIdle] 等待列表滚动结束
-  /// [onBeforeTempleDataReplaced] 圣殿分页替换前的滚动位置校正回调
-  /// [onRestoreTempleLevelAnchor] 等级刷新后的圣殿位置恢复回调
-  /// [pageSize] 每页圣殿数量
-  CurrentUserTemplePageController({
+  /// [onBeforeCharacterDataReplaced] 角色分页替换前的滚动位置校正回调
+  /// [onRestoreCharacterLevelAnchor] 等级刷新后的角色位置恢复回调
+  /// [automaticRefreshEnabled] 首屏缓存展示后是否自动刷新
+  /// [initialAbsoluteIndex] 首屏优先读取的角色绝对下标
+  /// [pageSize] 每页角色数量
+  UserCharacterSnapshotPageController({
     required UserAssetSnapshotRepository snapshotRepository,
     required String username,
     required String nickname,
     required VoidCallback onAutomaticRefreshSucceeded,
     required VoidCallback onAutomaticRefreshFailed,
-    required int? Function() readVisibleTempleIndex,
+    required int? Function() readVisibleCharacterIndex,
     required Future<void> Function() waitForScrollIdle,
     required void Function(
       int previousItemIndex,
       int replacementItemIndex,
-      List<UserTempleSnapshotEntry> items,
-    ) onBeforeTempleDataReplaced,
-    required void Function(int absoluteIndex) onRestoreTempleLevelAnchor,
+      List<UserCharacterApiItem> items,
+    ) onBeforeCharacterDataReplaced,
+    required void Function(int absoluteIndex) onRestoreCharacterLevelAnchor,
+    bool automaticRefreshEnabled = true,
+    int initialAbsoluteIndex = 0,
     super.pageSize = defaultPageSize,
   })  : _snapshotRepository = snapshotRepository,
         _username = username.trim(),
         _nickname = nickname.trim(),
         _onAutomaticRefreshSucceeded = onAutomaticRefreshSucceeded,
         _onAutomaticRefreshFailed = onAutomaticRefreshFailed,
-        _readVisibleTempleIndex = readVisibleTempleIndex,
+        _readVisibleCharacterIndex = readVisibleCharacterIndex,
         _waitForScrollIdle = waitForScrollIdle,
-        _onBeforeTempleDataReplaced = onBeforeTempleDataReplaced,
-        _onRestoreTempleLevelAnchor = onRestoreTempleLevelAnchor;
+        _onBeforeCharacterDataReplaced = onBeforeCharacterDataReplaced,
+        _onRestoreCharacterLevelAnchor = onRestoreCharacterLevelAnchor,
+        _automaticRefreshEnabled = automaticRefreshEnabled,
+        _initialAbsoluteIndex =
+            initialAbsoluteIndex < 0 ? 0 : initialAbsoluteIndex;
 
-  /// 当前用户圣殿本地分页数量
-  static const int defaultPageSize = 50;
+  /// 用户角色快照本地分页数量
+  static const int defaultPageSize = 100;
 
   final UserAssetSnapshotRepository _snapshotRepository;
   final String _username;
   final String _nickname;
   final VoidCallback _onAutomaticRefreshSucceeded;
   final VoidCallback _onAutomaticRefreshFailed;
-  final int? Function() _readVisibleTempleIndex;
+  final int? Function() _readVisibleCharacterIndex;
   final Future<void> Function() _waitForScrollIdle;
   final void Function(
     int previousItemIndex,
     int replacementItemIndex,
-    List<UserTempleSnapshotEntry> items,
-  ) _onBeforeTempleDataReplaced;
-  final void Function(int absoluteIndex) _onRestoreTempleLevelAnchor;
+    List<UserCharacterApiItem> items,
+  ) _onBeforeCharacterDataReplaced;
+  final void Function(int absoluteIndex) _onRestoreCharacterLevelAnchor;
+  final bool _automaticRefreshEnabled;
+  final int _initialAbsoluteIndex;
 
   bool _isDisposed = false;
   bool _isPageBlockingRefresh = false;
@@ -76,45 +87,47 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
   bool _initialPageRequested = false;
   bool _shouldLoadNextPageAfterRefreshPause = false;
   bool _suppressAutomaticRefreshFailure = false;
-  Future<TinygrailPage<UserTempleSnapshotEntry>>? _initialPageOperation;
-  Future<bool>? _templeRefreshOperation;
+  Future<TinygrailPage<UserCharacterApiItem>>? _initialPageOperation;
+  Future<bool>? _characterRefreshOperation;
   Future<bool>? _automaticRefreshOperation;
   Future<bool>? _queryChangeOperation;
   Future<int>? _prependPageOperation;
-  UserTempleSnapshotSort _sort = UserTempleSnapshotSort.assets;
-  UserTempleSnapshotSortDirection _direction =
-      UserTempleSnapshotSortDirection.descending;
-  UserTempleSnapshotSort _committedSort = UserTempleSnapshotSort.assets;
-  UserTempleSnapshotSortDirection _committedDirection =
-      UserTempleSnapshotSortDirection.descending;
+  // 当前交互查询与已提交查询分离，失败时回滚到已展示列表
+  UserCharacterSnapshotSort _sort = UserCharacterSnapshotSort.holdings;
+  UserCharacterSnapshotSortDirection _direction =
+      UserCharacterSnapshotSortDirection.descending;
+  UserCharacterSnapshotSort _committedSort = UserCharacterSnapshotSort.holdings;
+  UserCharacterSnapshotSortDirection _committedDirection =
+      UserCharacterSnapshotSortDirection.descending;
   String _searchKeyword = '';
   String _committedSearchKeyword = '';
-  List<UserTempleLevelPosition> _levelPositions = const [];
-  List<UserTempleLevelPosition> _committedLevelPositions = const [];
+  List<UserCharacterLevelPosition> _levelPositions = const [];
+  List<UserCharacterLevelPosition> _committedLevelPositions = const [];
   // 等级目录版本用于确保快速跳转下标与目标分页来自同一快照
   int? _levelIndexRevision;
   int? _committedLevelIndexRevision;
-  final UserAssetSparsePageCache<UserTempleSnapshotEntry> _levelPageCache =
-      UserAssetSparsePageCache<UserTempleSnapshotEntry>(
+  final UserAssetSparsePageCache<UserCharacterApiItem> _levelPageCache =
+      UserAssetSparsePageCache<UserCharacterApiItem>(
     pageSize: defaultPageSize,
   );
   int _levelLayoutVersion = 0;
   // 可视分页版本用于判断哈希一致时页面是否仍需同步
   int? _windowRevision;
   int _windowFirstPage = 1;
+  // 查询代次用于丢弃搜索、排序和刷新期间的过期分页结果
   int _queryGeneration = 0;
 
   /// 当前排序字段
-  UserTempleSnapshotSort get sort => _sort;
+  UserCharacterSnapshotSort get sort => _sort;
 
   /// 当前排序方向
-  UserTempleSnapshotSortDirection get direction => _direction;
+  UserCharacterSnapshotSortDirection get direction => _direction;
 
   /// 当前角色 ID 或名称筛选词
   String get searchKeyword => _searchKeyword;
 
-  /// 当前角色等级快速跳转位置
-  List<UserTempleLevelPosition> get levelPositions => _levelPositions;
+  /// 等级快速跳转位置
+  List<UserCharacterLevelPosition> get levelPositions => _levelPositions;
 
   /// 等级排序虚拟布局分组
   List<UserAssetLevelGroup> get levelGroups => [
@@ -132,12 +145,8 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
   /// 等级排序条目总数
   int get levelItemCount => _levelPageCache.totalItems;
 
-  /// 是否使用等级虚拟网格
-  bool get usesVirtualLevelGrid =>
-      _sort == UserTempleSnapshotSort.characterLevel;
-
-  /// 当前页面使用的圣殿快照版本
-  int? get templeSnapshotRevision => _windowRevision;
+  /// 是否使用等级虚拟列表
+  bool get usesVirtualLevelList => _sort == UserCharacterSnapshotSort.level;
 
   /// 是否可以向前加载相邻页
   bool get canLoadPreviousPage =>
@@ -159,7 +168,7 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
   @override
   bool get forceInitialLoading => _isChangingQuery;
 
-  /// 校验当前用户圣殿分页请求
+  /// 校验用户角色快照分页请求
   @override
   Object? validatePageRequest() {
     if (_username.isEmpty) {
@@ -168,18 +177,18 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
     return null;
   }
 
-  /// 读取当前用户圣殿本地分页
+  /// 读取用户角色本地分页
   ///
   /// [page] 页码
-  /// [pageSize] 每页圣殿数量
+  /// [pageSize] 每页角色数量
   @override
-  Future<TinygrailPage<UserTempleSnapshotEntry>> requestPage({
+  Future<TinygrailPage<UserCharacterApiItem>> requestPage({
     required int page,
     required int pageSize,
   }) {
     if (page == 1 && !_initialPageRequested) {
       _initialPageRequested = true;
-      late final Future<TinygrailPage<UserTempleSnapshotEntry>> operation;
+      late final Future<TinygrailPage<UserCharacterApiItem>> operation;
       operation = _loadInitialPage(pageSize).whenComplete(() {
         if (identical(_initialPageOperation, operation)) {
           _initialPageOperation = null;
@@ -191,41 +200,11 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
     return _readRequiredPage(page: page, pageSize: pageSize);
   }
 
-  /// 切换当前用户圣殿排序
-  ///
-  /// [nextSort] 目标排序字段
-  Future<bool> selectSort(UserTempleSnapshotSort nextSort) {
-    final nextDirection = nextSort == _sort
-        ? (_direction == UserTempleSnapshotSortDirection.descending
-            ? UserTempleSnapshotSortDirection.ascending
-            : UserTempleSnapshotSortDirection.descending)
-        : UserTempleSnapshotSortDirection.descending;
-    _sort = nextSort;
-    _direction = nextDirection;
-    _levelPositions = const [];
-    _levelIndexRevision = null;
-    return _startQueryChange();
-  }
-
-  /// 应用角色 ID 或名称筛选
-  ///
-  /// [keyword] 角色 ID 或名称筛选词
-  Future<bool> applySearchFilter(String keyword) {
-    final resolvedKeyword = keyword.trim();
-    if (resolvedKeyword == _searchKeyword) {
-      return _queryChangeOperation ?? Future<bool>.value(true);
-    }
-    _searchKeyword = resolvedKeyword;
-    _levelPositions = const [];
-    _levelIndexRevision = null;
-    return _startQueryChange();
-  }
-
   /// 向当前窗口前方加载相邻页
   ///
   /// [beforeItemsPrepended] 相邻页提交前的滚动位置校正回调
   Future<int> loadPreviousPage({
-    void Function(List<UserTempleSnapshotEntry> items)? beforeItemsPrepended,
+    void Function(List<UserCharacterApiItem> items)? beforeItemsPrepended,
   }) {
     final existing = _prependPageOperation;
     if (existing != null) {
@@ -253,12 +232,13 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
     return operation;
   }
 
-  /// 刷新当前用户圣殿并替换当前分页窗口
+  /// 刷新用户角色并替换当前分页窗口
   @override
   Future<bool> refresh() async {
     final initialOperation = _initialPageOperation;
     if (initialOperation != null) {
       try {
+        // 首屏请求已完成时直接复用结果，避免下拉刷新重复写入快照
         await initialOperation;
         return !_isDisposed;
       } catch (_) {
@@ -273,7 +253,7 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
       _suppressAutomaticRefreshFailure = true;
       return automaticOperation;
     }
-    return _startOrJoinTempleRefresh(blockPageLoading: items.isEmpty);
+    return _startOrJoinCharacterRefresh(blockPageLoading: items.isEmpty);
   }
 
   /// 记录刷新暂停期间触发的预加载位置
@@ -297,7 +277,7 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
     }
   }
 
-  /// 释放当前用户圣殿控制器
+  /// 释放用户角色快照控制器
   @override
   void dispose() {
     _isDisposed = true;
@@ -306,8 +286,8 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
 
   /// 使用最新查询替换当前可视分页窗口
   ///
-  /// [expectedRevision] 刷新完成时确认的圣殿快照版本
-  Future<bool> _replaceWithLatestTempleWindow({
+  /// [expectedRevision] 刷新完成时确认的角色快照版本
+  Future<bool> _replaceWithLatestCharacterWindow({
     required int expectedRevision,
   }) async {
     var replacementRevision = expectedRevision;
@@ -325,7 +305,7 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
       final replacementDirection = _direction;
       final replacementSearchKeyword = _searchKeyword;
       final targetRevision = replacementRevision;
-      late final TinygrailPage<UserTempleSnapshotEntry> replacementCountPage;
+      late final TinygrailPage<UserCharacterApiItem> replacementCountPage;
       try {
         replacementCountPage = await _readRequiredPage(
           page: 1,
@@ -336,7 +316,7 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
         final latestRevision =
             (await _snapshotRepository.readSourceState(_username))
                 ?.revisions
-                .temples;
+                .characters;
         if (latestRevision != null && latestRevision != targetRevision) {
           replacementRevision = latestRevision;
           continue;
@@ -344,8 +324,8 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
         rethrow;
       }
       final replacementLevelIndex =
-          replacementSort == UserTempleSnapshotSort.characterLevel
-              ? await _snapshotRepository.readTempleLevelIndex(
+          replacementSort == UserCharacterSnapshotSort.level
+              ? await _snapshotRepository.readCharacterLevelIndex(
                   username: _username,
                   direction: replacementDirection,
                   searchKeyword: replacementSearchKeyword,
@@ -368,8 +348,10 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
           replacementSort != _sort ||
           replacementDirection != _direction ||
           replacementSearchKeyword != _searchKeyword) {
+        // 交互查询变化后重新读取窗口，避免保留刷新前的等级跳转目录
         continue;
       }
+      // 列表停止滚动后再读取锚点，避免刷新提交时跳到拖动中的旧位置
       await _waitForScrollIdle();
       if (_isDisposed) {
         return false;
@@ -380,15 +362,15 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
           replacementSearchKeyword != _searchKeyword) {
         continue;
       }
-      final anchorItemIndex = _readVisibleTempleIndex();
-      final isVirtualLevelGrid =
-          replacementSort == UserTempleSnapshotSort.characterLevel;
-      final previousAnchorEntry = isVirtualLevelGrid && anchorItemIndex != null
+      final anchorItemIndex = _readVisibleCharacterIndex();
+      final isVirtualLevelList =
+          replacementSort == UserCharacterSnapshotSort.level;
+      final previousAnchorItem = isVirtualLevelList && anchorItemIndex != null
           ? levelItemAt(anchorItemIndex)
           : null;
-      final previousAnchorLevel = previousAnchorEntry?.item.level ??
-          (isVirtualLevelGrid ? _levelAtAbsoluteIndex(anchorItemIndex) : null);
-      final visibleAbsoluteIndex = isVirtualLevelGrid
+      final previousAnchorLevel = previousAnchorItem?.level ??
+          (isVirtualLevelList ? _levelAtAbsoluteIndex(anchorItemIndex) : null);
+      final visibleAbsoluteIndex = isVirtualLevelList
           ? anchorItemIndex ?? 0
           : anchorItemIndex == null
               ? (_windowFirstPage - 1) * pageSize
@@ -398,12 +380,12 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
           : visibleAbsoluteIndex
               .clamp(0, replacementCountPage.totalItems - 1)
               .toInt();
-      if (isVirtualLevelGrid && replacementCountPage.totalItems > 0) {
-        final persistedAnchorIndex = previousAnchorEntry == null
+      if (isVirtualLevelList && replacementCountPage.totalItems > 0) {
+        final persistedAnchorIndex = previousAnchorItem == null
             ? null
-            : await _snapshotRepository.readTempleLevelAbsoluteIndex(
+            : await _snapshotRepository.readCharacterLevelAbsoluteIndex(
                 username: _username,
-                templeId: previousAnchorEntry.item.id,
+                characterId: previousAnchorItem.characterId,
                 direction: replacementDirection,
                 searchKeyword: replacementSearchKeyword,
                 expectedRevision: targetRevision,
@@ -411,7 +393,7 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
         anchorAbsoluteIndex = persistedAnchorIndex ??
             _fallbackLevelAbsoluteIndex(
               replacementLevelIndex?.positions ??
-                  const <UserTempleLevelPosition>[],
+                  const <UserCharacterLevelPosition>[],
               previousLevel: previousAnchorLevel,
               previousAbsoluteIndex: visibleAbsoluteIndex,
               totalItems: replacementCountPage.totalItems,
@@ -431,9 +413,9 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
             replacementSort == _sort &&
             replacementDirection == _direction &&
             replacementSearchKeyword == _searchKeyword,
-        beforeCommit: anchorItemIndex == null || isVirtualLevelGrid
+        beforeCommit: anchorItemIndex == null || isVirtualLevelList
             ? null
-            : (replacementItems) => _onBeforeTempleDataReplaced(
+            : (replacementItems) => _onBeforeCharacterDataReplaced(
                   anchorItemIndex,
                   anchorAbsoluteIndex - (firstPage - 1) * pageSize,
                   replacementItems,
@@ -458,15 +440,15 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
         final latestRevision =
             (await _snapshotRepository.readSourceState(_username))
                 ?.revisions
-                .temples;
+                .characters;
         if (latestRevision != null && latestRevision != targetRevision) {
           replacementRevision = latestRevision;
           continue;
         }
         return false;
       }
-      _levelPositions =
-          replacementLevelIndex?.positions ?? const <UserTempleLevelPosition>[];
+      _levelPositions = replacementLevelIndex?.positions ??
+          const <UserCharacterLevelPosition>[];
       _levelIndexRevision = replacementLevelIndex?.revision;
       _windowFirstPage = firstPage;
       _windowRevision = targetRevision;
@@ -477,116 +459,34 @@ class CurrentUserTemplePageController extends TinygrailPagedListController<
       _committedLevelPositions = _levelPositions;
       _committedLevelIndexRevision = _levelIndexRevision;
       notifyListeners();
-      if (isVirtualLevelGrid && replacementCountPage.totalItems > 0) {
-        _onRestoreTempleLevelAnchor(anchorAbsoluteIndex);
+      if (isVirtualLevelList && replacementCountPage.totalItems > 0) {
+        _onRestoreCharacterLevelAnchor(anchorAbsoluteIndex);
       }
       return true;
     }
     return false;
   }
 
-  /// 应用最新排序与筛选并从第一页重新加载
-  ///
-  /// [generation] 查询请求代次
-  /// [previousQueryOperation] 前一次查询任务
-  Future<bool> _applyQueryChange(
-    int generation,
-    Future<bool>? previousQueryOperation,
-  ) async {
-    try {
-      if (previousQueryOperation != null) {
-        try {
-          await previousQueryOperation;
-        } catch (_) {
-          // 前一次查询失败不阻止最新查询继续读取本地数据
-        }
-      }
-      await _waitForInitialLoadAndBlockingRefresh();
-      await waitForPagingIdle();
-      if (_isDisposed || generation != _queryGeneration) {
-        return false;
-      }
-      await _refreshLevelPositions();
-      await waitForPagingIdle();
-      if (_isDisposed || generation != _queryGeneration) {
-        return false;
-      }
-      final success = await replaceFromPage(
-        1,
-        shouldCommit: () => !_isDisposed && generation == _queryGeneration,
-      );
-      if (_isDisposed || generation != _queryGeneration) {
-        return false;
-      }
-      if (success) {
-        _windowFirstPage = 1;
-        _commitLevelPageCache();
-      }
-      return success;
-    } catch (_) {
-      return false;
-    } finally {
-      if (generation == _queryGeneration) {
-        _setChangingQuery(false);
-      }
-    }
-  }
-
-  /// 启动排序或筛选查询
-  Future<bool> _startQueryChange() {
-    final generation = ++_queryGeneration;
-    _setChangingQuery(true);
-    final previousQueryOperation = _queryChangeOperation;
-    late final Future<bool> operation;
-    operation = _applyQueryChange(
-      generation,
-      previousQueryOperation,
-    ).then((success) {
-      if (!success && generation == _queryGeneration && !_isDisposed) {
-        _sort = _committedSort;
-        _direction = _committedDirection;
-        _searchKeyword = _committedSearchKeyword;
-        _levelPositions = _committedLevelPositions;
-        _levelIndexRevision = _committedLevelIndexRevision;
-        notifyListeners();
-      } else if (success && generation == _queryGeneration && !_isDisposed) {
-        _committedSort = _sort;
-        _committedDirection = _direction;
-        _committedSearchKeyword = _searchKeyword;
-        _committedLevelPositions = _levelPositions;
-        _committedLevelIndexRevision = _levelIndexRevision;
-        _resumePagingAfterIndependentWindowCommit();
-      }
-      return success;
-    }).whenComplete(() {
-      if (identical(_queryChangeOperation, operation)) {
-        _queryChangeOperation = null;
-      }
-    });
-    _queryChangeOperation = operation;
-    return operation;
-  }
-
-  /// 更新排序或筛选切换加载状态
-  ///
-  /// [value] 是否正在切换查询条件
-  void _setChangingQuery(bool value) {
-    if (_isDisposed || _isChangingQuery == value) {
-      return;
-    }
-    _isChangingQuery = value;
-    notifyListeners();
-  }
-
   /// 通知页面刷新状态变化
   void _notifyRefreshStateChanged() => notifyListeners();
 
-  /// 转换当前用户圣殿展示条目
+  /// 等待当前分页读写结束
+  Future<void> _waitForPagingToSettle() => waitForPagingIdle();
+
+  /// 使用当前查询从第一页替换角色窗口
   ///
-  /// [items] 本地圣殿条目
+  /// [shouldCommit] 提交前的查询代次校验
+  Future<bool> _replaceQueryFromFirstPage({
+    required bool Function() shouldCommit,
+  }) {
+    return replaceFromPage(1, shouldCommit: shouldCommit);
+  }
+
+  /// 转换用户角色展示条目
+  ///
+  /// [items] 本地角色条目
   @override
-  List<UserTempleSnapshotEntry> convertPageItems(
-    List<UserTempleSnapshotEntry> items,
-  ) =>
+  List<UserCharacterApiItem> convertPageItems(
+          List<UserCharacterApiItem> items) =>
       items;
 }

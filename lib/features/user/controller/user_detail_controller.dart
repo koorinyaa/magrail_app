@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
+import 'package:magrail_app/features/user/assets/controller/user_asset_snapshot_coordinator.dart';
 import 'package:magrail_app/features/user/controller/user_action_resolver.dart';
 import 'package:magrail_app/features/user/controller/user_chara_overview_loader.dart';
 import 'package:magrail_app/features/user/model/user_action_entry.dart';
@@ -16,17 +19,21 @@ class UserDetailController extends ChangeNotifier {
   /// 创建用户详情页控制器
   ///
   /// [repository] 用户仓库
+  /// [snapshotCoordinator] 用户资产快照全局协调器
   /// [username] 用户名，不传时展示当前登录用户
   UserDetailController({
     required UserRepository repository,
+    required UserAssetSnapshotCoordinator snapshotCoordinator,
     String? username,
   })  : _repository = repository,
+        _snapshotCoordinator = snapshotCoordinator,
         _charaOverviewLoader = UserCharaOverviewLoader(
           repository: repository,
         ),
         _username = username;
 
   final UserRepository _repository;
+  final UserAssetSnapshotCoordinator _snapshotCoordinator;
   final UserCharaOverviewLoader _charaOverviewLoader;
   final UserActionResolver _actionResolver = const UserActionResolver();
   final String? _username;
@@ -53,6 +60,7 @@ class UserDetailController extends ChangeNotifier {
   int _failureNotificationToken = 0;
   // 用户资料失效或重新加载时递增，用于丢弃旧资产预览响应
   int _charaLoadGeneration = 0;
+  String? _retainedOtherUsername;
 
   /// 用户资产资料
   UserDetailProfile? get profile => _profile;
@@ -251,6 +259,10 @@ class UserDetailController extends ChangeNotifier {
   @override
   void dispose() {
     _isDisposed = true;
+    final retainedOtherUsername = _retainedOtherUsername;
+    if (retainedOtherUsername != null) {
+      _snapshotCoordinator.releaseOtherUser(retainedOtherUsername);
+    }
     super.dispose();
   }
 
@@ -315,6 +327,24 @@ class UserDetailController extends ChangeNotifier {
       }
 
       _isCharaLoadFailed = result.hasError && _hasNoVisibleCharaOverview;
+
+      final currentUser = _repository.isCachedCurrentUser(username);
+      if (!currentUser && _retainedOtherUsername == null) {
+        _retainedOtherUsername = username;
+        _snapshotCoordinator.retainOtherUser(username);
+      }
+      // 用户页首屏请求均已结束后再排队全量任务，避免与预览请求争用网络
+      unawaited(
+        _snapshotCoordinator.refreshFromOverview(
+          username: username,
+          nickname: _profile?.nickname ?? '',
+          isCurrentUser: currentUser,
+          characterTotalItems:
+              result.didLoadCharacters ? result.characterTotalItems : null,
+          templeTotalItems:
+              result.didLoadTemples ? result.templeTotalItems : null,
+        ),
+      );
 
       // 部分区块失败时不写缓存，避免静默刷新用缺失区块覆盖旧缓存
       if (!result.hasError && _repository.isCachedCurrentUser(username)) {

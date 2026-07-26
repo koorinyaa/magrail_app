@@ -25,6 +25,7 @@ import 'package:magrail_app/features/scratch_ticket/repository/scratch_ticket_re
 import 'package:magrail_app/features/temple/repository/temple_asset_magic_repository.dart';
 import 'package:magrail_app/features/temple/repository/temple_repository.dart';
 import 'package:magrail_app/features/user/model/user_assets_fetch_result.dart';
+import 'package:magrail_app/features/user/assets/controller/user_asset_snapshot_coordinator.dart';
 import 'package:magrail_app/features/user/model/user_detail_entry_mode.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
 import 'package:magrail_app/features/user/view/user_detail_page.dart';
@@ -45,6 +46,7 @@ class MainNavigationPage extends StatefulWidget {
   /// [templeAssetMagicRepository] 圣殿资产魔法道具仓库
   /// [oosRepository] Tinygrail OOS 仓库
   /// [userRepository] 用户资产仓库
+  /// [userAssetSnapshotCoordinator] 用户资产快照全局协调器
   /// [scratchTicketRepository] 刮刮乐仓库
   /// [rankingRepository] 排行榜仓库
   /// [icoCharacterRepository] ICO 角色仓库
@@ -65,6 +67,7 @@ class MainNavigationPage extends StatefulWidget {
     required this.templeAssetMagicRepository,
     required this.oosRepository,
     required this.userRepository,
+    required this.userAssetSnapshotCoordinator,
     required this.scratchTicketRepository,
   });
 
@@ -109,6 +112,9 @@ class MainNavigationPage extends StatefulWidget {
 
   /// 用户资产仓库
   final UserRepository userRepository;
+
+  /// 用户资产快照全局协调器
+  final UserAssetSnapshotCoordinator userAssetSnapshotCoordinator;
 
   /// 刮刮乐仓库
   final ScratchTicketRepository scratchTicketRepository;
@@ -240,6 +246,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           authRepository: widget.authRepository,
           preferences: widget.preferences,
           repository: widget.userRepository,
+          snapshotCoordinator: widget.userAssetSnapshotCoordinator,
           characterDetailRepository: widget.characterDetailRepository,
           templeRepository: widget.templeRepository,
           templeAssetMagicRepository: widget.templeAssetMagicRepository,

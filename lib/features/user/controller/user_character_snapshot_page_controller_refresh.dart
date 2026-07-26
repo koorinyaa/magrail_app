@@ -1,11 +1,11 @@
-part of 'current_user_character_page_controller.dart';
+part of 'user_character_snapshot_page_controller.dart';
 
 // 静默刷新只重载当前页及前后各一页，避免替换整个角色列表
 const int _refreshAdjacentPageCount = 1;
 
-/// 当前用户角色控制器的刷新实现
-extension _CurrentUserCharacterPageControllerRefresh
-    on CurrentUserCharacterPageController {
+/// 用户角色快照控制器的刷新实现
+extension UserCharacterSnapshotPageControllerRefresh
+    on UserCharacterSnapshotPageController {
   /// 首屏缓存展示后的后台刷新
   void _scheduleAutomaticRefresh() {
     SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -34,6 +34,23 @@ extension _CurrentUserCharacterPageControllerRefresh
       _onAutomaticRefreshSucceeded();
     } else if (shouldReportFailure) {
       _onAutomaticRefreshFailed();
+    }
+  }
+
+  /// 从已写入数据库的最新角色快照替换可视窗口
+  Future<bool> reloadLatestSnapshot() async {
+    try {
+      final sourceState = await _snapshotRepository.readSourceState(_username);
+      final revision = sourceState?.revisions.characters;
+      if (revision == null || _isDisposed) {
+        return false;
+      }
+      if (revision == _windowRevision) {
+        return true;
+      }
+      return _replaceWithLatestCharacterWindow(expectedRevision: revision);
+    } catch (_) {
+      return false;
     }
   }
 
@@ -113,7 +130,7 @@ extension _CurrentUserCharacterPageControllerRefresh
     }
   }
 
-  /// 加载当前用户角色第一页
+  /// 加载用户角色第一页
   ///
   /// [pageSize] 每页角色数量
   Future<TinygrailPage<UserCharacterApiItem>> _loadInitialPage(
@@ -121,11 +138,16 @@ extension _CurrentUserCharacterPageControllerRefresh
   ) async {
     final sourceState = await _snapshotRepository.readSourceState(_username);
     TinygrailPage<UserCharacterApiItem>? cached;
-    if (sourceState?.isCharacterDataFreshAt(DateTime.now()) ?? false) {
+    if (sourceState?.isCharacterDataFreshAt(
+          DateTime.now(),
+          lifetime: _snapshotRepository.cacheLifetime,
+        ) ??
+        false) {
       final revision = sourceState!.revisions.characters;
+      final initialPage = _initialAbsoluteIndex ~/ pageSize + 1;
       cached = await _snapshotRepository.readCharacterPage(
         username: _username,
-        page: 1,
+        page: initialPage,
         pageSize: pageSize,
         sort: _sort,
         direction: _direction,
@@ -134,10 +156,13 @@ extension _CurrentUserCharacterPageControllerRefresh
       );
       if (cached != null) {
         _windowRevision = revision;
+        _windowFirstPage = initialPage;
       }
     }
     if (cached != null) {
-      _scheduleAutomaticRefresh();
+      if (_automaticRefreshEnabled) {
+        _scheduleAutomaticRefresh();
+      }
       return cached;
     }
 
@@ -164,7 +189,7 @@ extension _CurrentUserCharacterPageControllerRefresh
     return firstPage;
   }
 
-  /// 读取必须存在的当前用户角色分页
+  /// 读取必须存在的用户角色分页
   ///
   /// [page] 页码
   /// [pageSize] 每页角色数量

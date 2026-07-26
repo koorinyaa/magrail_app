@@ -12,7 +12,7 @@ extension _UserTemplePageScroll on _UserTemplePageState {
     _isProgrammaticLevelJump = true;
     int? absoluteIndex;
     try {
-      absoluteIndex = await _currentUserController?.prepareLevelJump(level);
+      absoluteIndex = await _snapshotController?.prepareLevelJump(level);
     } catch (_) {
       if (mounted && generation == _levelJumpGeneration) {
         _isProgrammaticLevelJump = false;
@@ -37,7 +37,7 @@ extension _UserTemplePageScroll on _UserTemplePageState {
 
   /// 读取当前视口顶部圣殿在当前排序中的下标
   int? _readVisibleTempleIndex() {
-    final controller = _currentUserController;
+    final controller = _snapshotController;
     if (!mounted ||
         controller == null ||
         !_scrollController.hasClients ||
@@ -102,7 +102,7 @@ extension _UserTemplePageScroll on _UserTemplePageState {
     int replacementItemIndex,
     List<UserTempleSnapshotEntry> replacementEntries,
   ) {
-    final controller = _currentUserController;
+    final controller = _snapshotController;
     if (!mounted ||
         controller == null ||
         !_scrollController.hasClients ||
@@ -162,7 +162,7 @@ extension _UserTemplePageScroll on _UserTemplePageState {
 
   /// 监听网格顶部并按需加载目标页前一页
   void _handleScroll() {
-    final controller = _currentUserController;
+    final controller = _snapshotController;
     if (controller == null ||
         controller.usesVirtualLevelGrid ||
         _isProgrammaticLevelJump ||
@@ -178,9 +178,9 @@ extension _UserTemplePageScroll on _UserTemplePageState {
 
   /// 加载目标窗口前一页并保持当前圣殿位置
   ///
-  /// [controller] 当前用户圣殿控制器
+  /// [controller] 用户圣殿快照控制器
   Future<void> _loadPreviousPage(
-    CurrentUserTemplePageController controller,
+    UserTempleSnapshotPageController controller,
   ) async {
     final showLevelHeaders =
         controller.sort == UserTempleSnapshotSort.characterLevel;
@@ -245,7 +245,7 @@ extension _UserTemplePageScroll on _UserTemplePageState {
 
   /// 解析当前页面的圣殿网格布局参数
   UserTempleGridMetrics _resolveGridMetrics() {
-    final controller = _currentUserController;
+    final controller = _snapshotController;
     return UserTempleResponsiveGrid.resolveMetrics(
       MediaQuery.sizeOf(context).width,
       AppSafeAreaInsets.horizontalSum(context),

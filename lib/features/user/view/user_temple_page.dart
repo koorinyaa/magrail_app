@@ -18,11 +18,10 @@ import 'package:magrail_app/features/temple/model/temple_asset_dialog_source.dar
 import 'package:magrail_app/features/temple/repository/temple_asset_magic_repository.dart';
 import 'package:magrail_app/features/temple/repository/temple_repository.dart';
 import 'package:magrail_app/features/temple/widgets/temple_asset_dialog.dart';
+import 'package:magrail_app/features/user/assets/controller/user_asset_snapshot_coordinator.dart';
 import 'package:magrail_app/features/user/assets/model/user_character_snapshot_query.dart';
 import 'package:magrail_app/features/user/assets/model/user_temple_snapshot_query.dart';
-import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_database.dart';
-import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_repository.dart';
-import 'package:magrail_app/features/user/controller/current_user_temple_page_controller.dart';
+import 'package:magrail_app/features/user/controller/user_temple_snapshot_page_controller.dart';
 import 'package:magrail_app/features/user/controller/user_temple_page_controller.dart';
 import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
@@ -36,6 +35,7 @@ import 'package:magrail_app/features/user/widgets/user_temple_sort_toolbar.dart'
 
 part 'user_temple_page_scroll.dart';
 part 'user_temple_page_search.dart';
+part 'user_temple_page_snapshot.dart';
 
 /// 用户圣殿二级页面
 class UserTemplePage extends StatefulWidget {
@@ -43,6 +43,7 @@ class UserTemplePage extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [repository] 用户仓库
+  /// [snapshotCoordinator] 用户资产快照全局协调器
   /// [characterDetailRepository] 角色详情仓库
   /// [templeRepository] 圣殿仓库
   /// [templeAssetMagicRepository] 圣殿资产魔法道具仓库
@@ -50,9 +51,11 @@ class UserTemplePage extends StatefulWidget {
   /// [username] 用户名
   /// [nickname] 用户昵称
   /// [currentUserName] 当前登录用户名
+  /// [templeTotalItems] 用户页预览返回的圣殿总数
   const UserTemplePage({
     super.key,
     required this.repository,
+    required this.snapshotCoordinator,
     required this.characterDetailRepository,
     required this.templeRepository,
     required this.templeAssetMagicRepository,
@@ -60,10 +63,14 @@ class UserTemplePage extends StatefulWidget {
     required this.username,
     this.nickname,
     this.currentUserName = '',
+    this.templeTotalItems,
   });
 
   /// 用户仓库
   final UserRepository repository;
+
+  /// 用户资产快照全局协调器
+  final UserAssetSnapshotCoordinator snapshotCoordinator;
 
   /// 角色详情仓库
   final CharacterDetailRepository characterDetailRepository;
@@ -86,6 +93,9 @@ class UserTemplePage extends StatefulWidget {
   /// 当前登录用户名
   final String currentUserName;
 
+  /// 用户页预览返回的圣殿总数
+  final int? templeTotalItems;
+
   /// 创建用户圣殿二级页面状态
   @override
   State<UserTemplePage> createState() => _UserTemplePageState();
@@ -98,8 +108,7 @@ class _UserTemplePageState extends State<UserTemplePage> {
   final UserAssetLevelSliverController _levelSliverController =
       UserAssetLevelSliverController();
   UserTemplePageController? _otherUserController;
-  CurrentUserTemplePageController? _currentUserController;
-  UserAssetSnapshotRepository? _snapshotRepository;
+  UserTempleSnapshotPageController? _snapshotController;
   bool _isLoadingPreviousPage = false;
   bool _isProgrammaticLevelJump = false;
   int _levelJumpGeneration = 0;
@@ -108,39 +117,24 @@ class _UserTemplePageState extends State<UserTemplePage> {
   VoidCallback? _scrollIdleListener;
   ValueNotifier<bool>? _scrollIdleNotifier;
   Timer? _searchDebounce;
+  bool _isAwaitingSnapshot = false;
 
   /// 初始化用户圣殿二级页面状态
   @override
   void initState() {
     super.initState();
-    if (_isCurrentUser) {
-      final snapshotRepository = UserAssetSnapshotRepository(
-        userRepository: widget.repository,
-        database: UserAssetSnapshotDatabase(),
-      );
-      _snapshotRepository = snapshotRepository;
-      final controller = CurrentUserTemplePageController(
-        snapshotRepository: snapshotRepository,
-        username: widget.username,
-        nickname: widget.nickname ?? '',
-        onAutomaticRefreshSucceeded: _showAutomaticRefreshSucceeded,
-        onAutomaticRefreshFailed: _showAutomaticRefreshFailed,
-        readVisibleTempleIndex: _readVisibleTempleIndex,
-        waitForScrollIdle: _waitForScrollIdle,
-        onBeforeTempleDataReplaced: _restoreVisibleTemplePosition,
-        onRestoreTempleLevelAnchor: _restoreTempleLevelAnchor,
-      );
-      _currentUserController = controller;
-      controller.initialize();
-    } else {
-      final controller = UserTemplePageController(
-        repository: widget.repository,
-        username: widget.username,
-      );
-      _otherUserController = controller;
-      controller.initialize();
+    final controller = UserTemplePageController(
+      repository: widget.repository,
+      username: widget.username,
+    );
+    _otherUserController = controller;
+    if (!_isCurrentUser) {
+      widget.snapshotCoordinator.retainOtherUser(widget.username);
     }
+    widget.snapshotCoordinator.addListener(_handleSnapshotCoordinatorChanged);
     _scrollController.addListener(_handleScroll);
+    controller.initialize();
+    unawaited(_prepareSnapshotMode());
   }
 
   /// 释放用户圣殿二级页面状态
@@ -161,7 +155,13 @@ class _UserTemplePageState extends State<UserTemplePage> {
       ..removeListener(_handleScroll)
       ..dispose();
     _levelSliverController.dispose();
-    _currentUserController?.dispose();
+    widget.snapshotCoordinator.removeListener(
+      _handleSnapshotCoordinatorChanged,
+    );
+    if (!_isCurrentUser) {
+      widget.snapshotCoordinator.releaseOtherUser(widget.username);
+    }
+    _snapshotController?.dispose();
     _otherUserController?.dispose();
     super.dispose();
   }
@@ -171,11 +171,16 @@ class _UserTemplePageState extends State<UserTemplePage> {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final currentController = _currentUserController;
-    if (currentController != null) {
-      return _buildCurrentUserPage(currentController);
+    final snapshotController = _snapshotController;
+    if (snapshotController != null) {
+      return _buildSnapshotPage(snapshotController);
     }
     return _buildOtherUserPage(_otherUserController!);
+  }
+
+  /// 提交圣殿快照模式切换后的页面重建
+  void _rebuildAfterSnapshotActivation() {
+    setState(() {});
   }
 
   /// 构建其他用户圣殿页面
@@ -185,11 +190,12 @@ class _UserTemplePageState extends State<UserTemplePage> {
     return TinygrailPagedSliverPage<UserTempleApiItem, UserTempleApiItem>(
       controller: controller,
       title: _title,
+      scrollController: _scrollController,
       loadingSliver: const UserTempleSkeletonGrid(),
       emptySliverBuilder: (context, controller) {
         return const PagedSliverState(
           title: '暂无圣殿',
-          message: '当前用户没有可展示的圣殿',
+          message: '该用户没有可展示的圣殿',
           icon: Icons.hourglass_empty_rounded,
         );
       },
@@ -208,28 +214,30 @@ class _UserTemplePageState extends State<UserTemplePage> {
     );
   }
 
-  /// 构建当前用户圣殿页面
+  /// 构建用户圣殿快照页面
   ///
-  /// [controller] 当前用户圣殿分页控制器
-  Widget _buildCurrentUserPage(CurrentUserTemplePageController controller) {
+  /// [controller] 用户圣殿快照分页控制器
+  Widget _buildSnapshotPage(UserTempleSnapshotPageController controller) {
     final page = TinygrailPagedSliverPage<UserTempleSnapshotEntry,
         UserTempleSnapshotEntry>(
       controller: controller,
       title: _title,
-      appBarActions: [
-        SizedBox(
-          width: kToolbarHeight,
-          child: Center(
-            child: IconButton(
-              onPressed: _openTempleRepairSheet,
-              icon: const Icon(
-                LucideIcons.wrench,
-                size: 22,
+      appBarActions: _isCurrentUser
+          ? [
+              SizedBox(
+                width: kToolbarHeight,
+                child: Center(
+                  child: IconButton(
+                    onPressed: _openTempleRepairSheet,
+                    icon: const Icon(
+                      LucideIcons.wrench,
+                      size: 22,
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-        ),
-      ],
+            ]
+          : null,
       appBarBottom: UserTempleSortToolbar(
         controller: controller,
         onSortSelected: (sort) {
@@ -242,7 +250,7 @@ class _UserTemplePageState extends State<UserTemplePage> {
         final isFiltering = controller.searchKeyword.isNotEmpty;
         return PagedSliverState(
           title: isFiltering ? '未找到圣殿' : '暂无圣殿',
-          message: isFiltering ? '没有符合搜索条件的圣殿' : '当前用户没有可展示的圣殿',
+          message: isFiltering ? '没有符合搜索条件的圣殿' : '该用户没有可展示的圣殿',
           icon: isFiltering
               ? Icons.search_off_rounded
               : Icons.hourglass_empty_rounded,
@@ -356,7 +364,7 @@ class _UserTemplePageState extends State<UserTemplePage> {
   ///
   /// [sort] 目标排序字段
   Future<void> _selectSort(UserTempleSnapshotSort sort) async {
-    final controller = _currentUserController;
+    final controller = _snapshotController;
     if (controller == null) {
       return;
     }
@@ -465,11 +473,13 @@ class _UserTemplePageState extends State<UserTemplePage> {
 
   /// 打开受损圣殿批量补塔抽屉
   void _openTempleRepairSheet() {
-    final snapshotRepository = _snapshotRepository;
-    final pageController = _currentUserController;
-    if (snapshotRepository == null || pageController == null) {
+    final pageController = _snapshotController;
+    if (!_isCurrentUser || pageController == null) {
       return;
     }
+    final snapshotRepository = widget.snapshotCoordinator.repositoryFor(
+      isCurrentUser: true,
+    );
     unawaited(
       showUserTempleRepairSheet(
         context,
@@ -481,23 +491,23 @@ class _UserTemplePageState extends State<UserTemplePage> {
     );
   }
 
-  /// 显示当前用户圣殿后台刷新成功提示
+  /// 显示圣殿数据刷新成功提示
   void _showAutomaticRefreshSucceeded() {
     if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) {
       return;
     }
-    AppToast.info(context, text: '圣殿数据刷新成功');
+    AppToast.info(context, text: '数据刷新成功');
   }
 
-  /// 显示当前用户圣殿后台刷新失败提示
+  /// 显示圣殿数据刷新失败提示
   void _showAutomaticRefreshFailed() {
     if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) {
       return;
     }
-    AppToast.error(context, text: '圣殿数据刷新失败');
+    AppToast.error(context, text: '数据刷新失败');
   }
 
-  /// 是否展示当前登录用户的本地圣殿快照
+  /// 是否为当前登录用户
   bool get _isCurrentUser {
     final username = widget.username.trim().toLowerCase();
     final currentUserName = widget.currentUserName.trim().toLowerCase();

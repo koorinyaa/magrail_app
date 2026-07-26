@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -25,8 +27,11 @@ import 'package:magrail_app/features/scratch_ticket/repository/scratch_ticket_re
 import 'package:magrail_app/features/temple/repository/temple_asset_magic_repository.dart';
 import 'package:magrail_app/features/temple/repository/temple_repository.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
+import 'package:magrail_app/features/user/assets/controller/user_asset_snapshot_coordinator.dart';
+import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_database.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart' as sqflite;
 
 /// 应用依赖集合
 class AppDependencies {
@@ -38,6 +43,7 @@ class AppDependencies {
   /// [updateController] 应用更新控制器
   /// [secureStorage] 安全存储
   /// [repositories] 业务仓库集合
+  /// [userAssetSnapshotCoordinator] 用户资产快照全局协调器
   AppDependencies({
     required this.apiClient,
     required this.authRepository,
@@ -45,6 +51,7 @@ class AppDependencies {
     required this.updateController,
     required this.secureStorage,
     required this.repositories,
+    required this.userAssetSnapshotCoordinator,
   });
 
   /// Tinygrail API 客户端
@@ -64,6 +71,9 @@ class AppDependencies {
 
   /// 业务仓库集合
   final AppRepositories repositories;
+
+  /// 用户资产快照全局协调器
+  final UserAssetSnapshotCoordinator userAssetSnapshotCoordinator;
 }
 
 /// 应用业务仓库集合
@@ -231,17 +241,38 @@ Future<AppDependencies> bootstrap() async {
     preferences: preferences,
   );
 
+  final repositories = AppRepositories(
+    apiClient: apiClient,
+    dio: dio,
+    authRepository: authRepository,
+    preferences: preferences,
+  );
+  final temporaryDirectory = await getTemporaryDirectory();
+  final separator = Platform.pathSeparator;
+  final temporarySnapshotPath =
+      '${temporaryDirectory.path}${separator}user_assets_ephemeral.sqlite';
+  try {
+    // 由 sqflite 协调单实例连接并清理附属文件，避免连接指向已删除的数据库
+    await sqflite.deleteDatabase(temporarySnapshotPath);
+  } catch (_) {
+    // 临时快照清理失败时仍由 SQLite 在后续 LRU 淘汰中删除用户数据
+  }
+  final userAssetSnapshotCoordinator = UserAssetSnapshotCoordinator(
+    userRepository: repositories.user,
+    persistentDatabase: UserAssetSnapshotDatabase(),
+    temporaryDatabase: UserAssetSnapshotDatabase(
+      databasePath: temporarySnapshotPath,
+      cacheLifetime: otherUserAssetSnapshotLifetime,
+    ),
+  );
+
   return AppDependencies(
     apiClient: apiClient,
     authRepository: authRepository,
     preferences: preferences,
     updateController: updateController,
     secureStorage: secureStorage,
-    repositories: AppRepositories(
-      apiClient: apiClient,
-      dio: dio,
-      authRepository: authRepository,
-      preferences: preferences,
-    ),
+    repositories: repositories,
+    userAssetSnapshotCoordinator: userAssetSnapshotCoordinator,
   );
 }

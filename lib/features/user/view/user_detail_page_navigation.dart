@@ -183,6 +183,8 @@ extension _UserDetailPageNavigation on _UserDetailPageState {
         'username': profile.name,
         'nickname': profile.nickname,
         if (_controller.isCurrentUser) 'currentUserName': profile.name,
+        if (_controller.templeTotalItems case final total?)
+          'templeTotalItems': '$total',
       },
     );
   }
@@ -197,6 +199,8 @@ extension _UserDetailPageNavigation on _UserDetailPageState {
         'username': profile.name,
         'nickname': profile.nickname,
         if (_controller.isCurrentUser) 'currentUserName': profile.name,
+        if (_controller.characterTotalItems case final total?)
+          'characterTotalItems': '$total',
       },
     );
   }

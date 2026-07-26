@@ -15,63 +15,6 @@ bool _canApplySourceUpdate({
       incomingUpdatedAtMilliseconds >= storedUpdatedAtMilliseconds;
 }
 
-/// 解析完整快照各来源的可写入状态
-///
-/// [current] 当前数据库状态
-/// [charactersUpdatedAtMilliseconds] 待写入用户角色完成时间戳
-/// [templesUpdatedAtMilliseconds] 待写入用户圣殿完成时间戳
-/// [characterContentHash] 待写入用户角色内容哈希
-/// [templeContentHash] 待写入用户圣殿内容哈希
-({
-  bool applyCharacters,
-  bool applyTemples,
-  bool characterChanged,
-  bool templeChanged,
-  int charactersUpdatedAtMilliseconds,
-  int templesUpdatedAtMilliseconds,
-  String characterContentHash,
-  String templeContentHash,
-}) _resolveSnapshotWrite({
-  required _StoredUserAssetSourceState? current,
-  required int charactersUpdatedAtMilliseconds,
-  required int templesUpdatedAtMilliseconds,
-  required String characterContentHash,
-  required String templeContentHash,
-}) {
-  // 较慢的旧刷新不得覆盖已由更新批次写入的同来源快照
-  final applyCharacters = _canApplySourceUpdate(
-    incomingUpdatedAtMilliseconds: charactersUpdatedAtMilliseconds,
-    storedUpdatedAtMilliseconds:
-        current?.sourceState.charactersUpdatedAtMilliseconds,
-  );
-  final applyTemples = _canApplySourceUpdate(
-    incomingUpdatedAtMilliseconds: templesUpdatedAtMilliseconds,
-    storedUpdatedAtMilliseconds:
-        current?.sourceState.templesUpdatedAtMilliseconds,
-  );
-  final resolvedCharacterContentHash = applyCharacters
-      ? characterContentHash
-      : current?.characterContentHash ?? '';
-  final resolvedTempleContentHash =
-      applyTemples ? templeContentHash : current?.templeContentHash ?? '';
-  return (
-    applyCharacters: applyCharacters,
-    applyTemples: applyTemples,
-    characterChanged: applyCharacters &&
-        current?.characterContentHash != resolvedCharacterContentHash,
-    templeChanged:
-        applyTemples && current?.templeContentHash != resolvedTempleContentHash,
-    charactersUpdatedAtMilliseconds: applyCharacters
-        ? charactersUpdatedAtMilliseconds
-        : current?.sourceState.charactersUpdatedAtMilliseconds ?? 0,
-    templesUpdatedAtMilliseconds: applyTemples
-        ? templesUpdatedAtMilliseconds
-        : current?.sourceState.templesUpdatedAtMilliseconds ?? 0,
-    characterContentHash: resolvedCharacterContentHash,
-    templeContentHash: resolvedTempleContentHash,
-  );
-}
-
 /// 用户资产快照数据库持久化操作
 extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
   /// 生成写入后的原始数据状态

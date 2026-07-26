@@ -2,6 +2,82 @@ part of 'user_asset_snapshot_database.dart';
 
 /// 用户资产等级快速跳转目录查询
 extension UserAssetSnapshotDatabaseLevelIndex on UserAssetSnapshotDatabase {
+  /// 读取角色在默认持股排序中的绝对下标
+  ///
+  /// [username] 用户名
+  /// [characterId] 角色 ID
+  Future<int?> readCharacterDefaultAbsoluteIndex({
+    required String username,
+    required int characterId,
+  }) async {
+    final database = await _openDatabase();
+    return database.transaction((transaction) async {
+      final storedState = await _readStoredSourceState(transaction, username);
+      if (!(storedState?.sourceState.isCharacterDataFreshAt(
+            DateTime.now(),
+            lifetime: _cacheLifetime,
+          ) ??
+          false)) {
+        return null;
+      }
+      final anchorRows = await transaction.rawQuery(
+        'SELECT user_total, row_order FROM $_characterTableName '
+        'WHERE username = ? AND character_id = ? LIMIT 1',
+        [username, characterId],
+      );
+      if (anchorRows.isEmpty) {
+        return null;
+      }
+      final userTotal = _rowInt(anchorRows.first['user_total']);
+      final rowOrder = _rowInt(anchorRows.first['row_order']);
+      final countRows = await transaction.rawQuery(
+        'SELECT COUNT(*) AS item_count FROM $_characterTableName '
+        'WHERE username = ? AND (user_total > ? '
+        'OR (user_total = ? AND row_order < ?))',
+        [username, userTotal, userTotal, rowOrder],
+      );
+      return _rowInt(countRows.firstOrNull?['item_count']);
+    });
+  }
+
+  /// 读取圣殿在默认资产排序中的绝对下标
+  ///
+  /// [username] 用户名
+  /// [templeId] 圣殿 ID
+  Future<int?> readTempleDefaultAbsoluteIndex({
+    required String username,
+    required int templeId,
+  }) async {
+    final database = await _openDatabase();
+    return database.transaction((transaction) async {
+      final storedState = await _readStoredSourceState(transaction, username);
+      if (!(storedState?.sourceState.isTempleDataFreshAt(
+            DateTime.now(),
+            lifetime: _cacheLifetime,
+          ) ??
+          false)) {
+        return null;
+      }
+      final anchorRows = await transaction.rawQuery(
+        'SELECT sacrifices, row_order FROM $_templeTableName '
+        'WHERE username = ? AND temple_id = ? LIMIT 1',
+        [username, templeId],
+      );
+      if (anchorRows.isEmpty) {
+        return null;
+      }
+      final sacrifices = _rowInt(anchorRows.first['sacrifices']);
+      final rowOrder = _rowInt(anchorRows.first['row_order']);
+      final countRows = await transaction.rawQuery(
+        'SELECT COUNT(*) AS item_count FROM $_templeTableName '
+        'WHERE username = ? AND (sacrifices > ? '
+        'OR (sacrifices = ? AND row_order < ?))',
+        [username, sacrifices, sacrifices, rowOrder],
+      );
+      return _rowInt(countRows.firstOrNull?['item_count']);
+    });
+  }
+
   /// 读取角色在等级排序结果中的绝对下标
   ///
   /// [username] 用户名

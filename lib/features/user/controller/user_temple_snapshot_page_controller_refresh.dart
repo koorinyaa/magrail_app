@@ -1,11 +1,11 @@
-part of 'current_user_temple_page_controller.dart';
+part of 'user_temple_snapshot_page_controller.dart';
 
 // 静默刷新只重载当前页及前后各一页，避免替换整个圣殿网格
 const int _refreshAdjacentPageCount = 1;
 
-/// 当前用户圣殿控制器的刷新实现
-extension _CurrentUserTemplePageControllerRefresh
-    on CurrentUserTemplePageController {
+/// 用户圣殿快照控制器的刷新实现
+extension UserTempleSnapshotPageControllerRefresh
+    on UserTempleSnapshotPageController {
   /// 首屏缓存展示后的后台刷新
   void _scheduleAutomaticRefresh() {
     SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -34,6 +34,23 @@ extension _CurrentUserTemplePageControllerRefresh
       _onAutomaticRefreshSucceeded();
     } else if (shouldReportFailure) {
       _onAutomaticRefreshFailed();
+    }
+  }
+
+  /// 从已写入数据库的最新圣殿快照替换可视窗口
+  Future<bool> reloadLatestSnapshot() async {
+    try {
+      final sourceState = await _snapshotRepository.readSourceState(_username);
+      final revision = sourceState?.revisions.temples;
+      if (revision == null || _isDisposed) {
+        return false;
+      }
+      if (revision == _windowRevision) {
+        return true;
+      }
+      return _replaceWithLatestTempleWindow(expectedRevision: revision);
+    } catch (_) {
+      return false;
     }
   }
 
@@ -113,7 +130,7 @@ extension _CurrentUserTemplePageControllerRefresh
     }
   }
 
-  /// 加载当前用户圣殿第一页
+  /// 加载用户圣殿第一页
   ///
   /// [pageSize] 每页圣殿数量
   Future<TinygrailPage<UserTempleSnapshotEntry>> _loadInitialPage(
@@ -121,11 +138,16 @@ extension _CurrentUserTemplePageControllerRefresh
   ) async {
     final sourceState = await _snapshotRepository.readSourceState(_username);
     TinygrailPage<UserTempleSnapshotEntry>? cached;
-    if (sourceState?.isTempleDataFreshAt(DateTime.now()) ?? false) {
+    if (sourceState?.isTempleDataFreshAt(
+          DateTime.now(),
+          lifetime: _snapshotRepository.cacheLifetime,
+        ) ??
+        false) {
       final revision = sourceState!.revisions.temples;
+      final initialPage = _initialAbsoluteIndex ~/ pageSize + 1;
       cached = await _snapshotRepository.readTemplePage(
         username: _username,
-        page: 1,
+        page: initialPage,
         pageSize: pageSize,
         sort: _sort,
         direction: _direction,
@@ -134,10 +156,13 @@ extension _CurrentUserTemplePageControllerRefresh
       );
       if (cached != null) {
         _windowRevision = revision;
+        _windowFirstPage = initialPage;
       }
     }
     if (cached != null) {
-      _scheduleAutomaticRefresh();
+      if (_automaticRefreshEnabled) {
+        _scheduleAutomaticRefresh();
+      }
       return cached;
     }
 
@@ -164,7 +189,7 @@ extension _CurrentUserTemplePageControllerRefresh
     return firstPage;
   }
 
-  /// 读取必须存在的当前用户圣殿分页
+  /// 读取必须存在的用户圣殿分页
   ///
   /// [page] 页码
   /// [pageSize] 每页圣殿数量

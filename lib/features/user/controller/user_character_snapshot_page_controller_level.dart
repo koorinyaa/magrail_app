@@ -1,8 +1,8 @@
-part of 'current_user_character_page_controller.dart';
+part of 'user_character_snapshot_page_controller.dart';
 
-/// 当前用户角色等级虚拟列表控制
-extension CurrentUserCharacterPageControllerLevel
-    on CurrentUserCharacterPageController {
+/// 用户角色等级虚拟列表控制
+extension UserCharacterSnapshotPageControllerLevel
+    on UserCharacterSnapshotPageController {
   /// 准备指定角色等级的目标分页
   ///
   /// [level] 目标角色等级

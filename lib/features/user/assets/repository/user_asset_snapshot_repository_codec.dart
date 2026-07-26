@@ -1,50 +1,5 @@
 part of 'user_asset_snapshot_repository.dart';
 
-/// 序列化用户资产快照明细
-///
-/// [request] 待序列化的用户资产
-_SerializedSnapshotRows _serializeUserAssetSnapshotRows(
-  _SnapshotRowsSerializeRequest request,
-) {
-  final characterRows = [
-    for (final item in request.characters)
-      UserCharacterSnapshotPayload(
-        id: item.characterId,
-        payloadJson: jsonEncode(item.toJson()),
-        name: item.name,
-        icon: item.icon,
-        level: item.level,
-        zeroCount: item.zeroCount,
-        starForces: item.starForces,
-        stars: item.stars,
-        userAmount: item.userAmount,
-        userTotal: item.userTotal,
-        sacrifices: item.sacrifices,
-        current: item.current,
-        fluctuation: item.fluctuation,
-        state: item.state,
-        price: item.price,
-        rate: item.rate,
-        rank: item.rank,
-        singleDividend: item.singleDividend,
-        totalDividend: item.totalDividend,
-      ),
-  ];
-  final templeRows = _buildTempleSnapshotRows(request.temples);
-  return _SerializedSnapshotRows(
-    characterRows: characterRows,
-    templeRows: templeRows,
-    characterContentHash: _contentHash(
-      characterRows.map((row) => '${row.id}:${row.payloadJson}'),
-      totalItems: request.characterTotalItems,
-    ),
-    templeContentHash: _contentHash(
-      templeRows.map((row) => '${row.id}:${row.payloadJson}'),
-      totalItems: request.templeTotalItems,
-    ),
-  );
-}
-
 /// 序列化用户圣殿快照明细
 ///
 /// [request] 待序列化的用户圣殿
@@ -187,34 +142,6 @@ T _decodeSnapshotRow<T>(
   return item;
 }
 
-/// 用户资产快照序列化请求
-class _SnapshotRowsSerializeRequest {
-  /// 创建用户资产快照序列化请求
-  ///
-  /// [characters] 用户全部角色
-  /// [temples] 用户全部圣殿
-  /// [characterTotalItems] 角色接口总数
-  /// [templeTotalItems] 圣殿接口总数
-  const _SnapshotRowsSerializeRequest({
-    required this.characters,
-    required this.temples,
-    required this.characterTotalItems,
-    required this.templeTotalItems,
-  });
-
-  /// 用户全部角色
-  final List<UserCharacterApiItem> characters;
-
-  /// 用户全部圣殿
-  final List<UserTempleApiItem> temples;
-
-  /// 角色接口总数
-  final int characterTotalItems;
-
-  /// 圣殿接口总数
-  final int templeTotalItems;
-}
-
 /// 用户角色快照序列化请求
 class _CharacterRowsSerializeRequest {
   /// 创建用户角色快照序列化请求
@@ -231,34 +158,6 @@ class _CharacterRowsSerializeRequest {
 
   /// 接口返回总数
   final int totalItems;
-}
-
-/// 用户资产快照序列化结果
-class _SerializedSnapshotRows {
-  /// 创建用户资产快照序列化结果
-  ///
-  /// [characterRows] 用户角色快照明细
-  /// [templeRows] 用户圣殿快照明细
-  /// [characterContentHash] 用户角色内容哈希
-  /// [templeContentHash] 用户圣殿内容哈希
-  const _SerializedSnapshotRows({
-    required this.characterRows,
-    required this.templeRows,
-    required this.characterContentHash,
-    required this.templeContentHash,
-  });
-
-  /// 用户角色快照明细
-  final List<UserCharacterSnapshotPayload> characterRows;
-
-  /// 用户圣殿快照明细
-  final List<UserTempleSnapshotPayload> templeRows;
-
-  /// 用户角色内容哈希
-  final String characterContentHash;
-
-  /// 用户圣殿内容哈希
-  final String templeContentHash;
 }
 
 /// 用户圣殿序列化结果

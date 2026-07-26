@@ -17,83 +17,27 @@ const String _sourceStateTableName = 'user_asset_snapshot_source_state';
 /// 用户资产快照数据库
 class UserAssetSnapshotDatabase {
   /// 创建用户资产快照数据库
-  UserAssetSnapshotDatabase();
-
-  // 用户资产快照在应用进程内共享单连接，避免页面与启动刷新并发打开数据库
-  static sqflite.Database? _database;
-  static Future<sqflite.Database>? _openingDatabase;
-
-  /// 写入完整用户资产快照
   ///
-  /// [record] 用户资产快照持久化记录
-  /// [charactersUpdatedAtMilliseconds] 用户角色更新时间戳
-  /// [templesUpdatedAtMilliseconds] 用户圣殿更新时间戳
-  /// [characterContentHash] 用户角色内容哈希
-  /// [templeContentHash] 用户圣殿内容哈希
-  Future<UserAssetSourceState> upsertSnapshotRecord(
-    UserAssetSnapshotRecord record, {
-    required int charactersUpdatedAtMilliseconds,
-    required int templesUpdatedAtMilliseconds,
-    required String characterContentHash,
-    required String templeContentHash,
-  }) async {
-    final database = await _openDatabase();
-    return database.transaction((transaction) async {
-      final current =
-          await _readStoredSourceState(transaction, record.username);
-      final metadata = await _readMetadata(transaction, record.username);
-      final resolvedWrite = _resolveSnapshotWrite(
-        current: current,
-        charactersUpdatedAtMilliseconds: charactersUpdatedAtMilliseconds,
-        templesUpdatedAtMilliseconds: templesUpdatedAtMilliseconds,
-        characterContentHash: characterContentHash,
-        templeContentHash: templeContentHash,
-      );
-      final sourceState = _buildSourceState(
-        current: current,
-        characterChanged: resolvedWrite.characterChanged,
-        templeChanged: resolvedWrite.templeChanged,
-        charactersUpdatedAtMilliseconds:
-            resolvedWrite.charactersUpdatedAtMilliseconds,
-        templesUpdatedAtMilliseconds:
-            resolvedWrite.templesUpdatedAtMilliseconds,
-      );
+  /// [databasePath] 数据库文件路径，不传时使用当前用户持久化数据库
+  /// [cacheLifetime] 当前数据库内快照的有效期
+  UserAssetSnapshotDatabase({
+    String databasePath = 'user_assets.sqlite',
+    Duration cacheLifetime = userAssetCacheLifetime,
+  })  : _databasePath = databasePath,
+        _cacheLifetime = cacheLifetime;
 
-      await _upsertMetadata(
-        transaction,
-        username: record.username,
-        nickname: record.nickname,
-        characterTotalItems: resolvedWrite.applyCharacters
-            ? record.characterTotalItems
-            : _rowInt(metadata?['character_total_items']),
-        templeTotalItems: resolvedWrite.applyTemples
-            ? record.templeTotalItems
-            : _rowInt(metadata?['temple_total_items']),
-      );
-      if (resolvedWrite.characterChanged) {
-        await _replaceCharacterRows(
-          transaction,
-          username: record.username,
-          rows: record.characterRows,
-        );
-      }
-      if (resolvedWrite.templeChanged) {
-        await _replaceTempleRows(
-          transaction,
-          username: record.username,
-          rows: record.templeRows,
-        );
-      }
-      await _writeSourceState(
-        transaction,
-        username: record.username,
-        sourceState: sourceState,
-        characterContentHash: resolvedWrite.characterContentHash,
-        templeContentHash: resolvedWrite.templeContentHash,
-      );
-      return sourceState;
-    });
-  }
+  // 同一路径在应用进程内共享单连接，持久化快照与临时快照保持存储隔离
+  static final Map<String, sqflite.Database> _databases = {};
+  static final Map<String, Future<sqflite.Database>> _openingDatabases = {};
+
+  final String _databasePath;
+  final Duration _cacheLifetime;
+
+  /// 数据库连接共享标识
+  String get storageKey => _databasePath;
+
+  /// 当前数据库内快照的有效期
+  Duration get cacheLifetime => _cacheLifetime;
 
   /// 单独写入用户角色快照并判断是否需要重新读取页面
   ///
@@ -260,7 +204,10 @@ class UserAssetSnapshotDatabase {
       }
       // 已展示窗口按版本继续读取，后台刷新完成后再整体替换
       if (expectedRevision == null &&
-          !sourceState.sourceState.isCharacterDataFreshAt(DateTime.now())) {
+          !sourceState.sourceState.isCharacterDataFreshAt(
+            DateTime.now(),
+            lifetime: _cacheLifetime,
+          )) {
         return null;
       }
       final storedTotalItems = await _countRows(
@@ -366,7 +313,10 @@ class UserAssetSnapshotDatabase {
       if (storedState == null) {
         throw StateError('圣殿快照不存在');
       }
-      if (!storedState.sourceState.isTempleDataFreshAt(DateTime.now())) {
+      if (!storedState.sourceState.isTempleDataFreshAt(
+        DateTime.now(),
+        lifetime: _cacheLifetime,
+      )) {
         throw StateError('圣殿快照已过期');
       }
       final countRows = await transaction.rawQuery(
@@ -435,7 +385,10 @@ class UserAssetSnapshotDatabase {
       }
       // 已展示窗口按版本继续读取，后台刷新完成后再整体替换
       if (expectedRevision == null &&
-          !storedState.sourceState.isTempleDataFreshAt(DateTime.now())) {
+          !storedState.sourceState.isTempleDataFreshAt(
+            DateTime.now(),
+            lifetime: _cacheLifetime,
+          )) {
         return null;
       }
       final storedTotalItems = await _countRows(

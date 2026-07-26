@@ -37,6 +37,7 @@ List<RouteBase> buildUserRoutes(
           authRepository: dependencies.authRepository,
           preferences: dependencies.preferences,
           repository: dependencies.repositories.user,
+          snapshotCoordinator: dependencies.userAssetSnapshotCoordinator,
           characterDetailRepository: dependencies.repositories.characterDetail,
           templeRepository: dependencies.repositories.temple,
           templeAssetMagicRepository:
@@ -152,6 +153,7 @@ List<RouteBase> buildUserRoutes(
         key: state.pageKey,
         child: UserTemplePage(
           repository: dependencies.repositories.user,
+          snapshotCoordinator: dependencies.userAssetSnapshotCoordinator,
           characterDetailRepository: dependencies.repositories.characterDetail,
           templeRepository: dependencies.repositories.temple,
           templeAssetMagicRepository:
@@ -160,6 +162,9 @@ List<RouteBase> buildUserRoutes(
           username: state.uri.queryParameters['username'] ?? '',
           nickname: state.uri.queryParameters['nickname'],
           currentUserName: state.uri.queryParameters['currentUserName'] ?? '',
+          templeTotalItems: int.tryParse(
+            state.uri.queryParameters['templeTotalItems'] ?? '',
+          ),
         ),
       ),
     ),
@@ -188,10 +193,14 @@ List<RouteBase> buildUserRoutes(
         key: state.pageKey,
         child: UserCharacterPage(
           repository: dependencies.repositories.user,
+          snapshotCoordinator: dependencies.userAssetSnapshotCoordinator,
           characterDetailRepository: dependencies.repositories.characterDetail,
           username: state.uri.queryParameters['username'] ?? '',
           nickname: state.uri.queryParameters['nickname'],
           currentUserName: state.uri.queryParameters['currentUserName'] ?? '',
+          characterTotalItems: int.tryParse(
+            state.uri.queryParameters['characterTotalItems'] ?? '',
+          ),
         ),
       ),
     ),

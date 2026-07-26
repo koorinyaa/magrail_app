@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:magrail_app/core/utils/user_error_message.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
 import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_repository.dart';
-import 'package:magrail_app/features/user/controller/current_user_temple_page_controller.dart';
+import 'package:magrail_app/features/user/controller/user_temple_snapshot_page_controller.dart';
 import 'package:magrail_app/features/user/model/user_temple_repair_entry.dart';
 
 /// 受损圣殿批量补塔抽屉控制器
@@ -19,7 +19,7 @@ final class UserTempleRepairSheetController extends ChangeNotifier {
   UserTempleRepairSheetController({
     required UserAssetSnapshotRepository snapshotRepository,
     required CharacterDetailRepository characterRepository,
-    required CurrentUserTemplePageController pageController,
+    required UserTempleSnapshotPageController pageController,
     required String username,
   })  : _snapshotRepository = snapshotRepository,
         _characterRepository = characterRepository,
@@ -31,7 +31,7 @@ final class UserTempleRepairSheetController extends ChangeNotifier {
 
   final UserAssetSnapshotRepository _snapshotRepository;
   final CharacterDetailRepository _characterRepository;
-  final CurrentUserTemplePageController _pageController;
+  final UserTempleSnapshotPageController _pageController;
   final String _username;
 
   List<UserTempleRepairEntry> _entries = const [];

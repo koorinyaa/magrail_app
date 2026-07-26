@@ -17,6 +17,26 @@ import 'package:magrail_app/features/user/repository/user_repository.dart';
 
 part 'user_asset_snapshot_repository_codec.dart';
 part 'user_asset_snapshot_repository_fetching.dart';
+part 'user_asset_snapshot_repository_repair.dart';
+part 'user_asset_snapshot_repository_scheduler.dart';
+
+/// 用户资产全量刷新优先级
+enum UserAssetSnapshotRefreshPriority {
+  /// 普通后台预加载
+  background,
+
+  /// 其他用户详情页预加载
+  userPage,
+
+  /// 当前登录用户预加载
+  currentUser,
+
+  /// 用户角色或圣殿二级页等待
+  secondaryPage,
+
+  /// 用户主动刷新
+  manual,
+}
 
 /// 用户资产快照仓库
 class UserAssetSnapshotRepository {
@@ -44,92 +64,75 @@ class UserAssetSnapshotRepository {
   static final Map<String, Future<_AllTemplesResult>> _templeFetchOperations =
       {};
 
+  static final _UserAssetSnapshotRefreshScheduler _refreshScheduler =
+      _UserAssetSnapshotRefreshScheduler();
+
   final UserRepository _userRepository;
   final UserAssetSnapshotDatabase _database;
+
+  /// 当前快照数据库的有效期
+  Duration get cacheLifetime => _database.cacheLifetime;
 
   /// 刷新并缓存用户资产快照
   ///
   /// [username] 用户名
   /// [nickname] 用户昵称
   /// [onProgress] 拉取进度回调
-  /// [maxServerConcurrency] 当前刷新允许的最大服务器并发请求数
   Future<UserAssetSnapshot> refreshSnapshot({
     required String username,
     required String nickname,
     required void Function(UserAssetSnapshotLoadProgress progress) onProgress,
-    int maxServerConcurrency = _maxServerConcurrency,
   }) async {
     final resolvedUsername = username.trim();
     if (resolvedUsername.isEmpty) {
       throw StateError('缺少用户名');
     }
 
-    final requestGate = _UserAssetSnapshotRequestGate(maxServerConcurrency);
-    late int charactersUpdatedAtMilliseconds;
-    late int templesUpdatedAtMilliseconds;
-    final charactersFuture = _fetchAllCharactersShared(
-      username: resolvedUsername,
-      requestGate: requestGate,
-      onProgress: onProgress,
-    ).then((result) {
-      charactersUpdatedAtMilliseconds = DateTime.now().millisecondsSinceEpoch;
-      return result;
-    });
-    final templesFuture = _fetchAllTemplesShared(
-      username: resolvedUsername,
-      requestGate: requestGate,
-      onProgress: onProgress,
-    ).then((result) {
-      templesUpdatedAtMilliseconds = DateTime.now().millisecondsSinceEpoch;
-      return result;
-    });
-    final results = await Future.wait<Object>([
-      charactersFuture,
-      templesFuture,
-    ]);
-    final characterResult = results[0] as _AllCharactersResult;
-    final templeResult = results[1] as _AllTemplesResult;
-    final serializedRows = await _serializeSnapshotRows(
-      _SnapshotRowsSerializeRequest(
-        characters: characterResult.items,
-        temples: templeResult.items,
-        characterTotalItems: characterResult.totalItems,
-        templeTotalItems: templeResult.totalItems,
-      ),
-    );
-    final sourceState = await _database.upsertSnapshotRecord(
-      UserAssetSnapshotRecord(
+    await Future.wait([
+      refreshCharacters(
         username: resolvedUsername,
-        nickname: nickname.trim(),
-        characterRows: serializedRows.characterRows,
-        templeRows: serializedRows.templeRows,
-        characterTotalItems: characterResult.totalItems,
-        templeTotalItems: templeResult.totalItems,
+        nickname: nickname,
+        onProgress: onProgress,
+        priority: UserAssetSnapshotRefreshPriority.manual,
       ),
-      charactersUpdatedAtMilliseconds: charactersUpdatedAtMilliseconds,
-      templesUpdatedAtMilliseconds: templesUpdatedAtMilliseconds,
-      characterContentHash: serializedRows.characterContentHash,
-      templeContentHash: serializedRows.templeContentHash,
-    );
-    if (sourceState.charactersUpdatedAtMilliseconds !=
-            charactersUpdatedAtMilliseconds ||
-        sourceState.templesUpdatedAtMilliseconds !=
-            templesUpdatedAtMilliseconds) {
-      // 旧批次被数据库拒绝时返回已持久化的新快照，避免分析结果与来源版本错位
-      final latestSnapshot = await readSnapshot(resolvedUsername);
-      if (latestSnapshot != null) {
-        return latestSnapshot;
-      }
+      refreshTemples(
+        username: resolvedUsername,
+        nickname: nickname,
+        onProgress: onProgress,
+        priority: UserAssetSnapshotRefreshPriority.manual,
+      ),
+    ]);
+    final snapshot = await readSnapshot(resolvedUsername);
+    if (snapshot == null) {
+      throw StateError('用户资产快照不可用');
     }
-    return UserAssetSnapshot(
-      username: resolvedUsername,
-      nickname: nickname.trim(),
-      characters: characterResult.items,
-      temples: templeResult.items,
-      characterTotalItems: characterResult.totalItems,
-      templeTotalItems: templeResult.totalItems,
-      sourceState: sourceState,
+    return snapshot;
+  }
+
+  /// 探测用户角色总数
+  ///
+  /// [username] 用户名
+  Future<int> probeCharacterTotalItems(String username) async {
+    final page = await _fetchUserCharacterPage(
+      username: username.trim(),
+      pageNumber: 1,
+      pageSize: _totalProbePageSize,
+      requestGate: _UserAssetSnapshotRequestGate(1),
     );
+    return page.totalItems > 0 ? page.totalItems : page.items.length;
+  }
+
+  /// 探测用户圣殿总数
+  ///
+  /// [username] 用户名
+  Future<int> probeTempleTotalItems(String username) async {
+    final page = await _fetchUserTemplePage(
+      username: username.trim(),
+      pageNumber: 1,
+      pageSize: _totalProbePageSize,
+      requestGate: _UserAssetSnapshotRequestGate(1),
+    );
+    return page.totalItems > 0 ? page.totalItems : page.items.length;
   }
 
   /// 读取用户资产原始数据状态
@@ -143,25 +146,85 @@ class UserAssetSnapshotRepository {
     return _database.readSourceState(resolvedUsername);
   }
 
+  /// 读取角色在默认持股排序中的绝对下标
+  ///
+  /// [username] 用户名
+  /// [characterId] 角色 ID
+  Future<int?> readCharacterDefaultAbsoluteIndex({
+    required String username,
+    required int characterId,
+  }) {
+    return _database.readCharacterDefaultAbsoluteIndex(
+      username: username.trim(),
+      characterId: characterId,
+    );
+  }
+
+  /// 读取圣殿在默认资产排序中的绝对下标
+  ///
+  /// [username] 用户名
+  /// [templeId] 圣殿 ID
+  Future<int?> readTempleDefaultAbsoluteIndex({
+    required String username,
+    required int templeId,
+  }) {
+    return _database.readTempleDefaultAbsoluteIndex(
+      username: username.trim(),
+      templeId: templeId,
+    );
+  }
+
   /// 单独刷新当前用户角色并判断是否需要重新读取页面
   ///
   /// [username] 用户名
   /// [nickname] 用户昵称
   /// [onProgress] 拉取进度回调
+  /// [totalItemsHint] 本次预览或探测得到的角色总数
+  /// [priority] 全量刷新优先级
   /// 返回是否需要重新读取快照窗口
   Future<bool> refreshCharacters({
     required String username,
     required String nickname,
     void Function(UserAssetSnapshotLoadProgress progress)? onProgress,
-  }) async {
+    int? totalItemsHint,
+    UserAssetSnapshotRefreshPriority priority =
+        UserAssetSnapshotRefreshPriority.manual,
+  }) {
     final resolvedUsername = username.trim();
     if (resolvedUsername.isEmpty) {
       throw StateError('缺少用户名');
     }
+    return _refreshScheduler.schedule(
+      key:
+          '${_database.storageKey}|${resolvedUsername.toLowerCase()}|characters',
+      priority: priority,
+      totalItemsHint: totalItemsHint,
+      action: (latestTotalItemsHint) => _refreshCharactersNow(
+        username: resolvedUsername,
+        nickname: nickname,
+        onProgress: onProgress,
+        totalItemsHint: latestTotalItemsHint,
+      ),
+    );
+  }
+
+  /// 执行单次角色全量刷新
+  ///
+  /// [username] 用户名
+  /// [nickname] 用户昵称
+  /// [onProgress] 拉取进度回调
+  /// [totalItemsHint] 开始请求前最后一次确认的角色总数
+  Future<bool> _refreshCharactersNow({
+    required String username,
+    required String nickname,
+    required void Function(UserAssetSnapshotLoadProgress progress)? onProgress,
+    required int? totalItemsHint,
+  }) async {
     final result = await _fetchAllCharactersShared(
-      username: resolvedUsername,
+      username: username,
       requestGate: _UserAssetSnapshotRequestGate(1),
       onProgress: onProgress ?? _ignoreSnapshotProgress,
+      totalItemsHint: totalItemsHint,
     );
     final serialized = await compute(
       _serializeUserCharacterSnapshotRows,
@@ -171,7 +234,7 @@ class UserAssetSnapshotRepository {
       ),
     );
     return _database.upsertCharacterSnapshot(
-      username: resolvedUsername,
+      username: username,
       nickname: nickname.trim(),
       rows: serialized.rows,
       totalItems: result.totalItems,
@@ -184,19 +247,52 @@ class UserAssetSnapshotRepository {
   ///
   /// [username] 用户名
   /// [nickname] 用户昵称
+  /// [onProgress] 拉取进度回调
+  /// [totalItemsHint] 本次预览或探测得到的圣殿总数
+  /// [priority] 全量刷新优先级
   /// 返回是否需要重新读取快照窗口
   Future<bool> refreshTemples({
     required String username,
     required String nickname,
-  }) async {
+    void Function(UserAssetSnapshotLoadProgress progress)? onProgress,
+    int? totalItemsHint,
+    UserAssetSnapshotRefreshPriority priority =
+        UserAssetSnapshotRefreshPriority.manual,
+  }) {
     final resolvedUsername = username.trim();
     if (resolvedUsername.isEmpty) {
       throw StateError('缺少用户名');
     }
+    return _refreshScheduler.schedule(
+      key: '${_database.storageKey}|${resolvedUsername.toLowerCase()}|temples',
+      priority: priority,
+      totalItemsHint: totalItemsHint,
+      action: (latestTotalItemsHint) => _refreshTemplesNow(
+        username: resolvedUsername,
+        nickname: nickname,
+        onProgress: onProgress,
+        totalItemsHint: latestTotalItemsHint,
+      ),
+    );
+  }
+
+  /// 执行单次圣殿全量刷新
+  ///
+  /// [username] 用户名
+  /// [nickname] 用户昵称
+  /// [onProgress] 拉取进度回调
+  /// [totalItemsHint] 开始请求前最后一次确认的圣殿总数
+  Future<bool> _refreshTemplesNow({
+    required String username,
+    required String nickname,
+    required void Function(UserAssetSnapshotLoadProgress progress)? onProgress,
+    required int? totalItemsHint,
+  }) async {
     final templeResult = await _fetchAllTemplesShared(
-      username: resolvedUsername,
+      username: username,
       requestGate: _UserAssetSnapshotRequestGate(1),
-      onProgress: _ignoreSnapshotProgress,
+      onProgress: onProgress ?? _ignoreSnapshotProgress,
+      totalItemsHint: totalItemsHint,
     );
     final serialized = await compute(
       _serializeUserTempleSnapshotRows,
@@ -205,47 +301,12 @@ class UserAssetSnapshotRepository {
       ),
     );
     return _database.upsertTempleSnapshot(
-      username: resolvedUsername,
+      username: username,
       nickname: nickname.trim(),
       templeRows: serialized.rows,
       templeTotalItems: templeResult.totalItems,
       templesUpdatedAtMilliseconds: DateTime.now().millisecondsSinceEpoch,
       templeContentHash: serialized.templeContentHash,
-    );
-  }
-
-  /// 获取受损圣殿补塔需要的完整原始数据
-  ///
-  /// [username] 用户名
-  Future<
-      ({
-        List<UserTempleApiItem> temples,
-        List<UserCharacterApiItem> characters,
-      })> fetchTempleRepairSource({
-    required String username,
-  }) async {
-    final resolvedUsername = username.trim();
-    if (resolvedUsername.isEmpty) {
-      throw StateError('缺少用户名');
-    }
-    final requestGate = _UserAssetSnapshotRequestGate(_maxServerConcurrency);
-    final results = await Future.wait<Object>([
-      _fetchAllTemplesShared(
-        username: resolvedUsername,
-        requestGate: requestGate,
-        onProgress: _ignoreSnapshotProgress,
-      ),
-      _fetchAllCharactersShared(
-        username: resolvedUsername,
-        requestGate: requestGate,
-        onProgress: _ignoreSnapshotProgress,
-      ),
-    ]);
-    final templeResult = results[0] as _AllTemplesResult;
-    final characterResult = results[1] as _AllCharactersResult;
-    return (
-      temples: templeResult.items,
-      characters: characterResult.items,
     );
   }
 
@@ -362,7 +423,10 @@ class UserAssetSnapshotRepository {
     final sourceState = record.sourceState;
     if (sourceState == null ||
         !sourceState.revisions.isComplete ||
-        !sourceState.isFreshAt(DateTime.now())) {
+        !sourceState.isFreshAt(
+          DateTime.now(),
+          lifetime: _database.cacheLifetime,
+        )) {
       return null;
     }
 
@@ -519,15 +583,6 @@ class UserAssetSnapshotRepository {
       totalItems: payloadPage.totalItems,
       itemsPerPage: payloadPage.itemsPerPage,
     );
-  }
-
-  /// 序列化快照明细
-  ///
-  /// [request] 待序列化资产列表
-  Future<_SerializedSnapshotRows> _serializeSnapshotRows(
-    _SnapshotRowsSerializeRequest request,
-  ) {
-    return compute(_serializeUserAssetSnapshotRows, request);
   }
 
   /// 反序列化快照明细

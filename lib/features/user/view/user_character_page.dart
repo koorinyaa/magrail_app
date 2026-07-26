@@ -10,10 +10,9 @@ import 'package:magrail_app/features/chara/detail/character_detail_navigation.da
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
 import 'package:magrail_app/features/chara/search/widgets/character_search_input_bar.dart';
 import 'package:magrail_app/features/chara/widgets/character_asset_skeleton_sliver_list.dart';
-import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_database.dart';
+import 'package:magrail_app/features/user/assets/controller/user_asset_snapshot_coordinator.dart';
 import 'package:magrail_app/features/user/assets/model/user_character_snapshot_query.dart';
-import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_repository.dart';
-import 'package:magrail_app/features/user/controller/current_user_character_page_controller.dart';
+import 'package:magrail_app/features/user/controller/user_character_snapshot_page_controller.dart';
 import 'package:magrail_app/features/user/controller/other_user_character_page_controller.dart';
 import 'package:magrail_app/features/user/model/user_character_api_item.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
@@ -24,6 +23,7 @@ import 'package:magrail_app/features/user/widgets/user_character_level_rail.dart
 import 'package:magrail_app/features/user/widgets/user_character_sort_toolbar.dart';
 
 part 'user_character_page_search.dart';
+part 'user_character_page_snapshot.dart';
 
 /// 用户角色二级页面
 class UserCharacterPage extends StatefulWidget {
@@ -31,21 +31,28 @@ class UserCharacterPage extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [repository] 用户仓库
+  /// [snapshotCoordinator] 用户资产快照全局协调器
   /// [characterDetailRepository] 角色详情仓库
   /// [username] 用户名
   /// [nickname] 用户昵称
   /// [currentUserName] 当前登录用户名
+  /// [characterTotalItems] 用户页预览返回的角色总数
   const UserCharacterPage({
     super.key,
     required this.repository,
+    required this.snapshotCoordinator,
     required this.characterDetailRepository,
     required this.username,
     this.nickname,
     this.currentUserName = '',
+    this.characterTotalItems,
   });
 
   /// 用户仓库
   final UserRepository repository;
+
+  /// 用户资产快照全局协调器
+  final UserAssetSnapshotCoordinator snapshotCoordinator;
 
   /// 角色详情仓库
   final CharacterDetailRepository characterDetailRepository;
@@ -59,6 +66,9 @@ class UserCharacterPage extends StatefulWidget {
   /// 当前登录用户名
   final String currentUserName;
 
+  /// 用户页预览返回的角色总数
+  final int? characterTotalItems;
+
   /// 创建用户角色二级页面状态
   @override
   State<UserCharacterPage> createState() => _UserCharacterPageState();
@@ -70,9 +80,10 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
   final TextEditingController _searchController = TextEditingController();
   final UserAssetLevelSliverController _levelSliverController =
       UserAssetLevelSliverController();
-  late final TinygrailPagedListController<UserCharacterApiItem,
-      UserCharacterApiItem> _controller;
-  CurrentUserCharacterPageController? _currentUserController;
+  late TinygrailPagedListController<UserCharacterApiItem, UserCharacterApiItem>
+      _controller;
+  UserCharacterSnapshotPageController? _snapshotController;
+  OtherUserCharacterPageController? _backendController;
   bool _isLoadingPreviousPage = false;
   bool _isProgrammaticLevelJump = false;
   int _levelJumpGeneration = 0;
@@ -81,37 +92,25 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
   VoidCallback? _scrollIdleListener;
   ValueNotifier<bool>? _scrollIdleNotifier;
   Timer? _searchDebounce;
+  bool _isAwaitingSnapshot = false;
 
   /// 初始化用户角色二级页面状态
   @override
   void initState() {
     super.initState();
-    if (_isCurrentUser) {
-      final database = UserAssetSnapshotDatabase();
-      final controller = CurrentUserCharacterPageController(
-        snapshotRepository: UserAssetSnapshotRepository(
-          userRepository: widget.repository,
-          database: database,
-        ),
-        username: widget.username,
-        nickname: widget.nickname ?? '',
-        onAutomaticRefreshSucceeded: _showAutomaticRefreshSucceeded,
-        onAutomaticRefreshFailed: _showAutomaticRefreshFailed,
-        readVisibleCharacterIndex: _readVisibleCharacterIndex,
-        waitForScrollIdle: _waitForScrollIdle,
-        onBeforeCharacterDataReplaced: _restoreVisibleCharacterPosition,
-        onRestoreCharacterLevelAnchor: _restoreCharacterLevelAnchor,
-      );
-      _currentUserController = controller;
-      _controller = controller;
-    } else {
-      _controller = OtherUserCharacterPageController(
-        repository: widget.repository,
-        username: widget.username,
-      );
+    final backendController = OtherUserCharacterPageController(
+      repository: widget.repository,
+      username: widget.username,
+    );
+    _backendController = backendController;
+    _controller = backendController;
+    if (!_isCurrentUser) {
+      widget.snapshotCoordinator.retainOtherUser(widget.username);
     }
+    widget.snapshotCoordinator.addListener(_handleSnapshotCoordinatorChanged);
     _scrollController.addListener(_handleScroll);
     _controller.initialize();
+    unawaited(_prepareSnapshotMode());
   }
 
   /// 释放用户角色二级页面状态
@@ -132,7 +131,14 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
       ..removeListener(_handleScroll)
       ..dispose();
     _levelSliverController.dispose();
-    _controller.dispose();
+    widget.snapshotCoordinator.removeListener(
+      _handleSnapshotCoordinatorChanged,
+    );
+    if (!_isCurrentUser) {
+      widget.snapshotCoordinator.releaseOtherUser(widget.username);
+    }
+    _snapshotController?.dispose();
+    _backendController?.dispose();
     super.dispose();
   }
 
@@ -141,7 +147,7 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final currentController = _currentUserController;
+    final currentController = _snapshotController;
     final page = TinygrailPagedSliverPage(
       controller: _controller,
       title: _title,
@@ -149,6 +155,7 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
           ? null
           : UserCharacterSortToolbar(
               controller: currentController,
+              isCurrentUser: _isCurrentUser,
               onSortSelected: (sort) {
                 unawaited(_selectSort(sort));
               },
@@ -182,10 +189,10 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
         return [
           UserCharacterAssetSliverList(
             items: items,
-            sort: _currentUserController?.sort ??
-                UserCharacterSnapshotSort.holdings,
+            sort:
+                _snapshotController?.sort ?? UserCharacterSnapshotSort.holdings,
             showLevelHeaders:
-                _currentUserController?.sort == UserCharacterSnapshotSort.level,
+                _snapshotController?.sort == UserCharacterSnapshotSort.level,
             onItemBuilt: onItemBuilt,
             onCharacterTap: _openCharacterDetail,
           ),
@@ -263,11 +270,16 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
     );
   }
 
+  /// 提交角色快照模式切换后的页面重建
+  void _rebuildAfterSnapshotActivation() {
+    setState(() {});
+  }
+
   /// 切换角色排序并回到列表顶部
   ///
   /// [sort] 目标排序字段
   Future<void> _selectSort(UserCharacterSnapshotSort sort) async {
-    final controller = _currentUserController;
+    final controller = _snapshotController;
     if (controller == null) {
       return;
     }
@@ -298,7 +310,7 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
     _isProgrammaticLevelJump = true;
     int? absoluteIndex;
     try {
-      absoluteIndex = await _currentUserController?.prepareLevelJump(level);
+      absoluteIndex = await _snapshotController?.prepareLevelJump(level);
     } catch (_) {
       if (mounted && generation == _levelJumpGeneration) {
         _isProgrammaticLevelJump = false;
@@ -323,7 +335,7 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
 
   /// 读取当前视口顶部角色在当前排序中的下标
   int? _readVisibleCharacterIndex() {
-    final controller = _currentUserController;
+    final controller = _snapshotController;
     if (!mounted ||
         controller == null ||
         !_scrollController.hasClients ||
@@ -392,7 +404,7 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
     int replacementItemIndex,
     List<UserCharacterApiItem> replacementItems,
   ) {
-    final controller = _currentUserController;
+    final controller = _snapshotController;
     if (!mounted ||
         controller == null ||
         !_scrollController.hasClients ||
@@ -449,7 +461,7 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
 
   /// 监听列表顶部并按需加载目标页前一页
   void _handleScroll() {
-    final controller = _currentUserController;
+    final controller = _snapshotController;
     if (controller == null ||
         controller.usesVirtualLevelList ||
         _isProgrammaticLevelJump ||
@@ -466,9 +478,9 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
 
   /// 加载目标窗口前一页并保持当前条目位置
   ///
-  /// [controller] 当前用户角色控制器
+  /// [controller] 用户角色快照控制器
   Future<void> _loadPreviousPage(
-    CurrentUserCharacterPageController controller,
+    UserCharacterSnapshotPageController controller,
   ) async {
     final showLevelHeaders = controller.sort == UserCharacterSnapshotSort.level;
     final previousListExtent = UserCharacterAssetSliverList.listExtent(
@@ -542,25 +554,25 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
     );
   }
 
-  /// 显示当前用户角色后台刷新成功提示
+  /// 显示角色数据刷新成功提示
   void _showAutomaticRefreshSucceeded() {
     if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) {
       return;
     }
     AppToast.info(
       context,
-      text: '角色数据刷新成功',
+      text: '数据刷新成功',
     );
   }
 
-  /// 显示当前用户角色后台刷新失败提示
+  /// 显示角色数据刷新失败提示
   void _showAutomaticRefreshFailed() {
     if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) {
       return;
     }
     AppToast.error(
       context,
-      text: '角色数据刷新失败',
+      text: '数据刷新失败',
     );
   }
 

@@ -1,6 +1,6 @@
 import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
 
-/// 当前用户圣殿本地排序字段
+/// 用户圣殿本地排序字段
 enum UserTempleSnapshotSort {
   /// 按圣殿资产值排序
   assets('资产值'),
@@ -26,7 +26,7 @@ enum UserTempleSnapshotSort {
   /// 按圣殿建塔日期排序
   create('建塔日期');
 
-  /// 创建当前用户圣殿本地排序字段
+  /// 创建用户圣殿本地排序字段
   ///
   /// [label] 排序工具栏文案
   const UserTempleSnapshotSort(this.label);
@@ -35,7 +35,7 @@ enum UserTempleSnapshotSort {
   final String label;
 }
 
-/// 当前用户圣殿本地排序方向
+/// 用户圣殿本地排序方向
 enum UserTempleSnapshotSortDirection {
   /// 升序
   ascending,
@@ -44,9 +44,9 @@ enum UserTempleSnapshotSortDirection {
   descending,
 }
 
-/// 当前用户圣殿等级跳转位置
+/// 用户圣殿等级跳转位置
 class UserTempleLevelPosition {
-  /// 创建当前用户圣殿等级跳转位置
+  /// 创建用户圣殿等级跳转位置
   ///
   /// [level] 角色等级
   /// [absoluteIndex] 当前排序下的起始下标
@@ -67,9 +67,9 @@ class UserTempleLevelPosition {
   final int itemCount;
 }
 
-/// 当前用户圣殿分页展示条目
+/// 用户圣殿分页展示条目
 class UserTempleSnapshotEntry {
-  /// 创建当前用户圣殿分页展示条目
+  /// 创建用户圣殿分页展示条目
   ///
   /// [item] 用户圣殿接口条目
   /// [singleDividend] 修正后的圣殿单元股息

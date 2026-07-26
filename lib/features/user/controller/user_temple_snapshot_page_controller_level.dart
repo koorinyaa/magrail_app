@@ -1,8 +1,8 @@
-part of 'current_user_temple_page_controller.dart';
+part of 'user_temple_snapshot_page_controller.dart';
 
-/// 当前用户圣殿等级虚拟网格控制
-extension CurrentUserTemplePageControllerLevel
-    on CurrentUserTemplePageController {
+/// 用户圣殿等级虚拟网格控制
+extension UserTempleSnapshotPageControllerLevel
+    on UserTempleSnapshotPageController {
   /// 准备指定角色等级的目标分页
   ///
   /// [level] 目标角色等级

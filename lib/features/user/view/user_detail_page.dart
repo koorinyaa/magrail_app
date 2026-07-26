@@ -20,6 +20,7 @@ import 'package:magrail_app/features/temple/repository/temple_asset_magic_reposi
 import 'package:magrail_app/features/temple/repository/temple_repository.dart';
 import 'package:magrail_app/features/temple/widgets/temple_asset_dialog.dart';
 import 'package:magrail_app/features/user/controller/user_detail_controller.dart';
+import 'package:magrail_app/features/user/assets/controller/user_asset_snapshot_coordinator.dart';
 import 'package:magrail_app/features/user/model/user_action_entry.dart';
 import 'package:magrail_app/features/user/model/user_character_api_item.dart';
 import 'package:magrail_app/features/user/model/user_detail_entry_mode.dart';
@@ -49,6 +50,7 @@ class UserDetailPage extends StatefulWidget {
   /// [authRepository] Tinygrail 授权仓库
   /// [preferences] 本地偏好设置
   /// [repository] 用户仓库
+  /// [snapshotCoordinator] 用户资产快照全局协调器
   /// [characterDetailRepository] 角色详情仓库
   /// [templeRepository] 圣殿仓库
   /// [templeAssetMagicRepository] 圣殿资产魔法道具仓库
@@ -65,6 +67,7 @@ class UserDetailPage extends StatefulWidget {
     required this.authRepository,
     required this.preferences,
     required this.repository,
+    required this.snapshotCoordinator,
     required this.characterDetailRepository,
     required this.templeRepository,
     required this.templeAssetMagicRepository,
@@ -88,6 +91,9 @@ class UserDetailPage extends StatefulWidget {
 
   /// 用户仓库
   final UserRepository repository;
+
+  /// 用户资产快照全局协调器
+  final UserAssetSnapshotCoordinator snapshotCoordinator;
 
   /// 角色详情仓库
   final CharacterDetailRepository characterDetailRepository;
@@ -167,6 +173,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
     _scrollController.addListener(_handleScrollOffsetChanged);
     _controller = UserDetailController(
       repository: widget.repository,
+      snapshotCoordinator: widget.snapshotCoordinator,
       username: widget.username,
     );
     _controller.addListener(_handleControllerChanged);

@@ -29,6 +29,8 @@ List<RouteBase> buildMainRoutes(AppDependencies dependencies) {
               dependencies.repositories.templeAssetMagic,
           oosRepository: dependencies.repositories.oos,
           userRepository: dependencies.repositories.user,
+          userAssetSnapshotCoordinator:
+              dependencies.userAssetSnapshotCoordinator,
           scratchTicketRepository: dependencies.repositories.scratchTicket,
         ),
       ),

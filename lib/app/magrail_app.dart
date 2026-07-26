@@ -5,8 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:magrail_app/core/update/app_update_dialog.dart';
-import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_database.dart';
-import 'package:magrail_app/features/user/assets/repository/user_asset_snapshot_repository.dart';
 
 import 'bootstrap.dart';
 import 'router/app_router.dart';
@@ -70,6 +68,7 @@ class _MagrailAppState extends State<MagrailApp> {
   @override
   void dispose() {
     _router.dispose();
+    widget.dependencies.userAssetSnapshotCoordinator.dispose();
     super.dispose();
   }
 
@@ -138,7 +137,6 @@ class _MagrailAppState extends State<MagrailApp> {
   /// 静默刷新当前用户的资产来源数据
   Future<void> _refreshCurrentUserAssetSourcesSilently() async {
     final userRepository = widget.dependencies.repositories.user;
-    final database = UserAssetSnapshotDatabase();
     try {
       if (!await userRepository.hasCurrentUserSessionCookie()) {
         return;
@@ -150,15 +148,9 @@ class _MagrailAppState extends State<MagrailApp> {
         return;
       }
 
-      final snapshotRepository = UserAssetSnapshotRepository(
-        userRepository: userRepository,
-        database: database,
-      );
-      await snapshotRepository.refreshSnapshot(
+      await widget.dependencies.userAssetSnapshotCoordinator.preloadCurrentUser(
         username: profile.name,
         nickname: profile.nickname,
-        onProgress: (_) {},
-        maxServerConcurrency: 1,
       );
     } catch (_) {
       // 启动静默刷新失败不影响应用正常使用

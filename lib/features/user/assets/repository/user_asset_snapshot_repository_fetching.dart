@@ -7,10 +7,12 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
   /// [username] 用户名
   /// [requestGate] 服务器请求并发阀门
   /// [onProgress] 拉取进度回调
+  /// [totalItemsHint] 当前已知的角色总数
   Future<_AllCharactersResult> _fetchAllCharactersShared({
     required String username,
     required _UserAssetSnapshotRequestGate requestGate,
     required void Function(UserAssetSnapshotLoadProgress progress) onProgress,
+    required int? totalItemsHint,
   }) {
     final operationKey = username.toLowerCase();
     final existing =
@@ -24,6 +26,7 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
       username: username,
       requestGate: requestGate,
       onProgress: onProgress,
+      totalItemsHint: totalItemsHint,
     ).whenComplete(() {
       if (identical(
         UserAssetSnapshotRepository._characterFetchOperations[operationKey],
@@ -44,28 +47,33 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
   /// [username] 用户名
   /// [requestGate] 服务器请求并发阀门
   /// [onProgress] 拉取进度回调
+  /// [totalItemsHint] 当前已知的角色总数
   Future<_AllCharactersResult> _fetchAllCharacters({
     required String username,
     required _UserAssetSnapshotRequestGate requestGate,
     required void Function(UserAssetSnapshotLoadProgress progress) onProgress,
+    required int? totalItemsHint,
   }) async {
-    onProgress(
-      const UserAssetSnapshotLoadProgress(
-        kind: UserAssetSnapshotLoadKind.characters,
-        label: '正在读取角色数量',
-        completedSteps: 0,
-        totalSteps: 2,
-      ),
-    );
-    final totalPage = await _fetchUserCharacterPage(
-      username: username,
-      pageNumber: 1,
-      pageSize: UserAssetSnapshotRepository._totalProbePageSize,
-      requestGate: requestGate,
-    );
-    final totalItems = totalPage.totalItems > 0
-        ? totalPage.totalItems
-        : totalPage.items.length;
+    var totalItems = totalItemsHint;
+    if (totalItems == null || totalItems < 0) {
+      onProgress(
+        const UserAssetSnapshotLoadProgress(
+          kind: UserAssetSnapshotLoadKind.characters,
+          label: '正在读取角色数量',
+          completedSteps: 0,
+          totalSteps: 2,
+        ),
+      );
+      final totalPage = await _fetchUserCharacterPage(
+        username: username,
+        pageNumber: 1,
+        pageSize: UserAssetSnapshotRepository._totalProbePageSize,
+        requestGate: requestGate,
+      );
+      totalItems = totalPage.totalItems > 0
+          ? totalPage.totalItems
+          : totalPage.items.length;
+    }
     if (totalItems <= 0) {
       onProgress(
         const UserAssetSnapshotLoadProgress(
@@ -89,12 +97,26 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
         totalSteps: 2,
       ),
     );
-    final fullPage = await _fetchUserCharacterPage(
+    var fullPage = await _fetchUserCharacterPage(
       username: username,
       pageNumber: 1,
-      pageSize: totalItems,
+      pageSize: totalItems < 1 ? 1 : totalItems,
       requestGate: requestGate,
     );
+    var responseTotalItems =
+        fullPage.totalItems > 0 ? fullPage.totalItems : fullPage.items.length;
+    if (fullPage.items.length < responseTotalItems) {
+      // 探测或预览后数量增长时仅扩大容量重试一次，避免写入半截快照
+      fullPage = await _fetchUserCharacterPage(
+        username: username,
+        pageNumber: 1,
+        pageSize: responseTotalItems,
+        requestGate: requestGate,
+      );
+      responseTotalItems =
+          fullPage.totalItems > 0 ? fullPage.totalItems : fullPage.items.length;
+    }
+    totalItems = responseTotalItems;
     if (fullPage.items.length < totalItems) {
       // 全量页未返回完整数据时不写入快照，避免上游使用半截资产
       throw StateError('角色数据未完整返回：${fullPage.items.length}/$totalItems');
@@ -130,10 +152,12 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
   /// [username] 用户名
   /// [requestGate] 服务器请求并发阀门
   /// [onProgress] 拉取进度回调
+  /// [totalItemsHint] 当前已知的圣殿总数
   Future<_AllTemplesResult> _fetchAllTemplesShared({
     required String username,
     required _UserAssetSnapshotRequestGate requestGate,
     required void Function(UserAssetSnapshotLoadProgress progress) onProgress,
+    required int? totalItemsHint,
   }) {
     final operationKey = username.toLowerCase();
     final existing =
@@ -147,6 +171,7 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
       username: username,
       requestGate: requestGate,
       onProgress: onProgress,
+      totalItemsHint: totalItemsHint,
     ).whenComplete(() {
       if (identical(
         UserAssetSnapshotRepository._templeFetchOperations[operationKey],
@@ -167,28 +192,33 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
   /// [username] 用户名
   /// [requestGate] 服务器请求并发阀门
   /// [onProgress] 拉取进度回调
+  /// [totalItemsHint] 当前已知的圣殿总数
   Future<_AllTemplesResult> _fetchAllTemples({
     required String username,
     required _UserAssetSnapshotRequestGate requestGate,
     required void Function(UserAssetSnapshotLoadProgress progress) onProgress,
+    required int? totalItemsHint,
   }) async {
-    onProgress(
-      const UserAssetSnapshotLoadProgress(
-        kind: UserAssetSnapshotLoadKind.temples,
-        label: '正在读取圣殿数量',
-        completedSteps: 0,
-        totalSteps: 2,
-      ),
-    );
-    final totalPage = await _fetchUserTemplePage(
-      username: username,
-      pageNumber: 1,
-      pageSize: UserAssetSnapshotRepository._totalProbePageSize,
-      requestGate: requestGate,
-    );
-    final totalItems = totalPage.totalItems > 0
-        ? totalPage.totalItems
-        : totalPage.items.length;
+    var totalItems = totalItemsHint;
+    if (totalItems == null || totalItems < 0) {
+      onProgress(
+        const UserAssetSnapshotLoadProgress(
+          kind: UserAssetSnapshotLoadKind.temples,
+          label: '正在读取圣殿数量',
+          completedSteps: 0,
+          totalSteps: 2,
+        ),
+      );
+      final totalPage = await _fetchUserTemplePage(
+        username: username,
+        pageNumber: 1,
+        pageSize: UserAssetSnapshotRepository._totalProbePageSize,
+        requestGate: requestGate,
+      );
+      totalItems = totalPage.totalItems > 0
+          ? totalPage.totalItems
+          : totalPage.items.length;
+    }
     if (totalItems <= 0) {
       onProgress(
         const UserAssetSnapshotLoadProgress(
@@ -212,12 +242,26 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
         totalSteps: 2,
       ),
     );
-    final fullPage = await _fetchUserTemplePage(
+    var fullPage = await _fetchUserTemplePage(
       username: username,
       pageNumber: 1,
-      pageSize: totalItems,
+      pageSize: totalItems < 1 ? 1 : totalItems,
       requestGate: requestGate,
     );
+    var responseTotalItems =
+        fullPage.totalItems > 0 ? fullPage.totalItems : fullPage.items.length;
+    if (fullPage.items.length < responseTotalItems) {
+      // 探测或预览后数量增长时仅扩大容量重试一次，避免写入半截快照
+      fullPage = await _fetchUserTemplePage(
+        username: username,
+        pageNumber: 1,
+        pageSize: responseTotalItems,
+        requestGate: requestGate,
+      );
+      responseTotalItems =
+          fullPage.totalItems > 0 ? fullPage.totalItems : fullPage.items.length;
+    }
+    totalItems = responseTotalItems;
     if (fullPage.items.length < totalItems) {
       // 全量页未返回完整数据时不写入快照，避免上游使用半截资产
       throw StateError('圣殿数据未完整返回：${fullPage.items.length}/$totalItems');
