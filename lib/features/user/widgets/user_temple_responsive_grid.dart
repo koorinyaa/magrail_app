@@ -42,7 +42,7 @@ class UserTempleResponsiveGrid extends StatelessWidget {
 
   /// 网格横向间距
   static const double crossAxisSpacing = 10;
-  static const double _minCardWidth = 156;
+  static const double _minCardWidth = 150;
 
   /// 等级分组标题固定高度
   static const double levelHeaderExtent = 40;
