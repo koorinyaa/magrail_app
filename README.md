@@ -15,10 +15,6 @@ MaGrail 是为小圣杯打造的移动端 APP，覆盖小圣杯原有全部功�
 ## 下载与安装
 
 - Releases：[Releases](https://github.com/koorinyaa/magrail_app/releases)
-- `app-arm64-v8a-release.apk`：Android 64 位 ARM 安装包，推荐绝大多数现代手机和平板使用
-- `app-armeabi-v7a-release.apk`：Android 32 位 ARM 安装包，适合较老设备
-- `app-x86_64-release.apk`：Android x86_64 安装包，主要适合模拟器或少数 x86 设备
-- `Magrail-sideload.ipa`：iOS 侧载包，需要自行重签名安装
 
 ## 界面预览
 
@@ -91,7 +87,7 @@ flutter build apk --release --no-pub
 在 GitHub Actions 页面手动运行 `iOS Sideload IPA` 后，构建产物会上传为：
 
 ```text
-Magrail-sideload.ipa
+MaGrail_<版本号>.ipa
 ```
 
 该 IPA 不包含 App Store 分发签名，安装时需要使用侧载工具重新签名。
