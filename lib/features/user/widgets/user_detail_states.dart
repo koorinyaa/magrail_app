@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
+import 'package:magrail_app/shared/widgets/paged_action_grid.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 /// 用户详情页骨架屏
@@ -136,30 +137,10 @@ class UserDetailSkeleton extends StatelessWidget {
         color: cardColor,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          const minItemWidth = 88.0;
-          final rawColumnCount = (constraints.maxWidth / minItemWidth).floor();
-          final columnCount = switch (rawColumnCount) {
-            < 1 => 1,
-            > 6 => 6,
-            _ => rawColumnCount,
-          };
-          final itemWidth = constraints.maxWidth / columnCount;
-
-          return Wrap(
-            alignment: WrapAlignment.start,
-            runSpacing: 8,
-            spacing: 0,
-            children: [
-              for (var index = 0; index < 9; index += 1)
-                SizedBox(
-                  width: itemWidth,
-                  height: 56,
-                  child: const _UserActionItemSkeleton(),
-                ),
-            ],
-          );
+      child: PagedActionGrid(
+        itemCount: 9,
+        itemBuilder: (context, index) {
+          return const _UserActionItemSkeleton();
         },
       ),
     );
