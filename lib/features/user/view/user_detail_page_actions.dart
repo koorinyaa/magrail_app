@@ -1,6 +1,20 @@
 part of 'user_detail_page.dart';
 
 extension _UserDetailPageActions on _UserDetailPageState {
+  /// 查询其他用户的角色未公开持股
+  ///
+  /// [item] 用户角色条目
+  Future<int?> _revealCharacterHoldings(UserCharacterApiItem item) async {
+    final username = _controller.profile?.name.trim() ?? '';
+    if (username.isEmpty || _controller.isCurrentUser) {
+      return null;
+    }
+
+    final holding = await widget.characterDetailRepository
+        .fetchUserCharacterHolding(item.characterId, username);
+    return holding?.total;
+  }
+
   /// 复制用户 ID
   ///
   /// [context] 当前组件树上下文

@@ -154,7 +154,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
   // 滚动时只刷新顶部浮层，避免整页内容随透明度重建
   late final ValueNotifier<double> _topActionBlurProgress;
   late final ValueNotifier<double> _topIdentityProgress;
-  bool _isBalanceAndAssetsHidden = false;
+  bool _hidePrivateAssetValues = false;
   bool _isClaimingWeeklyBonus = false;
   bool _isClaimingDailyBonus = false;
   bool _isClaimingHolidayBonus = false;
@@ -256,9 +256,9 @@ class _UserDetailPageState extends State<UserDetailPage> {
                           identityProgress: identityProgress,
                           showBackButton: _isSecondary,
                           showSettingsButton: _controller.isCurrentUser,
-                          hideBalanceAndAssets: _isBalanceAndAssetsHidden,
-                          onBalanceAndAssetsVisibilityPressed:
-                              _toggleBalanceAndAssetsVisibility,
+                          hidePrivateAssetValues: _hidePrivateAssetValues,
+                          onPrivateAssetValuesVisibilityPressed:
+                              _togglePrivateAssetValuesVisibility,
                           onSettingsPressed: _openSettingsPage,
                         );
                       },
@@ -357,7 +357,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
             UserProfileCard(
               profile: profile,
               isCurrentUser: _controller.isCurrentUser,
-              hideBalanceAndAssets: _isBalanceAndAssetsHidden,
+              hideBalanceAndAssets: _hidePrivateAssetValues,
               onRecordPressed: () => _openRedPacketLogs(profile),
               onSendPressed: () => _openSendRedPacket(profile),
               onCopyPressed: () => _copyUserId(context),
@@ -386,6 +386,12 @@ class _UserDetailPageState extends State<UserDetailPage> {
         icoTotalItems: _controller.icoTotalItems,
         isLoading: _controller.isCharaLoading,
         isLoadFailed: _controller.isCharaLoadFailed,
+        hidePrivateValues: _hidePrivateAssetValues,
+        onRevealHoldings: !_controller.isCurrentUser &&
+                widget.preferences.hiddenFeaturesEnabled &&
+                widget.preferences.revealPrivateUserHoldingsEnabled
+            ? _revealCharacterHoldings
+            : null,
         onRetry: _controller.refreshCharaOverview,
         onLinksHeaderTap: () => _openUserLinks(profile),
         onTemplesHeaderTap: () => _openUserTemples(profile),
@@ -424,10 +430,10 @@ class _UserDetailPageState extends State<UserDetailPage> {
     );
   }
 
-  /// 切换余额和资产显示状态
-  void _toggleBalanceAndAssetsVisibility() {
+  /// 切换私有资产数值显示状态
+  void _togglePrivateAssetValuesVisibility() {
     setState(() {
-      _isBalanceAndAssetsHidden = !_isBalanceAndAssetsHidden;
+      _hidePrivateAssetValues = !_hidePrivateAssetValues;
     });
   }
 

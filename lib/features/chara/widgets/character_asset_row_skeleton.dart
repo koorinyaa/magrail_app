@@ -12,6 +12,9 @@ class CharacterAssetRowSkeleton extends StatelessWidget {
   /// [trailingWidth] 右侧骨架宽度
   /// [trailingHeight] 右侧骨架高度
   /// [contentPadding] 内容内边距
+  /// [titleMetricSpacing] 名称与首行数据间距
+  /// [metricSpacing] 数据行间距
+  /// [primaryMetricAsPill] 首行数据是否使用胶囊骨架
   const CharacterAssetRowSkeleton({
     super.key,
     this.showLevel = true,
@@ -20,6 +23,9 @@ class CharacterAssetRowSkeleton extends StatelessWidget {
     this.trailingWidth = 54,
     this.trailingHeight = 18,
     this.contentPadding = const EdgeInsets.symmetric(horizontal: 6),
+    this.titleMetricSpacing = 5,
+    this.metricSpacing = 3,
+    this.primaryMetricAsPill = false,
   });
 
   /// 是否显示等级骨架
@@ -39,6 +45,15 @@ class CharacterAssetRowSkeleton extends StatelessWidget {
 
   /// 内容内边距
   final EdgeInsetsGeometry contentPadding;
+
+  /// 名称与首行数据间距
+  final double titleMetricSpacing;
+
+  /// 数据行间距
+  final double metricSpacing;
+
+  /// 首行数据是否使用胶囊骨架
+  final bool primaryMetricAsPill;
 
   /// 构建角色资产行骨架
   ///
@@ -82,7 +97,7 @@ class CharacterAssetRowSkeleton extends StatelessWidget {
                         ],
                       ],
                     ),
-                    const SizedBox(height: 5),
+                    SizedBox(height: titleMetricSpacing),
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,11 +105,17 @@ class CharacterAssetRowSkeleton extends StatelessWidget {
                         for (var index = 0; index < metricCount; index++) ...[
                           Bone(
                             width: 92.0 + index * 16,
-                            height: index == 0 ? 11 : 10,
-                            borderRadius: BorderRadius.circular(5),
+                            height: index == 0 && primaryMetricAsPill
+                                ? 16
+                                : index == 0
+                                    ? 11
+                                    : 10,
+                            borderRadius: BorderRadius.circular(
+                              index == 0 && primaryMetricAsPill ? 999 : 5,
+                            ),
                           ),
                           if (index != metricCount - 1)
-                            const SizedBox(height: 3),
+                            SizedBox(height: metricSpacing),
                         ],
                       ],
                     ),

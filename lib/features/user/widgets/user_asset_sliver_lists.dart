@@ -26,6 +26,8 @@ class UserCharacterAssetSliverList extends StatelessWidget {
   /// [items] 用户角色条目
   /// [showLevelHeaders] 是否显示等级分组标题
   /// [sort] 当前用户角色排序字段
+  /// [hideHoldings] 是否隐藏持股数量
+  /// [onRevealHoldings] 未公开持股查询回调
   /// [onItemBuilt] 条目构建回调
   /// [onCharacterTap] 角色条目点击回调
   const UserCharacterAssetSliverList({
@@ -33,6 +35,8 @@ class UserCharacterAssetSliverList extends StatelessWidget {
     required this.items,
     this.showLevelHeaders = false,
     this.sort = UserCharacterSnapshotSort.holdings,
+    this.hideHoldings = false,
+    this.onRevealHoldings,
     this.onItemBuilt,
     this.onCharacterTap,
   });
@@ -45,6 +49,12 @@ class UserCharacterAssetSliverList extends StatelessWidget {
 
   /// 当前用户角色排序字段
   final UserCharacterSnapshotSort sort;
+
+  /// 是否隐藏持股数量
+  final bool hideHoldings;
+
+  /// 未公开持股查询回调
+  final UserCharacterHoldingResolver? onRevealHoldings;
 
   /// 条目构建回调
   final ValueChanged<int>? onItemBuilt;
@@ -192,6 +202,8 @@ class UserCharacterAssetSliverList extends StatelessWidget {
     return UserCharacterAssetListItem(
       item: item,
       sort: sort,
+      hideHoldings: hideHoldings,
+      onRevealHoldings: onRevealHoldings,
       reserveLevelRail: showLevelHeaders,
       showDivider: index < items.length - 1,
       onCharacterTap: onCharacterTap,
@@ -206,6 +218,8 @@ class UserCharacterAssetListItem extends StatelessWidget {
   /// [key] Flutter 组件标识
   /// [item] 用户角色条目
   /// [sort] 当前排序字段
+  /// [hideHoldings] 是否隐藏持股数量
+  /// [onRevealHoldings] 未公开持股查询回调
   /// [reserveLevelRail] 是否为等级轨道预留右侧宽度
   /// [showDivider] 是否显示底部分割线
   /// [onCharacterTap] 角色条目点击回调
@@ -213,6 +227,8 @@ class UserCharacterAssetListItem extends StatelessWidget {
     super.key,
     required this.item,
     required this.sort,
+    this.hideHoldings = false,
+    this.onRevealHoldings,
     this.reserveLevelRail = false,
     this.showDivider = true,
     this.onCharacterTap,
@@ -223,6 +239,12 @@ class UserCharacterAssetListItem extends StatelessWidget {
 
   /// 当前排序字段
   final UserCharacterSnapshotSort sort;
+
+  /// 是否隐藏持股数量
+  final bool hideHoldings;
+
+  /// 未公开持股查询回调
+  final UserCharacterHoldingResolver? onRevealHoldings;
 
   /// 是否为等级轨道预留右侧宽度
   final bool reserveLevelRail;
@@ -259,6 +281,8 @@ class UserCharacterAssetListItem extends StatelessWidget {
           item: item,
           avatarHeroTag: avatarHeroTag,
           sort: sort,
+          hideHoldings: hideHoldings,
+          onRevealHoldings: onRevealHoldings,
           contentPadding: AppSafeAreaInsets.fromLTRB(
             context,
             left: UserCharacterAssetSliverList._contentLeadingInset,
@@ -327,17 +351,22 @@ class UserIcoAssetSliverList extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [items] 用户 ICO 条目
+  /// [hideInvestment] 是否隐藏已注资金额
   /// [onItemBuilt] 条目构建回调
   /// [onIcoTap] ICO 条目点击回调
   const UserIcoAssetSliverList({
     super.key,
     required this.items,
+    this.hideInvestment = false,
     this.onItemBuilt,
     this.onIcoTap,
   });
 
   /// 用户 ICO 条目
   final List<UserIcoApiItem> items;
+
+  /// 是否隐藏已注资金额
+  final bool hideInvestment;
 
   /// 条目构建回调
   final ValueChanged<int>? onItemBuilt;
@@ -367,6 +396,7 @@ class UserIcoAssetSliverList extends StatelessWidget {
             child: UserIcoAssetRow(
               item: item,
               avatarHeroTag: avatarHeroTag,
+              hideInvestment: hideInvestment,
               onTap: onIcoTap == null
                   ? null
                   : () => onIcoTap?.call(item, avatarHeroTag),

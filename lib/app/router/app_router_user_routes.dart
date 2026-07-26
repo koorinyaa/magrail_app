@@ -201,6 +201,11 @@ List<RouteBase> buildUserRoutes(
           characterTotalItems: int.tryParse(
             state.uri.queryParameters['characterTotalItems'] ?? '',
           ),
+          initiallyHideHoldings:
+              state.uri.queryParameters['hidePrivateValues'] == 'true',
+          revealPrivateUserHoldings:
+              dependencies.preferences.hiddenFeaturesEnabled &&
+                  dependencies.preferences.revealPrivateUserHoldingsEnabled,
         ),
       ),
     ),
@@ -213,6 +218,8 @@ List<RouteBase> buildUserRoutes(
           repository: dependencies.repositories.user,
           username: state.uri.queryParameters['username'] ?? '',
           nickname: state.uri.queryParameters['nickname'],
+          initiallyHideInvestment:
+              state.uri.queryParameters['hidePrivateValues'] == 'true',
         ),
       ),
     ),

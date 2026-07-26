@@ -7,6 +7,7 @@ import 'package:magrail_app/features/user/controller/user_ico_page_controller.da
 import 'package:magrail_app/features/user/model/user_ico_api_item.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
 import 'package:magrail_app/features/user/widgets/user_asset_sliver_lists.dart';
+import 'package:magrail_app/features/user/widgets/user_private_asset_visibility_button.dart';
 
 /// 用户 ICO 二级页面
 class UserIcoPage extends StatefulWidget {
@@ -16,11 +17,13 @@ class UserIcoPage extends StatefulWidget {
   /// [repository] 用户仓库
   /// [username] 用户名
   /// [nickname] 用户昵称
+  /// [initiallyHideInvestment] 是否初始隐藏已注资金额
   const UserIcoPage({
     super.key,
     required this.repository,
     required this.username,
     this.nickname,
+    this.initiallyHideInvestment = false,
   });
 
   /// 用户仓库
@@ -32,6 +35,9 @@ class UserIcoPage extends StatefulWidget {
   /// 用户昵称
   final String? nickname;
 
+  /// 是否初始隐藏已注资金额
+  final bool initiallyHideInvestment;
+
   /// 创建用户 ICO 二级页面状态
   @override
   State<UserIcoPage> createState() => _UserIcoPageState();
@@ -40,11 +46,13 @@ class UserIcoPage extends StatefulWidget {
 /// 用户 ICO 二级页面状态
 class _UserIcoPageState extends State<UserIcoPage> {
   late final UserIcoPageController _controller;
+  late bool _hideInvestment;
 
   /// 初始化用户 ICO 二级页面状态
   @override
   void initState() {
     super.initState();
+    _hideInvestment = widget.initiallyHideInvestment;
     _controller = UserIcoPageController(
       repository: widget.repository,
       username: widget.username,
@@ -66,10 +74,19 @@ class _UserIcoPageState extends State<UserIcoPage> {
     return TinygrailPagedSliverPage(
       controller: _controller,
       title: _title,
+      appBarActions: [
+        UserPrivateAssetVisibilityButton(
+          isHidden: _hideInvestment,
+          onPressed: _toggleInvestmentVisibility,
+        ),
+      ],
       loadingSliver: const CharacterAssetSkeletonSliverList(
         showLevel: false,
         metricCount: 2,
         showTrailing: true,
+        titleMetricSpacing: 4,
+        metricSpacing: 4,
+        primaryMetricAsPill: true,
       ),
       emptySliverBuilder: (context, controller) {
         return const PagedSliverState(
@@ -82,6 +99,7 @@ class _UserIcoPageState extends State<UserIcoPage> {
         return [
           UserIcoAssetSliverList(
             items: items,
+            hideInvestment: _hideInvestment,
             onItemBuilt: onItemBuilt,
             onIcoTap: _openCharacterDetail,
           ),
@@ -89,6 +107,13 @@ class _UserIcoPageState extends State<UserIcoPage> {
       },
       completedLabel: '没有更多ICO了',
     );
+  }
+
+  /// 切换已注资金额显示状态
+  void _toggleInvestmentVisibility() {
+    setState(() {
+      _hideInvestment = !_hideInvestment;
+    });
   }
 
   /// 页面标题

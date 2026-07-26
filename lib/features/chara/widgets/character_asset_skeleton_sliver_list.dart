@@ -15,6 +15,9 @@ class CharacterAssetSkeletonSliverList extends StatelessWidget {
   /// [trailingHeight] 右侧骨架高度
   /// [itemHorizontalPadding] 条目外层水平间距
   /// [contentPadding] 骨架内容内边距
+  /// [titleMetricSpacing] 名称与首行数据间距
+  /// [metricSpacing] 数据行间距
+  /// [primaryMetricAsPill] 首行数据是否使用胶囊骨架
   const CharacterAssetSkeletonSliverList({
     super.key,
     this.itemCount = 24,
@@ -25,6 +28,9 @@ class CharacterAssetSkeletonSliverList extends StatelessWidget {
     this.trailingHeight = 18,
     this.itemHorizontalPadding = 12,
     this.contentPadding = const EdgeInsets.symmetric(horizontal: 6),
+    this.titleMetricSpacing = 5,
+    this.metricSpacing = 3,
+    this.primaryMetricAsPill = false,
   });
 
   /// 骨架条目数量
@@ -51,6 +57,15 @@ class CharacterAssetSkeletonSliverList extends StatelessWidget {
   /// 骨架内容内边距
   final EdgeInsetsGeometry contentPadding;
 
+  /// 名称与首行数据间距
+  final double titleMetricSpacing;
+
+  /// 数据行间距
+  final double metricSpacing;
+
+  /// 首行数据是否使用胶囊骨架
+  final bool primaryMetricAsPill;
+
   /// 构建角色资产 sliver 骨架列表
   ///
   /// [context] 当前组件树上下文
@@ -69,6 +84,9 @@ class CharacterAssetSkeletonSliverList extends StatelessWidget {
               trailingWidth: trailingWidth,
               trailingHeight: trailingHeight,
               contentPadding: contentPadding,
+              titleMetricSpacing: titleMetricSpacing,
+              metricSpacing: metricSpacing,
+              primaryMetricAsPill: primaryMetricAsPill,
             ),
           );
         },

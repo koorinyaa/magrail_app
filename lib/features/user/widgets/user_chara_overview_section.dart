@@ -7,6 +7,7 @@ import 'package:magrail_app/features/user/model/user_ico_api_item.dart';
 import 'package:magrail_app/features/user/model/user_link_api_item.dart';
 import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
 import 'package:magrail_app/features/user/widgets/user_asset_carousels.dart';
+import 'package:magrail_app/features/user/widgets/user_asset_rows.dart';
 import 'package:magrail_app/features/user/widgets/user_chara_overview_states.dart';
 import 'package:magrail_app/features/user/widgets/user_link_temple_overview_carousel.dart';
 
@@ -26,6 +27,8 @@ class UserCharaOverviewSection extends StatelessWidget {
   /// [icoTotalItems] 用户 ICO 总数
   /// [isLoading] 是否正在加载
   /// [isLoadFailed] 是否加载失败
+  /// [hidePrivateValues] 是否隐藏持股和已注资数值
+  /// [onRevealHoldings] 未公开持股查询回调
   /// [onRetry] 重试回调
   /// [onLinksHeaderTap] 连接标题点击回调
   /// [onTemplesHeaderTap] 圣殿标题点击回调
@@ -48,6 +51,8 @@ class UserCharaOverviewSection extends StatelessWidget {
     required this.icoTotalItems,
     required this.isLoading,
     required this.isLoadFailed,
+    this.hidePrivateValues = false,
+    this.onRevealHoldings,
     required this.onRetry,
     required this.onLinksHeaderTap,
     required this.onTemplesHeaderTap,
@@ -91,6 +96,12 @@ class UserCharaOverviewSection extends StatelessWidget {
 
   /// 是否加载失败
   final bool isLoadFailed;
+
+  /// 是否隐藏持股和已注资数值
+  final bool hidePrivateValues;
+
+  /// 未公开持股查询回调
+  final UserCharacterHoldingResolver? onRevealHoldings;
 
   /// 重试回调
   final Future<void> Function() onRetry;
@@ -229,6 +240,8 @@ class UserCharaOverviewSection extends StatelessWidget {
                 child: UserCharacterAssetCarousel(
                   characters: characters,
                   isLoading: true,
+                  hideHoldings: hidePrivateValues,
+                  onRevealHoldings: onRevealHoldings,
                   onCharacterTap: onCharacterTap,
                 ),
               ),
@@ -239,6 +252,7 @@ class UserCharaOverviewSection extends StatelessWidget {
                 child: UserIcoAssetCarousel(
                   icos: icos,
                   isLoading: true,
+                  hideInvestment: hidePrivateValues,
                   onIcoTap: onIcoTap,
                 ),
               ),
@@ -320,6 +334,8 @@ class UserCharaOverviewSection extends StatelessWidget {
           child: UserCharacterAssetCarousel(
             characters: characters,
             isLoading: false,
+            hideHoldings: hidePrivateValues,
+            onRevealHoldings: onRevealHoldings,
             onCharacterTap: onCharacterTap,
           ),
         ),
@@ -335,6 +351,7 @@ class UserCharaOverviewSection extends StatelessWidget {
           child: UserIcoAssetCarousel(
             icos: icos,
             isLoading: false,
+            hideInvestment: hidePrivateValues,
             onIcoTap: onIcoTap,
           ),
         ),

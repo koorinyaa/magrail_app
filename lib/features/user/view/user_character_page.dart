@@ -21,9 +21,11 @@ import 'package:magrail_app/features/user/widgets/user_asset_level_sliver_contro
 import 'package:magrail_app/features/user/widgets/user_character_level_virtual_sliver.dart';
 import 'package:magrail_app/features/user/widgets/user_character_level_rail.dart';
 import 'package:magrail_app/features/user/widgets/user_character_sort_toolbar.dart';
+import 'package:magrail_app/features/user/widgets/user_private_asset_visibility_button.dart';
 
 part 'user_character_page_search.dart';
 part 'user_character_page_snapshot.dart';
+part 'user_character_page_actions.dart';
 
 /// 用户角色二级页面
 class UserCharacterPage extends StatefulWidget {
@@ -37,6 +39,8 @@ class UserCharacterPage extends StatefulWidget {
   /// [nickname] 用户昵称
   /// [currentUserName] 当前登录用户名
   /// [characterTotalItems] 用户页预览返回的角色总数
+  /// [initiallyHideHoldings] 是否初始隐藏持股数量
+  /// [revealPrivateUserHoldings] 是否允许查询其他用户未公开持股
   const UserCharacterPage({
     super.key,
     required this.repository,
@@ -46,6 +50,8 @@ class UserCharacterPage extends StatefulWidget {
     this.nickname,
     this.currentUserName = '',
     this.characterTotalItems,
+    this.initiallyHideHoldings = false,
+    this.revealPrivateUserHoldings = false,
   });
 
   /// 用户仓库
@@ -68,6 +74,12 @@ class UserCharacterPage extends StatefulWidget {
 
   /// 用户页预览返回的角色总数
   final int? characterTotalItems;
+
+  /// 是否初始隐藏持股数量
+  final bool initiallyHideHoldings;
+
+  /// 是否允许查询其他用户未公开持股
+  final bool revealPrivateUserHoldings;
 
   /// 创建用户角色二级页面状态
   @override
@@ -93,11 +105,13 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
   ValueNotifier<bool>? _scrollIdleNotifier;
   Timer? _searchDebounce;
   bool _isAwaitingSnapshot = false;
+  late bool _hideHoldings;
 
   /// 初始化用户角色二级页面状态
   @override
   void initState() {
     super.initState();
+    _hideHoldings = widget.initiallyHideHoldings;
     final backendController = OtherUserCharacterPageController(
       repository: widget.repository,
       username: widget.username,
@@ -148,9 +162,18 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
   @override
   Widget build(BuildContext context) {
     final currentController = _snapshotController;
+    final onRevealHoldings = !_isCurrentUser && widget.revealPrivateUserHoldings
+        ? _revealCharacterHoldings
+        : null;
     final page = TinygrailPagedSliverPage(
       controller: _controller,
       title: _title,
+      appBarActions: [
+        UserPrivateAssetVisibilityButton(
+          isHidden: _hideHoldings,
+          onPressed: _toggleHoldingsVisibility,
+        ),
+      ],
       appBarBottom: currentController == null
           ? null
           : UserCharacterSortToolbar(
@@ -163,6 +186,9 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
       scrollController: _scrollController,
       loadingSliver: const CharacterAssetSkeletonSliverList(
         showTrailing: true,
+        titleMetricSpacing: 4,
+        metricSpacing: 4,
+        primaryMetricAsPill: true,
       ),
       emptySliverBuilder: (context, controller) {
         final isFiltering =
@@ -182,6 +208,8 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
               controller: currentController!,
               scrollController: _scrollController,
               levelSliverController: _levelSliverController,
+              hideHoldings: _hideHoldings,
+              onRevealHoldings: onRevealHoldings,
               onCharacterTap: _openCharacterDetail,
             ),
           ];
@@ -193,6 +221,8 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
                 _snapshotController?.sort ?? UserCharacterSnapshotSort.holdings,
             showLevelHeaders:
                 _snapshotController?.sort == UserCharacterSnapshotSort.level,
+            hideHoldings: _hideHoldings,
+            onRevealHoldings: onRevealHoldings,
             onItemBuilt: onItemBuilt,
             onCharacterTap: _openCharacterDetail,
           ),
@@ -273,6 +303,13 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
   /// 提交角色快照模式切换后的页面重建
   void _rebuildAfterSnapshotActivation() {
     setState(() {});
+  }
+
+  /// 切换持股数量显示状态
+  void _toggleHoldingsVisibility() {
+    setState(() {
+      _hideHoldings = !_hideHoldings;
+    });
   }
 
   /// 切换角色排序并回到列表顶部
@@ -535,63 +572,5 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
         _scrollController.jumpTo(0);
       }
     });
-  }
-
-  /// 打开角色详情页
-  ///
-  /// [item] 用户角色条目
-  /// [avatarHeroTag] 入口头像转场标识
-  void _openCharacterDetail(
-    UserCharacterApiItem item,
-    String? avatarHeroTag,
-  ) {
-    openCharacterDetail(
-      context,
-      characterId: item.characterId,
-      name: item.name,
-      avatarUrl: item.icon,
-      avatarHeroTag: avatarHeroTag,
-    );
-  }
-
-  /// 显示角色数据刷新成功提示
-  void _showAutomaticRefreshSucceeded() {
-    if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) {
-      return;
-    }
-    AppToast.info(
-      context,
-      text: '数据刷新成功',
-    );
-  }
-
-  /// 显示角色数据刷新失败提示
-  void _showAutomaticRefreshFailed() {
-    if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) {
-      return;
-    }
-    AppToast.error(
-      context,
-      text: '数据刷新失败',
-    );
-  }
-
-  /// 是否展示当前登录用户的本地角色快照
-  bool get _isCurrentUser {
-    final username = widget.username.trim().toLowerCase();
-    final currentUserName = widget.currentUserName.trim().toLowerCase();
-    return username.isNotEmpty && username == currentUserName;
-  }
-
-  /// 页面标题
-  String get _title {
-    final nickname = widget.nickname?.trim();
-    if (nickname != null && nickname.isNotEmpty) {
-      return '$nickname的角色';
-    }
-    if (widget.username.isNotEmpty) {
-      return '${widget.username}的角色';
-    }
-    return '用户角色';
   }
 }

@@ -5,6 +5,7 @@ import 'package:magrail_app/features/user/assets/model/user_character_snapshot_q
 import 'package:magrail_app/features/user/controller/user_character_snapshot_page_controller.dart';
 import 'package:magrail_app/features/user/model/user_character_api_item.dart';
 import 'package:magrail_app/features/user/widgets/user_asset_level_sliver_controller.dart';
+import 'package:magrail_app/features/user/widgets/user_asset_rows.dart';
 import 'package:magrail_app/features/user/widgets/user_asset_sliver_lists.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
@@ -16,12 +17,16 @@ class UserCharacterLevelVirtualSliver extends StatelessWidget {
   /// [controller] 用户角色快照页面控制器
   /// [scrollController] 页面滚动控制器
   /// [levelSliverController] 等级虚拟列表滚动控制器
+  /// [hideHoldings] 是否隐藏持股数量
+  /// [onRevealHoldings] 未公开持股查询回调
   /// [onCharacterTap] 角色条目点击回调
   const UserCharacterLevelVirtualSliver({
     super.key,
     required this.controller,
     required this.scrollController,
     required this.levelSliverController,
+    this.hideHoldings = false,
+    this.onRevealHoldings,
     this.onCharacterTap,
   });
 
@@ -33,6 +38,12 @@ class UserCharacterLevelVirtualSliver extends StatelessWidget {
 
   /// 等级虚拟列表滚动控制器
   final UserAssetLevelSliverController levelSliverController;
+
+  /// 是否隐藏持股数量
+  final bool hideHoldings;
+
+  /// 未公开持股查询回调
+  final UserCharacterHoldingResolver? onRevealHoldings;
 
   /// 角色条目点击回调
   final void Function(UserCharacterApiItem item, String? avatarHeroTag)?
@@ -77,6 +88,9 @@ class UserCharacterLevelVirtualSliver extends StatelessWidget {
             child: CharacterAssetRowSkeleton(
               showTrailing: true,
               contentPadding: EdgeInsets.symmetric(horizontal: 18),
+              titleMetricSpacing: 4,
+              metricSpacing: 4,
+              primaryMetricAsPill: true,
             ),
           );
         }
@@ -84,6 +98,8 @@ class UserCharacterLevelVirtualSliver extends StatelessWidget {
           key: ValueKey<int>(item.characterId),
           item: item,
           sort: UserCharacterSnapshotSort.level,
+          hideHoldings: hideHoldings,
+          onRevealHoldings: onRevealHoldings,
           reserveLevelRail: true,
           showDivider: absoluteIndex + 1 < controller.levelItemCount,
           onCharacterTap: onCharacterTap,

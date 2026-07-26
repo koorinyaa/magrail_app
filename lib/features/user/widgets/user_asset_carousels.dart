@@ -17,11 +17,15 @@ class UserCharacterAssetCarousel extends StatelessWidget {
   /// [key] Flutter 组件标识
   /// [characters] 用户角色预览
   /// [isLoading] 是否正在加载
+  /// [hideHoldings] 是否隐藏持股数量
+  /// [onRevealHoldings] 未公开持股查询回调
   /// [onCharacterTap] 角色条目点击回调
   const UserCharacterAssetCarousel({
     super.key,
     required this.characters,
     required this.isLoading,
+    this.hideHoldings = false,
+    this.onRevealHoldings,
     this.onCharacterTap,
   });
 
@@ -30,6 +34,12 @@ class UserCharacterAssetCarousel extends StatelessWidget {
 
   /// 是否正在加载
   final bool isLoading;
+
+  /// 是否隐藏持股数量
+  final bool hideHoldings;
+
+  /// 未公开持股查询回调
+  final UserCharacterHoldingResolver? onRevealHoldings;
 
   /// 角色条目点击回调
   final void Function(UserCharacterApiItem item, String? avatarHeroTag)?
@@ -57,6 +67,8 @@ class UserCharacterAssetCarousel extends StatelessWidget {
         return UserCharacterAssetRow(
           item: item,
           avatarHeroTag: avatarHeroTag,
+          hideHoldings: hideHoldings,
+          onRevealHoldings: onRevealHoldings,
           onTap: onCharacterTap == null
               ? null
               : () => onCharacterTap?.call(item, avatarHeroTag),
@@ -73,11 +85,13 @@ class UserIcoAssetCarousel extends StatelessWidget {
   /// [key] Flutter 组件标识
   /// [icos] 用户 ICO 预览
   /// [isLoading] 是否正在加载
+  /// [hideInvestment] 是否隐藏已注资金额
   /// [onIcoTap] ICO 条目点击回调
   const UserIcoAssetCarousel({
     super.key,
     required this.icos,
     required this.isLoading,
+    this.hideInvestment = false,
     this.onIcoTap,
   });
 
@@ -86,6 +100,9 @@ class UserIcoAssetCarousel extends StatelessWidget {
 
   /// 是否正在加载
   final bool isLoading;
+
+  /// 是否隐藏已注资金额
+  final bool hideInvestment;
 
   /// ICO 条目点击回调
   final void Function(UserIcoApiItem item, String? avatarHeroTag)? onIcoTap;
@@ -113,6 +130,7 @@ class UserIcoAssetCarousel extends StatelessWidget {
         return UserIcoAssetRow(
           item: item,
           avatarHeroTag: avatarHeroTag,
+          hideInvestment: hideInvestment,
           onTap: onIcoTap == null
               ? null
               : () => onIcoTap?.call(item, avatarHeroTag),
@@ -219,6 +237,9 @@ class _UserAssetCarousel<T> extends StatelessWidget {
                           showLevel: showLevelSkeleton,
                           metricCount: skeletonMetricCount,
                           showTrailing: showTrailingSkeleton,
+                          titleMetricSpacing: 4,
+                          metricSpacing: 4,
+                          primaryMetricAsPill: true,
                         ),
                         if (row != _rowsPerColumn - 1)
                           const SizedBox(height: 4),

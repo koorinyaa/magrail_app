@@ -16,8 +16,8 @@ class UserDetailFloatingTopActions extends StatelessWidget {
   /// [identityProgress] 顶部紧凑用户标识显示进度
   /// [showBackButton] 是否显示返回按钮
   /// [showSettingsButton] 是否显示设置按钮
-  /// [hideBalanceAndAssets] 是否隐藏余额和资产
-  /// [onBalanceAndAssetsVisibilityPressed] 余额和资产显示按钮点击回调
+  /// [hidePrivateAssetValues] 是否隐藏私有资产数值
+  /// [onPrivateAssetValuesVisibilityPressed] 私有资产数值显示按钮点击回调
   /// [onSettingsPressed] 设置按钮点击回调
   const UserDetailFloatingTopActions({
     super.key,
@@ -27,8 +27,8 @@ class UserDetailFloatingTopActions extends StatelessWidget {
     required this.identityProgress,
     required this.showBackButton,
     required this.showSettingsButton,
-    required this.hideBalanceAndAssets,
-    required this.onBalanceAndAssetsVisibilityPressed,
+    required this.hidePrivateAssetValues,
+    required this.onPrivateAssetValuesVisibilityPressed,
     required this.onSettingsPressed,
   });
 
@@ -50,11 +50,11 @@ class UserDetailFloatingTopActions extends StatelessWidget {
   /// 是否显示设置按钮
   final bool showSettingsButton;
 
-  /// 是否隐藏余额和资产
-  final bool hideBalanceAndAssets;
+  /// 是否隐藏私有资产数值
+  final bool hidePrivateAssetValues;
 
-  /// 余额和资产显示按钮点击回调
-  final VoidCallback onBalanceAndAssetsVisibilityPressed;
+  /// 私有资产数值显示按钮点击回调
+  final VoidCallback onPrivateAssetValuesVisibilityPressed;
 
   /// 设置按钮点击回调
   final VoidCallback onSettingsPressed;
@@ -97,9 +97,9 @@ class UserDetailFloatingTopActions extends StatelessWidget {
                 identityProgress: identityProgress,
                 showBackButton: showBackButton,
                 showSettingsButton: showSettingsButton,
-                hideBalanceAndAssets: hideBalanceAndAssets,
-                onBalanceAndAssetsVisibilityPressed:
-                    onBalanceAndAssetsVisibilityPressed,
+                hidePrivateAssetValues: hidePrivateAssetValues,
+                onPrivateAssetValuesVisibilityPressed:
+                    onPrivateAssetValuesVisibilityPressed,
                 onSettingsPressed: onSettingsPressed,
               ),
             ),
@@ -195,8 +195,8 @@ class _UserDetailTopActions extends StatelessWidget {
   /// [identityProgress] 顶部紧凑用户标识显示进度
   /// [showBackButton] 是否显示返回按钮
   /// [showSettingsButton] 是否显示设置按钮
-  /// [hideBalanceAndAssets] 是否隐藏余额和资产
-  /// [onBalanceAndAssetsVisibilityPressed] 余额和资产显示按钮点击回调
+  /// [hidePrivateAssetValues] 是否隐藏私有资产数值
+  /// [onPrivateAssetValuesVisibilityPressed] 私有资产数值显示按钮点击回调
   /// [onSettingsPressed] 设置按钮点击回调
   const _UserDetailTopActions({
     required this.toolbarHeight,
@@ -204,8 +204,8 @@ class _UserDetailTopActions extends StatelessWidget {
     required this.identityProgress,
     required this.showBackButton,
     required this.showSettingsButton,
-    required this.hideBalanceAndAssets,
-    required this.onBalanceAndAssetsVisibilityPressed,
+    required this.hidePrivateAssetValues,
+    required this.onPrivateAssetValuesVisibilityPressed,
     required this.onSettingsPressed,
   });
 
@@ -224,11 +224,11 @@ class _UserDetailTopActions extends StatelessWidget {
   /// 是否显示设置按钮
   final bool showSettingsButton;
 
-  /// 是否隐藏余额和资产
-  final bool hideBalanceAndAssets;
+  /// 是否隐藏私有资产数值
+  final bool hidePrivateAssetValues;
 
-  /// 余额和资产显示按钮点击回调
-  final VoidCallback onBalanceAndAssetsVisibilityPressed;
+  /// 私有资产数值显示按钮点击回调
+  final VoidCallback onPrivateAssetValuesVisibilityPressed;
 
   /// 设置按钮点击回调
   final VoidCallback onSettingsPressed;
@@ -295,9 +295,9 @@ class _UserDetailTopActions extends StatelessWidget {
                       child: Center(
                         child: IconButton(
                           style: trailingIconButtonStyle,
-                          onPressed: onBalanceAndAssetsVisibilityPressed,
+                          onPressed: onPrivateAssetValuesVisibilityPressed,
                           icon: Icon(
-                            hideBalanceAndAssets
+                            hidePrivateAssetValues
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined,
                             size: _trailingIconSize,

@@ -50,6 +50,8 @@ class CharacterAssetRowShell extends StatelessWidget {
   /// [onTap] 条目点击回调
   /// [contentPadding] 内容内边距
   /// [tapBorderRadius] 点击反馈圆角
+  /// [titleMetricSpacing] 名称与首行数据间距
+  /// [metricSpacing] 数据行间距
   const CharacterAssetRowShell({
     super.key,
     required this.name,
@@ -62,6 +64,8 @@ class CharacterAssetRowShell extends StatelessWidget {
     this.onTap,
     this.contentPadding = const EdgeInsets.symmetric(horizontal: 6),
     this.tapBorderRadius,
+    this.titleMetricSpacing = 5,
+    this.metricSpacing = 3,
   });
 
   /// 角色名称
@@ -93,6 +97,12 @@ class CharacterAssetRowShell extends StatelessWidget {
 
   /// 点击反馈圆角
   final BorderRadius? tapBorderRadius;
+
+  /// 名称与首行数据间距
+  final double titleMetricSpacing;
+
+  /// 数据行间距
+  final double metricSpacing;
 
   /// 构建角色资产行
   ///
@@ -148,7 +158,7 @@ class CharacterAssetRowShell extends StatelessWidget {
                           ],
                         ],
                       ),
-                      const SizedBox(height: 5),
+                      SizedBox(height: titleMetricSpacing),
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,7 +171,7 @@ class CharacterAssetRowShell extends StatelessWidget {
                               isPrimary: index == 0,
                             ),
                             if (index != metrics.length - 1)
-                              const SizedBox(height: 3),
+                              SizedBox(height: metricSpacing),
                           ],
                         ],
                       ),

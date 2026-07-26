@@ -201,6 +201,7 @@ extension _UserDetailPageNavigation on _UserDetailPageState {
         if (_controller.isCurrentUser) 'currentUserName': profile.name,
         if (_controller.characterTotalItems case final total?)
           'characterTotalItems': '$total',
+        if (_hidePrivateAssetValues) 'hidePrivateValues': 'true',
       },
     );
   }
@@ -214,6 +215,7 @@ extension _UserDetailPageNavigation on _UserDetailPageState {
       queryParameters: {
         'username': profile.name,
         'nickname': profile.nickname,
+        if (_hidePrivateAssetValues) 'hidePrivateValues': 'true',
       },
     );
   }
