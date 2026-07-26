@@ -335,10 +335,15 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
     );
   }
 
-  /// 通过当前路由打开历史角色
+  /// 打开历史角色或重新请求当前角色资料
   ///
   /// [item] 目标历史角色
   void _openHistoryItem(CharacterDetailHistoryItem item) {
+    if (item.characterId == _controller.current?.characterId) {
+      unawaited(_controller.refreshCurrentCharacter(showLoading: true));
+      return;
+    }
+
     openCharacterDetail(
       context,
       characterId: item.characterId,

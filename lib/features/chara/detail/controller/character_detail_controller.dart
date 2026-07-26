@@ -160,11 +160,18 @@ class CharacterDetailController extends ChangeNotifier {
   /// 当前 Tinygrail 会话是否可用
   bool get isAuthorized => currentUser != null;
 
-  /// 静默刷新当前角色资料
-  Future<void> refreshCurrentCharacter() async {
+  /// 刷新当前角色资料
+  ///
+  /// [showLoading] 是否在请求期间显示角色详情骨架
+  Future<void> refreshCurrentCharacter({bool showLoading = false}) async {
     final characterId = _current?.characterId;
     if (characterId == null || characterId <= 0) {
       return;
+    }
+
+    if (showLoading) {
+      _pageTypes[characterId] = CharacterDetailPageType.pending;
+      _notifyIfActive();
     }
 
     await _refreshCharacterInfo(characterId, force: true);

@@ -41,24 +41,46 @@ class CharacterDetailHistoryBar extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    const itemWidth = 72.0;
+    const itemSpacing = 8.0;
+    const contentHeight = 96.0;
+    final disableAnimations = MediaQuery.disableAnimationsOf(context);
+    final contentWidth =
+        itemWidth * items.length + itemSpacing * (items.length - 1);
+
     return SizedBox(
       height: 104,
-      child: ListView.separated(
+      child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-        itemBuilder: (context, index) {
-          final item = items[index];
-          return _CharacterDetailHistoryItemButton(
-            item: item,
-            selected: item.characterId == selectedCharacterId,
-            avatarHeroTag: item.characterId == selectedCharacterId
-                ? selectedAvatarHeroTag
-                : null,
-            onPressed: () => onItemPressed(item),
-          );
-        },
-        separatorBuilder: (context, index) => const SizedBox(width: 8),
-        itemCount: items.length,
+        child: SizedBox(
+          width: contentWidth,
+          height: contentHeight,
+          child: Stack(
+            children: [
+              for (final (index, item) in items.indexed)
+                AnimatedPositioned(
+                  key: ValueKey<int>(item.characterId),
+                  duration: disableAnimations
+                      ? Duration.zero
+                      : const Duration(milliseconds: 280),
+                  curve: Curves.easeInOutCubic,
+                  left: index * (itemWidth + itemSpacing),
+                  top: 0,
+                  width: itemWidth,
+                  height: contentHeight,
+                  child: _CharacterDetailHistoryItemButton(
+                    item: item,
+                    selected: item.characterId == selectedCharacterId,
+                    avatarHeroTag: item.characterId == selectedCharacterId
+                        ? selectedAvatarHeroTag
+                        : null,
+                    onPressed: () => onItemPressed(item),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
