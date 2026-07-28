@@ -373,6 +373,13 @@ Widget _buildUserAmountPill(
   VoidCallback? onPressed,
 }) {
   final colorScheme = Theme.of(context).colorScheme;
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final foregroundColor = colorScheme.onSurfaceVariant.withValues(
+    alpha: isDark ? 0.86 : 0.72,
+  );
+  final backgroundColor = colorScheme.onSurfaceVariant.withValues(
+    alpha: isDark ? 0.12 : 0.08,
+  );
   final borderRadius = BorderRadius.circular(999);
   return Material(
     color: Colors.transparent,
@@ -383,7 +390,7 @@ Widget _buildUserAmountPill(
       borderRadius: borderRadius,
       child: Ink(
         decoration: BoxDecoration(
-          color: colorScheme.outlineVariant,
+          color: backgroundColor,
           borderRadius: borderRadius,
         ),
         child: Padding(
@@ -393,7 +400,7 @@ Widget _buildUserAmountPill(
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: colorScheme.onSurfaceVariant,
+              color: foregroundColor,
               fontSize: 10,
               fontWeight: FontWeight.w700,
               height: 1,
