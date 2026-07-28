@@ -2,26 +2,19 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
-import 'package:magrail_app/core/utils/formatters.dart';
 import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
-import 'package:magrail_app/core/utils/tinygrail_formatters.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
 import 'package:magrail_app/core/widgets/snapping_horizontal_list_view.dart';
 import 'package:magrail_app/features/chara/auction/model/auction_api_item.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_hero.dart';
+import 'package:magrail_app/features/chara/model/character_full_list_sort.dart';
 import 'package:magrail_app/features/user/model/user_character_api_item.dart';
-import 'package:magrail_app/features/chara/widgets/character_asset_chips.dart';
-import 'package:magrail_app/features/chara/widgets/character_asset_row_components.dart';
 import 'package:magrail_app/features/chara/widgets/character_asset_row_skeleton.dart';
+import 'package:magrail_app/features/chara/widgets/character_level_grouped_sliver_list.dart';
 
-/// 角色池资产行类型
-enum CharacterPoolRowType {
-  /// 英灵殿角色行
-  valhalla,
+import 'character_pool_row.dart';
 
-  /// 幻想乡角色行
-  gensokyo,
-}
+export 'character_pool_row.dart';
 
 /// 角色池横向预览栏
 class CharacterPoolCarousel extends StatelessWidget {
@@ -111,6 +104,8 @@ class CharacterPoolSliverList extends StatelessWidget {
   /// [items] 角色池条目
   /// [rowType] 角色池资产行类型
   /// [auctionMap] 当前用户竞拍映射
+  /// [sort] 当前全量列表排序字段
+  /// [showLevelHeaders] 是否显示等级标题
   /// [onItemBuilt] 条目构建回调
   /// [onCharacterTap] 角色条目点击回调
   /// [onAuctionPressed] 竞拍按钮点击回调
@@ -119,6 +114,8 @@ class CharacterPoolSliverList extends StatelessWidget {
     required this.items,
     required this.rowType,
     required this.auctionMap,
+    this.sort,
+    this.showLevelHeaders = false,
     this.onItemBuilt,
     this.onCharacterTap,
     this.onAuctionPressed,
@@ -132,6 +129,12 @@ class CharacterPoolSliverList extends StatelessWidget {
 
   /// 当前用户竞拍映射
   final Map<int, AuctionApiItem> auctionMap;
+
+  /// 当前全量列表排序字段
+  final CharacterFullListSort? sort;
+
+  /// 是否显示等级标题
+  final bool showLevelHeaders;
 
   /// 条目构建回调
   final ValueChanged<int>? onItemBuilt;
@@ -148,35 +151,57 @@ class CharacterPoolSliverList extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
+    if (showLevelHeaders) {
+      return CharacterLevelGroupedSliverList<UserCharacterApiItem>(
+        items: items,
+        levelOf: (item) => item.level,
+        itemBuilder: (context, item, index) {
+          return _buildItem(context, index, reserveLevelRail: true);
+        },
+      );
+    }
     return SliverFixedExtentList(
       itemExtent: _CharacterPoolListMetrics.itemExtent,
       delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final item = items[index];
-          final avatarUrl = TinygrailAssetUrls.normalizeAvatar(item.icon);
-          final avatarHeroTag = createCharacterDetailAvatarHeroTag(
-            characterId: item.characterId,
-            avatarUrl: avatarUrl,
-            source: item,
-          );
-
-          onItemBuilt?.call(index);
-          return _CharacterPoolListItem(
-            child: CharacterPoolRow(
-              item: item,
-              rowType: rowType,
-              auction: auctionMap[item.characterId],
-              avatarHeroTag: avatarHeroTag,
-              onTap: onCharacterTap == null
-                  ? null
-                  : () => onCharacterTap?.call(item, avatarHeroTag),
-              onAuctionPressed: onAuctionPressed == null
-                  ? null
-                  : () => onAuctionPressed?.call(item),
-            ),
-          );
-        },
+        (context, index) => _buildItem(context, index),
         childCount: items.length,
+      ),
+    );
+  }
+
+  /// 构建角色池列表条目
+  ///
+  /// [context] 当前组件树上下文
+  /// [index] 当前角色下标
+  /// [reserveLevelRail] 是否为等级轨道预留右侧宽度
+  Widget _buildItem(
+    BuildContext context,
+    int index, {
+    bool reserveLevelRail = false,
+  }) {
+    final item = items[index];
+    final avatarUrl = TinygrailAssetUrls.normalizeAvatar(item.icon);
+    final avatarHeroTag = createCharacterDetailAvatarHeroTag(
+      characterId: item.characterId,
+      avatarUrl: avatarUrl,
+      source: item,
+    );
+
+    onItemBuilt?.call(index);
+    return _CharacterPoolListItem(
+      reserveLevelRail: reserveLevelRail,
+      child: CharacterPoolRow(
+        item: item,
+        rowType: rowType,
+        sort: sort,
+        auction: auctionMap[item.characterId],
+        avatarHeroTag: avatarHeroTag,
+        onTap: onCharacterTap == null
+            ? null
+            : () => onCharacterTap?.call(item, avatarHeroTag),
+        onAuctionPressed: onAuctionPressed == null
+            ? null
+            : () => onAuctionPressed?.call(item),
       ),
     );
   }
@@ -223,111 +248,6 @@ class CharacterPoolSkeletonSliverList extends StatelessWidget {
         childCount: itemCount,
       ),
     );
-  }
-}
-
-/// 角色池资产行
-class CharacterPoolRow extends StatelessWidget {
-  /// 创建角色池资产行
-  ///
-  /// [key] Flutter 组件标识
-  /// [item] 角色池条目
-  /// [rowType] 角色池资产行类型
-  /// [auction] 当前用户拍卖详情
-  /// [avatarHeroTag] 头像转场标识
-  /// [onTap] 条目点击回调
-  /// [onAuctionPressed] 竞拍按钮点击回调
-  const CharacterPoolRow({
-    super.key,
-    required this.item,
-    required this.rowType,
-    this.auction,
-    this.avatarHeroTag,
-    this.onTap,
-    this.onAuctionPressed,
-  });
-
-  /// 角色池条目
-  final UserCharacterApiItem item;
-
-  /// 角色池资产行类型
-  final CharacterPoolRowType rowType;
-
-  /// 当前用户拍卖详情
-  final AuctionApiItem? auction;
-
-  /// 头像转场标识
-  final String? avatarHeroTag;
-
-  /// 条目点击回调
-  final VoidCallback? onTap;
-
-  /// 竞拍按钮点击回调
-  final VoidCallback? onAuctionPressed;
-
-  /// 构建角色池资产行
-  ///
-  /// [context] 当前组件树上下文
-  @override
-  Widget build(BuildContext context) {
-    final avatarUrl = TinygrailAssetUrls.normalizeAvatar(item.icon);
-
-    return CharacterAssetRowShell(
-      name: TinygrailFormatters.decodeHtmlEntities(item.name),
-      avatarUrl: avatarUrl,
-      avatarHeroTag: avatarHeroTag,
-      level: item.level,
-      zeroCount: item.zeroCount,
-      metrics: [
-        CharacterAssetMetric(
-          label: '数量',
-          value: _formatCount(item.state),
-          isValueMuted: true,
-        ),
-        _buildSecondaryMetric(),
-      ],
-      trailing: _buildTrailing(),
-      onTap: onTap,
-    );
-  }
-
-  CharacterAssetMetric _buildSecondaryMetric() {
-    return switch (rowType) {
-      CharacterPoolRowType.valhalla => CharacterAssetMetric(
-          label: '底价',
-          value: Formatters.tinygrailCurrency(item.price),
-          isValueMuted: true,
-        ),
-      CharacterPoolRowType.gensokyo => CharacterAssetMetric(
-          label: '股息',
-          value: '+${Formatters.tinygrailCurrency(item.rate)}',
-          isValueMuted: true,
-        ),
-    };
-  }
-
-  Widget _buildTrailing() {
-    return switch (rowType) {
-      CharacterPoolRowType.valhalla => _CharacterPoolAuctionButton(
-          hasUserBid: auction != null,
-          onPressed: onAuctionPressed,
-        ),
-      CharacterPoolRowType.gensokyo => CharacterAssetCurrentPriceChip(
-          current: item.current,
-          fluctuation: item.fluctuation,
-        ),
-    };
-  }
-
-  /// 格式化角色池数量
-  ///
-  /// [value] 原始数量
-  String _formatCount(int value) {
-    if (value <= 0) {
-      return '0';
-    }
-
-    return Formatters.groupedNumber(value);
   }
 }
 
@@ -519,68 +439,26 @@ class _CharacterPoolInlineEmpty extends StatelessWidget {
   }
 }
 
-class _CharacterPoolAuctionButton extends StatelessWidget {
-  const _CharacterPoolAuctionButton({
-    required this.hasUserBid,
-    required this.onPressed,
-  });
-
-  static const double width = 46;
-  static const double height = 22;
-
-  final bool hasUserBid;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final onPressed = this.onPressed;
-    final isEnabled = onPressed != null;
-    final foregroundColor = hasUserBid
-        ? Colors.white
-        : colorScheme.onSurfaceVariant.withValues(
-            alpha: isEnabled ? (isDark ? 0.86 : 0.76) : 0.38,
-          );
-    final backgroundColor = hasUserBid
-        ? colorScheme.primary.withValues(alpha: isEnabled ? 0.92 : 0.38)
-        : colorScheme.onSurfaceVariant.withValues(
-            alpha: isEnabled ? (isDark ? 0.12 : 0.08) : 0.05,
-          );
-
-    return SizedBox(
-      width: width,
-      height: height,
-      child: Material(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(999),
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(999),
-          child: Center(
-            child: Text(
-              hasUserBid ? '改价' : '竞拍',
-              style: TextStyle(
-                color: foregroundColor,
-                fontSize: 10.5,
-                fontWeight: FontWeight.w700,
-                height: 1,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
+/// 角色池列表条目外层
 class _CharacterPoolListItem extends StatelessWidget {
+  /// 创建角色池列表条目外层
+  ///
+  /// [child] 列表项内容
+  /// [reserveLevelRail] 是否为等级轨道预留右侧宽度
   const _CharacterPoolListItem({
     required this.child,
+    this.reserveLevelRail = false,
   });
 
+  /// 列表项内容
   final Widget child;
 
+  /// 是否为等级轨道预留右侧宽度
+  final bool reserveLevelRail;
+
+  /// 构建角色池列表条目外层
+  ///
+  /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -588,7 +466,7 @@ class _CharacterPoolListItem extends StatelessWidget {
         context,
         left: 12,
         top: 0,
-        right: 12,
+        right: reserveLevelRail ? 32 : 12,
         bottom: 4,
       ),
       child: child,
@@ -596,18 +474,21 @@ class _CharacterPoolListItem extends StatelessWidget {
   }
 }
 
+/// 角色池列表尺寸
 final class _CharacterPoolListMetrics {
+  /// 禁止创建角色池列表尺寸实例
   const _CharacterPoolListMetrics._();
 
+  /// 角色池列表条目高度
   static const double itemExtent = 68;
 }
 
+/// 读取角色池行尾骨架尺寸
+///
+/// [rowType] 角色池资产行类型
 Size _trailingSkeletonSize(CharacterPoolRowType rowType) {
   return switch (rowType) {
-    CharacterPoolRowType.valhalla => const Size(
-        _CharacterPoolAuctionButton.width,
-        _CharacterPoolAuctionButton.height,
-      ),
+    CharacterPoolRowType.valhalla => CharacterPoolRow.auctionButtonSize,
     CharacterPoolRowType.gensokyo => const Size(54, 18),
   };
 }

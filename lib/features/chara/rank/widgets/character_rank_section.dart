@@ -7,11 +7,14 @@ import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
 import 'package:magrail_app/core/utils/tinygrail_formatters.dart';
 import 'package:magrail_app/core/widgets/snapping_horizontal_list_view.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_hero.dart';
+import 'package:magrail_app/features/chara/model/character_full_list_sort.dart';
 import 'package:magrail_app/features/chara/rank/model/character_rank_entry.dart';
 import 'package:magrail_app/features/chara/rank/repository/character_rank_repository.dart';
+import 'package:magrail_app/features/chara/tower/widgets/tower_ranking_badges.dart';
 import 'package:magrail_app/features/chara/widgets/character_asset_chips.dart';
 import 'package:magrail_app/features/chara/widgets/character_asset_row_components.dart';
 import 'package:magrail_app/features/chara/widgets/character_asset_row_skeleton.dart';
+import 'package:magrail_app/features/chara/widgets/character_level_grouped_sliver_list.dart';
 
 /// 角色排序横向预览栏
 class CharacterRankCarousel extends StatelessWidget {
@@ -85,12 +88,16 @@ class CharacterRankSliverList extends StatelessWidget {
   /// [key] Flutter 组件标识
   /// [items] 角色排序条目
   /// [selectedType] 当前排序类型
+  /// [localSort] 当前全量列表排序字段
+  /// [showLevelHeaders] 是否显示等级标题
   /// [onItemBuilt] 条目构建回调
   /// [onCharacterTap] 角色条目点击回调
   const CharacterRankSliverList({
     super.key,
     required this.items,
     required this.selectedType,
+    this.localSort,
+    this.showLevelHeaders = false,
     this.onItemBuilt,
     this.onCharacterTap,
   });
@@ -100,6 +107,12 @@ class CharacterRankSliverList extends StatelessWidget {
 
   /// 当前排序类型
   final CharacterRankSortType selectedType;
+
+  /// 当前全量列表排序字段
+  final CharacterFullListSort? localSort;
+
+  /// 是否显示等级标题
+  final bool showLevelHeaders;
 
   /// 条目构建回调
   final ValueChanged<int>? onItemBuilt;
@@ -113,31 +126,53 @@ class CharacterRankSliverList extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
+    if (showLevelHeaders) {
+      return CharacterLevelGroupedSliverList<CharacterRankEntry>(
+        items: items,
+        levelOf: (item) => item.level,
+        itemBuilder: (context, item, index) {
+          return _buildItem(context, index, reserveLevelRail: true);
+        },
+      );
+    }
     return SliverFixedExtentList(
       itemExtent: _CharacterRankListMetrics.itemExtent,
       delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final item = items[index];
-          final avatarUrl = TinygrailAssetUrls.normalizeAvatar(item.icon);
-          final avatarHeroTag = createCharacterDetailAvatarHeroTag(
-            characterId: item.characterId,
-            avatarUrl: avatarUrl,
-            source: item,
-          );
-
-          onItemBuilt?.call(index);
-          return _CharacterRankListItem(
-            child: CharacterRankRow(
-              item: item,
-              selectedType: selectedType,
-              avatarHeroTag: avatarHeroTag,
-              onTap: onCharacterTap == null
-                  ? null
-                  : () => onCharacterTap?.call(item, avatarHeroTag),
-            ),
-          );
-        },
+        (context, index) => _buildItem(context, index),
         childCount: items.length,
+      ),
+    );
+  }
+
+  /// 构建角色排序列表条目
+  ///
+  /// [context] 当前组件树上下文
+  /// [index] 当前角色下标
+  /// [reserveLevelRail] 是否为等级轨道预留右侧宽度
+  Widget _buildItem(
+    BuildContext context,
+    int index, {
+    bool reserveLevelRail = false,
+  }) {
+    final item = items[index];
+    final avatarUrl = TinygrailAssetUrls.normalizeAvatar(item.icon);
+    final avatarHeroTag = createCharacterDetailAvatarHeroTag(
+      characterId: item.characterId,
+      avatarUrl: avatarUrl,
+      source: item,
+    );
+
+    onItemBuilt?.call(index);
+    return _CharacterRankListItem(
+      reserveLevelRail: reserveLevelRail,
+      child: CharacterRankRow(
+        item: item,
+        selectedType: selectedType,
+        localSort: localSort,
+        avatarHeroTag: avatarHeroTag,
+        onTap: onCharacterTap == null
+            ? null
+            : () => onCharacterTap?.call(item, avatarHeroTag),
       ),
     );
   }
@@ -187,12 +222,14 @@ class CharacterRankRow extends StatelessWidget {
   /// [key] Flutter 组件标识
   /// [item] 角色排序条目
   /// [selectedType] 当前排序类型
+  /// [localSort] 当前全量列表排序字段
   /// [avatarHeroTag] 头像转场标识
   /// [onTap] 条目点击回调
   const CharacterRankRow({
     super.key,
     required this.item,
     required this.selectedType,
+    this.localSort,
     this.avatarHeroTag,
     this.onTap,
   });
@@ -202,6 +239,9 @@ class CharacterRankRow extends StatelessWidget {
 
   /// 当前排序类型
   final CharacterRankSortType selectedType;
+
+  /// 当前全量列表排序字段
+  final CharacterFullListSort? localSort;
 
   /// 头像转场标识
   final String? avatarHeroTag;
@@ -215,10 +255,6 @@ class CharacterRankRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final avatarUrl = TinygrailAssetUrls.normalizeAvatar(item.icon);
-    final fluctuationColor =
-        CharacterAssetCurrentPriceChip.resolveCurrentPriceColor(
-      item.fluctuation,
-    );
 
     return CharacterAssetRowShell(
       name: TinygrailFormatters.decodeHtmlEntities(item.name),
@@ -228,12 +264,7 @@ class CharacterRankRow extends StatelessWidget {
       zeroCount: item.zeroCount,
       metrics: [
         _buildPrimaryMetric(),
-        CharacterAssetMetric(
-          label: '涨跌',
-          value: _formatFluctuation(item.fluctuation),
-          isValueMuted: true,
-          valueColor: fluctuationColor,
-        ),
+        _buildSecondaryMetric(),
       ],
       trailing: CharacterAssetCurrentPriceChip(
         current: item.current,
@@ -245,7 +276,8 @@ class CharacterRankRow extends StatelessWidget {
 
   /// 构建排序主数据行
   CharacterAssetMetric _buildPrimaryMetric() {
-    if (selectedType == CharacterRankSortType.highestMarketValue) {
+    if (localSort == null &&
+        selectedType == CharacterRankSortType.highestMarketValue) {
       return CharacterAssetMetric(
         label: '市值',
         value: _formatMarketValue(item.marketValue),
@@ -255,8 +287,51 @@ class CharacterRankRow extends StatelessWidget {
 
     return CharacterAssetMetric(
       label: '股息',
-      value: '+${Formatters.tinygrailCurrency(item.rate)}',
+      value: '+${Formatters.tinygrailCurrency(item.singleDividend)}',
       isValueMuted: true,
+    );
+  }
+
+  /// 构建随本地排序变化的第三行数据
+  CharacterAssetMetric _buildSecondaryMetric() {
+    final selectedSort = localSort;
+    if (selectedSort == CharacterFullListSort.towerRank) {
+      return CharacterAssetMetric(
+        value: '通天塔 '
+            '${item.rank <= 0 ? '--' : '${Formatters.groupedNumber(item.rank)}名'}'
+            ' · 星之力 ${Formatters.groupedNumber(item.starForces)}',
+        isValueMuted: true,
+      );
+    }
+    if (selectedSort == CharacterFullListSort.stars) {
+      return CharacterAssetMetric(
+        value: '',
+        valueWidget: TowerStarsRow(
+          stars: item.stars,
+          iconSize: 10,
+          spacing: 1,
+          runSpacing: 0,
+        ),
+        isValueMuted: true,
+      );
+    }
+    if (selectedSort == CharacterFullListSort.marketValue) {
+      return CharacterAssetMetric(
+        label: '市值',
+        value: _formatMarketValue(item.marketValue),
+        isValueMuted: true,
+      );
+    }
+
+    final fluctuationColor =
+        CharacterAssetCurrentPriceChip.resolveCurrentPriceColor(
+      item.fluctuation,
+    );
+    return CharacterAssetMetric(
+      label: '涨跌',
+      value: _formatFluctuation(item.fluctuation),
+      isValueMuted: true,
+      valueColor: fluctuationColor,
     );
   }
 
@@ -429,15 +504,22 @@ class _CharacterRankInlineEmpty extends StatelessWidget {
   }
 }
 
+/// 角色排序列表条目外层
 class _CharacterRankListItem extends StatelessWidget {
   /// 创建角色排序列表条目外层
   ///
   /// [child] 条目内容
+  /// [reserveLevelRail] 是否为等级轨道预留右侧宽度
   const _CharacterRankListItem({
     required this.child,
+    this.reserveLevelRail = false,
   });
 
+  /// 条目内容
   final Widget child;
+
+  /// 是否为等级轨道预留右侧宽度
+  final bool reserveLevelRail;
 
   /// 构建角色排序列表条目外层
   ///
@@ -449,7 +531,7 @@ class _CharacterRankListItem extends StatelessWidget {
         context,
         left: 12,
         top: 0,
-        right: 12,
+        right: reserveLevelRail ? 32 : 12,
         bottom: 4,
       ),
       child: child,
@@ -457,9 +539,11 @@ class _CharacterRankListItem extends StatelessWidget {
   }
 }
 
+/// 角色排序列表尺寸
 final class _CharacterRankListMetrics {
   /// 禁止创建角色排序列表尺寸实例
   const _CharacterRankListMetrics._();
 
+  /// 角色排序列表条目高度
   static const double itemExtent = 68;
 }

@@ -8,6 +8,8 @@ import 'package:magrail_app/core/utils/tinygrail_formatters.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
 import 'package:magrail_app/core/widgets/snapping_horizontal_list_view.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_hero.dart';
+import 'package:magrail_app/features/chara/model/character_full_list_sort.dart';
+import 'package:magrail_app/features/chara/tower/widgets/tower_ranking_badges.dart';
 import 'package:magrail_app/features/ico/model/st_character_entry.dart';
 import 'package:magrail_app/features/chara/widgets/character_asset_chips.dart';
 import 'package:magrail_app/features/chara/widgets/character_asset_row_components.dart';
@@ -78,17 +80,22 @@ class StCharacterSliverList extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [items] ST 角色条目
+  /// [sort] 当前全量列表排序字段
   /// [onItemBuilt] 条目构建回调
   /// [onCharacterTap] 角色条目点击回调
   const StCharacterSliverList({
     super.key,
     required this.items,
+    this.sort,
     this.onItemBuilt,
     this.onCharacterTap,
   });
 
   /// ST 角色条目
   final List<StCharacterEntry> items;
+
+  /// 当前全量列表排序字段
+  final CharacterFullListSort? sort;
 
   /// 条目构建回调
   final ValueChanged<int>? onItemBuilt;
@@ -118,6 +125,7 @@ class StCharacterSliverList extends StatelessWidget {
           return _StCharacterListItem(
             child: StCharacterRow(
               item: item,
+              sort: sort,
               avatarHeroTag: avatarHeroTag,
               onTap: onCharacterTap == null
                   ? null
@@ -174,17 +182,22 @@ class StCharacterRow extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [item] ST 角色条目
+  /// [sort] 当前全量列表排序字段
   /// [avatarHeroTag] 头像转场标识
   /// [onTap] 条目点击回调
   const StCharacterRow({
     super.key,
     required this.item,
+    this.sort,
     this.avatarHeroTag,
     this.onTap,
   });
 
   /// ST 角色条目
   final StCharacterEntry item;
+
+  /// 当前全量列表排序字段
+  final CharacterFullListSort? sort;
 
   /// 头像转场标识
   final String? avatarHeroTag;
@@ -211,11 +224,7 @@ class StCharacterRow extends StatelessWidget {
           value: _formatCount(item.total),
           isValueMuted: true,
         ),
-        CharacterAssetMetric(
-          label: '买卖',
-          value: '${_formatCount(item.bids)} / ${_formatCount(item.asks)}',
-          isValueMuted: true,
-        ),
+        _buildSecondaryMetric(),
       ],
       trailing: CharacterAssetCurrentPriceChip(
         current: item.current,
@@ -223,6 +232,38 @@ class StCharacterRow extends StatelessWidget {
       ),
       onTap: onTap,
     );
+  }
+
+  /// 构建随排序字段变化的第三行数据
+  CharacterAssetMetric _buildSecondaryMetric() {
+    return switch (sort) {
+      CharacterFullListSort.dividend => CharacterAssetMetric(
+          label: '股息',
+          value: '+${Formatters.tinygrailCurrency(item.singleDividend)}',
+          isValueMuted: true,
+        ),
+      CharacterFullListSort.towerRank => CharacterAssetMetric(
+          value: '通天塔 '
+              '${item.rank <= 0 ? '--' : '${Formatters.groupedNumber(item.rank)}名'}'
+              ' · 星之力 ${Formatters.groupedNumber(item.starForces)}',
+          isValueMuted: true,
+        ),
+      CharacterFullListSort.stars => CharacterAssetMetric(
+          value: '',
+          valueWidget: TowerStarsRow(
+            stars: item.stars,
+            iconSize: 10,
+            spacing: 1,
+            runSpacing: 0,
+          ),
+          isValueMuted: true,
+        ),
+      _ => CharacterAssetMetric(
+          label: '买卖',
+          value: '${_formatCount(item.bids)} / ${_formatCount(item.asks)}',
+          isValueMuted: true,
+        ),
+    };
   }
 
   /// 格式化 ST 角色数量

@@ -70,6 +70,31 @@ class CharacterRankRepository {
     required CharacterRankSortType sortType,
     int page = 1,
   }) async {
+    final items = await fetchRankCharacters(
+      sortType: sortType,
+      page: page,
+      pageSize: pageSize,
+    );
+
+    return TinygrailPage<CharacterRankEntry>(
+      items: items,
+      currentPage: page,
+      totalPages: maxPage,
+      totalItems: maxPage * pageSize,
+      itemsPerPage: pageSize,
+    );
+  }
+
+  /// 获取指定榜单的角色数据
+  ///
+  /// [sortType] 排序类型
+  /// [page] 页码
+  /// [pageSize] 每页数量
+  Future<List<CharacterRankEntry>> fetchRankCharacters({
+    required CharacterRankSortType sortType,
+    int page = 1,
+    int pageSize = CharacterRankRepository.pageSize,
+  }) async {
     final json = await _apiClient.getJson<Map<String, Object?>>(
       '${sortType.endpoint}/$page/$pageSize',
     );
@@ -86,12 +111,6 @@ class CharacterRankRepository {
       throw StateError(response.message ?? '获取角色排序失败');
     }
 
-    return TinygrailPage<CharacterRankEntry>(
-      items: items,
-      currentPage: page,
-      totalPages: maxPage,
-      totalItems: maxPage * pageSize,
-      itemsPerPage: pageSize,
-    );
+    return items;
   }
 }

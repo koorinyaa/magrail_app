@@ -6,7 +6,7 @@ import 'package:magrail_app/features/chara/rank/controller/character_rank_contro
 import 'package:magrail_app/features/chara/rank/model/character_rank_entry.dart';
 import 'package:magrail_app/features/chara/rank/repository/character_rank_repository.dart';
 import 'package:magrail_app/features/chara/rank/widgets/character_rank_section.dart';
-import 'package:magrail_app/features/chara/rank/widgets/character_rank_sort_header.dart';
+import 'package:magrail_app/features/chara/view/character_full_list_page_state_mixin.dart';
 
 /// 所有角色排序二级页面
 class AllCharacterRankPage extends StatefulWidget {
@@ -28,33 +28,34 @@ class AllCharacterRankPage extends StatefulWidget {
 }
 
 /// 所有角色排序二级页面状态
-class _AllCharacterRankPageState extends State<AllCharacterRankPage> {
-  late final Map<CharacterRankSortType, CharacterRankPageController>
-      _controllers;
-  final ScrollController _scrollController = ScrollController();
-  CharacterRankSortType _selectedType = CharacterRankSortType.highestRate;
+class _AllCharacterRankPageState extends State<AllCharacterRankPage>
+    with
+        CharacterFullListPageStateMixin<CharacterRankEntry,
+            AllCharacterRankPage> {
+  late final AllCharacterFullListPageController _controller;
+
+  /// 当前所有角色全量列表控制器
+  @override
+  AllCharacterFullListPageController get fullListController => _controller;
 
   /// 初始化所有角色排序二级页面状态
   @override
   void initState() {
     super.initState();
-    _controllers = {
-      for (final type in CharacterRankSortType.values)
-        type: CharacterRankPageController(
-          repository: widget.repository,
-          sortType: type,
-        ),
-    };
-    _currentController.initialize();
+    _controller = AllCharacterFullListPageController(
+      repository: widget.repository,
+      waitForScrollIdle: waitForFullListScrollIdle,
+      onBeforeFullItemsReplaced: preserveFullListVisibleItem,
+      onDataRefreshSucceeded: showFullListRefreshSucceeded,
+      onDataRefreshFailed: showFullListRefreshFailed,
+    )..initialize();
   }
 
   /// 释放所有角色排序二级页面状态
   @override
   void dispose() {
-    _scrollController.dispose();
-    for (final controller in _controllers.values) {
-      controller.dispose();
-    }
+    _controller.dispose();
+    disposeFullListPageState();
     super.dispose();
   }
 
@@ -63,61 +64,43 @@ class _AllCharacterRankPageState extends State<AllCharacterRankPage> {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return TinygrailPagedSliverPage<CharacterRankEntry, CharacterRankEntry>(
-      controller: _currentController,
-      scrollController: _scrollController,
-      title: '所有角色',
-      appBarBottom: CharacterRankSortHeader(
-        selectedType: _selectedType,
-        onSelected: _selectType,
-      ),
-      loadingSliver: const CharacterRankSkeletonSliverList(),
-      emptySliverBuilder: (context, controller) {
-        return const PagedSliverState(
-          title: '暂无角色',
-          message: '当前没有可展示的角色',
-          icon: Icons.inbox_rounded,
+    return ListenableBuilder(
+      listenable: _controller,
+      builder: (context, child) {
+        final page =
+            TinygrailPagedSliverPage<CharacterRankEntry, CharacterRankEntry>(
+          controller: _controller,
+          scrollController: fullListScrollController,
+          title: '所有角色',
+          appBarBottom: buildFullListSortToolbar(),
+          loadingSliver: const CharacterRankSkeletonSliverList(),
+          emptySliverBuilder: (context, controller) {
+            final isFiltering = _controller.searchKeyword.isNotEmpty;
+            return PagedSliverState(
+              title: isFiltering ? '未找到角色' : '暂无角色',
+              message: isFiltering ? '没有符合搜索条件的角色' : '当前没有可展示的角色',
+              icon:
+                  isFiltering ? Icons.search_off_rounded : Icons.inbox_rounded,
+            );
+          },
+          contentSliversBuilder: (context, items, onItemBuilt) {
+            return [
+              CharacterRankSliverList(
+                items: items,
+                selectedType: CharacterRankSortType.maxRise,
+                localSort: _controller.hasFullData ? _controller.sort : null,
+                showLevelHeaders: _controller.showsLevelHeaders,
+                onItemBuilt: onItemBuilt,
+                onCharacterTap: _openCharacterDetail,
+              ),
+            ];
+          },
+          completedLabel: '没有更多角色了',
+          bottomContentPadding: fullListBottomContentPadding,
+          refreshErrorText: '数据刷新失败',
         );
+        return buildFullListOverlay(child: page);
       },
-      contentSliversBuilder: (context, items, onItemBuilt) {
-        return [
-          CharacterRankSliverList(
-            items: items,
-            selectedType: _selectedType,
-            onItemBuilt: onItemBuilt,
-            onCharacterTap: _openCharacterDetail,
-          ),
-        ];
-      },
-      completedLabel: '没有更多角色了',
-    );
-  }
-
-  CharacterRankPageController get _currentController {
-    return _controllers[_selectedType]!;
-  }
-
-  /// 切换角色排序类型
-  ///
-  /// [type] 目标排序类型
-  void _selectType(CharacterRankSortType type) {
-    if (_selectedType == type) {
-      return;
-    }
-
-    setState(() {
-      _selectedType = type;
-    });
-    _currentController.initialize();
-
-    if (!_scrollController.hasClients) {
-      return;
-    }
-
-    _scrollController.animateTo(
-      0,
-      duration: const Duration(milliseconds: 220),
-      curve: Curves.easeOutCubic,
     );
   }
 

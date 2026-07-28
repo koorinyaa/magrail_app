@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:magrail_app/core/widgets/paged_sliver_state.dart';
 import 'package:magrail_app/core/widgets/tinygrail_paged_sliver_page.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
+import 'package:magrail_app/features/chara/view/character_full_list_page_state_mixin.dart';
 import 'package:magrail_app/features/ico/controller/st_character_controller.dart';
 import 'package:magrail_app/features/ico/model/st_character_entry.dart';
 import 'package:magrail_app/features/ico/repository/st_character_repository.dart';
@@ -27,8 +28,13 @@ class StCharacterPage extends StatefulWidget {
 }
 
 /// ST 角色二级页面状态
-class _StCharacterPageState extends State<StCharacterPage> {
+class _StCharacterPageState extends State<StCharacterPage>
+    with CharacterFullListPageStateMixin<StCharacterEntry, StCharacterPage> {
   late final StCharacterPageController _controller;
+
+  /// 当前 ST 角色全量列表控制器
+  @override
+  StCharacterPageController get fullListController => _controller;
 
   /// 初始化 ST 角色二级页面状态
   @override
@@ -36,6 +42,10 @@ class _StCharacterPageState extends State<StCharacterPage> {
     super.initState();
     _controller = StCharacterPageController(
       repository: widget.repository,
+      waitForScrollIdle: waitForFullListScrollIdle,
+      onBeforeFullItemsReplaced: preserveFullListVisibleItem,
+      onDataRefreshSucceeded: showFullListRefreshSucceeded,
+      onDataRefreshFailed: showFullListRefreshFailed,
     )..initialize();
   }
 
@@ -43,6 +53,7 @@ class _StCharacterPageState extends State<StCharacterPage> {
   @override
   void dispose() {
     _controller.dispose();
+    disposeFullListPageState();
     super.dispose();
   }
 
@@ -51,27 +62,41 @@ class _StCharacterPageState extends State<StCharacterPage> {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return TinygrailPagedSliverPage<StCharacterEntry, StCharacterEntry>(
-      controller: _controller,
-      title: 'ST',
-      loadingSliver: const StCharacterSkeletonSliverList(),
-      emptySliverBuilder: (context, controller) {
-        return const PagedSliverState(
-          title: '暂无 ST 角色',
-          message: '当前没有可展示的 ST 角色',
-          icon: Icons.inbox_rounded,
+    return ListenableBuilder(
+      listenable: _controller,
+      builder: (context, child) {
+        final page =
+            TinygrailPagedSliverPage<StCharacterEntry, StCharacterEntry>(
+          controller: _controller,
+          scrollController: fullListScrollController,
+          title: 'ST',
+          appBarBottom: buildFullListSortToolbar(),
+          loadingSliver: const StCharacterSkeletonSliverList(),
+          emptySliverBuilder: (context, controller) {
+            final isFiltering = _controller.searchKeyword.isNotEmpty;
+            return PagedSliverState(
+              title: isFiltering ? '未找到角色' : '暂无 ST 角色',
+              message: isFiltering ? '没有符合搜索条件的角色' : '当前没有可展示的 ST 角色',
+              icon:
+                  isFiltering ? Icons.search_off_rounded : Icons.inbox_rounded,
+            );
+          },
+          contentSliversBuilder: (context, items, onItemBuilt) {
+            return [
+              StCharacterSliverList(
+                items: items,
+                sort: _controller.hasFullData ? _controller.sort : null,
+                onItemBuilt: onItemBuilt,
+                onCharacterTap: _openCharacterDetail,
+              ),
+            ];
+          },
+          completedLabel: '没有更多 ST 角色了',
+          bottomContentPadding: fullListBottomContentPadding,
+          refreshErrorText: '数据刷新失败',
         );
+        return buildFullListOverlay(child: page);
       },
-      contentSliversBuilder: (context, items, onItemBuilt) {
-        return [
-          StCharacterSliverList(
-            items: items,
-            onItemBuilt: onItemBuilt,
-            onCharacterTap: _openCharacterDetail,
-          ),
-        ];
-      },
-      completedLabel: '没有更多 ST 角色了',
     );
   }
 

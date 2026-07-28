@@ -8,6 +8,7 @@ import 'package:magrail_app/features/chara/auction/widgets/auction_bid_sheet.dar
 import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
 import 'package:magrail_app/features/chara/pool/controller/character_pool_controller.dart';
 import 'package:magrail_app/features/chara/pool/widgets/character_pool_assets.dart';
+import 'package:magrail_app/features/chara/view/character_full_list_page_state_mixin.dart';
 import 'package:magrail_app/features/user/model/user_assets_fetch_result.dart';
 import 'package:magrail_app/features/user/model/user_character_api_item.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
@@ -77,8 +78,15 @@ class CharacterPoolPage extends StatefulWidget {
 }
 
 /// 角色池二级页面状态
-class _CharacterPoolPageState extends State<CharacterPoolPage> {
+class _CharacterPoolPageState extends State<CharacterPoolPage>
+    with
+        CharacterFullListPageStateMixin<UserCharacterApiItem,
+            CharacterPoolPage> {
   late final CharacterPoolPageController _controller;
+
+  /// 当前角色池全量列表控制器
+  @override
+  CharacterPoolPageController get fullListController => _controller;
 
   bool get _isAuctionEnabled => widget.rowType == CharacterPoolRowType.valhalla;
 
@@ -90,6 +98,10 @@ class _CharacterPoolPageState extends State<CharacterPoolPage> {
       repository: widget.repository,
       username: widget.username,
       auctionRepository: _isAuctionEnabled ? widget.auctionRepository : null,
+      waitForScrollIdle: waitForFullListScrollIdle,
+      onBeforeFullItemsReplaced: preserveFullListVisibleItem,
+      onDataRefreshSucceeded: showFullListRefreshSucceeded,
+      onDataRefreshFailed: showFullListRefreshFailed,
     )..initialize();
   }
 
@@ -97,6 +109,7 @@ class _CharacterPoolPageState extends State<CharacterPoolPage> {
   @override
   void dispose() {
     _controller.dispose();
+    disposeFullListPageState();
     super.dispose();
   }
 
@@ -105,32 +118,45 @@ class _CharacterPoolPageState extends State<CharacterPoolPage> {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return TinygrailPagedSliverPage(
-      controller: _controller,
-      title: widget.title,
-      loadingSliver: CharacterPoolSkeletonSliverList(
-        rowType: widget.rowType,
-      ),
-      emptySliverBuilder: (context, controller) {
-        return PagedSliverState(
-          title: widget.emptyTitle,
-          message: widget.emptyMessage,
-          icon: widget.emptyIcon,
-        );
-      },
-      contentSliversBuilder: (context, items, onItemBuilt) {
-        return [
-          CharacterPoolSliverList(
-            items: items,
+    return ListenableBuilder(
+      listenable: _controller,
+      builder: (context, child) {
+        final page = TinygrailPagedSliverPage(
+          controller: _controller,
+          title: widget.title,
+          appBarBottom: buildFullListSortToolbar(),
+          scrollController: fullListScrollController,
+          loadingSliver: CharacterPoolSkeletonSliverList(
             rowType: widget.rowType,
-            auctionMap: _controller.auctionMap,
-            onItemBuilt: onItemBuilt,
-            onCharacterTap: _openCharacterDetail,
-            onAuctionPressed: _isAuctionEnabled ? _openAuction : null,
           ),
-        ];
+          emptySliverBuilder: (context, controller) {
+            final isFiltering = _controller.searchKeyword.isNotEmpty;
+            return PagedSliverState(
+              title: isFiltering ? '未找到角色' : widget.emptyTitle,
+              message: isFiltering ? '没有符合搜索条件的角色' : widget.emptyMessage,
+              icon: isFiltering ? Icons.search_off_rounded : widget.emptyIcon,
+            );
+          },
+          contentSliversBuilder: (context, items, onItemBuilt) {
+            return [
+              CharacterPoolSliverList(
+                items: items,
+                rowType: widget.rowType,
+                auctionMap: _controller.auctionMap,
+                sort: _controller.hasFullData ? _controller.sort : null,
+                showLevelHeaders: _controller.showsLevelHeaders,
+                onItemBuilt: onItemBuilt,
+                onCharacterTap: _openCharacterDetail,
+                onAuctionPressed: _isAuctionEnabled ? _openAuction : null,
+              ),
+            ];
+          },
+          completedLabel: widget.completedLabel,
+          bottomContentPadding: fullListBottomContentPadding,
+          refreshErrorText: '数据刷新失败',
+        );
+        return buildFullListOverlay(child: page);
       },
-      completedLabel: widget.completedLabel,
     );
   }
 
