@@ -31,7 +31,6 @@ abstract class CharacterFullListPageController<ItemType>
   /// [initialSort] 页面首次启用全量数据时的排序字段
   /// [waitForScrollIdle] 等待列表拖动和惯性滚动结束
   /// [onBeforeFullItemsReplaced] 全量数据替换前回调
-  /// [onDataRefreshSucceeded] 全量数据刷新成功回调
   /// [onDataRefreshFailed] 全量数据刷新失败回调
   CharacterFullListPageController({
     required super.pageSize,
@@ -39,7 +38,6 @@ abstract class CharacterFullListPageController<ItemType>
     CharacterFullListSort? initialSort,
     required Future<void> Function() waitForScrollIdle,
     CharacterFullListReplacementCallback<ItemType>? onBeforeFullItemsReplaced,
-    VoidCallback? onDataRefreshSucceeded,
     VoidCallback? onDataRefreshFailed,
   })  : assert(availableSorts.isNotEmpty),
         assert(initialSort == null || availableSorts.contains(initialSort)),
@@ -49,14 +47,12 @@ abstract class CharacterFullListPageController<ItemType>
         _sort = initialSort,
         _waitForScrollIdle = waitForScrollIdle,
         _onBeforeFullItemsReplaced = onBeforeFullItemsReplaced,
-        _onDataRefreshSucceeded = onDataRefreshSucceeded,
         _onDataRefreshFailed = onDataRefreshFailed;
 
   final List<CharacterFullListSort> _availableSorts;
   final Future<void> Function() _waitForScrollIdle;
   final CharacterFullListReplacementCallback<ItemType>?
       _onBeforeFullItemsReplaced;
-  final VoidCallback? _onDataRefreshSucceeded;
   final VoidCallback? _onDataRefreshFailed;
 
   List<ItemType>? _fullSourceItems;
@@ -273,9 +269,7 @@ abstract class CharacterFullListPageController<ItemType>
       if (_isDisposed) {
         return false;
       }
-      if (success) {
-        _onDataRefreshSucceeded?.call();
-      } else {
+      if (!success) {
         _onDataRefreshFailed?.call();
       }
       return success;

@@ -44,7 +44,6 @@ class _StCharacterPageState extends State<StCharacterPage>
       repository: widget.repository,
       waitForScrollIdle: waitForFullListScrollIdle,
       onBeforeFullItemsReplaced: preserveFullListVisibleItem,
-      onDataRefreshSucceeded: showFullListRefreshSucceeded,
       onDataRefreshFailed: showFullListRefreshFailed,
     )..initialize();
   }

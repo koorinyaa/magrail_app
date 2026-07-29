@@ -20,7 +20,6 @@ class UserTempleSnapshotPageController extends TinygrailPagedListController<
   /// [snapshotRepository] 用户资产快照仓库
   /// [username] 用户名
   /// [nickname] 用户昵称
-  /// [onAutomaticRefreshSucceeded] 后台刷新成功回调
   /// [onAutomaticRefreshFailed] 后台刷新失败回调
   /// [readVisibleTempleIndex] 读取当前可视圣殿下标，等级排序使用绝对下标
   /// [waitForScrollIdle] 等待列表滚动结束
@@ -33,7 +32,6 @@ class UserTempleSnapshotPageController extends TinygrailPagedListController<
     required UserAssetSnapshotRepository snapshotRepository,
     required String username,
     required String nickname,
-    required VoidCallback onAutomaticRefreshSucceeded,
     required VoidCallback onAutomaticRefreshFailed,
     required int? Function() readVisibleTempleIndex,
     required Future<void> Function() waitForScrollIdle,
@@ -49,7 +47,6 @@ class UserTempleSnapshotPageController extends TinygrailPagedListController<
   })  : _snapshotRepository = snapshotRepository,
         _username = username.trim(),
         _nickname = nickname.trim(),
-        _onAutomaticRefreshSucceeded = onAutomaticRefreshSucceeded,
         _onAutomaticRefreshFailed = onAutomaticRefreshFailed,
         _readVisibleTempleIndex = readVisibleTempleIndex,
         _waitForScrollIdle = waitForScrollIdle,
@@ -65,7 +62,6 @@ class UserTempleSnapshotPageController extends TinygrailPagedListController<
   final UserAssetSnapshotRepository _snapshotRepository;
   final String _username;
   final String _nickname;
-  final VoidCallback _onAutomaticRefreshSucceeded;
   final VoidCallback _onAutomaticRefreshFailed;
   final int? Function() _readVisibleTempleIndex;
   final Future<void> Function() _waitForScrollIdle;

@@ -114,13 +114,11 @@ class StCharacterPageController
   /// [repository] ST 角色仓库
   /// [waitForScrollIdle] 等待列表拖动和惯性滚动结束
   /// [onBeforeFullItemsReplaced] 全量数据替换前回调
-  /// [onDataRefreshSucceeded] 全量数据刷新成功回调
   /// [onDataRefreshFailed] 全量数据刷新失败回调
   StCharacterPageController({
     required StCharacterRepository repository,
     required super.waitForScrollIdle,
     super.onBeforeFullItemsReplaced,
-    super.onDataRefreshSucceeded,
     super.onDataRefreshFailed,
   })  : _repository = repository,
         super(

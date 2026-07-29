@@ -46,7 +46,6 @@ class _AllCharacterRankPageState extends State<AllCharacterRankPage>
       repository: widget.repository,
       waitForScrollIdle: waitForFullListScrollIdle,
       onBeforeFullItemsReplaced: preserveFullListVisibleItem,
-      onDataRefreshSucceeded: showFullListRefreshSucceeded,
       onDataRefreshFailed: showFullListRefreshFailed,
     )..initialize();
   }

@@ -53,9 +53,7 @@ extension _UserTemplePageSnapshot on _UserTemplePageState {
     if (!mounted) {
       return;
     }
-    if (activated) {
-      _showAutomaticRefreshSucceeded();
-    } else {
+    if (!activated) {
       _showAutomaticRefreshFailed();
     }
   }
@@ -78,7 +76,6 @@ extension _UserTemplePageSnapshot on _UserTemplePageState {
       if (controller != null) {
         unawaited(controller.reloadLatestSnapshot());
       }
-      _showAutomaticRefreshSucceeded();
     } else {
       _showAutomaticRefreshFailed();
     }
@@ -134,7 +131,6 @@ extension _UserTemplePageSnapshot on _UserTemplePageState {
       snapshotRepository: repository,
       username: widget.username,
       nickname: widget.nickname ?? '',
-      onAutomaticRefreshSucceeded: _showAutomaticRefreshSucceeded,
       onAutomaticRefreshFailed: _showAutomaticRefreshFailed,
       readVisibleTempleIndex: _readVisibleTempleIndex,
       waitForScrollIdle: _waitForScrollIdle,

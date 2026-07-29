@@ -100,7 +100,6 @@ class _CharacterPoolPageState extends State<CharacterPoolPage>
       auctionRepository: _isAuctionEnabled ? widget.auctionRepository : null,
       waitForScrollIdle: waitForFullListScrollIdle,
       onBeforeFullItemsReplaced: preserveFullListVisibleItem,
-      onDataRefreshSucceeded: showFullListRefreshSucceeded,
       onDataRefreshFailed: showFullListRefreshFailed,
     )..initialize();
   }

@@ -218,7 +218,6 @@ class CharacterPoolPageController
   /// [pageSize] 每页角色数量
   /// [waitForScrollIdle] 等待列表拖动和惯性滚动结束
   /// [onBeforeFullItemsReplaced] 全量数据替换前回调
-  /// [onDataRefreshSucceeded] 全量数据刷新成功回调
   /// [onDataRefreshFailed] 全量数据刷新失败回调
   CharacterPoolPageController({
     required UserRepository repository,
@@ -227,7 +226,6 @@ class CharacterPoolPageController
     super.pageSize = characterPoolPageSize,
     required super.waitForScrollIdle,
     super.onBeforeFullItemsReplaced,
-    super.onDataRefreshSucceeded,
     super.onDataRefreshFailed,
   })  : _repository = repository,
         _username = username,

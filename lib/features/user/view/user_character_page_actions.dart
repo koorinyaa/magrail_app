@@ -32,17 +32,6 @@ extension _UserCharacterPageActions on _UserCharacterPageState {
     );
   }
 
-  /// 显示角色数据刷新成功提示
-  void _showAutomaticRefreshSucceeded() {
-    if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) {
-      return;
-    }
-    AppToast.info(
-      context,
-      text: '数据刷新成功',
-    );
-  }
-
   /// 显示角色数据刷新失败提示
   void _showAutomaticRefreshFailed() {
     if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) {

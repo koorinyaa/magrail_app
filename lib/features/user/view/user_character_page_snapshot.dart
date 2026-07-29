@@ -50,9 +50,7 @@ extension _UserCharacterPageSnapshot on _UserCharacterPageState {
     if (!mounted) {
       return;
     }
-    if (activated) {
-      _showAutomaticRefreshSucceeded();
-    } else {
+    if (!activated) {
       _showAutomaticRefreshFailed();
     }
   }
@@ -75,7 +73,6 @@ extension _UserCharacterPageSnapshot on _UserCharacterPageState {
       if (controller != null) {
         unawaited(controller.reloadLatestSnapshot());
       }
-      _showAutomaticRefreshSucceeded();
     } else {
       _showAutomaticRefreshFailed();
     }
@@ -125,7 +122,6 @@ extension _UserCharacterPageSnapshot on _UserCharacterPageState {
       snapshotRepository: repository,
       username: widget.username,
       nickname: widget.nickname ?? '',
-      onAutomaticRefreshSucceeded: _showAutomaticRefreshSucceeded,
       onAutomaticRefreshFailed: _showAutomaticRefreshFailed,
       readVisibleCharacterIndex: _readVisibleCharacterIndex,
       waitForScrollIdle: _waitForScrollIdle,

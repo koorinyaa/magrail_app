@@ -30,9 +30,7 @@ extension UserCharacterSnapshotPageControllerRefresh
         !_suppressAutomaticRefreshFailure &&
         !_isDisposed;
     _suppressAutomaticRefreshFailure = false;
-    if (startedByAutomatic && success && !_isDisposed) {
-      _onAutomaticRefreshSucceeded();
-    } else if (shouldReportFailure) {
+    if (shouldReportFailure) {
       _onAutomaticRefreshFailed();
     }
   }

@@ -311,15 +311,6 @@ mixin CharacterFullListPageStateMixin<ItemType,
     });
   }
 
-  /// 显示角色全量数据刷新成功提示
-  @protected
-  void showFullListRefreshSucceeded() {
-    if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) {
-      return;
-    }
-    AppToast.info(context, text: '数据刷新成功');
-  }
-
   /// 显示角色全量数据刷新失败提示
   @protected
   void showFullListRefreshFailed() {
