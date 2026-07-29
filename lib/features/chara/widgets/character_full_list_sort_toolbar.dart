@@ -13,7 +13,7 @@ class CharacterFullListSortToolbar extends StatelessWidget
   ///
   /// [key] Flutter 组件标识
   /// [options] 当前页面可用排序字段
-  /// [selectedSort] 当前排序字段
+  /// [selectedSort] 当前排序字段，未选择时为空
   /// [direction] 当前排序方向
   /// [onSortSelected] 排序选择回调
   const CharacterFullListSortToolbar({
@@ -27,8 +27,8 @@ class CharacterFullListSortToolbar extends StatelessWidget
   /// 当前页面可用排序字段
   final List<CharacterFullListSort> options;
 
-  /// 当前排序字段
-  final CharacterFullListSort selectedSort;
+  /// 当前排序字段，未选择时为空
+  final CharacterFullListSort? selectedSort;
 
   /// 当前排序方向
   final CharacterFullListSortDirection direction;

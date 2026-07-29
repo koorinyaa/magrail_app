@@ -15,6 +15,7 @@ class CharacterRankEntry {
   /// [current] 当前价
   /// [fluctuation] 当前价涨跌幅
   /// [rate] 股息
+  /// [total] 流通数量
   /// [marketValue] 市值
   /// [rank] 通天塔排名
   /// [stars] 角色星级
@@ -28,6 +29,7 @@ class CharacterRankEntry {
     required this.current,
     required this.fluctuation,
     required this.rate,
+    required this.total,
     required this.marketValue,
     required this.rank,
     required this.stars,
@@ -57,6 +59,9 @@ class CharacterRankEntry {
 
   /// 股息
   final double rate;
+
+  /// 流通数量
+  final int total;
 
   /// 市值
   final double marketValue;
@@ -98,6 +103,7 @@ class CharacterRankEntry {
       current: TinygrailResponseParser.asDouble(json['Current']),
       fluctuation: TinygrailResponseParser.asDouble(json['Fluctuation']),
       rate: TinygrailResponseParser.asDouble(json['Rate']),
+      total: TinygrailResponseParser.asInt(json['Total']),
       marketValue: TinygrailResponseParser.asDouble(json['MarketValue']),
       rank: TinygrailResponseParser.asInt(json['Rank']),
       stars: TinygrailResponseParser.asInt(json['Stars']),

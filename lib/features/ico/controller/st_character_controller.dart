@@ -125,8 +125,6 @@ class StCharacterPageController
   })  : _repository = repository,
         super(
           pageSize: StCharacterRepository.pageSize,
-          // ST 数据量较小且服务端顺序不稳定，首屏直接等待全量排序结果
-          loadPagedDataWhileFullDataPending: false,
           availableSorts: const <CharacterFullListSort>[
             CharacterFullListSort.st,
             CharacterFullListSort.circulation,
@@ -136,8 +134,9 @@ class StCharacterPageController
             CharacterFullListSort.towerRank,
             CharacterFullListSort.stars,
             CharacterFullListSort.currentPrice,
+            CharacterFullListSort.fluctuation,
+            CharacterFullListSort.marketValue,
           ],
-          initialSort: CharacterFullListSort.st,
         );
 
   final StCharacterRepository _repository;
@@ -196,6 +195,8 @@ class StCharacterPageController
       CharacterFullListSort.towerRank => item.rank,
       CharacterFullListSort.stars => item.stars,
       CharacterFullListSort.currentPrice => item.current,
+      CharacterFullListSort.fluctuation => item.fluctuation,
+      CharacterFullListSort.marketValue => item.marketValue,
       CharacterFullListSort.st => item.zeroCount,
       CharacterFullListSort.circulation => item.total,
       CharacterFullListSort.bids => item.bids,

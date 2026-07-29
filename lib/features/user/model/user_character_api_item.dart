@@ -20,8 +20,10 @@ class UserCharacterApiItem {
   /// [current] 当前价
   /// [fluctuation] 当前价涨跌幅
   /// [state] 数量
+  /// [total] 流通数量
   /// [price] 价格
   /// [rate] 股息
+  /// [marketValue] 市值
   /// [rank] 通天塔排名
   const UserCharacterApiItem({
     required this.characterId,
@@ -37,8 +39,10 @@ class UserCharacterApiItem {
     required this.current,
     required this.fluctuation,
     required this.state,
+    required this.total,
     required this.price,
     required this.rate,
+    required this.marketValue,
     this.rank = 0,
   });
 
@@ -81,11 +85,17 @@ class UserCharacterApiItem {
   /// 数量
   final int state;
 
+  /// 流通数量
+  final int total;
+
   /// 价格
   final double price;
 
   /// 股息
   final double rate;
+
+  /// 市值
+  final double marketValue;
 
   /// 通天塔排名
   final int rank;
@@ -123,8 +133,10 @@ class UserCharacterApiItem {
       current: TinygrailResponseParser.asDouble(json['Current']),
       fluctuation: TinygrailResponseParser.asDouble(json['Fluctuation']),
       state: TinygrailResponseParser.asInt(json['State']),
+      total: TinygrailResponseParser.asInt(json['Total']),
       price: TinygrailResponseParser.asDouble(json['Price']),
       rate: TinygrailResponseParser.asDouble(json['Rate']),
+      marketValue: TinygrailResponseParser.asDouble(json['MarketValue']),
       rank: TinygrailResponseParser.asInt(json['Rank']),
     );
   }
@@ -145,8 +157,10 @@ class UserCharacterApiItem {
       'Current': current,
       'Fluctuation': fluctuation,
       'State': state,
+      'Total': total,
       'Price': price,
       'Rate': rate,
+      'MarketValue': marketValue,
       'Rank': rank,
     };
   }

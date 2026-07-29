@@ -28,36 +28,32 @@ abstract class CharacterFullListPageController<ItemType>
   ///
   /// [pageSize] 普通后端分页每页角色数量
   /// [availableSorts] 当前页面允许使用的排序字段
-  /// [initialSort] 全量数据首次启用时的排序字段
+  /// [initialSort] 页面首次启用全量数据时的排序字段
   /// [waitForScrollIdle] 等待列表拖动和惯性滚动结束
-  /// [loadPagedDataWhileFullDataPending] 全量数据完成前是否加载普通分页
   /// [onBeforeFullItemsReplaced] 全量数据替换前回调
   /// [onDataRefreshSucceeded] 全量数据刷新成功回调
   /// [onDataRefreshFailed] 全量数据刷新失败回调
   CharacterFullListPageController({
     required super.pageSize,
     required List<CharacterFullListSort> availableSorts,
-    required CharacterFullListSort initialSort,
+    CharacterFullListSort? initialSort,
     required Future<void> Function() waitForScrollIdle,
-    bool loadPagedDataWhileFullDataPending = true,
     CharacterFullListReplacementCallback<ItemType>? onBeforeFullItemsReplaced,
     VoidCallback? onDataRefreshSucceeded,
     VoidCallback? onDataRefreshFailed,
   })  : assert(availableSorts.isNotEmpty),
-        assert(availableSorts.contains(initialSort)),
+        assert(initialSort == null || availableSorts.contains(initialSort)),
         _availableSorts = List<CharacterFullListSort>.unmodifiable(
           availableSorts,
         ),
         _sort = initialSort,
         _waitForScrollIdle = waitForScrollIdle,
-        _loadPagedDataWhileFullDataPending = loadPagedDataWhileFullDataPending,
         _onBeforeFullItemsReplaced = onBeforeFullItemsReplaced,
         _onDataRefreshSucceeded = onDataRefreshSucceeded,
         _onDataRefreshFailed = onDataRefreshFailed;
 
   final List<CharacterFullListSort> _availableSorts;
   final Future<void> Function() _waitForScrollIdle;
-  final bool _loadPagedDataWhileFullDataPending;
   final CharacterFullListReplacementCallback<ItemType>?
       _onBeforeFullItemsReplaced;
   final VoidCallback? _onDataRefreshSucceeded;
@@ -66,22 +62,20 @@ abstract class CharacterFullListPageController<ItemType>
   List<ItemType>? _fullSourceItems;
   List<ItemType>? _fullDisplayItems;
   List<CharacterFullListLevelPosition> _levelPositions = const [];
-  CharacterFullListSort _sort;
+  CharacterFullListSort? _sort;
   CharacterFullListSortDirection _direction =
       CharacterFullListSortDirection.descending;
   String _searchKeyword = '';
   Future<bool>? _fullLoadOperation;
   bool _isCommittingFullView = false;
-  bool _isInitialFullLoadInProgress = false;
-  Object? _initialFullLoadError;
   bool _isDisposed = false;
   int _queryGeneration = 0;
 
   /// 当前页面允许使用的排序字段
   List<CharacterFullListSort> get availableSorts => _availableSorts;
 
-  /// 当前排序字段
-  CharacterFullListSort get sort => _sort;
+  /// 当前排序字段，未选择时保留服务器顺序
+  CharacterFullListSort? get sort => _sort;
 
   /// 当前排序方向
   CharacterFullListSortDirection get direction => _direction;
@@ -103,53 +97,22 @@ abstract class CharacterFullListPageController<ItemType>
   bool get showsLevelHeaders =>
       hasFullData && _sort == CharacterFullListSort.level;
 
-  /// 全量等待模式下是否强制显示首屏骨架
+  /// 全量数据提交或启用后暂停下一页请求
   @override
-  bool get forceInitialLoading =>
-      !_loadPagedDataWhileFullDataPending &&
-      !hasFullData &&
-      _isInitialFullLoadInProgress;
+  bool get isNextPageLoadPaused => _isCommittingFullView || hasFullData;
 
-  /// 全量等待模式下的首次加载错误
-  @override
-  Object? get initialError {
-    if (!_loadPagedDataWhileFullDataPending &&
-        !hasFullData &&
-        _initialFullLoadError != null) {
-      return _initialFullLoadError;
-    }
-    return super.initialError;
-  }
-
-  /// 按全量加载状态和分页回退配置暂停下一页请求
-  @override
-  bool get isNextPageLoadPaused =>
-      !_loadPagedDataWhileFullDataPending ||
-      _isCommittingFullView ||
-      hasFullData;
-
-  /// 按配置初始化普通分页并请求全量数据
+  /// 初始化普通分页并请求全量数据
   @override
   void initialize() {
-    if (_loadPagedDataWhileFullDataPending) {
-      super.initialize();
-    }
+    super.initialize();
     unawaited(_startOrJoinFullLoad());
   }
 
   /// 刷新当前页面数据
-  ///
-  /// 启用分页回退时同步刷新分页与全量数据，关闭时只刷新全量数据
   @override
   Future<bool> refresh() async {
     if (_isDisposed) {
       return false;
-    }
-
-    if (!_loadPagedDataWhileFullDataPending) {
-      await _startOrJoinFullLoad();
-      // 全量请求已经通过统一回调提示结果，避免页面壳层重复弹出失败提示
-      return true;
     }
 
     final pagingOperation = hasFullData ? _probeFirstPage() : super.refresh();
@@ -283,13 +246,6 @@ abstract class CharacterFullListPageController<ItemType>
 
   /// 请求完整角色数据并在列表停止滚动后提交
   Future<bool> _loadFullItems() async {
-    final tracksInitialFullLoad =
-        !_loadPagedDataWhileFullDataPending && !hasFullData;
-    if (tracksInitialFullLoad) {
-      _initialFullLoadError = null;
-      _isInitialFullLoadInProgress = true;
-      notifyListeners();
-    }
     var commitPending = false;
     try {
       final requestedItems = await requestFullItems();
@@ -320,34 +276,18 @@ abstract class CharacterFullListPageController<ItemType>
       if (success) {
         _onDataRefreshSucceeded?.call();
       } else {
-        if (tracksInitialFullLoad && !hasFullData) {
-          _initialFullLoadError = StateError('完整角色数据加载失败');
-        }
         _onDataRefreshFailed?.call();
       }
       return success;
-    } catch (error) {
+    } catch (_) {
       if (!_isDisposed) {
-        if (tracksInitialFullLoad && !hasFullData) {
-          _initialFullLoadError = error;
-        }
         _onDataRefreshFailed?.call();
       }
       return false;
     } finally {
-      if (!_isDisposed) {
-        var shouldNotify = false;
-        if (tracksInitialFullLoad) {
-          _isInitialFullLoadInProgress = false;
-          shouldNotify = true;
-        }
-        if (commitPending && _isCommittingFullView) {
-          _isCommittingFullView = false;
-          shouldNotify = true;
-        }
-        if (shouldNotify) {
-          notifyListeners();
-        }
+      if (!_isDisposed && commitPending && _isCommittingFullView) {
+        _isCommittingFullView = false;
+        notifyListeners();
       }
     }
   }
@@ -433,7 +373,9 @@ abstract class CharacterFullListPageController<ItemType>
       return characterIdOf(item).toString().contains(normalizedKeyword) ||
           characterNameOf(item).toLowerCase().contains(normalizedKeyword);
     }).toList(growable: false);
-    displayItems.sort(_compareItems);
+    if (_sort != null) {
+      displayItems.sort(_compareItems);
+    }
     return List<ItemType>.unmodifiable(displayItems);
   }
 
@@ -442,14 +384,18 @@ abstract class CharacterFullListPageController<ItemType>
   /// [left] 左侧角色
   /// [right] 右侧角色
   int _compareItems(ItemType left, ItemType right) {
-    final comparison = _sort == CharacterFullListSort.towerRank
+    final sort = _sort;
+    if (sort == null) {
+      return 0;
+    }
+    final comparison = sort == CharacterFullListSort.towerRank
         ? _compareTowerRanks(
-            sortValueOf(left, _sort).toInt(),
-            sortValueOf(right, _sort).toInt(),
+            sortValueOf(left, sort).toInt(),
+            sortValueOf(right, sort).toInt(),
           )
         : _compareValues(
-            sortValueOf(left, _sort),
-            sortValueOf(right, _sort),
+            sortValueOf(left, sort),
+            sortValueOf(right, sort),
           );
     if (comparison != 0) {
       return comparison;

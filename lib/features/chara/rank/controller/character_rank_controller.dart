@@ -67,15 +67,15 @@ class AllCharacterFullListPageController
         super(
           pageSize: CharacterRankRepository.pageSize,
           availableSorts: const <CharacterFullListSort>[
-            CharacterFullListSort.fluctuation,
             CharacterFullListSort.dividend,
             CharacterFullListSort.level,
             CharacterFullListSort.towerRank,
             CharacterFullListSort.stars,
+            CharacterFullListSort.circulation,
             CharacterFullListSort.currentPrice,
+            CharacterFullListSort.fluctuation,
             CharacterFullListSort.marketValue,
           ],
-          initialSort: CharacterFullListSort.fluctuation,
         );
 
   final CharacterRankRepository _repository;
@@ -134,6 +134,7 @@ class AllCharacterFullListPageController
       CharacterFullListSort.dividend => item.singleDividend,
       CharacterFullListSort.towerRank => item.rank,
       CharacterFullListSort.stars => item.stars,
+      CharacterFullListSort.circulation => item.total,
       CharacterFullListSort.currentPrice => item.current,
       CharacterFullListSort.marketValue => item.marketValue,
       CharacterFullListSort.fluctuation => item.fluctuation,

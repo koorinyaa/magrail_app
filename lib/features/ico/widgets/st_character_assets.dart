@@ -258,6 +258,19 @@ class StCharacterRow extends StatelessWidget {
           ),
           isValueMuted: true,
         ),
+      CharacterFullListSort.fluctuation => CharacterAssetMetric(
+          label: '涨跌',
+          value: _formatFluctuation(item.fluctuation),
+          isValueMuted: true,
+          valueColor: CharacterAssetCurrentPriceChip.resolveCurrentPriceColor(
+            item.fluctuation,
+          ),
+        ),
+      CharacterFullListSort.marketValue => CharacterAssetMetric(
+          label: '市值',
+          value: _formatMarketValue(item.marketValue),
+          isValueMuted: true,
+        ),
       _ => CharacterAssetMetric(
           label: '买卖',
           value: '${_formatCount(item.bids)} / ${_formatCount(item.asks)}',
@@ -275,6 +288,30 @@ class StCharacterRow extends StatelessWidget {
     }
 
     return Formatters.groupedNumber(value);
+  }
+
+  /// 格式化 ST 角色涨跌幅
+  ///
+  /// [value] 原始涨跌幅
+  String _formatFluctuation(double value) {
+    final percent = Formatters.groupedNumber(value * 100);
+    if (value > 0) {
+      return '+$percent%';
+    }
+    return '$percent%';
+  }
+
+  /// 格式化 ST 角色市值
+  ///
+  /// [value] 原始市值
+  String _formatMarketValue(double value) {
+    if (value.abs() >= 10000) {
+      return Formatters.tinygrailCompactValue(
+        value.truncate(),
+        prefix: '₵',
+      );
+    }
+    return Formatters.tinygrailCurrency(value);
   }
 }
 

@@ -295,6 +295,14 @@ class CharacterRankRow extends StatelessWidget {
   /// 构建随本地排序变化的第三行数据
   CharacterAssetMetric _buildSecondaryMetric() {
     final selectedSort = localSort;
+    if (selectedSort == CharacterFullListSort.level ||
+        selectedSort == CharacterFullListSort.circulation) {
+      return CharacterAssetMetric(
+        label: '流通',
+        value: Formatters.groupedNumber(item.total),
+        isValueMuted: true,
+      );
+    }
     if (selectedSort == CharacterFullListSort.towerRank) {
       return CharacterAssetMetric(
         value: '通天塔 '

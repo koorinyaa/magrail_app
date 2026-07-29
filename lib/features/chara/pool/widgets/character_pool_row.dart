@@ -105,7 +105,7 @@ class CharacterPoolRow extends StatelessWidget {
   /// [selectedSort] 当前排序字段
   bool _isSortDisplayed(CharacterFullListSort selectedSort) {
     return switch (selectedSort) {
-      CharacterFullListSort.quantity || CharacterFullListSort.level => true,
+      CharacterFullListSort.quantity => true,
       CharacterFullListSort.dividend =>
         rowType == CharacterPoolRowType.gensokyo,
       CharacterFullListSort.currentPrice =>
@@ -119,6 +119,13 @@ class CharacterPoolRow extends StatelessWidget {
   /// [selectedSort] 当前排序字段
   CharacterAssetMetric _buildSortMetric(CharacterFullListSort selectedSort) {
     return switch (selectedSort) {
+      CharacterFullListSort.level ||
+      CharacterFullListSort.circulation =>
+        CharacterAssetMetric(
+          label: '流通',
+          value: _formatCount(item.total),
+          isValueMuted: true,
+        ),
       CharacterFullListSort.dividend => CharacterAssetMetric(
           label: '股息',
           value: '+${Formatters.tinygrailCurrency(item.singleDividend)}',
@@ -143,6 +150,19 @@ class CharacterPoolRow extends StatelessWidget {
       CharacterFullListSort.currentPrice => CharacterAssetMetric(
           label: '当前价',
           value: Formatters.tinygrailCurrency(item.current),
+          isValueMuted: true,
+        ),
+      CharacterFullListSort.fluctuation => CharacterAssetMetric(
+          label: '涨跌',
+          value: _formatFluctuation(item.fluctuation),
+          isValueMuted: true,
+          valueColor: CharacterAssetCurrentPriceChip.resolveCurrentPriceColor(
+            item.fluctuation,
+          ),
+        ),
+      CharacterFullListSort.marketValue => CharacterAssetMetric(
+          label: '市值',
+          value: _formatMarketValue(item.marketValue),
           isValueMuted: true,
         ),
       _ => _buildDefaultSecondaryMetric(),
@@ -188,6 +208,30 @@ class CharacterPoolRow extends StatelessWidget {
     }
 
     return Formatters.groupedNumber(value);
+  }
+
+  /// 格式化角色池涨跌幅
+  ///
+  /// [value] 原始涨跌幅
+  String _formatFluctuation(double value) {
+    final percent = Formatters.groupedNumber(value * 100);
+    if (value > 0) {
+      return '+$percent%';
+    }
+    return '$percent%';
+  }
+
+  /// 格式化角色池市值
+  ///
+  /// [value] 原始市值
+  String _formatMarketValue(double value) {
+    if (value.abs() >= 10000) {
+      return Formatters.tinygrailCompactValue(
+        value.truncate(),
+        prefix: '₵',
+      );
+    }
+    return Formatters.tinygrailCurrency(value);
   }
 }
 

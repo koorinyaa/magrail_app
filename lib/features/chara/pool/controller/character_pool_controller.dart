@@ -239,7 +239,10 @@ class CharacterPoolPageController
             CharacterFullListSort.dividend,
             CharacterFullListSort.towerRank,
             CharacterFullListSort.stars,
+            CharacterFullListSort.circulation,
             CharacterFullListSort.currentPrice,
+            CharacterFullListSort.fluctuation,
+            CharacterFullListSort.marketValue,
           ],
           initialSort: CharacterFullListSort.quantity,
         );
@@ -335,7 +338,10 @@ class CharacterPoolPageController
       CharacterFullListSort.dividend => item.singleDividend,
       CharacterFullListSort.towerRank => item.rank,
       CharacterFullListSort.stars => item.stars,
+      CharacterFullListSort.circulation => item.total,
       CharacterFullListSort.currentPrice => item.current,
+      CharacterFullListSort.fluctuation => item.fluctuation,
+      CharacterFullListSort.marketValue => item.marketValue,
       _ => 0,
     };
   }
