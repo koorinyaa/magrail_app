@@ -62,11 +62,12 @@ class UserActionResolver {
           type: UserActionType.syncRate,
           label: '同步率',
         ),
-      if (cachedUser?.isGameMaster == true) ...[
+      if (cachedUser != null)
         const UserActionEntry(
           type: UserActionType.dividendForecast,
           label: '股息预测',
         ),
+      if (cachedUser?.isGameMaster == true) ...[
         const UserActionEntry(type: UserActionType.tradeLog, label: '交易记录'),
         if (profile.isBanned)
           const UserActionEntry(type: UserActionType.unblock, label: '解封')
