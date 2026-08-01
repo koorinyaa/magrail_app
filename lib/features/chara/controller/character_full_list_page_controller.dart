@@ -85,6 +85,10 @@ abstract class CharacterFullListPageController<ItemType>
   /// 是否已经启用全量数据
   bool get hasFullData => _fullSourceItems != null;
 
+  /// 当前页面角色数量统计
+  @override
+  int? get totalItems => _fullSourceItems?.length ?? super.totalItems;
+
   /// 已加载完整角色列表的总条目数
   int? get fullItemCount => _fullSourceItems?.length;
 
