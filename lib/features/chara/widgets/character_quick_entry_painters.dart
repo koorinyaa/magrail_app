@@ -75,7 +75,6 @@ class _PortalCardPainter extends CustomPainter {
   /// [oldDelegate] 上一次入口卡片背景绘制器
   @override
   bool shouldRepaint(covariant _PortalCardPainter oldDelegate) {
-    return oldDelegate.accent != accent ||
-        oldDelegate.prominent != prominent;
+    return oldDelegate.accent != accent || oldDelegate.prominent != prominent;
   }
 }

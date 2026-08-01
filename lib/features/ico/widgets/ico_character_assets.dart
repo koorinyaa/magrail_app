@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 import 'package:magrail_app/core/utils/formatters.dart';
 import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
@@ -53,9 +53,7 @@ class IcoCharacterCarousel extends StatelessWidget {
       itemBuilder: (context, item) {
         return IcoCharacterRow(
           item: item,
-          onTap: onIcoTap == null
-              ? null
-              : () => onIcoTap?.call(item, null),
+          onTap: onIcoTap == null ? null : () => onIcoTap?.call(item, null),
         );
       },
     );

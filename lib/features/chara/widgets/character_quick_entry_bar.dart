@@ -58,10 +58,10 @@ class CharacterQuickEntryBar extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final horizontalPadding = MediaQuery.sizeOf(context).width >=
-            _tabletBreakpoint
-        ? _tabletHorizontalPadding
-        : 16.0;
+    final horizontalPadding =
+        MediaQuery.sizeOf(context).width >= _tabletBreakpoint
+            ? _tabletHorizontalPadding
+            : 16.0;
     return Padding(
       padding: AppSafeAreaInsets.fromLTRB(
         context,

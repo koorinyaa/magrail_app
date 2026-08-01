@@ -391,17 +391,17 @@ abstract class CharacterFullListPageController<ItemType>
     }
     final comparison = switch (sort) {
       CharacterFullListSort.towerRank => _compareTowerRanks(
-            sortValueOf(left, sort).toInt(),
-            sortValueOf(right, sort).toInt(),
-          ),
+          sortValueOf(left, sort).toInt(),
+          sortValueOf(right, sort).toInt(),
+        ),
       CharacterFullListSort.listedDate => _compareListedDates(
-            sortValueOf(left, sort).toInt(),
-            sortValueOf(right, sort).toInt(),
-          ),
+          sortValueOf(left, sort).toInt(),
+          sortValueOf(right, sort).toInt(),
+        ),
       _ => _compareValues(
-            sortValueOf(left, sort),
-            sortValueOf(right, sort),
-          ),
+          sortValueOf(left, sort),
+          sortValueOf(right, sort),
+        ),
     };
     if (comparison != 0) {
       return comparison;

@@ -29,8 +29,7 @@ class CharacterAssetPreviewCarousel<T> extends StatelessWidget {
   // 一级页固定预览 24 条，按每列 4 条呈现为 6 列
   static const int _rowsPerColumn = 4;
   static const int _previewItemCount = 24;
-  static const int _skeletonColumnCount =
-      _previewItemCount ~/ _rowsPerColumn;
+  static const int _skeletonColumnCount = _previewItemCount ~/ _rowsPerColumn;
 
   /// 角色预览条目
   final List<T>? items;

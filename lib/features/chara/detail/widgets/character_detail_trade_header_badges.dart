@@ -61,7 +61,6 @@ class _TradeHeaderBadges extends StatelessWidget {
 
     return Formatters.groupedNumber(value);
   }
-
 }
 
 /// 已上市头部价格 Chip

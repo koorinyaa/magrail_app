@@ -64,8 +64,7 @@ class IcoCharacterSortToolbar extends StatelessWidget
                   if (index > 0) const SizedBox(width: 6),
                   _IcoCharacterSortChip(
                     sort: IcoCharacterSort.values[index],
-                    isSelected:
-                        selectedSort == IcoCharacterSort.values[index],
+                    isSelected: selectedSort == IcoCharacterSort.values[index],
                     onSelected: onSortSelected,
                   ),
                 ],

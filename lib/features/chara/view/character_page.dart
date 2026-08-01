@@ -256,5 +256,4 @@ class _CharacterPageState extends State<CharacterPage> {
       avatarHeroTag: avatarHeroTag,
     );
   }
-
 }
