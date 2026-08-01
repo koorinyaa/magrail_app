@@ -33,6 +33,8 @@ class CharacterPoolRow extends StatelessWidget {
   /// [avatarHeroTag] 头像转场标识
   /// [onTap] 条目点击回调
   /// [onAuctionPressed] 竞拍按钮点击回调
+  /// [contentPadding] 行内容内边距
+  /// [tapBorderRadius] 点击反馈圆角
   const CharacterPoolRow({
     super.key,
     required this.item,
@@ -42,6 +44,8 @@ class CharacterPoolRow extends StatelessWidget {
     this.avatarHeroTag,
     this.onTap,
     this.onAuctionPressed,
+    this.contentPadding = const EdgeInsets.symmetric(horizontal: 6),
+    this.tapBorderRadius,
   });
 
   /// 角色池条目
@@ -64,6 +68,12 @@ class CharacterPoolRow extends StatelessWidget {
 
   /// 竞拍按钮点击回调
   final VoidCallback? onAuctionPressed;
+
+  /// 行内容内边距
+  final EdgeInsetsGeometry contentPadding;
+
+  /// 点击反馈圆角
+  final BorderRadius? tapBorderRadius;
 
   /// 构建角色池资产行
   ///
@@ -88,6 +98,8 @@ class CharacterPoolRow extends StatelessWidget {
       ],
       trailing: _buildTrailing(),
       onTap: onTap,
+      contentPadding: contentPadding,
+      tapBorderRadius: tapBorderRadius,
     );
   }
 

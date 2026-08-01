@@ -56,6 +56,7 @@ flutter:
     - assets/icons/torii.svg
     - assets/images/donate/
     - assets/images/magic/
+    - assets/images/tinygrail/
   fonts:
     - family: NotoSansSC
       fonts:

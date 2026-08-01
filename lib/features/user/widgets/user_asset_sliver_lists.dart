@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_hero.dart';
+import 'package:magrail_app/features/chara/widgets/character_asset_row_components.dart';
 import 'package:magrail_app/features/user/assets/model/user_character_snapshot_query.dart';
 import 'package:magrail_app/features/user/model/user_character_api_item.dart';
 import 'package:magrail_app/features/user/model/user_ico_api_item.dart';
@@ -272,8 +273,7 @@ class UserCharacterAssetListItem extends StatelessWidget {
         : UserCharacterAssetSliverList._contentTrailingInset;
     return SizedBox(
       height: UserCharacterAssetSliverList.itemExtent,
-      child: _AssetListItem(
-        fullWidth: true,
+      child: CharacterAssetListItemShell(
         showDivider: showDivider,
         dividerLeadingInset: UserCharacterAssetSliverList._textLeadingInset,
         dividerTrailingInset: contentTrailingInset,
@@ -414,66 +414,27 @@ class _AssetListItem extends StatelessWidget {
   /// 创建用户资产列表条目外层
   ///
   /// [child] 条目主体
-  /// [fullWidth] 是否让条目覆盖列表完整宽度
-  /// [showDivider] 是否显示条目分割线
-  /// [dividerLeadingInset] 分割线左侧留白
-  /// [dividerTrailingInset] 分割线右侧留白
   const _AssetListItem({
     required this.child,
-    this.fullWidth = false,
-    this.showDivider = false,
-    this.dividerLeadingInset = 0,
-    this.dividerTrailingInset = 0,
   });
 
   /// 条目主体
   final Widget child;
-
-  /// 是否让条目覆盖列表完整宽度
-  final bool fullWidth;
-
-  /// 是否显示条目分割线
-  final bool showDivider;
-
-  /// 分割线左侧留白
-  final double dividerLeadingInset;
-
-  /// 分割线右侧留白
-  final double dividerTrailingInset;
 
   /// 构建用户资产列表条目外层
   ///
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    if (!fullWidth) {
-      return Padding(
-        padding: AppSafeAreaInsets.fromLTRB(
-          context,
-          left: 12,
-          top: 0,
-          right: 12,
-          bottom: 4,
-        ),
-        child: child,
-      );
-    }
-    final colorScheme = Theme.of(context).colorScheme;
-    final mediaPadding = MediaQuery.paddingOf(context);
-    return Stack(
-      children: [
-        Positioned.fill(child: child),
-        if (showDivider)
-          Positioned(
-            left: dividerLeadingInset + mediaPadding.left,
-            right: dividerTrailingInset + mediaPadding.right,
-            bottom: 0,
-            height: 1,
-            child: ColoredBox(
-              color: colorScheme.outlineVariant.withValues(alpha: 0.55),
-            ),
-          ),
-      ],
+    return Padding(
+      padding: AppSafeAreaInsets.fromLTRB(
+        context,
+        left: 12,
+        top: 0,
+        right: 12,
+        bottom: 4,
+      ),
+      child: child,
     );
   }
 }

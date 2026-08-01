@@ -85,6 +85,9 @@ abstract class CharacterFullListPageController<ItemType>
   /// 是否已经启用全量数据
   bool get hasFullData => _fullSourceItems != null;
 
+  /// 已加载完整角色列表的总条目数
+  int? get fullItemCount => _fullSourceItems?.length;
+
   /// 当前分页或全量模式已经提交的展示角色
   @override
   List<ItemType> get items => _fullDisplayItems ?? super.items;

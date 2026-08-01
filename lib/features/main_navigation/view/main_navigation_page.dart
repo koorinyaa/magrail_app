@@ -13,8 +13,6 @@ import 'package:magrail_app/features/chara/top_week/repository/top_week_reposito
 import 'package:magrail_app/features/chara/view/character_page.dart';
 import 'package:magrail_app/features/home/view/main_home_view.dart';
 import 'package:magrail_app/features/ico/repository/ico_character_repository.dart';
-import 'package:magrail_app/features/ico/repository/st_character_repository.dart';
-import 'package:magrail_app/features/ico/view/ico_page.dart';
 import 'package:magrail_app/features/main_navigation/model/main_tab.dart';
 import 'package:magrail_app/features/main_navigation/widgets/chrome/main_top_bar.dart';
 import 'package:magrail_app/features/main_navigation/widgets/navigation/main_mobile_navigation_dock.dart';
@@ -50,7 +48,6 @@ class MainNavigationPage extends StatefulWidget {
   /// [scratchTicketRepository] 刮刮乐仓库
   /// [rankingRepository] 排行榜仓库
   /// [icoCharacterRepository] ICO 角色仓库
-  /// [stCharacterRepository] ST 角色仓库
   const MainNavigationPage({
     super.key,
     required this.authRepository,
@@ -61,7 +58,6 @@ class MainNavigationPage extends StatefulWidget {
     required this.characterDetailRepository,
     required this.towerRepository,
     required this.icoCharacterRepository,
-    required this.stCharacterRepository,
     required this.characterRankRepository,
     required this.templeRepository,
     required this.templeAssetMagicRepository,
@@ -95,9 +91,6 @@ class MainNavigationPage extends StatefulWidget {
   /// ICO 角色仓库
   final IcoCharacterRepository icoCharacterRepository;
 
-  /// ST 角色仓库
-  final StCharacterRepository stCharacterRepository;
-
   /// 角色排序仓库
   final CharacterRankRepository characterRankRepository;
 
@@ -129,7 +122,6 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   MainTab _currentTab = MainTab.home;
   final ScrollController _homeScrollController = ScrollController();
   final ScrollController _characterScrollController = ScrollController();
-  final ScrollController _icoScrollController = ScrollController();
   final ScrollController _profileScrollController = ScrollController();
   // 排行榜用独立 token 区分切换重置与当前标签平滑回顶
   int _rankingScrollResetToken = 0;
@@ -149,7 +141,6 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   void dispose() {
     _homeScrollController.dispose();
     _characterScrollController.dispose();
-    _icoScrollController.dispose();
     _profileScrollController.dispose();
     super.dispose();
   }
@@ -231,15 +222,8 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         ),
       MainTab.character => CharacterPage(
           scrollController: _characterScrollController,
-          authRepository: widget.authRepository,
-          userRepository: widget.userRepository,
-          auctionRepository: widget.auctionRepository,
           rankRepository: widget.characterRankRepository,
-        ),
-      MainTab.ico => IcoPage(
-          scrollController: _icoScrollController,
           icoCharacterRepository: widget.icoCharacterRepository,
-          stCharacterRepository: widget.stCharacterRepository,
         ),
       MainTab.profile => UserDetailPage(
           entryMode: UserDetailEntryMode.primary,
@@ -460,8 +444,6 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         _scrollRankingToTop();
       case MainTab.character:
         _scrollToTop(_characterScrollController);
-      case MainTab.ico:
-        _scrollToTop(_icoScrollController);
     }
   }
 

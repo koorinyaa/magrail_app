@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:magrail_app/core/widgets/paged_sliver_state.dart';
 import 'package:magrail_app/core/widgets/tinygrail_paged_sliver_page.dart';
+import 'package:magrail_app/core/utils/formatters.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
 import 'package:magrail_app/features/chara/rank/controller/character_rank_controller.dart';
 import 'package:magrail_app/features/chara/rank/model/character_rank_entry.dart';
@@ -71,6 +72,7 @@ class _AllCharacterRankPageState extends State<AllCharacterRankPage>
           controller: _controller,
           scrollController: fullListScrollController,
           title: '所有角色',
+          titleSupplement: _buildTitleSupplement(),
           appBarBottom: buildFullListSortToolbar(),
           loadingSliver: const CharacterRankSkeletonSliverList(),
           emptySliverBuilder: (context, controller) {
@@ -101,6 +103,15 @@ class _AllCharacterRankPageState extends State<AllCharacterRankPage>
         return buildFullListOverlay(child: page);
       },
     );
+  }
+
+  /// 构建完整列表总数标题辅助文本
+  String? _buildTitleSupplement() {
+    final count = _controller.fullItemCount;
+    if (count == null) {
+      return null;
+    }
+    return '(${Formatters.groupedNumber(count)} 个角色)';
   }
 
   /// 打开角色详情页

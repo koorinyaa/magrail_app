@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:magrail_app/core/auth/tinygrail_auth_repository.dart';
 import 'package:magrail_app/core/feedback/app_toast.dart';
+import 'package:magrail_app/core/utils/formatters.dart';
 import 'package:magrail_app/core/widgets/paged_sliver_state.dart';
 import 'package:magrail_app/core/widgets/tinygrail_paged_sliver_page.dart';
 import 'package:magrail_app/features/chara/auction/repository/auction_repository.dart';
@@ -123,6 +124,7 @@ class _CharacterPoolPageState extends State<CharacterPoolPage>
         final page = TinygrailPagedSliverPage(
           controller: _controller,
           title: widget.title,
+          titleSupplement: _buildTitleSupplement(),
           appBarBottom: buildFullListSortToolbar(),
           scrollController: fullListScrollController,
           loadingSliver: CharacterPoolSkeletonSliverList(
@@ -157,6 +159,15 @@ class _CharacterPoolPageState extends State<CharacterPoolPage>
         return buildFullListOverlay(child: page);
       },
     );
+  }
+
+  /// 构建接口总数标题辅助文本
+  String? _buildTitleSupplement() {
+    final count = _controller.totalItems;
+    if (count == null) {
+      return null;
+    }
+    return '(${Formatters.groupedNumber(count)} 个角色)';
   }
 
   /// 打开角色详情页

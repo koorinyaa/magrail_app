@@ -14,6 +14,7 @@ import 'package:magrail_app/features/chara/tower/widgets/tower_ranking_badges.da
 import 'package:magrail_app/features/chara/widgets/character_asset_chips.dart';
 import 'package:magrail_app/features/chara/widgets/character_asset_row_components.dart';
 import 'package:magrail_app/features/chara/widgets/character_asset_row_skeleton.dart';
+import 'package:magrail_app/features/chara/widgets/character_asset_skeleton_sliver_list.dart';
 import 'package:magrail_app/features/chara/widgets/character_level_grouped_sliver_list.dart';
 
 /// 角色排序横向预览栏
@@ -163,8 +164,10 @@ class CharacterRankSliverList extends StatelessWidget {
     );
 
     onItemBuilt?.call(index);
-    return _CharacterRankListItem(
-      reserveLevelRail: reserveLevelRail,
+    final contentTrailingInset = reserveLevelRail ? 38.0 : 18.0;
+    return CharacterAssetListItemShell(
+      showDivider: index < items.length - 1,
+      dividerTrailingInset: contentTrailingInset,
       child: CharacterRankRow(
         item: item,
         selectedType: selectedType,
@@ -173,6 +176,14 @@ class CharacterRankSliverList extends StatelessWidget {
         onTap: onCharacterTap == null
             ? null
             : () => onCharacterTap?.call(item, avatarHeroTag),
+        contentPadding: AppSafeAreaInsets.fromLTRB(
+          context,
+          left: 18,
+          top: 0,
+          right: contentTrailingInset,
+          bottom: 0,
+        ),
+        tapBorderRadius: BorderRadius.zero,
       ),
     );
   }
@@ -197,20 +208,9 @@ class CharacterRankSkeletonSliverList extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return SliverFixedExtentList(
-      itemExtent: _CharacterRankListMetrics.itemExtent,
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          return const _CharacterRankListItem(
-            child: CharacterAssetRowSkeleton(
-              showTrailing: true,
-              trailingWidth: 54,
-              trailingHeight: 18,
-            ),
-          );
-        },
-        childCount: itemCount,
-      ),
+    return CharacterAssetSkeletonSliverList(
+      itemCount: itemCount,
+      showTrailing: true,
     );
   }
 }
@@ -225,6 +225,8 @@ class CharacterRankRow extends StatelessWidget {
   /// [localSort] 当前全量列表排序字段
   /// [avatarHeroTag] 头像转场标识
   /// [onTap] 条目点击回调
+  /// [contentPadding] 行内容内边距
+  /// [tapBorderRadius] 点击反馈圆角
   const CharacterRankRow({
     super.key,
     required this.item,
@@ -232,6 +234,8 @@ class CharacterRankRow extends StatelessWidget {
     this.localSort,
     this.avatarHeroTag,
     this.onTap,
+    this.contentPadding = const EdgeInsets.symmetric(horizontal: 6),
+    this.tapBorderRadius,
   });
 
   /// 角色排序条目
@@ -248,6 +252,12 @@ class CharacterRankRow extends StatelessWidget {
 
   /// 条目点击回调
   final VoidCallback? onTap;
+
+  /// 行内容内边距
+  final EdgeInsetsGeometry contentPadding;
+
+  /// 点击反馈圆角
+  final BorderRadius? tapBorderRadius;
 
   /// 构建角色排序行
   ///
@@ -271,6 +281,8 @@ class CharacterRankRow extends StatelessWidget {
         fluctuation: item.fluctuation,
       ),
       onTap: onTap,
+      contentPadding: contentPadding,
+      tapBorderRadius: tapBorderRadius,
     );
   }
 
@@ -508,41 +520,6 @@ class _CharacterRankInlineEmpty extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-/// 角色排序列表条目外层
-class _CharacterRankListItem extends StatelessWidget {
-  /// 创建角色排序列表条目外层
-  ///
-  /// [child] 条目内容
-  /// [reserveLevelRail] 是否为等级轨道预留右侧宽度
-  const _CharacterRankListItem({
-    required this.child,
-    this.reserveLevelRail = false,
-  });
-
-  /// 条目内容
-  final Widget child;
-
-  /// 是否为等级轨道预留右侧宽度
-  final bool reserveLevelRail;
-
-  /// 构建角色排序列表条目外层
-  ///
-  /// [context] 当前组件树上下文
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: AppSafeAreaInsets.fromLTRB(
-        context,
-        left: 12,
-        top: 0,
-        right: reserveLevelRail ? 32 : 12,
-        bottom: 4,
-      ),
-      child: child,
     );
   }
 }

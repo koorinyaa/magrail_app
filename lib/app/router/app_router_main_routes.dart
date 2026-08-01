@@ -22,7 +22,6 @@ List<RouteBase> buildMainRoutes(AppDependencies dependencies) {
           characterDetailRepository: dependencies.repositories.characterDetail,
           towerRepository: dependencies.repositories.tower,
           icoCharacterRepository: dependencies.repositories.icoCharacter,
-          stCharacterRepository: dependencies.repositories.stCharacter,
           characterRankRepository: dependencies.repositories.characterRank,
           templeRepository: dependencies.repositories.temple,
           templeAssetMagicRepository:

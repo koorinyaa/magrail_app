@@ -23,6 +23,7 @@ class TinygrailPagedSliverPage<T, R> extends StatefulWidget {
   /// [key] Flutter 组件标识
   /// [controller] 分页控制器
   /// [title] 页面标题
+  /// [titleSupplement] 标题末尾的次级文本
   /// [loadingSliver] 首屏加载骨架
   /// [emptySliverBuilder] 空状态构建器
   /// [contentSliversBuilder] 内容 sliver 构建器
@@ -38,6 +39,7 @@ class TinygrailPagedSliverPage<T, R> extends StatefulWidget {
     super.key,
     required this.controller,
     required this.title,
+    this.titleSupplement,
     required this.loadingSliver,
     required this.emptySliverBuilder,
     required this.contentSliversBuilder,
@@ -56,6 +58,9 @@ class TinygrailPagedSliverPage<T, R> extends StatefulWidget {
 
   /// 页面标题
   final String title;
+
+  /// 标题末尾的次级文本
+  final String? titleSupplement;
 
   /// 首屏加载骨架
   final Widget loadingSliver;
@@ -120,6 +125,7 @@ class _TinygrailPagedSliverPageState<T, R>
 
           return SecondaryPageRefreshView(
             title: widget.title,
+            titleSupplement: widget.titleSupplement,
             actions: widget.appBarActions,
             bottom: widget.appBarBottom,
             onRefresh: _refresh,

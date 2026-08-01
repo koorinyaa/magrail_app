@@ -27,6 +27,7 @@ class CharacterDetailIcoParticipantsController
   int _totalItems = 0;
 
   /// 接口返回的参与者总数
+  @override
   int get totalItems => _totalItems;
 
   /// 校验 ICO 参与者分页请求

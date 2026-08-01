@@ -11,6 +11,7 @@ class IcoCharacterEntry {
   /// [total] 已筹集金额
   /// [users] 参与人数
   /// [end] ICO 结束时间
+  /// [last] 最近活跃时间
   /// [type] ICO 类型
   /// [bonus] 额外分红期数
   const IcoCharacterEntry({
@@ -21,6 +22,7 @@ class IcoCharacterEntry {
     required this.total,
     required this.users,
     required this.end,
+    required this.last,
     required this.type,
     required this.bonus,
   });
@@ -46,6 +48,9 @@ class IcoCharacterEntry {
   /// ICO 结束时间
   final String end;
 
+  /// 最近活跃时间
+  final String last;
+
   /// ICO 类型
   final int type;
 
@@ -69,6 +74,7 @@ class IcoCharacterEntry {
       total: TinygrailResponseParser.asDouble(json['Total']),
       users: TinygrailResponseParser.asInt(json['Users']),
       end: TinygrailResponseParser.asString(json['End']),
+      last: TinygrailResponseParser.asString(json['Last']),
       type: TinygrailResponseParser.asInt(json['Type']),
       bonus: TinygrailResponseParser.asInt(json['Bonus']),
     );

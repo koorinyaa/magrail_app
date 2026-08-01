@@ -1,124 +1,246 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:magrail_app/core/utils/tinygrail_formatters.dart';
 import 'package:magrail_app/features/ico/model/ico_character_entry.dart';
+import 'package:magrail_app/features/ico/model/ico_character_sort.dart';
 import 'package:magrail_app/features/ico/repository/ico_character_repository.dart';
 
-/// ICO 角色列表控制器
+/// ICO 角色全量列表控制器
 class IcoCharacterController extends ChangeNotifier {
-  /// 创建 ICO 角色列表控制器
+  /// 创建 ICO 角色全量列表控制器
   ///
   /// [repository] ICO 角色仓库
   IcoCharacterController({
     required IcoCharacterRepository repository,
   }) : _repository = repository;
 
+  /// ICO 一级页面预览数量
+  static const int previewItemCount = 24;
+
   final IcoCharacterRepository _repository;
 
-  final Map<IcoCharacterSortType, List<IcoCharacterEntry>> _itemsByType = {};
-  final Set<IcoCharacterSortType> _loadingTypes = {};
-  final Set<IcoCharacterSortType> _failedTypes = {};
-  var _selectedType = IcoCharacterSortType.endingSoon;
-  var _isDisposed = false;
+  List<IcoCharacterEntry>? _sourceItems;
+  List<IcoCharacterEntry> _previewItems = const <IcoCharacterEntry>[];
+  List<IcoCharacterEntry> _items = const <IcoCharacterEntry>[];
+  IcoCharacterSort _selectedSort = IcoCharacterSort.endingSoon;
+  String _searchKeyword = '';
+  Future<bool>? _loadOperation;
+  bool _isLoading = false;
+  bool _isLoadFailed = false;
+  bool _isDisposed = false;
 
-  /// 当前排序类型
-  IcoCharacterSortType get selectedType => _selectedType;
+  /// 一级页面即将结束预览条目
+  List<IcoCharacterEntry> get previewItems => _previewItems;
 
-  /// 当前排序下的 ICO 角色条目
-  List<IcoCharacterEntry> get items {
-    return _itemsByType[_selectedType] ?? const <IcoCharacterEntry>[];
-  }
+  /// 二级页面当前排序和筛选后的条目
+  List<IcoCharacterEntry> get items => _items;
 
-  /// 当前排序是否正在加载
-  bool get isLoading => _loadingTypes.contains(_selectedType);
+  /// 当前本地排序字段
+  IcoCharacterSort get selectedSort => _selectedSort;
 
-  /// 当前排序是否加载失败
-  bool get isLoadFailed => _failedTypes.contains(_selectedType);
+  /// 当前角色 ID 或名称筛选词
+  String get searchKeyword => _searchKeyword;
 
-  /// 当前排序是否已有缓存
-  bool get hasLoadedCurrentType => _itemsByType.containsKey(_selectedType);
+  /// 完整 ICO 角色数量
+  int? get totalItems => _sourceItems?.length;
 
-  /// 初始化 ICO 角色列表
+  /// 是否正在请求完整 ICO 数据
+  bool get isLoading => _isLoading;
+
+  /// 是否尚未取得可展示数据
+  bool get isInitialLoading => _isLoading && _sourceItems == null;
+
+  /// 最近一次完整 ICO 请求是否失败
+  bool get isLoadFailed => _isLoadFailed;
+
+  /// 是否已经取得完整 ICO 数据
+  bool get hasLoadedData => _sourceItems != null;
+
+  /// 初始化完整 ICO 数据
   void initialize() {
-    unawaited(_load(_selectedType));
+    unawaited(_startOrJoinLoad());
   }
 
-  /// 选择 ICO 角色排序类型
-  ///
-  /// [type] 目标排序类型
-  void selectType(IcoCharacterSortType type) {
-    if (_isDisposed || type == _selectedType) {
+  /// 刷新完整 ICO 数据
+  Future<bool> refresh() => _startOrJoinLoad();
+
+  /// 为新打开的二级页面恢复默认查询
+  void prepareSecondaryPage() {
+    if (_isDisposed ||
+        (_selectedSort == IcoCharacterSort.endingSoon &&
+            _searchKeyword.isEmpty)) {
       return;
     }
+    _selectedSort = IcoCharacterSort.endingSoon;
+    _searchKeyword = '';
+    _rebuildDisplayItems();
+    notifyListeners();
+  }
 
-    _selectedType = type;
-    _notifyIfActive();
-
-    if (!_itemsByType.containsKey(type)) {
-      unawaited(_load(type));
+  /// 选择本地排序字段
+  ///
+  /// [sort] 目标排序字段
+  void selectSort(IcoCharacterSort sort) {
+    if (_isDisposed || sort == _selectedSort) {
+      return;
     }
+    _selectedSort = sort;
+    _rebuildDisplayItems();
+    notifyListeners();
   }
 
-  /// 刷新当前排序下的 ICO 角色列表
-  Future<void> refresh() {
-    return _load(_selectedType, force: true);
+  /// 应用角色 ID 或名称筛选词
+  ///
+  /// [keyword] 角色 ID 或名称筛选词
+  void applySearchFilter(String keyword) {
+    if (_isDisposed) {
+      return;
+    }
+    final normalizedKeyword = keyword.trim();
+    if (_searchKeyword == normalizedKeyword) {
+      return;
+    }
+    _searchKeyword = normalizedKeyword;
+    _rebuildDisplayItems();
+    notifyListeners();
   }
 
-  /// 释放 ICO 角色列表控制器
+  /// 释放 ICO 角色全量列表控制器
   @override
   void dispose() {
     _isDisposed = true;
     super.dispose();
   }
 
-  /// 加载指定排序下的 ICO 角色列表
-  ///
-  /// [type] 目标排序类型
-  /// [force] 是否忽略已有缓存
-  Future<void> _load(
-    IcoCharacterSortType type, {
-    bool force = false,
-  }) async {
-    if (_isDisposed || _loadingTypes.contains(type)) {
-      return;
+  /// 启动或复用完整 ICO 请求
+  Future<bool> _startOrJoinLoad() {
+    final existingOperation = _loadOperation;
+    if (existingOperation != null) {
+      return existingOperation;
     }
 
-    if (!force && _itemsByType.containsKey(type)) {
-      return;
-    }
+    late final Future<bool> operation;
+    operation = _load().whenComplete(() {
+      if (identical(_loadOperation, operation)) {
+        _loadOperation = null;
+      }
+    });
+    _loadOperation = operation;
+    return operation;
+  }
 
-    _loadingTypes.add(type);
-    _failedTypes.remove(type);
-    _notifyIfActive();
+  /// 使用即将结束接口刷新唯一全量数据源
+  Future<bool> _load() async {
+    if (_isDisposed) {
+      return false;
+    }
+    _isLoading = true;
+    _isLoadFailed = false;
+    notifyListeners();
 
     try {
-      final items = await _repository.fetchIcoCharacters(sortType: type);
+      final requestedItems = await _repository.fetchEndingSoonCharacters();
       if (_isDisposed) {
-        return;
+        return false;
       }
-
-      _itemsByType[type] = List<IcoCharacterEntry>.unmodifiable(items);
-      _failedTypes.remove(type);
+      final endingSoonItems = List<IcoCharacterEntry>.of(requestedItems)
+        ..sort(_compareEndingSoon);
+      _sourceItems = List<IcoCharacterEntry>.unmodifiable(endingSoonItems);
+      _previewItems = List<IcoCharacterEntry>.unmodifiable(
+        endingSoonItems.take(previewItemCount),
+      );
+      _rebuildDisplayItems();
+      return true;
     } catch (_) {
-      if (_isDisposed) {
-        return;
+      if (!_isDisposed) {
+        _isLoadFailed = true;
       }
-
-      _failedTypes.add(type);
+      return false;
     } finally {
       if (!_isDisposed) {
-        _loadingTypes.remove(type);
-        _notifyIfActive();
+        _isLoading = false;
+        notifyListeners();
       }
     }
   }
 
-  /// 通知仍挂载的监听者
-  void _notifyIfActive() {
-    if (_isDisposed) {
-      return;
+  /// 按当前筛选和排序生成二级页面展示列表
+  void _rebuildDisplayItems() {
+    final sourceItems = _sourceItems ?? const <IcoCharacterEntry>[];
+    final rawKeyword = _searchKeyword.toLowerCase();
+    // 角色 ID 支持 #123 输入格式
+    final normalizedKeyword = RegExp(r'^#[0-9]+$').hasMatch(rawKeyword)
+        ? rawKeyword.substring(1)
+        : rawKeyword;
+    final displayItems = sourceItems.where((item) {
+      if (normalizedKeyword.isEmpty) {
+        return true;
+      }
+      return item.characterId.toString().contains(normalizedKeyword) ||
+          item.name.toLowerCase().contains(normalizedKeyword);
+    }).toList(growable: false);
+    if (_selectedSort != IcoCharacterSort.endingSoon) {
+      displayItems.sort(_compareItems);
     }
+    _items = List<IcoCharacterEntry>.unmodifiable(displayItems);
+  }
 
-    notifyListeners();
+  /// 比较当前本地排序下的两个 ICO 角色
+  ///
+  /// [left] 左侧 ICO 角色
+  /// [right] 右侧 ICO 角色
+  int _compareItems(IcoCharacterEntry left, IcoCharacterEntry right) {
+    final comparison = switch (_selectedSort) {
+      IcoCharacterSort.endingSoon => _compareEndingSoon(left, right),
+      IcoCharacterSort.maxValue => right.total.compareTo(left.total),
+      IcoCharacterSort.maxUsers => right.users.compareTo(left.users),
+      IcoCharacterSort.recentActive => _compareTime(
+          left.last,
+          right.last,
+          latestFirst: true,
+        ),
+    };
+    return comparison != 0
+        ? comparison
+        : left.characterId.compareTo(right.characterId);
+  }
+
+  /// 按结束时间由近到远比较 ICO 角色
+  ///
+  /// [left] 左侧 ICO 角色
+  /// [right] 右侧 ICO 角色
+  int _compareEndingSoon(IcoCharacterEntry left, IcoCharacterEntry right) {
+    final comparison = _compareTime(
+      left.end,
+      right.end,
+      latestFirst: false,
+    );
+    return comparison != 0
+        ? comparison
+        : left.characterId.compareTo(right.characterId);
+  }
+
+  /// 比较服务端时间并将无效时间固定放在末尾
+  ///
+  /// [left] 左侧服务端时间
+  /// [right] 右侧服务端时间
+  /// [latestFirst] 是否将较新的时间排在前面
+  int _compareTime(
+    String left,
+    String right, {
+    required bool latestFirst,
+  }) {
+    final leftTime = TinygrailFormatters.parseServerTime(left);
+    final rightTime = TinygrailFormatters.parseServerTime(right);
+    if (leftTime == null || rightTime == null) {
+      if (leftTime == null && rightTime == null) {
+        return 0;
+      }
+      return leftTime == null ? 1 : -1;
+    }
+    return latestFirst
+        ? rightTime.compareTo(leftTime)
+        : leftTime.compareTo(rightTime);
   }
 }

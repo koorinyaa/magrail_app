@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:magrail_app/core/utils/formatters.dart';
 import 'package:magrail_app/core/widgets/paged_sliver_state.dart';
 import 'package:magrail_app/core/widgets/tinygrail_paged_sliver_page.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
@@ -69,6 +70,7 @@ class _StCharacterPageState extends State<StCharacterPage>
           controller: _controller,
           scrollController: fullListScrollController,
           title: 'ST',
+          titleSupplement: _buildTitleSupplement(),
           appBarBottom: buildFullListSortToolbar(),
           loadingSliver: const StCharacterSkeletonSliverList(),
           emptySliverBuilder: (context, controller) {
@@ -97,6 +99,15 @@ class _StCharacterPageState extends State<StCharacterPage>
         return buildFullListOverlay(child: page);
       },
     );
+  }
+
+  /// 构建接口总数标题辅助文本
+  String? _buildTitleSupplement() {
+    final count = _controller.totalItems;
+    if (count == null) {
+      return null;
+    }
+    return '(${Formatters.groupedNumber(count)} 个角色)';
   }
 
   /// 打开角色详情页

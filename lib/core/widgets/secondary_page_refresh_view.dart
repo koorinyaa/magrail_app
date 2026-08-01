@@ -9,6 +9,7 @@ class SecondaryPageRefreshView extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [title] 页面标题
+  /// [titleSupplement] 标题末尾的次级文本
   /// [onRefresh] 下拉刷新回调
   /// [slivers] 页面滚动内容
   /// [actions] 标题栏右侧操作组件
@@ -17,6 +18,7 @@ class SecondaryPageRefreshView extends StatelessWidget {
   const SecondaryPageRefreshView({
     super.key,
     required this.title,
+    this.titleSupplement,
     required this.onRefresh,
     required this.slivers,
     this.actions,
@@ -26,6 +28,9 @@ class SecondaryPageRefreshView extends StatelessWidget {
 
   /// 页面标题
   final String title;
+
+  /// 标题末尾的次级文本
+  final String? titleSupplement;
 
   /// 下拉刷新回调
   final RefreshCallback onRefresh;
@@ -47,21 +52,35 @@ class SecondaryPageRefreshView extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final headerHeight = MediaQuery.paddingOf(context).top +
+        SecondaryPageSliverAppBar.defaultToolbarHeight +
+        (bottom?.preferredSize.height ?? 0);
+
+    return Stack(
       children: [
-        _SecondaryPageHeader(
-          title: title,
-          actions: actions,
-          bottom: bottom,
+        RefreshIndicator(
+          onRefresh: onRefresh,
+          // 将刷新反馈置于固定标题下方，避免被模糊层遮挡
+          edgeOffset: headerHeight,
+          displacement: 40,
+          child: CustomScrollView(
+            controller: scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(child: SizedBox(height: headerHeight)),
+              ...slivers,
+            ],
+          ),
         ),
-        Expanded(
-          child: RefreshIndicator(
-            onRefresh: onRefresh,
-            child: CustomScrollView(
-              controller: scrollController,
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: slivers,
-            ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: _SecondaryPageHeader(
+            title: title,
+            titleSupplement: titleSupplement,
+            actions: actions,
+            bottom: bottom,
           ),
         ),
       ],
@@ -74,16 +93,21 @@ class _SecondaryPageHeader extends StatelessWidget {
   /// 创建二级页面固定标题区域
   ///
   /// [title] 页面标题
+  /// [titleSupplement] 标题末尾的次级文本
   /// [actions] 右侧操作组件
   /// [bottom] 标题栏下方的固定区域
   const _SecondaryPageHeader({
     required this.title,
+    required this.titleSupplement,
     required this.actions,
     required this.bottom,
   });
 
   /// 页面标题
   final String title;
+
+  /// 标题末尾的次级文本
+  final String? titleSupplement;
 
   /// 右侧操作组件
   final List<Widget>? actions;
@@ -135,8 +159,22 @@ class _SecondaryPageHeader extends StatelessWidget {
                         size: 30,
                       ),
                     ),
-                    title: Text(
-                      title,
+                    title: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(text: title),
+                          if (titleSupplement case final supplement?)
+                            TextSpan(
+                              text: '  $supplement',
+                              style: TextStyle(
+                                color: colorScheme.onSurfaceVariant,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                fontFeatures: const [FontFeature.tabularFigures()],
+                              ),
+                            ),
+                        ],
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(

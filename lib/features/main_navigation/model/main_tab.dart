@@ -12,15 +12,6 @@ enum MainTab {
     showInMobileDock: true,
   ),
 
-  /// 排行榜
-  ranking(
-    title: '排行榜',
-    label: '排行榜',
-    icon: Icons.leaderboard_outlined,
-    activeIcon: Icons.leaderboard_rounded,
-    showInMobileDock: true,
-  ),
-
   /// 角色
   character(
     title: '角色',
@@ -30,12 +21,12 @@ enum MainTab {
     showInMobileDock: true,
   ),
 
-  /// ICO
-  ico(
-    title: 'ICO',
-    label: 'ICO',
-    icon: Icons.token_outlined,
-    activeIcon: Icons.token_rounded,
+  /// 排行榜
+  ranking(
+    title: '排行榜',
+    label: '排行榜',
+    icon: Icons.leaderboard_outlined,
+    activeIcon: Icons.leaderboard_rounded,
     showInMobileDock: true,
   ),
 

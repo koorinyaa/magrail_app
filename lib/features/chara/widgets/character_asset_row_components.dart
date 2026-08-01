@@ -35,6 +35,60 @@ class CharacterAssetMetric {
   final Widget? valueWidget;
 }
 
+/// 角色资产列表条目外壳
+class CharacterAssetListItemShell extends StatelessWidget {
+  /// 创建角色资产列表条目外壳
+  ///
+  /// [key] Flutter 组件标识
+  /// [child] 条目内容
+  /// [showDivider] 是否显示底部分割线
+  /// [dividerLeadingInset] 分割线左侧留白
+  /// [dividerTrailingInset] 分割线右侧留白
+  const CharacterAssetListItemShell({
+    super.key,
+    required this.child,
+    this.showDivider = false,
+    this.dividerLeadingInset = 74,
+    this.dividerTrailingInset = 18,
+  });
+
+  /// 条目内容
+  final Widget child;
+
+  /// 是否显示底部分割线
+  final bool showDivider;
+
+  /// 分割线左侧留白
+  final double dividerLeadingInset;
+
+  /// 分割线右侧留白
+  final double dividerTrailingInset;
+
+  /// 构建角色资产列表条目外壳
+  ///
+  /// [context] 当前组件树上下文
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final mediaPadding = MediaQuery.paddingOf(context);
+    return Stack(
+      children: [
+        Positioned.fill(child: child),
+        if (showDivider)
+          Positioned(
+            left: dividerLeadingInset + mediaPadding.left,
+            right: dividerTrailingInset + mediaPadding.right,
+            bottom: 0,
+            height: 1,
+            child: ColoredBox(
+              color: colorScheme.outlineVariant.withValues(alpha: 0.55),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
 /// 角色资产行
 class CharacterAssetRowShell extends StatelessWidget {
   /// 创建角色资产行

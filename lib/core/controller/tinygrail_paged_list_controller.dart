@@ -26,6 +26,7 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
   late final PagingController<int, ItemType> _pagingController;
 
   int _nextPage = 1;
+  int? _totalItems;
   bool _canLoadMore = true;
   bool _isRefreshing = false;
   bool _isReplacingPages = false;
@@ -50,6 +51,9 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
   List<ItemType> get items {
     return _pagingController.items ?? <ItemType>[];
   }
+
+  /// 接口返回的列表总条目数
+  int? get totalItems => _totalItems;
 
   /// 是否正在首次加载
   bool get isInitialLoading {
@@ -480,6 +484,7 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
           return <ItemType>[];
         }
 
+        _totalItems = result.totalItems;
         batchItems.addAll(convertPageItems(result.items));
         _syncPageCursor(
           requestedPage: nextPage,
