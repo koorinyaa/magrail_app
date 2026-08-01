@@ -34,7 +34,10 @@ enum CharacterFullListSort {
   bids('买单'),
 
   /// 角色卖单数量
-  asks('卖单');
+  asks('卖单'),
+
+  /// 角色上市日期
+  listedDate('上市日期');
 
   /// 创建角色全量列表本地排序字段
   ///

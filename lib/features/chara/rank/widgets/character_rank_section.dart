@@ -342,6 +342,13 @@ class CharacterRankRow extends StatelessWidget {
         isValueMuted: true,
       );
     }
+    if (selectedSort == CharacterFullListSort.listedDate) {
+      return CharacterAssetMetric(
+        label: '上市日期',
+        value: TinygrailFormatters.listedDate(item.listedDate),
+        isValueMuted: true,
+      );
+    }
 
     final fluctuationColor =
         CharacterAssetCurrentPriceChip.resolveCurrentPriceColor(

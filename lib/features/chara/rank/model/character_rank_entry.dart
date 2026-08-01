@@ -1,4 +1,5 @@
 import 'package:magrail_app/core/network/tinygrail_response.dart';
+import 'package:magrail_app/core/utils/tinygrail_formatters.dart';
 
 // 通天塔 500 名外按每颗星固定折算单期股息
 const double _outsideTowerDividendPerStar = 2;
@@ -20,6 +21,8 @@ class CharacterRankEntry {
   /// [rank] 通天塔排名
   /// [stars] 角色星级
   /// [starForces] 星之力
+  /// [listedDate] 上市时间原始文本
+  /// [listedDateTimestamp] 上市时间毫秒时间戳
   const CharacterRankEntry({
     required this.characterId,
     required this.name,
@@ -34,6 +37,8 @@ class CharacterRankEntry {
     required this.rank,
     required this.stars,
     required this.starForces,
+    required this.listedDate,
+    required this.listedDateTimestamp,
   });
 
   /// 角色 ID
@@ -75,6 +80,12 @@ class CharacterRankEntry {
   /// 星之力
   final int starForces;
 
+  /// 上市时间原始文本
+  final String listedDate;
+
+  /// 上市时间毫秒时间戳，无效时间为 0
+  final int listedDateTimestamp;
+
   /// 计算角色单期股息
   double get singleDividend {
     if (rank > 0 && rank <= 500) {
@@ -93,6 +104,7 @@ class CharacterRankEntry {
     final name = TinygrailResponseParser.asString(
       json['CharacterName'] ?? json['Name'],
     );
+    final listedDate = TinygrailResponseParser.asString(json['ListedDate']);
 
     return CharacterRankEntry(
       characterId: characterId,
@@ -108,6 +120,8 @@ class CharacterRankEntry {
       rank: TinygrailResponseParser.asInt(json['Rank']),
       stars: TinygrailResponseParser.asInt(json['Stars']),
       starForces: TinygrailResponseParser.asInt(json['StarForces']),
+      listedDate: listedDate,
+      listedDateTimestamp: TinygrailFormatters.listedDateTimestamp(listedDate),
     );
   }
 }

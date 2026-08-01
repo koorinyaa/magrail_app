@@ -45,7 +45,7 @@ class _TradeHeaderBadges extends StatelessWidget {
           value: _formatOptionalAmount(header.poolAmount),
         ),
         _TradeHeaderInfoChip(
-          text: _formatListedDate(header.listedDate),
+          text: TinygrailFormatters.listedDate(header.listedDate),
         ),
       ],
     );
@@ -62,23 +62,6 @@ class _TradeHeaderBadges extends StatelessWidget {
     return Formatters.groupedNumber(value);
   }
 
-  /// 格式化上市时间
-  ///
-  /// [value] Tinygrail 服务端时间文本
-  String _formatListedDate(String value) {
-    final text = value.trim();
-    if (text.isEmpty) {
-      return '--';
-    }
-
-    final parsed = TinygrailFormatters.parseServerTime(text);
-    if (parsed == null) {
-      final dateText = text.split(RegExp(r'[T\s]')).first.trim();
-      return dateText.isEmpty ? text : dateText;
-    }
-
-    return DateFormat('yyyy/MM/dd').format(parsed.toLocal());
-  }
 }
 
 /// 已上市头部价格 Chip

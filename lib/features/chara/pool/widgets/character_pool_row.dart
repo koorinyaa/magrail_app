@@ -177,6 +177,11 @@ class CharacterPoolRow extends StatelessWidget {
           value: _formatMarketValue(item.marketValue),
           isValueMuted: true,
         ),
+      CharacterFullListSort.listedDate => CharacterAssetMetric(
+          label: '上市日期',
+          value: TinygrailFormatters.listedDate(item.listedDate),
+          isValueMuted: true,
+        ),
       _ => _buildDefaultSecondaryMetric(),
     };
   }

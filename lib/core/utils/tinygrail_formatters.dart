@@ -102,6 +102,31 @@ final class TinygrailFormatters {
     return DateFormat('yyyy-MM-dd HH:mm:ss').format(parsed.toLocal());
   }
 
+  /// 格式化 Tinygrail 上市日期
+  ///
+  /// [value] 服务端上市时间文本
+  static String listedDate(String value) {
+    final text = value.trim();
+    if (text.isEmpty) {
+      return '--';
+    }
+
+    final parsed = parseServerTime(text);
+    if (parsed == null) {
+      final dateText = text.split(RegExp(r'[T\s]')).first.trim();
+      return dateText.isEmpty ? text : dateText;
+    }
+
+    return DateFormat('yyyy/MM/dd').format(parsed.toLocal());
+  }
+
+  /// 读取 Tinygrail 上市时间排序值
+  ///
+  /// [value] 服务端上市时间文本
+  static int listedDateTimestamp(String value) {
+    return parseServerTime(value)?.millisecondsSinceEpoch ?? 0;
+  }
+
   /// 解析 Tinygrail 服务端时间
   ///
   /// [value] 服务端时间文本

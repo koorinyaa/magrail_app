@@ -32,6 +32,7 @@ class StCharacterPageController
             CharacterFullListSort.currentPrice,
             CharacterFullListSort.fluctuation,
             CharacterFullListSort.marketValue,
+            CharacterFullListSort.listedDate,
           ],
         );
 
@@ -97,6 +98,7 @@ class StCharacterPageController
       CharacterFullListSort.circulation => item.total,
       CharacterFullListSort.bids => item.bids,
       CharacterFullListSort.asks => item.asks,
+      CharacterFullListSort.listedDate => item.listedDateTimestamp,
       _ => 0,
     };
   }

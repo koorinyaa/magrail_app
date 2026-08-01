@@ -53,6 +53,7 @@ class CharacterPoolPageController
             CharacterFullListSort.currentPrice,
             CharacterFullListSort.fluctuation,
             CharacterFullListSort.marketValue,
+            CharacterFullListSort.listedDate,
           ],
           initialSort: CharacterFullListSort.quantity,
         );
@@ -152,6 +153,7 @@ class CharacterPoolPageController
       CharacterFullListSort.currentPrice => item.current,
       CharacterFullListSort.fluctuation => item.fluctuation,
       CharacterFullListSort.marketValue => item.marketValue,
+      CharacterFullListSort.listedDate => item.listedDateTimestamp,
       _ => 0,
     };
   }

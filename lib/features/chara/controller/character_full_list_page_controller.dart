@@ -389,15 +389,20 @@ abstract class CharacterFullListPageController<ItemType>
     if (sort == null) {
       return 0;
     }
-    final comparison = sort == CharacterFullListSort.towerRank
-        ? _compareTowerRanks(
+    final comparison = switch (sort) {
+      CharacterFullListSort.towerRank => _compareTowerRanks(
             sortValueOf(left, sort).toInt(),
             sortValueOf(right, sort).toInt(),
-          )
-        : _compareValues(
+          ),
+      CharacterFullListSort.listedDate => _compareListedDates(
+            sortValueOf(left, sort).toInt(),
+            sortValueOf(right, sort).toInt(),
+          ),
+      _ => _compareValues(
             sortValueOf(left, sort),
             sortValueOf(right, sort),
-          );
+          ),
+    };
     if (comparison != 0) {
       return comparison;
     }
@@ -433,6 +438,22 @@ abstract class CharacterFullListPageController<ItemType>
     return _direction == CharacterFullListSortDirection.descending
         ? comparison
         : -comparison;
+  }
+
+  /// 比较上市日期并保持无效日期始终位于末尾
+  ///
+  /// [left] 左侧上市时间戳
+  /// [right] 右侧上市时间戳
+  int _compareListedDates(int left, int right) {
+    final leftValid = left > 0;
+    final rightValid = right > 0;
+    if (leftValid != rightValid) {
+      return leftValid ? -1 : 1;
+    }
+    if (!leftValid) {
+      return 0;
+    }
+    return _compareValues(left, right);
   }
 
   /// 构建等级快速跳转目录

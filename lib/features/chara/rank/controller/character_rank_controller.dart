@@ -73,6 +73,7 @@ class AllCharacterFullListPageController
             CharacterFullListSort.currentPrice,
             CharacterFullListSort.fluctuation,
             CharacterFullListSort.marketValue,
+            CharacterFullListSort.listedDate,
           ],
         );
 
@@ -136,6 +137,7 @@ class AllCharacterFullListPageController
       CharacterFullListSort.currentPrice => item.current,
       CharacterFullListSort.marketValue => item.marketValue,
       CharacterFullListSort.fluctuation => item.fluctuation,
+      CharacterFullListSort.listedDate => item.listedDateTimestamp,
       _ => 0,
     };
   }

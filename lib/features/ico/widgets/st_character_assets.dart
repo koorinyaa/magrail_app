@@ -218,6 +218,11 @@ class StCharacterRow extends StatelessWidget {
           value: _formatMarketValue(item.marketValue),
           isValueMuted: true,
         ),
+      CharacterFullListSort.listedDate => CharacterAssetMetric(
+          label: '上市日期',
+          value: TinygrailFormatters.listedDate(item.listedDate),
+          isValueMuted: true,
+        ),
       _ => CharacterAssetMetric(
           label: '买卖',
           value: '${_formatCount(item.bids)} / ${_formatCount(item.asks)}',

@@ -1,4 +1,5 @@
 import 'package:magrail_app/core/network/tinygrail_response.dart';
+import 'package:magrail_app/core/utils/tinygrail_formatters.dart';
 
 // 通天塔 500 名外按每颗星固定折算单期股息
 const double _outsideTowerDividendPerStar = 2;
@@ -25,6 +26,8 @@ class UserCharacterApiItem {
   /// [rate] 股息
   /// [marketValue] 市值
   /// [rank] 通天塔排名
+  /// [listedDate] 上市时间原始文本
+  /// [listedDateTimestamp] 上市时间毫秒时间戳
   const UserCharacterApiItem({
     required this.characterId,
     required this.name,
@@ -44,6 +47,8 @@ class UserCharacterApiItem {
     required this.rate,
     required this.marketValue,
     this.rank = 0,
+    required this.listedDate,
+    required this.listedDateTimestamp,
   });
 
   /// 角色 ID
@@ -100,6 +105,12 @@ class UserCharacterApiItem {
   /// 通天塔排名
   final int rank;
 
+  /// 上市时间原始文本
+  final String listedDate;
+
+  /// 上市时间毫秒时间戳，无效时间为 0
+  final int listedDateTimestamp;
+
   /// 计算角色单期股息
   double get singleDividend {
     if (rank > 0 && rank <= 500) {
@@ -116,6 +127,7 @@ class UserCharacterApiItem {
   /// [json] 原始条目 JSON
   factory UserCharacterApiItem.fromJson(Map<String, Object?> json) {
     final characterId = TinygrailResponseParser.asInt(json['CharacterId']);
+    final listedDate = TinygrailResponseParser.asString(json['ListedDate']);
 
     return UserCharacterApiItem(
       characterId: characterId == 0
@@ -138,6 +150,8 @@ class UserCharacterApiItem {
       rate: TinygrailResponseParser.asDouble(json['Rate']),
       marketValue: TinygrailResponseParser.asDouble(json['MarketValue']),
       rank: TinygrailResponseParser.asInt(json['Rank']),
+      listedDate: listedDate,
+      listedDateTimestamp: TinygrailFormatters.listedDateTimestamp(listedDate),
     );
   }
 
@@ -162,6 +176,7 @@ class UserCharacterApiItem {
       'Rate': rate,
       'MarketValue': marketValue,
       'Rank': rank,
+      'ListedDate': listedDate,
     };
   }
 }
