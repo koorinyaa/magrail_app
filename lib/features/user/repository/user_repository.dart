@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:magrail_app/core/analytics/app_activity_reporter.dart';
 import 'package:magrail_app/core/auth/tinygrail_auth_repository.dart';
 import 'package:magrail_app/core/network/api_client.dart';
 import 'package:magrail_app/core/network/api_exception.dart';
@@ -35,20 +36,24 @@ class UserRepository with _UserRepositoryPageQueries {
   /// [authRepository] Tinygrail 授权仓库
   /// [preferences] 本地偏好设置
   /// [auctionRepository] 拍卖仓库
+  /// [activityReporter] 应用活跃状态上报器
   const UserRepository({
     required ApiClient apiClient,
     required TinygrailAuthRepository authRepository,
     required AppPreferences preferences,
     required AuctionRepository auctionRepository,
+    required AppActivityReporter activityReporter,
   })  : _apiClient = apiClient,
         _authRepository = authRepository,
         _preferences = preferences,
-        _auctionRepository = auctionRepository;
+        _auctionRepository = auctionRepository,
+        _activityReporter = activityReporter;
 
   @override
   final ApiClient _apiClient;
   final TinygrailAuthRepository _authRepository;
   final AppPreferences _preferences;
+  final AppActivityReporter _activityReporter;
   @override
   final AuctionRepository _auctionRepository;
 
@@ -143,17 +148,15 @@ class UserRepository with _UserRepositoryPageQueries {
   ///
   /// [username] 用户名，不传时获取当前登录用户
   Future<UserAssetsFetchResult> fetchUserAssets({String? username}) async {
-    final isCurrentUserRequest = _isCurrentUserRequest(username);
+    final isCurrentUserRequest = _shouldCacheCurrentUserAssets(username);
     if (isCurrentUserRequest) {
       try {
         final hasCookie = await _authRepository.hasTinygrailCookie();
         if (!hasCookie) {
-          await clearCurrentUserAssetsCache();
-          return const UserAssetsFetchResult.authExpired('请先授权');
+          return _handleCurrentUserAuthExpired('请先授权');
         }
       } catch (_) {
-        await clearCurrentUserAssetsCache();
-        return const UserAssetsFetchResult.authExpired('请先授权');
+        return _handleCurrentUserAuthExpired('请先授权');
       }
     }
 
@@ -179,24 +182,33 @@ class UserRepository with _UserRepositoryPageQueries {
       if (!response.isSuccess || profile == null) {
         final message = response.message ?? '获取用户资产失败';
         if (isCurrentUserRequest) {
-          // 会话失效不是普通网络失败，需要丢弃当前用户缓存避免下次展示旧资料
-          unawaited(clearCurrentUserAssetsCache());
-          return UserAssetsFetchResult.authExpired(message);
+          return _handleCurrentUserAuthExpired(message);
         }
 
         return UserAssetsFetchResult.failure(message);
       }
 
-      if (_shouldCacheCurrentUserAssets(username)) {
+      if (isCurrentUserRequest) {
         try {
           await cacheCurrentUserAssets(profile);
         } catch (_) {
           // 缓存写入失败不影响本次接口结果返回
         }
+        // 接口已确认当前会话后再上报登录用户，避免使用未校验的页面参数
+        unawaited(
+          _activityReporter.report(
+            userId: profile.userId,
+            username: profile.name,
+          ),
+        );
       }
 
       return UserAssetsFetchResult.success(profile);
     } on ApiException catch (error) {
+      if (isCurrentUserRequest &&
+          (error.statusCode == 401 || error.statusCode == 403)) {
+        return _handleCurrentUserAuthExpired(error.message);
+      }
       return UserAssetsFetchResult.failure(error.message);
     } catch (_) {
       return const UserAssetsFetchResult.failure('获取用户资产失败');
@@ -450,6 +462,8 @@ class UserRepository with _UserRepositoryPageQueries {
     }
 
     await clearCurrentUserAssetsCache();
+    // 本地退出完成后立即把设备最新登录状态更新为空
+    unawaited(_activityReporter.report());
   }
 
   /// 获取当前用户委托订单分页数据
@@ -470,11 +484,16 @@ class UserRepository with _UserRepositoryPageQueries {
     );
   }
 
-  /// 判断是否为当前登录用户资产请求
+  /// 处理当前用户会话失效
   ///
-  /// [username] 用户名
-  bool _isCurrentUserRequest(String? username) {
-    return _shouldCacheCurrentUserAssets(username);
+  /// [message] 会话失效提示
+  Future<UserAssetsFetchResult> _handleCurrentUserAuthExpired(
+    String message,
+  ) async {
+    // 会话失效时清除资料缓存，并把设备最新登录状态更新为空
+    await clearCurrentUserAssetsCache();
+    unawaited(_activityReporter.report());
+    return UserAssetsFetchResult.authExpired(message);
   }
 
   /// 判断本次资产结果是否应写入当前用户缓存

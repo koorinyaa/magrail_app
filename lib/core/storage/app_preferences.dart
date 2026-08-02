@@ -28,6 +28,7 @@ class AppPreferences {
   static const _lastPromptedReleaseTagKey = 'last_prompted_release_tag';
   static const _lastPromptedReleaseTagSavedAtKey =
       'last_prompted_release_tag_saved_at';
+  static const _lastActivityReportKey = 'last_activity_report_key';
 
   /// 读取应用主题模式
   ThemeMode get themeMode {
@@ -233,5 +234,17 @@ class AppPreferences {
   Future<void> clearLastPromptedReleaseTag() async {
     await _preferences.remove(_lastPromptedReleaseTagKey);
     await _preferences.remove(_lastPromptedReleaseTagSavedAtKey);
+  }
+
+  /// 读取上次成功活跃上报的去重键
+  String? get lastActivityReportKey {
+    return _preferences.getString(_lastActivityReportKey);
+  }
+
+  /// 保存成功活跃上报的去重键
+  ///
+  /// [value] UTC+8 日期、账号、平台和版本组成的去重键
+  Future<void> setLastActivityReportKey(String value) {
+    return _preferences.setString(_lastActivityReportKey, value);
   }
 }

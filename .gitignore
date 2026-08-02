@@ -55,6 +55,9 @@ xcuserdata/
 *.log
 test_driver/screenshots/
 
+# Cloudflare Worker
+cloudflare/activity_worker/
+
 # 操作系统与临时文件
 .DS_Store
 Thumbs.db

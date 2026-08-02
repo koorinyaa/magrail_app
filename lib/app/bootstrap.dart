@@ -4,6 +4,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:magrail_app/core/analytics/app_activity_reporter.dart';
 import 'package:magrail_app/core/auth/tinygrail_auth_repository.dart';
 import 'package:magrail_app/core/auth/tinygrail_site_config.dart';
 import 'package:magrail_app/core/network/api_client.dart';
@@ -42,6 +43,7 @@ class AppDependencies {
   /// [preferences] 本地偏好设置
   /// [updateController] 应用更新控制器
   /// [secureStorage] 安全存储
+  /// [activityReporter] 应用活跃状态上报器
   /// [repositories] 业务仓库集合
   /// [userAssetSnapshotCoordinator] 用户资产快照全局协调器
   AppDependencies({
@@ -50,6 +52,7 @@ class AppDependencies {
     required this.preferences,
     required this.updateController,
     required this.secureStorage,
+    required this.activityReporter,
     required this.repositories,
     required this.userAssetSnapshotCoordinator,
   });
@@ -69,6 +72,9 @@ class AppDependencies {
   /// 安全存储
   final SecureStorage secureStorage;
 
+  /// 应用活跃状态上报器
+  final AppActivityReporter activityReporter;
+
   /// 业务仓库集合
   final AppRepositories repositories;
 
@@ -84,11 +90,13 @@ class AppRepositories {
   /// [dio] Dio 客户端
   /// [authRepository] Tinygrail 授权仓库
   /// [preferences] 本地偏好设置
+  /// [activityReporter] 应用活跃状态上报器
   factory AppRepositories({
     required ApiClient apiClient,
     required Dio dio,
     required TinygrailAuthRepository authRepository,
     required AppPreferences preferences,
+    required AppActivityReporter activityReporter,
   }) {
     final auctionRepository = AuctionRepository(apiClient: apiClient);
 
@@ -113,6 +121,7 @@ class AppRepositories {
         authRepository: authRepository,
         preferences: preferences,
         auctionRepository: auctionRepository,
+        activityReporter: activityReporter,
       ),
     );
   }
@@ -220,6 +229,19 @@ Future<AppDependencies> bootstrap() async {
   final apiClient = ApiClient(dio);
   final secureStorage = const SecureStorage(FlutterSecureStorage());
   final preferences = AppPreferences(await SharedPreferences.getInstance());
+  // 统计客户端不复用 Tinygrail Dio，避免向独立域名附带业务会话 Cookie
+  final activityReporter = AppActivityReporter(
+    dio: Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 3),
+        sendTimeout: const Duration(seconds: 3),
+        receiveTimeout: const Duration(seconds: 3),
+        responseType: ResponseType.plain,
+      ),
+    ),
+    secureStorage: secureStorage,
+    preferences: preferences,
+  );
   // 启动时同步 Bangumi 镜像偏好，供静态资源地址工具使用
   TinygrailAssetUrls.configureBangumiMirror(
     useMirror: preferences.useBangumiMirror,
@@ -246,6 +268,7 @@ Future<AppDependencies> bootstrap() async {
     dio: dio,
     authRepository: authRepository,
     preferences: preferences,
+    activityReporter: activityReporter,
   );
   final temporaryDirectory = await getTemporaryDirectory();
   final separator = Platform.pathSeparator;
@@ -272,6 +295,7 @@ Future<AppDependencies> bootstrap() async {
     preferences: preferences,
     updateController: updateController,
     secureStorage: secureStorage,
+    activityReporter: activityReporter,
     repositories: repositories,
     userAssetSnapshotCoordinator: userAssetSnapshotCoordinator,
   );

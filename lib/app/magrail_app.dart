@@ -45,6 +45,7 @@ class MagrailApp extends StatefulWidget {
 class _MagrailAppState extends State<MagrailApp> {
   late final GlobalKey<NavigatorState> _rootNavigatorKey;
   late final GoRouter _router;
+  late final AppLifecycleListener _appLifecycleListener;
   late ThemeMode _themeMode;
 
   /// 初始化根组件状态
@@ -58,15 +59,17 @@ class _MagrailAppState extends State<MagrailApp> {
       rootNavigatorKey: _rootNavigatorKey,
       onThemeModeChanged: _handleThemeModeChanged,
     );
+    _appLifecycleListener = AppLifecycleListener(onResume: _handleAppResumed);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       unawaited(_checkForStartupUpdate());
-      unawaited(_refreshCurrentUserAssetSourcesSilently());
+      unawaited(_refreshCurrentUserStateSilently(preloadAssets: true));
     });
   }
 
   /// 释放根组件状态
   @override
   void dispose() {
+    _appLifecycleListener.dispose();
     _router.dispose();
     widget.dependencies.userAssetSnapshotCoordinator.dispose();
     super.dispose();
@@ -134,11 +137,16 @@ class _MagrailAppState extends State<MagrailApp> {
     }
   }
 
-  /// 静默刷新当前用户的资产来源数据
-  Future<void> _refreshCurrentUserAssetSourcesSilently() async {
+  /// 静默恢复当前用户并上报活跃状态
+  ///
+  /// [preloadAssets] 是否同时预加载当前用户资产来源
+  Future<void> _refreshCurrentUserStateSilently({
+    required bool preloadAssets,
+  }) async {
     final userRepository = widget.dependencies.repositories.user;
     try {
       if (!await userRepository.hasCurrentUserSessionCookie()) {
+        await widget.dependencies.activityReporter.report();
         return;
       }
 
@@ -148,13 +156,26 @@ class _MagrailAppState extends State<MagrailApp> {
         return;
       }
 
+      await widget.dependencies.activityReporter.report(
+        userId: profile.userId,
+        username: profile.name,
+      );
+      if (!preloadAssets) {
+        return;
+      }
+
       await widget.dependencies.userAssetSnapshotCoordinator.preloadCurrentUser(
         username: profile.name,
         nickname: profile.nickname,
       );
     } catch (_) {
-      // 启动静默刷新失败不影响应用正常使用
+      // 当前用户恢复或活跃统计失败不影响应用正常使用
     }
+  }
+
+  /// 处理应用重新进入前台
+  void _handleAppResumed() {
+    unawaited(_refreshCurrentUserStateSilently(preloadAssets: false));
   }
 
   /// 解析当前系统栏亮暗模式
