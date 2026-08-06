@@ -8,11 +8,13 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
   /// [nickname] 用户昵称
   /// [onProgress] 拉取进度回调
   /// [totalItemsHint] 开始请求前最后一次确认的角色总数
+  /// [sessionGeneration] 任务开始时捕获的会话代际
   Future<bool> _refreshCharactersNow({
     required String username,
     required String nickname,
     required void Function(UserAssetSnapshotLoadProgress progress)? onProgress,
     required int? totalItemsHint,
+    required int? sessionGeneration,
   }) async {
     final result = await _fetchAllCharactersShared(
       username: username,
@@ -20,6 +22,9 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
       onProgress: onProgress ?? _ignoreSnapshotProgress,
       totalItemsHint: totalItemsHint,
     );
+    if (!_isSessionGenerationCurrent(sessionGeneration)) {
+      return false;
+    }
     final serialized = await compute(
       _serializeUserCharacterSnapshotRows,
       _CharacterRowsSerializeRequest(
@@ -34,6 +39,7 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
       totalItems: result.totalItems,
       updatedAtMilliseconds: DateTime.now().millisecondsSinceEpoch,
       contentHash: serialized.contentHash,
+      canWrite: () => _isSessionGenerationCurrent(sessionGeneration),
     );
   }
 
@@ -43,11 +49,13 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
   /// [nickname] 用户昵称
   /// [onProgress] 拉取进度回调
   /// [totalItemsHint] 开始请求前最后一次确认的圣殿总数
+  /// [sessionGeneration] 任务开始时捕获的会话代际
   Future<bool> _refreshTemplesNow({
     required String username,
     required String nickname,
     required void Function(UserAssetSnapshotLoadProgress progress)? onProgress,
     required int? totalItemsHint,
+    required int? sessionGeneration,
   }) async {
     final templeResult = await _fetchAllTemplesShared(
       username: username,
@@ -55,6 +63,9 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
       onProgress: onProgress ?? _ignoreSnapshotProgress,
       totalItemsHint: totalItemsHint,
     );
+    if (!_isSessionGenerationCurrent(sessionGeneration)) {
+      return false;
+    }
     final serialized = await compute(
       _serializeUserTempleSnapshotRows,
       _TempleRowsSerializeRequest(
@@ -68,6 +79,7 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
       templeTotalItems: templeResult.totalItems,
       templesUpdatedAtMilliseconds: DateTime.now().millisecondsSinceEpoch,
       templeContentHash: serialized.templeContentHash,
+      canWrite: () => _isSessionGenerationCurrent(sessionGeneration),
     );
   }
 

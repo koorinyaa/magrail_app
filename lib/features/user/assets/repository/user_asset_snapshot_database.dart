@@ -47,6 +47,7 @@ class UserAssetSnapshotDatabase {
   /// [totalItems] 角色接口总数
   /// [updatedAtMilliseconds] 用户角色更新时间戳
   /// [contentHash] 用户角色内容哈希
+  /// [canWrite] 写入事务开始时的会话校验
   /// 返回是否需要重新读取快照窗口
   Future<bool> upsertCharacterSnapshot({
     required String username,
@@ -55,9 +56,14 @@ class UserAssetSnapshotDatabase {
     required int totalItems,
     required int updatedAtMilliseconds,
     required String contentHash,
+    bool Function()? canWrite,
   }) async {
     final database = await _openDatabase();
     return database.transaction((transaction) async {
+      // 校验必须位于事务内，确保退出清理与旧任务写入保持确定顺序
+      if (canWrite != null && !canWrite()) {
+        return false;
+      }
       final current = await _readStoredSourceState(transaction, username);
       if (!_canApplySourceUpdate(
         incomingUpdatedAtMilliseconds: updatedAtMilliseconds,
@@ -109,6 +115,7 @@ class UserAssetSnapshotDatabase {
   /// [templeTotalItems] 圣殿接口总数
   /// [templesUpdatedAtMilliseconds] 用户圣殿更新时间戳
   /// [templeContentHash] 用户圣殿内容哈希
+  /// [canWrite] 写入事务开始时的会话校验
   /// 返回是否需要重新读取快照窗口
   Future<bool> upsertTempleSnapshot({
     required String username,
@@ -117,9 +124,14 @@ class UserAssetSnapshotDatabase {
     required int templeTotalItems,
     required int templesUpdatedAtMilliseconds,
     required String templeContentHash,
+    bool Function()? canWrite,
   }) async {
     final database = await _openDatabase();
     return database.transaction((transaction) async {
+      // 校验必须位于事务内，确保退出清理与旧任务写入保持确定顺序
+      if (canWrite != null && !canWrite()) {
+        return false;
+      }
       final current = await _readStoredSourceState(transaction, username);
       if (!_canApplySourceUpdate(
         incomingUpdatedAtMilliseconds: templesUpdatedAtMilliseconds,

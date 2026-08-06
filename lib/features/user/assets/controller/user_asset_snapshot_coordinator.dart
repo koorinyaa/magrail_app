@@ -64,6 +64,7 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
         _temporaryRepository = UserAssetSnapshotRepository(
           userRepository: userRepository,
           database: temporaryDatabase,
+          protectCurrentUserSession: false,
         ),
         _temporaryDatabase = temporaryDatabase;
 
@@ -100,6 +101,11 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
     if (resolvedUsername.isEmpty) {
       return;
     }
+    final sessionGeneration =
+        _persistentRepository.captureCurrentUserSessionGeneration();
+    if (sessionGeneration == null) {
+      return;
+    }
     final characterTotalItems = await _probeTotalSafely(
       () => _persistentRepository.probeCharacterTotalItems(resolvedUsername),
     );
@@ -114,6 +120,7 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
       templeTotalItems: templeTotalItems,
       priority: UserAssetSnapshotRefreshPriority.currentUser,
       force: true,
+      sessionGeneration: sessionGeneration,
     );
   }
 
@@ -139,6 +146,11 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
       _touchOtherUser(resolvedUsername);
     }
     final repository = repositoryFor(isCurrentUser: isCurrentUser);
+    final sessionGeneration =
+        isCurrentUser ? repository.captureCurrentUserSessionGeneration() : null;
+    if (isCurrentUser && sessionGeneration == null) {
+      return;
+    }
     final resolvedCharacterTotal = characterTotalItems ??
         await _probeTotalSafely(
           () => repository.probeCharacterTotalItems(resolvedUsername),
@@ -157,6 +169,7 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
           ? UserAssetSnapshotRefreshPriority.currentUser
           : UserAssetSnapshotRefreshPriority.userPage,
       force: isCurrentUser,
+      sessionGeneration: sessionGeneration,
     );
   }
 
@@ -181,6 +194,12 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
     if (!isCurrentUser) {
       _touchOtherUser(resolvedUsername);
     }
+    final repository = repositoryFor(isCurrentUser: isCurrentUser);
+    final sessionGeneration =
+        isCurrentUser ? repository.captureCurrentUserSessionGeneration() : null;
+    if (isCurrentUser && sessionGeneration == null) {
+      return false;
+    }
     if (await isFresh(
       username: resolvedUsername,
       isCurrentUser: isCurrentUser,
@@ -196,6 +215,7 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
       totalItemsHint: totalItemsHint,
       priority: UserAssetSnapshotRefreshPriority.secondaryPage,
       force: true,
+      sessionGeneration: sessionGeneration,
     );
   }
 
@@ -284,6 +304,7 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
   /// [templeTotalItems] 本次圣殿总数
   /// [priority] 全量刷新优先级
   /// [force] 是否忽略快照有效期
+  /// [sessionGeneration] 当前用户任务开始时捕获的会话代际
   Future<void> _refreshInTotalOrder({
     required String username,
     required String nickname,
@@ -292,6 +313,7 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
     required int? templeTotalItems,
     required UserAssetSnapshotRefreshPriority priority,
     required bool force,
+    required int? sessionGeneration,
   }) async {
     if (!isCurrentUser) {
       // 避免临时快照被提前淘汰
@@ -320,6 +342,7 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
               : templeTotalItems,
           priority: priority,
           force: force,
+          sessionGeneration: sessionGeneration,
         );
       }
     } finally {
@@ -338,6 +361,7 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
   /// [totalItemsHint] 本次已知的数据总数
   /// [priority] 全量刷新优先级
   /// [force] 是否忽略快照有效期
+  /// [sessionGeneration] 当前用户任务开始时捕获的会话代际
   Future<bool> _refreshKind({
     required String username,
     required String nickname,
@@ -346,6 +370,7 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
     required int? totalItemsHint,
     required UserAssetSnapshotRefreshPriority priority,
     required bool force,
+    required int? sessionGeneration,
   }) async {
     if (!force) {
       try {
@@ -361,7 +386,7 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
       }
     }
     final operationKey =
-        '${isCurrentUser ? 'persistent' : 'temporary'}|${_normalizeUsername(username)}|${kind.name}';
+        '${isCurrentUser ? 'persistent|$sessionGeneration' : 'temporary'}|${_normalizeUsername(username)}|${kind.name}';
     final repository = repositoryFor(isCurrentUser: isCurrentUser);
     final refreshOperation = switch (kind) {
       UserAssetSnapshotKind.characters => repository.refreshCharacters(
@@ -369,12 +394,14 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
           nickname: nickname,
           totalItemsHint: totalItemsHint,
           priority: priority,
+          expectedSessionGeneration: sessionGeneration,
         ),
       UserAssetSnapshotKind.temples => repository.refreshTemples(
           username: username,
           nickname: nickname,
           totalItemsHint: totalItemsHint,
           priority: priority,
+          expectedSessionGeneration: sessionGeneration,
         ),
     };
     final existing = _operations[operationKey];

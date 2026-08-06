@@ -44,11 +44,14 @@ class UserAssetSnapshotRepository {
   ///
   /// [userRepository] 用户仓库
   /// [database] 用户资产快照数据库
+  /// [protectCurrentUserSession] 是否阻止旧会话任务写入当前用户快照
   const UserAssetSnapshotRepository({
     required UserRepository userRepository,
     required UserAssetSnapshotDatabase database,
+    bool protectCurrentUserSession = true,
   })  : _userRepository = userRepository,
-        _database = database;
+        _database = database,
+        _protectCurrentUserSession = protectCurrentUserSession;
 
   // 全量资产快照先用 1 条探测总数，再用总数一次取完整列表
   static const int _totalProbePageSize = 1;
@@ -69,9 +72,20 @@ class UserAssetSnapshotRepository {
 
   final UserRepository _userRepository;
   final UserAssetSnapshotDatabase _database;
+  final bool _protectCurrentUserSession;
 
   /// 当前快照数据库的有效期
   Duration get cacheLifetime => _database.cacheLifetime;
+
+  /// 捕获当前用户快照任务使用的会话代际
+  ///
+  /// 临时快照仓库或无可用会话时返回空值
+  int? captureCurrentUserSessionGeneration() {
+    if (!_protectCurrentUserSession) {
+      return null;
+    }
+    return _userRepository.captureCurrentUserSessionGeneration();
+  }
 
   /// 刷新并缓存用户资产快照
   ///
@@ -181,6 +195,7 @@ class UserAssetSnapshotRepository {
   /// [onProgress] 拉取进度回调
   /// [totalItemsHint] 本次预览或探测得到的角色总数
   /// [priority] 全量刷新优先级
+  /// [expectedSessionGeneration] 上层任务开始时捕获的会话代际
   /// 返回是否需要重新读取快照窗口
   Future<bool> refreshCharacters({
     required String username,
@@ -189,22 +204,34 @@ class UserAssetSnapshotRepository {
     int? totalItemsHint,
     UserAssetSnapshotRefreshPriority priority =
         UserAssetSnapshotRefreshPriority.manual,
+    int? expectedSessionGeneration,
   }) {
     final resolvedUsername = username.trim();
     if (resolvedUsername.isEmpty) {
       throw StateError('缺少用户名');
     }
+    final sessionGeneration =
+        expectedSessionGeneration ?? captureCurrentUserSessionGeneration();
+    if (!_isSessionGenerationCurrent(sessionGeneration)) {
+      return Future.value(false);
+    }
     return _refreshScheduler.schedule(
       key:
-          '${_database.storageKey}|${resolvedUsername.toLowerCase()}|characters',
+          '${_database.storageKey}|${resolvedUsername.toLowerCase()}|characters|${sessionGeneration ?? 'temporary'}',
       priority: priority,
       totalItemsHint: totalItemsHint,
-      action: (latestTotalItemsHint) => _refreshCharactersNow(
-        username: resolvedUsername,
-        nickname: nickname,
-        onProgress: onProgress,
-        totalItemsHint: latestTotalItemsHint,
-      ),
+      action: (latestTotalItemsHint) {
+        if (!_isSessionGenerationCurrent(sessionGeneration)) {
+          return Future.value(false);
+        }
+        return _refreshCharactersNow(
+          username: resolvedUsername,
+          nickname: nickname,
+          onProgress: onProgress,
+          totalItemsHint: latestTotalItemsHint,
+          sessionGeneration: sessionGeneration,
+        );
+      },
     );
   }
 
@@ -215,6 +242,7 @@ class UserAssetSnapshotRepository {
   /// [onProgress] 拉取进度回调
   /// [totalItemsHint] 本次预览或探测得到的圣殿总数
   /// [priority] 全量刷新优先级
+  /// [expectedSessionGeneration] 上层任务开始时捕获的会话代际
   /// 返回是否需要重新读取快照窗口
   Future<bool> refreshTemples({
     required String username,
@@ -223,22 +251,46 @@ class UserAssetSnapshotRepository {
     int? totalItemsHint,
     UserAssetSnapshotRefreshPriority priority =
         UserAssetSnapshotRefreshPriority.manual,
+    int? expectedSessionGeneration,
   }) {
     final resolvedUsername = username.trim();
     if (resolvedUsername.isEmpty) {
       throw StateError('缺少用户名');
     }
+    final sessionGeneration =
+        expectedSessionGeneration ?? captureCurrentUserSessionGeneration();
+    if (!_isSessionGenerationCurrent(sessionGeneration)) {
+      return Future.value(false);
+    }
     return _refreshScheduler.schedule(
-      key: '${_database.storageKey}|${resolvedUsername.toLowerCase()}|temples',
+      key:
+          '${_database.storageKey}|${resolvedUsername.toLowerCase()}|temples|${sessionGeneration ?? 'temporary'}',
       priority: priority,
       totalItemsHint: totalItemsHint,
-      action: (latestTotalItemsHint) => _refreshTemplesNow(
-        username: resolvedUsername,
-        nickname: nickname,
-        onProgress: onProgress,
-        totalItemsHint: latestTotalItemsHint,
-      ),
+      action: (latestTotalItemsHint) {
+        if (!_isSessionGenerationCurrent(sessionGeneration)) {
+          return Future.value(false);
+        }
+        return _refreshTemplesNow(
+          username: resolvedUsername,
+          nickname: nickname,
+          onProgress: onProgress,
+          totalItemsHint: latestTotalItemsHint,
+          sessionGeneration: sessionGeneration,
+        );
+      },
     );
+  }
+
+  /// 判断快照任务是否仍属于可写入的会话
+  ///
+  /// [generation] 任务开始时捕获的会话代际
+  bool _isSessionGenerationCurrent(int? generation) {
+    if (!_protectCurrentUserSession) {
+      return true;
+    }
+    return generation != null &&
+        _userRepository.isCurrentUserSessionGenerationCurrent(generation);
   }
 
   /// 从本地快照分页读取有效的用户角色

@@ -68,6 +68,18 @@ class UserRepository with _UserRepositoryPageQueries {
     return _authRepository.hasTinygrailCookie();
   }
 
+  /// 捕获当前登录用户会话代际
+  int? captureCurrentUserSessionGeneration() {
+    return _authRepository.captureSessionGeneration();
+  }
+
+  /// 判断任务捕获的当前用户会话代际是否仍然有效
+  ///
+  /// [generation] 任务开始时捕获的会话代际
+  bool isCurrentUserSessionGenerationCurrent(int generation) {
+    return _authRepository.isSessionGenerationCurrent(generation);
+  }
+
   /// 读取当前登录用户资产缓存
   UserDetailProfile? readCachedCurrentUserAssets() {
     final rawCache = _preferences.currentUserAssetsCache;
