@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:magrail_app/core/feedback/app_toast.dart';
 import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
 import 'package:magrail_app/core/widgets/page_section_sliver.dart';
@@ -123,10 +124,15 @@ class _CharacterPageState extends State<CharacterPage> {
 
   /// 刷新角色一级页面
   Future<void> _refresh() async {
-    await Future.wait([
+    final results = await Future.wait([
       _icoController.refresh(),
       _allCharactersController.refresh(),
     ]);
+    if (!mounted || results.every((succeeded) => succeeded)) {
+      return;
+    }
+
+    AppToast.error(context, text: '数据刷新失败');
   }
 
   /// 构建 ICO 角色预览
