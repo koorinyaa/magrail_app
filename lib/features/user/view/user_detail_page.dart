@@ -255,7 +255,8 @@ class _UserDetailPageState extends State<UserDetailPage> {
                           profile: _controller.profile,
                           identityProgress: identityProgress,
                           showBackButton: _isSecondary,
-                          showSettingsButton: _controller.isCurrentUser,
+                          showSettingsButton:
+                              _controller.isCurrentUser && !_isSecondary,
                           hidePrivateAssetValues: _hidePrivateAssetValues,
                           onPrivateAssetValuesVisibilityPressed:
                               _togglePrivateAssetValuesVisibility,
@@ -331,10 +332,13 @@ class _UserDetailPageState extends State<UserDetailPage> {
           child: UserDetailErrorState(
             title: _controller.isAuthExpired ? '未授权' : '加载失败',
             icon: _controller.isAuthExpired
-                ? Icons.login_rounded
+                ? Icons.shield_outlined
                 : Icons.wifi_off_rounded,
             message: _controller.errorMessage ?? '用户资产加载失败',
             actionLabel: _controller.isAuthExpired ? '点击授权' : '重试',
+            actionIcon: _controller.isAuthExpired
+                ? Icons.open_in_new_rounded
+                : Icons.refresh_rounded,
             onActionPressed: _controller.isAuthExpired
                 ? _openAuthPage
                 : () {

@@ -216,6 +216,7 @@ class UserDetailErrorState extends StatelessWidget {
   /// [icon] 错误状态图标
   /// [message] 错误文案
   /// [actionLabel] 操作按钮文案
+  /// [actionIcon] 操作按钮图标
   /// [onActionPressed] 操作按钮点击回调
   const UserDetailErrorState({
     super.key,
@@ -223,6 +224,7 @@ class UserDetailErrorState extends StatelessWidget {
     this.icon = Icons.wifi_off_rounded,
     required this.message,
     this.actionLabel = '重试',
+    this.actionIcon = Icons.refresh_rounded,
     required this.onActionPressed,
   });
 
@@ -237,6 +239,9 @@ class UserDetailErrorState extends StatelessWidget {
 
   /// 操作按钮文案
   final String actionLabel;
+
+  /// 操作按钮图标
+  final IconData? actionIcon;
 
   /// 操作按钮点击回调
   final VoidCallback onActionPressed;
@@ -259,6 +264,7 @@ class UserDetailErrorState extends StatelessWidget {
         message: message,
         icon: icon,
         actionLabel: actionLabel,
+        actionIcon: actionIcon,
         onActionPressed: onActionPressed,
       ),
     );
