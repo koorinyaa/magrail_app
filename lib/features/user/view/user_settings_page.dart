@@ -475,37 +475,16 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
     unawaited(showAppLoadingDialog(context, message: '正在退出登录'));
 
     try {
-      // 退出登录先清理本地会话和缓存，避免继续展示旧登录用户
-      await widget.authRepository.clearSession();
-      await widget.userRepository.clearCurrentUserDataOnSignOut();
-    } catch (_) {
-      if (rootNavigator.mounted) {
-        rootNavigator.pop();
-      }
-      if (!mounted) {
-        return;
-      }
-
-      setState(() {
-        _isSigningOut = false;
-      });
-      AppToast.error(
-        context,
-        text: '退出登录失败，请稍后重试',
-      );
-      return;
-    }
-
-    try {
-      // 远端退出只做补充清理，失败不阻断本地退出流程
+      // 远端注销必须在本地 Cookie 清理前执行，确保请求携带当前会话
       await widget.authRepository.logoutRemote();
     } catch (_) {
-      // 远端退出失败时仍继续关闭当前登录态
+      // 远端注销失败时仍继续关闭当前登录态
     }
 
     try {
-      // 远端退出响应可能重新写入失效 Cookie，离开设置页前再次清理
+      // 无论远端注销结果如何都清理本地会话和用户缓存
       await widget.authRepository.clearSession();
+      await widget.userRepository.clearCurrentUserDataOnSignOut();
     } catch (_) {
       if (rootNavigator.mounted) {
         rootNavigator.pop();
