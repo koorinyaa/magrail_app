@@ -120,26 +120,27 @@ Future<ImageSaveResult> _saveImageFileToGallery(
     );
   }
 
-  final hasAccess = await Gal.hasAccess(toAlbum: true);
-  final granted = hasAccess || await Gal.requestAccess(toAlbum: true);
-  if (!granted) {
-    return const ImageSaveResult(
-      status: ImageSaveStatus.permissionDenied,
-      message: '未授予相册权限',
-    );
-  }
-
   File? tempFile;
   try {
+    final hasAccess = await Gal.hasAccess(toAlbum: true);
+    final granted = hasAccess || await Gal.requestAccess(toAlbum: true);
+    if (!granted) {
+      return const ImageSaveResult(
+        status: ImageSaveStatus.permissionDenied,
+        message: '未授予相册权限',
+      );
+    }
+
     tempFile = await tempFileLoader();
-    if (tempFile == null || !tempFile.existsSync()) {
+    final file = tempFile;
+    if (file == null || !await file.exists()) {
       return const ImageSaveResult(
         status: ImageSaveStatus.downloadFailed,
         message: '图片下载失败',
       );
     }
 
-    await Gal.putImage(tempFile.path, album: 'magrail');
+    await Gal.putImage(file.path, album: 'magrail');
     return const ImageSaveResult(
       status: ImageSaveStatus.success,
       message: '图片已保存',
@@ -150,8 +151,15 @@ Future<ImageSaveResult> _saveImageFileToGallery(
       message: '写入相册失败',
     );
   } finally {
-    if (tempFile != null && tempFile.existsSync()) {
-      await tempFile.delete();
+    final file = tempFile;
+    if (file != null) {
+      try {
+        if (await file.exists()) {
+          await file.delete();
+        }
+      } catch (_) {
+        // 临时文件清理失败不影响已经返回的相册保存结果
+      }
     }
   }
 }
@@ -164,9 +172,15 @@ Future<File?> _downloadImageToTempFile(String imageUrl) async {
     final temporaryDirectory = await getTemporaryDirectory();
     final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
     final file = File('${temporaryDirectory.path}/$fileName');
+    // 图片保存是用户主动操作，连接和发送最多等待十五秒，响应最多等待三十秒
     final response = await Dio().get<List<int>>(
       imageUrl,
-      options: Options(responseType: ResponseType.bytes),
+      options: Options(
+        connectTimeout: const Duration(seconds: 15),
+        sendTimeout: const Duration(seconds: 15),
+        receiveTimeout: const Duration(seconds: 30),
+        responseType: ResponseType.bytes,
+      ),
     );
     final bytes = response.data;
     if (bytes == null || bytes.isEmpty) {
