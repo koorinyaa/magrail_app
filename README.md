@@ -6,7 +6,7 @@
 
 <p align="center">
   <img alt="Flutter" src="https://img.shields.io/badge/Flutter-Android%20%7C%20iOS-02569B?logo=flutter&logoColor=white">
-  <img alt="Dart" src="https://img.shields.io/badge/Dart-3.5%2B-0175C2?logo=dart&logoColor=white">
+  <img alt="Dart" src="https://img.shields.io/badge/Dart-3.12%2B-0175C2?logo=dart&logoColor=white">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-green">
 </p>
 
@@ -38,8 +38,8 @@ MaGrail 是为小圣杯打造的移动端 APP，覆盖小圣杯原有全部功�
 
 ## 开发与构建环境
 
-- Flutter SDK
-- Dart SDK `>=3.5.0 <4.0.0`
+- Flutter SDK `>=3.44.0`
+- Dart SDK `>=3.12.0 <4.0.0`
 - Android SDK
 - JDK 17
 - Xcode 15 或更新版本，仅 iOS 构建需要
