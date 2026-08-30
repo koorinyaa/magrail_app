@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
@@ -441,7 +442,7 @@ class _UserAssetAnalysisLoadingSliver extends StatelessWidget {
                       color: _activeColor,
                     ),
                     Center(
-                      child: Image.asset(
+                      child: SvgPicture.asset(
                         _appIconAsset,
                         width: 38,
                         height: 38,
@@ -546,7 +547,7 @@ class _UserAssetAnalysisFailureSliver extends StatelessWidget {
   }
 }
 
-const _appIconAsset = 'assets/icons/app_icon_cropped.png';
+const _appIconAsset = 'assets/icons/app_icon.svg';
 const _activeColor = Color(0xFF20B8D8);
 const _templeColor = Color(0xFFD9A441);
 const _lightPageTop = Color(0xFFEAF7F4);

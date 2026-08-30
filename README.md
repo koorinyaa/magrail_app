@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/koorinyaa/magrail_app/main/assets/icons/app_icon_foreground.png" width="128" alt="MaGrail">
+  <img src="https://raw.githubusercontent.com/koorinyaa/magrail_app/main/assets/icons/app_icon.svg" width="128" alt="MaGrail">
 </p>
 
 <h1 align="center">MaGrail</h1>

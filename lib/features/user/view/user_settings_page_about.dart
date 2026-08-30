@@ -78,10 +78,14 @@ class _AboutPageState extends State<_AboutPage> {
                         turns: _appIconTurns,
                         duration: const Duration(milliseconds: 520),
                         curve: Curves.easeInOutCubic,
-                        child: Image.asset(
-                          _appIconAsset,
-                          width: 112,
-                          height: 112,
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: SvgPicture.asset(
+                            _appIconAsset,
+                            width: 64,
+                            height: 64,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                     ),

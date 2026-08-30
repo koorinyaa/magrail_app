@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:magrail_app/core/utils/formatters.dart';
 import 'package:magrail_app/features/user/analysis/model/user_asset_analysis.dart';
@@ -118,7 +119,7 @@ class UserAssetAnalysisCoreHeader extends StatelessWidget {
               child: IgnorePointer(
                 child: Opacity(
                   opacity: isDark ? 0.10 : 0.12,
-                  child: Image.asset(
+                  child: SvgPicture.asset(
                     _appIconAsset,
                     width: isTablet ? 142 : 112,
                     height: isTablet ? 142 : 112,
@@ -531,4 +532,4 @@ class _AnalysisStatusIndicator extends StatelessWidget {
   }
 }
 
-const _appIconAsset = 'assets/icons/app_icon_cropped.png';
+const _appIconAsset = 'assets/icons/app_icon.svg';
