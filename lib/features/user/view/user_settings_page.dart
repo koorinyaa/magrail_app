@@ -21,6 +21,7 @@ import 'package:url_launcher/url_launcher.dart';
 part 'user_settings_page_about.dart';
 part 'user_settings_page_components.dart';
 part 'user_settings_page_donate.dart';
+part 'user_settings_page_mirror.dart';
 part 'user_settings_page_theme.dart';
 
 const _appName = 'MaGrail';
@@ -98,6 +99,7 @@ class UserSettingsPage extends StatefulWidget {
 /// 用户设置二级页面状态
 class _UserSettingsPageState extends State<UserSettingsPage> {
   bool _isSigningOut = false;
+  bool _isUpdatingBangumiMirror = false;
   late bool _useBangumiMirror;
   late String _bangumiMirrorHost;
   late bool _hiddenFeaturesEnabled;
@@ -177,10 +179,30 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                     ),
                     const SizedBox(height: 16),
                     _SettingsSurface(
-                      child: _BangumiMirrorSwitchTile(
-                        value: _useBangumiMirror,
-                        mirrorHost: _bangumiMirrorHost,
-                        onChanged: _handleBangumiMirrorChanged,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _BangumiMirrorSwitchTile(
+                            value: _useBangumiMirror,
+                            mirrorHost: _bangumiMirrorHost,
+                            onChanged: _handleBangumiMirrorChanged,
+                          ),
+                          Divider(
+                            height: 1,
+                            thickness: 0.5,
+                            indent: 50,
+                            endIndent: 16,
+                            color: colorScheme.outlineVariant.withValues(
+                              alpha: 0.72,
+                            ),
+                          ),
+                          _SettingsValueActionTile(
+                            icon: Icons.dns_rounded,
+                            label: '自定义镜像',
+                            value: _bangumiMirrorHost,
+                            onPressed: _openBangumiMirrorEditor,
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -328,13 +350,54 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
     });
   }
 
+  /// 保存自定义镜像域名并同步后续请求
+  ///
+  /// [input] 用户输入的镜像域名或 HTTP(S) 地址
+  Future<bool> _saveBangumiMirrorHost(String input) async {
+    final trimmedInput = input.trim();
+    final normalizedHost = BangumiMirrorConfig.normalizeHost(trimmedInput);
+    if (trimmedInput.isNotEmpty && normalizedHost == null) {
+      AppToast.error(context, text: '请输入有效的镜像地址');
+      return false;
+    }
+
+    final resolvedHost = normalizedHost ?? BangumiMirrorConfig.defaultHost;
+    try {
+      if (resolvedHost == BangumiMirrorConfig.defaultHost) {
+        await widget.preferences.clearBangumiMirrorHost();
+      } else {
+        await widget.preferences.setBangumiMirrorHost(resolvedHost);
+      }
+      TinygrailAssetUrls.configureBangumiMirror(
+        useMirror: _useBangumiMirror,
+        mirrorHost: resolvedHost,
+      );
+      if (mounted) {
+        setState(() {
+          _bangumiMirrorHost = resolvedHost;
+        });
+      }
+      return true;
+    } catch (_) {
+      if (mounted) {
+        AppToast.error(context, text: '保存设置失败，请稍后重试');
+      }
+      return false;
+    }
+  }
+
   /// 处理 Bangumi 镜像开关变化
   ///
   /// [value] 是否使用 Bangumi 镜像
   Future<void> _handleBangumiMirrorChanged(bool value) async {
+    if (_isUpdatingBangumiMirror) {
+      return;
+    }
+
     final previousValue = _useBangumiMirror;
     setState(() {
       _useBangumiMirror = value;
+      _isUpdatingBangumiMirror = true;
     });
     TinygrailAssetUrls.configureBangumiMirror(
       useMirror: value,
@@ -354,6 +417,10 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
             : '已关闭 $_bangumiMirrorHost 镜像',
       );
     } catch (_) {
+      TinygrailAssetUrls.configureBangumiMirror(
+        useMirror: previousValue,
+        mirrorHost: _bangumiMirrorHost,
+      );
       if (!mounted) {
         return;
       }
@@ -361,11 +428,13 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
       setState(() {
         _useBangumiMirror = previousValue;
       });
-      TinygrailAssetUrls.configureBangumiMirror(
-        useMirror: previousValue,
-        mirrorHost: _bangumiMirrorHost,
-      );
       AppToast.error(context, text: '保存设置失败，请稍后重试');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isUpdatingBangumiMirror = false;
+        });
+      }
     }
   }
 

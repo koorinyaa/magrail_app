@@ -4,7 +4,14 @@ class BangumiMirrorConfig {
   const BangumiMirrorConfig._();
 
   /// 默认 Bangumi 镜像域名
-  static const String defaultHost = 'bangumi.lol';
+  static const String defaultHost = 'bangumi.pro';
+
+  // 仅接受含顶级域名且每段长度符合 DNS 限制的主机名
+  static final RegExp _hostPattern = RegExp(
+    r'^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+'
+    r'[a-z](?:[a-z0-9-]{0,61}[a-z0-9])?$',
+    caseSensitive: false,
+  );
 
   /// 解析可用的 Bangumi 镜像域名
   ///
@@ -27,18 +34,25 @@ class BangumiMirrorConfig {
       return null;
     }
 
-    final uriText = value.startsWith('//') ? 'https:$value' : value;
+    final uriText = value.startsWith('//')
+        ? 'https:$value'
+        : value.contains('://')
+        ? value
+        : 'https://$value';
     final uri = Uri.tryParse(uriText);
-    if (uri != null && uri.host.trim().isNotEmpty) {
-      return uri.host.trim().toLowerCase();
-    }
-
-    final withoutScheme = uriText.replaceFirst(RegExp(r'^https?://'), '');
-    final resolvedHost = withoutScheme.split('/').first.trim();
-    if (resolvedHost.isEmpty) {
+    if (uri == null ||
+        (uri.scheme != 'http' && uri.scheme != 'https') ||
+        uri.host.isEmpty ||
+        uri.userInfo.isNotEmpty ||
+        uri.hasPort) {
       return null;
     }
 
-    return resolvedHost.toLowerCase();
+    final normalizedHost = uri.host.trim().toLowerCase();
+    if (!_hostPattern.hasMatch(normalizedHost)) {
+      return null;
+    }
+
+    return normalizedHost;
   }
 }
