@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/koorinyaa/magrail_app/main/assets/icons/app_icon.svg" width="72" alt="MaGrail">
+  <img src="https://raw.githubusercontent.com/koorinyaa/magrail_app/main/assets/icons/app_icon.svg" width="72" alt="Magrail">
 </p>
 
-<h1 align="center">MaGrail</h1>
+<h1 align="center">Magrail</h1>
 
 <p align="center">
   <img alt="Flutter" src="https://img.shields.io/badge/Flutter-Android%20%7C%20iOS-02569B?logo=flutter&logoColor=white">
@@ -10,7 +10,7 @@
   <img alt="License" src="https://img.shields.io/badge/license-MIT-green">
 </p>
 
-MaGrail 是为小圣杯打造的移动端 APP，覆盖小圣杯原有全部功能，并针对移动端使用体验进行了重新设计。
+Magrail 是为小圣杯打造的移动端 APP，覆盖小圣杯原有全部功能，并针对移动端使用体验进行了重新设计。
 
 ## 下载与安装
 
@@ -87,7 +87,7 @@ flutter build apk --release --no-pub
 在 GitHub Actions 页面手动运行 `iOS Sideload IPA` 后，构建产物会上传为：
 
 ```text
-MaGrail_<版本号>.ipa
+Magrail_<版本号>.ipa
 ```
 
 该 IPA 不包含 App Store 分发签名，安装时需要使用侧载工具重新签名。

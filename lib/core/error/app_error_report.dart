@@ -79,7 +79,7 @@ class AppErrorReport {
     }
 
     return [
-      'MaGrail 错误反馈',
+      'Magrail 错误反馈',
       '时间: ${time.toIso8601String()}',
       '版本: $version',
       '模式: ${kReleaseMode ? 'release' : 'debug'}',

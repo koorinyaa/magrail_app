@@ -97,11 +97,12 @@ gradle.projectsEvaluated {
                 project.findProperty("split-per-abi")?.toString()?.toBoolean() == true
             val splitApkPattern =
                 Regex("""app-(armeabi-v7a|arm64-v8a|x86_64)-release\.apk""")
+            val brandedApkPattern = Regex("""magrail_.*\.apk""", RegexOption.IGNORE_CASE)
 
             // Flutter 需要保留默认产物名用于构建结果校验，另行生成发布用文件
             outputDirectory
                 .listFiles { file ->
-                    file.isFile && file.name.startsWith("MaGrail_") && file.extension == "apk"
+                    file.isFile && brandedApkPattern.matches(file.name)
                 }.orEmpty()
                 .forEach { it.delete() }
 
@@ -111,7 +112,7 @@ gradle.projectsEvaluated {
                     if (splitMatch != null) {
                         sourceFile.copyTo(
                             outputDirectory.resolve(
-                                "MaGrail_${releaseVersion}_${splitMatch.groupValues[1]}.apk",
+                                "Magrail_${releaseVersion}_${splitMatch.groupValues[1]}.apk",
                             ),
                             overwrite = true,
                         )
@@ -121,7 +122,7 @@ gradle.projectsEvaluated {
                 val universalApk = outputDirectory.resolve("app-release.apk")
                 if (universalApk.exists()) {
                     universalApk.copyTo(
-                        outputDirectory.resolve("MaGrail_${releaseVersion}_universal.apk"),
+                        outputDirectory.resolve("Magrail_${releaseVersion}_universal.apk"),
                         overwrite = true,
                     )
                 }

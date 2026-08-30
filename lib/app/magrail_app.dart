@@ -81,7 +81,7 @@ class _MagrailAppState extends State<MagrailApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'MaGrail',
+      title: 'Magrail',
       debugShowCheckedModeBanner: false,
       theme: AppMaterialTheme.light(),
       darkTheme: AppMaterialTheme.dark(),

@@ -179,7 +179,7 @@ class _SharePosterFooter extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  'MaGrail',
+                  'Magrail',
                   style: TextStyle(
                     color: colorScheme.onSurface,
                     fontSize: 13,

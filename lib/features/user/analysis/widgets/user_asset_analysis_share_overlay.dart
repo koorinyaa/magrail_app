@@ -430,7 +430,7 @@ class _UserAssetAnalysisShareOverlayState
       await temporaryFile.writeAsBytes(bytes, flush: true);
       await SharePlus.instance.share(
         ShareParams(
-          title: 'MaGrail 资产分析',
+          title: 'Magrail 资产分析',
           files: [XFile(temporaryFile.path, mimeType: 'image/png')],
           sharePositionOrigin: sharePositionOrigin,
         ),

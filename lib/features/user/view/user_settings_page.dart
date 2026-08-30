@@ -24,7 +24,7 @@ part 'user_settings_page_donate.dart';
 part 'user_settings_page_mirror.dart';
 part 'user_settings_page_theme.dart';
 
-const _appName = 'MaGrail';
+const _appName = 'Magrail';
 const _appIconAsset = 'assets/icons/app_icon.svg';
 const _githubIconAsset = 'assets/icons/github.svg';
 const _donateAlipayAsset = 'assets/images/donate/alipay.jpg';

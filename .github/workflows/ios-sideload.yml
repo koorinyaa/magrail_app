@@ -36,9 +36,9 @@ jobs:
       - name: Package unsigned IPA
         run: |
           APP_VERSION="$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml)"
-          IPA_NAME="MaGrail_${APP_VERSION}.ipa"
+          IPA_NAME="Magrail_${APP_VERSION}.ipa"
           rm -rf Payload
-          rm -f MaGrail_*.ipa
+          rm -f Magrail_*.ipa
           test -d build/ios/iphoneos/Runner.app
           mkdir Payload
           cp -R build/ios/iphoneos/Runner.app Payload/
