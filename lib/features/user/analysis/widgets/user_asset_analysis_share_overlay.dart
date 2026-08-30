@@ -322,7 +322,10 @@ class _UserAssetAnalysisShareOverlayState
 
   /// 预加载分享长图使用的图片
   Future<void> _precachePosterImages() async {
-    await _precacheImageSafely(const AssetImage(_appIconAsset));
+    await precacheImage(
+      const AssetImage(_appIconAsset),
+      context,
+    ).timeout(_imagePrecacheTimeout);
     final bubbles = selectUserAssetAnalysisCharacterBubbles(
       analysis: widget.analysis,
       mode: widget.assetMode,
@@ -345,7 +348,7 @@ class _UserAssetAnalysisShareOverlayState
       final end = (index + _precacheBatchSize).clamp(0, providers.length);
       try {
         await Future.wait(
-          providers.sublist(index, end).map(_precacheImageSafely),
+          providers.sublist(index, end).map(_precacheAvatarSafely),
         ).timeout(remaining);
       } on TimeoutException {
         return;
@@ -353,14 +356,20 @@ class _UserAssetAnalysisShareOverlayState
     }
   }
 
-  /// 安全预加载单张分享图片
+  /// 安全预加载单张分享头像
   ///
-  /// [provider] 图片提供器
-  Future<void> _precacheImageSafely(ImageProvider provider) async {
+  /// [provider] 头像图片提供器
+  Future<void> _precacheAvatarSafely(ImageProvider provider) async {
     try {
-      await precacheImage(provider, context).timeout(_imagePrecacheTimeout);
+      await precacheImage(
+        provider,
+        context,
+        onError: (_, _) {
+          // 网络头像加载失败由分享海报中的角色头像占位图接管
+        },
+      ).timeout(_imagePrecacheTimeout);
     } catch (_) {
-      // 图片加载失败时由现有角色头像占位图接管
+      // 头像预加载超时或同步异常时继续生成可用分享图
     }
   }
 
