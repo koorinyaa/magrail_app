@@ -44,7 +44,8 @@ Future<void> showAuctionHistorySheet(
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
       // 列表型抽屉保留更明显的顶部拖拽空间，避免内容加载后贴到屏幕顶部
-      final heightCap = mediaQuery.size.height *
+      final heightCap =
+          mediaQuery.size.height *
           (mediaQuery.orientation == Orientation.landscape ? 0.9 : 0.86);
       final maxHeight = availableHeight.clamp(0.0, heightCap).toDouble();
 
@@ -141,9 +142,7 @@ class _AuctionHistorySheetState extends State<AuctionHistorySheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: mediaQuery.viewInsets.bottom),
       child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(28),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: backgroundColor,

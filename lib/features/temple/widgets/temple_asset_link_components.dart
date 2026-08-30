@@ -100,10 +100,7 @@ class TempleAssetLinkPreview extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final linkItem = UserLinkApiItem(
-      temple: _sourceTemple,
-      link: target,
-    );
+    final linkItem = UserLinkApiItem(temple: _sourceTemple, link: target);
     final left = linkItem.left;
     final right = linkItem.right;
 
@@ -118,16 +115,12 @@ class TempleAssetLinkPreview extends StatelessWidget {
             child: TempleLinkCard(
               width: width,
               leftCoverUrl: TinygrailAssetUrls.getSmallCover(left.cover),
-              leftAvatarUrl: TinygrailAssetUrls.normalizeAvatar(
-                left.avatar,
-              ),
+              leftAvatarUrl: TinygrailAssetUrls.normalizeAvatar(left.avatar),
               leftCharacterName: TinygrailFormatters.decodeHtmlEntities(
                 left.name,
               ),
               rightCoverUrl: TinygrailAssetUrls.getSmallCover(right.cover),
-              rightAvatarUrl: TinygrailAssetUrls.normalizeAvatar(
-                right.avatar,
-              ),
+              rightAvatarUrl: TinygrailAssetUrls.normalizeAvatar(right.avatar),
               rightCharacterName: TinygrailFormatters.decodeHtmlEntities(
                 right.name,
               ),

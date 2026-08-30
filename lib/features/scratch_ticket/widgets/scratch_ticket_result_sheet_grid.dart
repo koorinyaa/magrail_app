@@ -1,4 +1,4 @@
-﻿part of 'scratch_ticket_result_sheet.dart';
+part of 'scratch_ticket_result_sheet.dart';
 
 /// 刮刮乐获得角色卡片网格
 class _ResultGrid extends StatelessWidget {
@@ -35,8 +35,10 @@ class _ResultGrid extends StatelessWidget {
       builder: (context, constraints) {
         const spacing = 12.0;
         const minCardWidth = 142.0;
-        final columnCount =
-            (constraints.maxWidth / minCardWidth).floor().clamp(1, 4).toInt();
+        final columnCount = (constraints.maxWidth / minCardWidth)
+            .floor()
+            .clamp(1, 4)
+            .toInt();
         final cardWidth =
             (constraints.maxWidth - spacing * (columnCount - 1)) / columnCount;
 

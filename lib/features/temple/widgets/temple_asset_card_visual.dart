@@ -113,10 +113,10 @@ class _TempleAssetThumbnail extends StatelessWidget {
                 heroTag: heroTag,
                 onTap: enableCoverPreview && imageUrl.isNotEmpty
                     ? () => _openImageViewer(
-                          context,
-                          imageUrl: imageUrl,
-                          heroTag: heroTag,
-                        )
+                        context,
+                        imageUrl: imageUrl,
+                        heroTag: heroTag,
+                      )
                     : null,
               ),
             ),
@@ -135,10 +135,10 @@ class _TempleAssetThumbnail extends StatelessWidget {
         heroTag: heroTag,
         onTap: enableCoverPreview && imageUrl.isNotEmpty
             ? () => _openImageViewer(
-                  context,
-                  imageUrl: imageUrl,
-                  heroTag: heroTag,
-                )
+                context,
+                imageUrl: imageUrl,
+                heroTag: heroTag,
+              )
             : null,
       ),
     );
@@ -253,13 +253,7 @@ class _TempleAssetCoverCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            if (tag == null)
-              coverImage
-            else
-              Hero(
-                tag: tag,
-                child: coverImage,
-              ),
+            if (tag == null) coverImage else Hero(tag: tag, child: coverImage),
             if (badgeData != null)
               Positioned(
                 left: 8,
@@ -295,9 +289,7 @@ class _TempleAssetLineButton extends StatelessWidget {
   /// 创建圣殿资产台词按钮
   ///
   /// [line] 角色台词
-  const _TempleAssetLineButton({
-    required this.line,
-  });
+  const _TempleAssetLineButton({required this.line});
 
   /// 角色台词
   final String line;
@@ -309,8 +301,9 @@ class _TempleAssetLineButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
-    final tooltipSurfaceAlpha =
-        isDark ? AppBlurStyle.lightSurfaceAlpha : AppBlurStyle.darkSurfaceAlpha;
+    final tooltipSurfaceAlpha = isDark
+        ? AppBlurStyle.lightSurfaceAlpha
+        : AppBlurStyle.darkSurfaceAlpha;
 
     return Tooltip(
       message: line,
@@ -361,9 +354,7 @@ class _TempleAssetLevelBadge extends StatelessWidget {
   /// 创建圣殿资产等级徽标
   ///
   /// [data] 圣殿资产卡片展示数据
-  const _TempleAssetLevelBadge({
-    required this.data,
-  });
+  const _TempleAssetLevelBadge({required this.data});
 
   /// 圣殿资产卡片展示数据
   final TempleAssetCardData data;

@@ -1,6 +1,9 @@
 part of '../temple_asset_magic_action_sheet.dart';
 
+/// 圣殿资产魔法道具状态查询
 extension _TempleAssetMagicStateQueries on _TempleAssetMagicActionSheetState {
+  /// 计算星光碎片消耗倍率
+  ///
   /// [item] 消耗活股角色
   int _stardustRateValue(CharacterDetailSearchItem item) {
     if (item.level + 1 >= _data.characterLevel) {
@@ -14,7 +17,6 @@ extension _TempleAssetMagicStateQueries on _TempleAssetMagicActionSheetState {
   /// 使用指定圣殿数据计算闪光结晶攻击倍率
   ///
   /// [data] 圣殿资产卡片展示数据
-
   /// [item] 攻击目标角色
   String _starbreakRateForData(
     TempleAssetCardData data,
@@ -28,8 +30,8 @@ extension _TempleAssetMagicStateQueries on _TempleAssetMagicActionSheetState {
       return '1';
     }
 
-    final ratio =
-        (15 * math.log(item.level / data.characterLevel) / math.ln10).abs();
+    final ratio = (15 * math.log(item.level / data.characterLevel) / math.ln10)
+        .abs();
     if (ratio <= 0) {
       return '0';
     }
@@ -63,8 +65,7 @@ extension _TempleAssetMagicStateQueries on _TempleAssetMagicActionSheetState {
       TempleAssetMagicAction.stardust => '请选择星光碎片消耗的角色',
       TempleAssetMagicAction.starbreak => '请选择闪光结晶攻击的角色',
       TempleAssetMagicAction.chaosCube ||
-      TempleAssetMagicAction.starForces =>
-        '',
+      TempleAssetMagicAction.starForces => '',
     };
   }
 
@@ -99,11 +100,9 @@ extension _TempleAssetMagicStateQueries on _TempleAssetMagicActionSheetState {
       TempleAssetMagicAction.guidepost ||
       TempleAssetMagicAction.fisheye ||
       TempleAssetMagicAction.stardust ||
-      TempleAssetMagicAction.starbreak =>
-        true,
+      TempleAssetMagicAction.starbreak => true,
       TempleAssetMagicAction.chaosCube ||
-      TempleAssetMagicAction.starForces =>
-        false,
+      TempleAssetMagicAction.starForces => false,
     };
   }
 
@@ -111,13 +110,11 @@ extension _TempleAssetMagicStateQueries on _TempleAssetMagicActionSheetState {
   bool get _requiresAmount {
     return switch (widget.action) {
       TempleAssetMagicAction.stardust ||
-      TempleAssetMagicAction.starForces =>
-        !_isFillStar,
+      TempleAssetMagicAction.starForces => !_isFillStar,
       TempleAssetMagicAction.guidepost ||
       TempleAssetMagicAction.fisheye ||
       TempleAssetMagicAction.starbreak ||
-      TempleAssetMagicAction.chaosCube =>
-        false,
+      TempleAssetMagicAction.chaosCube => false,
     };
   }
 

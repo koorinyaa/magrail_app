@@ -18,10 +18,7 @@ var _showingFatalErrorView = false;
 
 /// 应用入口
 Future<void> main() async {
-  await runZonedGuarded<Future<void>>(
-    _startApp,
-    _handleZoneError,
-  );
+  await runZonedGuarded<Future<void>>(_startApp, _handleZoneError);
 }
 
 /// 启动应用
@@ -64,9 +61,7 @@ void _configureErrorHandling() {
 
   ErrorWidget.builder = (details) {
     if (!kReleaseMode) {
-      return ErrorWidget.withDetails(
-        message: details.exceptionAsString(),
-      );
+      return ErrorWidget.withDetails(message: details.exceptionAsString());
     }
 
     return AppFatalErrorView(

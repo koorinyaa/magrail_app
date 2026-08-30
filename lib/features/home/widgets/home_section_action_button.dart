@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class HomeSectionActionButton extends StatelessWidget {
   /// 创建首页区块操作按钮
   ///
+  /// [key] Flutter 组件标识
   /// [icon] 按钮图标
   /// [label] 按钮文案
   /// [onPressed] 点击回调

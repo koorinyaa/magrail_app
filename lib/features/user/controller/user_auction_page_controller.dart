@@ -4,8 +4,9 @@ import 'package:magrail_app/features/user/model/user_auction_api_item.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
 
 /// 用户拍卖二级页面控制器
-class UserAuctionPageController extends TinygrailPagedListController<
-    UserAuctionApiItem, UserAuctionApiItem> {
+class UserAuctionPageController
+    extends
+        TinygrailPagedListController<UserAuctionApiItem, UserAuctionApiItem> {
   /// 创建用户拍卖二级页面控制器
   ///
   /// [repository] 用户仓库
@@ -29,19 +30,14 @@ class UserAuctionPageController extends TinygrailPagedListController<
     required int page,
     required int pageSize,
   }) {
-    return _repository.fetchUserAuctionPage(
-      page: page,
-      pageSize: pageSize,
-    );
+    return _repository.fetchUserAuctionPage(page: page, pageSize: pageSize);
   }
 
   /// 转换用户拍卖展示条目
   ///
   /// [items] 接口返回拍卖条目
   @override
-  List<UserAuctionApiItem> convertPageItems(
-    List<UserAuctionApiItem> items,
-  ) {
+  List<UserAuctionApiItem> convertPageItems(List<UserAuctionApiItem> items) {
     return items;
   }
 }

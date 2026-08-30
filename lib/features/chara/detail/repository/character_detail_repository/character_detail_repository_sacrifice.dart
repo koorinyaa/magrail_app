@@ -1,5 +1,6 @@
 part of '../character_detail_repository.dart';
 
+/// 角色详情资产重组操作
 extension CharacterDetailRepositorySacrificeActions
     on CharacterDetailRepository {
   /// 提交角色资产重组或股权融资
@@ -28,9 +29,7 @@ extension CharacterDetailRepositorySacrificeActions
     );
 
     if (!response.isSuccess) {
-      throw StateError(
-        response.message ?? (isFinancing ? '股权融资失败' : '资产重组失败'),
-      );
+      throw StateError(response.message ?? (isFinancing ? '股权融资失败' : '资产重组失败'));
     }
 
     return response.value ?? const CharacterDetailSacrificeResult.empty();

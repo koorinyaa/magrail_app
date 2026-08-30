@@ -59,9 +59,10 @@ Future<void> showTempleLinkDialog(
         opacity: curvedAnimation,
         child: ScaleTransition(
           scale: animation.drive(
-            Tween<double>(begin: 0.98, end: 1).chain(
-              CurveTween(curve: Curves.easeOutCubic),
-            ),
+            Tween<double>(
+              begin: 0.98,
+              end: 1,
+            ).chain(CurveTween(curve: Curves.easeOutCubic)),
           ),
           child: child,
         ),

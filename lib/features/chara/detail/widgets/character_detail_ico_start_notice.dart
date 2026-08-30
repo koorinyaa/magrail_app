@@ -5,9 +5,7 @@ class _IcoStartWarning extends StatelessWidget {
   /// 创建 ICO 启动警告
   ///
   /// [text] 警告文案
-  const _IcoStartWarning({
-    required this.text,
-  });
+  const _IcoStartWarning({required this.text});
 
   /// 警告文案
   final String text;
@@ -32,9 +30,7 @@ class _IcoStartStatus extends StatelessWidget {
   /// 创建 ICO 启动状态
   ///
   /// [text] 状态文案
-  const _IcoStartStatus({
-    required this.text,
-  });
+  const _IcoStartStatus({required this.text});
 
   /// 状态文案
   final String text;

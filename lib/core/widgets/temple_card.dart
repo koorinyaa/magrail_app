@@ -7,6 +7,7 @@ import 'package:magrail_app/core/widgets/temple_cover_image.dart';
 class TempleCard extends StatelessWidget {
   /// 创建圣殿卡片
   ///
+  /// [key] Flutter 组件标识
   /// [width] 卡片宽度
   /// [borderRadius] 卡片圆角
   /// [coverUrl] 圣殿封面地址
@@ -193,10 +194,7 @@ class TempleCard extends StatelessWidget {
           width: 0.75,
         ),
       ),
-      child: TempleCoverImage(
-        coverUrl: coverUrl,
-        avatarUrl: avatarUrl,
-      ),
+      child: TempleCoverImage(coverUrl: coverUrl, avatarUrl: avatarUrl),
     );
 
     final tag = heroTag;
@@ -249,8 +247,10 @@ class TempleCard extends StatelessWidget {
                 splashColor: Colors.white.withValues(alpha: 0.10),
                 highlightColor: Colors.white.withValues(alpha: 0.05),
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 2, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 2,
+                    vertical: 3,
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -341,10 +341,7 @@ class _TempleCardEntryButton extends StatelessWidget {
   ///
   /// [icon] 入口图标
   /// [onPressed] 点击回调
-  const _TempleCardEntryButton({
-    required this.icon,
-    required this.onPressed,
-  });
+  const _TempleCardEntryButton({required this.icon, required this.onPressed});
 
   /// 入口图标
   final IconData icon;
@@ -367,11 +364,7 @@ class _TempleCardEntryButton extends StatelessWidget {
         highlightColor: Colors.white.withValues(alpha: 0.06),
         child: SizedBox.square(
           dimension: 28,
-          child: Icon(
-            icon,
-            size: 14,
-            color: Colors.white,
-          ),
+          child: Icon(icon, size: 14, color: Colors.white),
         ),
       ),
     );
@@ -384,10 +377,7 @@ class _TempleCardLevelBadge extends StatelessWidget {
   ///
   /// [levelText] 等级文本
   /// [color] 徽标颜色
-  const _TempleCardLevelBadge({
-    required this.levelText,
-    required this.color,
-  });
+  const _TempleCardLevelBadge({required this.levelText, required this.color});
 
   /// 等级文本
   final String levelText;
@@ -434,9 +424,7 @@ class _TempleCardStarBadge extends StatelessWidget {
   /// 创建圣殿卡片星之力徽标
   ///
   /// [highlighted] 是否高亮
-  const _TempleCardStarBadge({
-    required this.highlighted,
-  });
+  const _TempleCardStarBadge({required this.highlighted});
 
   /// 是否高亮
   final bool highlighted;

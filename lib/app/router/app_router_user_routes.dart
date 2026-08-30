@@ -83,9 +83,7 @@ List<RouteBase> buildUserRoutes(
       path: '/user-balance-logs',
       pageBuilder: (context, state) => MaterialPage(
         key: state.pageKey,
-        child: UserBalanceLogPage(
-          repository: dependencies.repositories.user,
-        ),
+        child: UserBalanceLogPage(repository: dependencies.repositories.user),
       ),
     ),
     GoRoute(
@@ -93,9 +91,7 @@ List<RouteBase> buildUserRoutes(
       path: '/user-auctions',
       pageBuilder: (context, state) => MaterialPage(
         key: state.pageKey,
-        child: UserAuctionPage(
-          repository: dependencies.repositories.user,
-        ),
+        child: UserAuctionPage(repository: dependencies.repositories.user),
       ),
     ),
     GoRoute(
@@ -103,9 +99,7 @@ List<RouteBase> buildUserRoutes(
       path: '/user-market-orders',
       pageBuilder: (context, state) => MaterialPage(
         key: state.pageKey,
-        child: UserMarketOrderPage(
-          repository: dependencies.repositories.user,
-        ),
+        child: UserMarketOrderPage(repository: dependencies.repositories.user),
       ),
     ),
     GoRoute(
@@ -113,9 +107,7 @@ List<RouteBase> buildUserRoutes(
       path: '/user-items',
       pageBuilder: (context, state) => MaterialPage(
         key: state.pageKey,
-        child: UserItemPage(
-          repository: dependencies.repositories.user,
-        ),
+        child: UserItemPage(repository: dependencies.repositories.user),
       ),
     ),
     GoRoute(
@@ -137,10 +129,7 @@ List<RouteBase> buildUserRoutes(
         key: state.pageKey,
         child: UserTradeLogPage(
           repository: dependencies.repositories.user,
-          userId: int.tryParse(
-                state.uri.queryParameters['userId'] ?? '',
-              ) ??
-              0,
+          userId: int.tryParse(state.uri.queryParameters['userId'] ?? '') ?? 0,
           username: state.uri.queryParameters['username'] ?? '',
           nickname: state.uri.queryParameters['nickname'],
         ),
@@ -205,7 +194,7 @@ List<RouteBase> buildUserRoutes(
               state.uri.queryParameters['hidePrivateValues'] == 'true',
           revealPrivateUserHoldings:
               dependencies.preferences.hiddenFeaturesEnabled &&
-                  dependencies.preferences.revealPrivateUserHoldingsEnabled,
+              dependencies.preferences.revealPrivateUserHoldingsEnabled,
         ),
       ),
     ),
@@ -244,7 +233,8 @@ List<RouteBase> buildUserRoutes(
         final routeExtra = state.extra is UserSettingsRouteExtra
             ? state.extra as UserSettingsRouteExtra
             : null;
-        final onSignedOut = routeExtra?.onSignedOut ??
+        final onSignedOut =
+            routeExtra?.onSignedOut ??
             (state.extra is VoidCallback ? state.extra as VoidCallback : null);
 
         return MaterialPage(

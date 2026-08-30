@@ -86,10 +86,7 @@ class LatestLinkPair {
   ///
   /// [first] 接口返回中的第一条圣殿
   /// [second] 接口返回中的第二条圣殿
-  static bool _isValidPair(
-    LatestLinkApiItem first,
-    LatestLinkApiItem second,
-  ) {
+  static bool _isValidPair(LatestLinkApiItem first, LatestLinkApiItem second) {
     return first.characterId > 0 &&
         second.characterId > 0 &&
         first.linkId == second.characterId &&

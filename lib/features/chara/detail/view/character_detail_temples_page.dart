@@ -182,10 +182,7 @@ class _CharacterDetailTemplesPageState
       return;
     }
 
-    context.pushNamed(
-      'userDetail',
-      queryParameters: {'username': username},
-    );
+    context.pushNamed('userDetail', queryParameters: {'username': username});
   }
 
   /// 打开圣殿资产卡片弹窗
@@ -239,7 +236,8 @@ class _CharacterDetailTemplesPageState
     CharacterDetailTempleItem item, {
     int? characterId,
   }) {
-    final resolvedCharacterId = characterId ??
+    final resolvedCharacterId =
+        characterId ??
         (item.characterId > 0 ? item.characterId : widget.characterId);
 
     return TempleAssetDialogSource(

@@ -120,11 +120,14 @@ final class UserDetailProfile {
       assets: TinygrailResponseParser.asDouble(json['Assets']),
       type: TinygrailResponseParser.asInt(json['Type']),
       state: TinygrailResponseParser.asInt(json['State']),
-      showDaily: TinygrailResponseParser.asInt(json['ShowDaily']) != 0 ||
+      showDaily:
+          TinygrailResponseParser.asInt(json['ShowDaily']) != 0 ||
           json['ShowDaily'] == true,
-      showWeekly: TinygrailResponseParser.asInt(json['ShowWeekly']) != 0 ||
+      showWeekly:
+          TinygrailResponseParser.asInt(json['ShowWeekly']) != 0 ||
           json['ShowWeekly'] == true,
-      showHoliday: TinygrailResponseParser.asInt(json['ShowHoliday']) != 0 ||
+      showHoliday:
+          TinygrailResponseParser.asInt(json['ShowHoliday']) != 0 ||
           json['ShowHoliday'] == true,
       holidayName: TinygrailResponseParser.asNullableString(
         json['HolidayName'],

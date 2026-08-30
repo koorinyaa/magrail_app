@@ -35,8 +35,9 @@ Future<void> showUserRedPacketSendSheet(
       const topGap = 32.0;
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
-      final maxHeight =
-          availableHeight.clamp(0.0, mediaQuery.size.height).toDouble();
+      final maxHeight = availableHeight
+          .clamp(0.0, mediaQuery.size.height)
+          .toDouble();
 
       return ConstrainedBox(
         constraints: BoxConstraints(maxHeight: maxHeight),
@@ -279,10 +280,7 @@ class _UserRedPacketSendSheetState extends State<UserRedPacketSendSheet> {
         return;
       }
 
-      AppToast.error(
-        context,
-        text: _resolveErrorMessage(error),
-      );
+      AppToast.error(context, text: _resolveErrorMessage(error));
     } finally {
       if (mounted) {
         setState(() {
@@ -396,10 +394,7 @@ class _SendButton extends StatelessWidget {
   ///
   /// [isLoading] 是否正在提交
   /// [onPressed] 点击回调
-  const _SendButton({
-    required this.isLoading,
-    required this.onPressed,
-  });
+  const _SendButton({required this.isLoading, required this.onPressed});
 
   /// 是否正在提交
   final bool isLoading;

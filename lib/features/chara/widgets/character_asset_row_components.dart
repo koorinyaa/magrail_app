@@ -217,9 +217,11 @@ class CharacterAssetRowShell extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          for (var index = 0;
-                              index < metrics.length;
-                              index++) ...[
+                          for (
+                            var index = 0;
+                            index < metrics.length;
+                            index++
+                          ) ...[
                             _CharacterAssetMetricText(
                               metric: metrics[index],
                               isPrimary: index == 0,
@@ -232,10 +234,7 @@ class CharacterAssetRowShell extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (trailing != null) ...[
-                  const SizedBox(width: 8),
-                  trailing!,
-                ],
+                if (trailing != null) ...[const SizedBox(width: 8), trailing!],
               ],
             ),
           ),
@@ -251,10 +250,7 @@ class _CharacterAssetAvatar extends StatelessWidget {
   ///
   /// [imageUrl] 头像地址
   /// [heroTag] 头像转场标识
-  const _CharacterAssetAvatar({
-    required this.imageUrl,
-    required this.heroTag,
-  });
+  const _CharacterAssetAvatar({required this.imageUrl, required this.heroTag});
 
   /// 头像地址
   final String imageUrl;
@@ -312,16 +308,15 @@ class _CharacterAssetMetricText extends StatelessWidget {
     final textColor = isPrimary
         ? colorScheme.onSurfaceVariant
         : colorScheme.onSurfaceVariant.withValues(alpha: 0.58);
-    final valueColor = metric.valueColor ??
+    final valueColor =
+        metric.valueColor ??
         (metric.isValueMuted ? textColor : colorScheme.onSurface);
 
     final valueWidget = metric.valueWidget;
     if (valueWidget != null) {
       return Row(
         mainAxisSize: MainAxisSize.max,
-        children: [
-          Flexible(child: valueWidget),
-        ],
+        children: [Flexible(child: valueWidget)],
       );
     }
 
@@ -339,10 +334,7 @@ class _CharacterAssetMetricText extends StatelessWidget {
           if (label != null && label.isNotEmpty) TextSpan(text: '$label '),
           TextSpan(
             text: metric.value,
-            style: TextStyle(
-              color: valueColor,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(color: valueColor, fontWeight: FontWeight.w600),
           ),
         ],
       ),

@@ -44,13 +44,13 @@ class CharacterDetailController extends ChangeNotifier {
     String? initialName,
     String? initialAvatarUrl,
     String? initialAvatarHeroTag,
-  })  : _preferences = preferences,
-        _repository = repository,
-        _userRepository = userRepository,
-        _initialCharacterId = initialCharacterId,
-        _initialName = initialName ?? '',
-        _initialAvatarUrl = initialAvatarUrl ?? '',
-        _initialAvatarHeroTag = initialAvatarHeroTag ?? '';
+  }) : _preferences = preferences,
+       _repository = repository,
+       _userRepository = userRepository,
+       _initialCharacterId = initialCharacterId,
+       _initialName = initialName ?? '',
+       _initialAvatarUrl = initialAvatarUrl ?? '',
+       _initialAvatarHeroTag = initialAvatarHeroTag ?? '';
 
   // 历史头像切换只保留最近十个
   static const int _maxHistoryItems = 10;
@@ -387,8 +387,8 @@ class CharacterDetailController extends ChangeNotifier {
     final resolvedAvatarHeroTag = avatarHeroTag?.trim() ?? '';
     _currentAvatarHeroTag =
         resolvedItem.hasAvatar && resolvedAvatarHeroTag.isNotEmpty
-            ? resolvedAvatarHeroTag
-            : null;
+        ? resolvedAvatarHeroTag
+        : null;
     // 每次打开角色都等待当前请求完成，避免旧头部与新头部切换造成宽度抖动
     _pageTypes[item.characterId] = CharacterDetailPageType.pending;
     _tradeHeaders.remove(item.characterId);
@@ -400,8 +400,9 @@ class CharacterDetailController extends ChangeNotifier {
         ...nextHistory,
       ].take(_maxHistoryItems),
     );
-    final historyIds =
-        _history.map((historyItem) => historyItem.characterId).toSet();
+    final historyIds = _history
+        .map((historyItem) => historyItem.characterId)
+        .toSet();
     _pageTypes.removeWhere(
       (characterId, _) => !historyIds.contains(characterId),
     );
@@ -439,22 +440,25 @@ class CharacterDetailController extends ChangeNotifier {
       return;
     }
 
-    final generation = _CharacterDetailControllerRefresh(this)
-        ._nextRefreshGeneration(characterId);
+    final generation = _CharacterDetailControllerRefresh(
+      this,
+    )._nextRefreshGeneration(characterId);
     _refreshingCharacterIds.add(characterId);
     try {
       final info = await _repository.fetchCharacterBasicInfo(characterId);
       if (_isDisposed ||
-          !_CharacterDetailControllerRefresh(this)
-              ._isLatestCharacterRefresh(characterId, generation)) {
+          !_CharacterDetailControllerRefresh(
+            this,
+          )._isLatestCharacterRefresh(characterId, generation)) {
         return;
       }
 
       final name = TinygrailFormatters.decodeHtmlEntities(info.name).trim();
       final icon = info.icon.trim();
       // 小圣杯未返回头像时保留入口或 BGM 补全头像
-      final avatarUrl =
-          icon.isEmpty ? '' : TinygrailAssetUrls.normalizeAvatar(icon);
+      final avatarUrl = icon.isEmpty
+          ? ''
+          : TinygrailAssetUrls.normalizeAvatar(icon);
       final icoInfo = info.icoInfo;
 
       _CharacterDetailControllerHistory(this)._updateCharacterInfo(
@@ -484,8 +488,9 @@ class CharacterDetailController extends ChangeNotifier {
             refreshGeneration: generation,
           ),
         );
-        await _CharacterDetailControllerRefresh(this)
-            ._refreshTradeHeaderSupplementalStats(
+        await _CharacterDetailControllerRefresh(
+          this,
+        )._refreshTradeHeaderSupplementalStats(
           characterId,
           tradeHeader,
           refreshGeneration: generation,
@@ -493,8 +498,9 @@ class CharacterDetailController extends ChangeNotifier {
       }
     } catch (_) {
       if (_isDisposed ||
-          !_CharacterDetailControllerRefresh(this)
-              ._isLatestCharacterRefresh(characterId, generation)) {
+          !_CharacterDetailControllerRefresh(
+            this,
+          )._isLatestCharacterRefresh(characterId, generation)) {
         return;
       }
 
@@ -514,8 +520,9 @@ class CharacterDetailController extends ChangeNotifier {
         _notifyIfActive();
       }
     } finally {
-      if (_CharacterDetailControllerRefresh(this)
-          ._isLatestCharacterRefresh(characterId, generation)) {
+      if (_CharacterDetailControllerRefresh(
+        this,
+      )._isLatestCharacterRefresh(characterId, generation)) {
         _refreshingCharacterIds.remove(characterId);
       }
     }
@@ -536,10 +543,9 @@ class CharacterDetailController extends ChangeNotifier {
     try {
       final character = await _bangumiRepository.fetchCharacter(characterId);
       if (_isDisposed ||
-          !_CharacterDetailControllerRefresh(this)._isLatestCharacterRefresh(
-            characterId,
-            refreshGeneration,
-          )) {
+          !_CharacterDetailControllerRefresh(
+            this,
+          )._isLatestCharacterRefresh(characterId, refreshGeneration)) {
         return;
       }
 

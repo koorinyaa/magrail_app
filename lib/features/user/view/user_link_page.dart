@@ -102,32 +102,34 @@ class _UserLinkPageState extends State<UserLinkPage> {
       emptySliverBuilder: (context, controller) {
         final isSearchingMoreFromEmpty =
             controller.items.isEmpty && controller.isLoadingMore;
-        final canContinueSearching = controller.items.isEmpty &&
+        final canContinueSearching =
+            controller.items.isEmpty &&
             !isSearchingMoreFromEmpty &&
             controller.canLoadMore;
         final emptyTitle = isSearchingMoreFromEmpty
             ? '正在查找连接'
             : canContinueSearching
-                ? '继续查找连接'
-                : '暂无连接';
+            ? '继续查找连接'
+            : '暂无连接';
         final emptyMessage = isSearchingMoreFromEmpty
             ? '正在从后续数据中查找可展示连接'
             : canContinueSearching
-                ? '当前已加载数据暂无可展示连接，可继续查找后续数据'
-                : '当前用户没有可展示的角色连接';
+            ? '当前已加载数据暂无可展示连接，可继续查找后续数据'
+            : '当前用户没有可展示的角色连接';
         final emptyIcon = isSearchingMoreFromEmpty
             ? Icons.hourglass_top_rounded
             : canContinueSearching
-                ? Icons.manage_search_rounded
-                : Icons.hourglass_empty_rounded;
+            ? Icons.manage_search_rounded
+            : Icons.hourglass_empty_rounded;
 
         return PagedSliverState(
           title: emptyTitle,
           message: emptyMessage,
           icon: emptyIcon,
           actionLabel: canContinueSearching ? '继续加载' : null,
-          onActionPressed:
-              canContinueSearching ? controller.loadNextPage : null,
+          onActionPressed: canContinueSearching
+              ? controller.loadNextPage
+              : null,
         );
       },
       contentSliversBuilder: (context, items, onItemBuilt) {

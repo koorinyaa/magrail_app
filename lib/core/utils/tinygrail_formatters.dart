@@ -131,20 +131,14 @@ final class TinygrailFormatters {
   ///
   /// [value] 服务端时间文本
   static DateTime? parseServerTime(String value) {
-    return _parseServerTime(
-      value,
-      fallbackWhenCorrectedFuture: true,
-    );
+    return _parseServerTime(value, fallbackWhenCorrectedFuture: true);
   }
 
   /// 解析 Tinygrail 服务端未来业务时间
   ///
   /// [value] 服务端时间文本
   static DateTime? parseServerFutureTime(String value) {
-    return _parseServerTime(
-      value,
-      fallbackWhenCorrectedFuture: false,
-    );
+    return _parseServerTime(value, fallbackWhenCorrectedFuture: false);
   }
 
   /// 解析 Tinygrail 服务端时间原始值
@@ -184,9 +178,9 @@ final class TinygrailFormatters {
     );
 
     if (!fallbackWhenCorrectedFuture ||
-        !corrected
-            .toLocal()
-            .isAfter(DateTime.now().add(const Duration(minutes: 1)))) {
+        !corrected.toLocal().isAfter(
+          DateTime.now().add(const Duration(minutes: 1)),
+        )) {
       return corrected;
     }
 

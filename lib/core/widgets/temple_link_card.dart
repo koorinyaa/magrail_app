@@ -8,6 +8,7 @@ import 'package:magrail_app/core/widgets/temple_cover_image.dart';
 class TempleLinkCard extends StatelessWidget {
   /// 创建圣殿连接卡片
   ///
+  /// [key] Flutter 组件标识
   /// [leftCoverUrl] 左侧封面地址
   /// [leftAvatarUrl] 左侧头像回退地址
   /// [leftCharacterName] 左侧角色名称
@@ -250,11 +251,7 @@ class TempleLinkCard extends StatelessWidget {
       fontWeight: FontWeight.w800,
       height: 1,
       shadows: const [
-        Shadow(
-          color: Color(0x66000000),
-          offset: Offset(0, 1),
-          blurRadius: 4,
-        ),
+        Shadow(color: Color(0x66000000), offset: Offset(0, 1), blurRadius: 4),
       ],
     );
 
@@ -312,11 +309,7 @@ class TempleLinkCard extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                Color(0x002F2830),
-                Color(0x522F2830),
-                Color(0x8A2F2830),
-              ],
+              colors: [Color(0x002F2830), Color(0x522F2830), Color(0x8A2F2830)],
               stops: [0, 0.42, 1],
             ),
           ),

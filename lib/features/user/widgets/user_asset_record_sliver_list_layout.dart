@@ -14,11 +14,9 @@ abstract final class UserAssetRecordListMetrics {
 class UserAssetRecordListItem extends StatelessWidget {
   /// 创建用户资产记录列表条目外层
   ///
+  /// [key] Flutter 组件标识
   /// [child] 条目主体
-  const UserAssetRecordListItem({
-    super.key,
-    required this.child,
-  });
+  const UserAssetRecordListItem({super.key, required this.child});
 
   /// 条目主体
   final Widget child;

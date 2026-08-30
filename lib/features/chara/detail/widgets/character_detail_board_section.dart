@@ -141,10 +141,7 @@ class _CharacterDetailBoardSectionState
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([
-        _controller,
-        widget.collectionsController,
-      ]),
+      listenable: Listenable.merge([_controller, widget.collectionsController]),
       builder: (context, _) {
         return PageSectionSliver(
           title: _title,
@@ -189,10 +186,7 @@ class _CharacterDetailBoardSectionState
         final screenWidth = constraints.maxWidth.isFinite
             ? constraints.maxWidth
             : MediaQuery.sizeOf(context).width;
-        final columnWidth = math.max(
-          248.0,
-          math.min(318.0, screenWidth - 72),
-        );
+        final columnWidth = math.max(248.0, math.min(318.0, screenWidth - 72));
 
         return SnappingHorizontalListView(
           height: _BoardPreviewMetrics.height,
@@ -214,8 +208,8 @@ class _CharacterDetailBoardSectionState
                     member: column[row],
                     serialNumber:
                         columnIndex * _BoardPreviewMetrics.rowsPerColumn +
-                            row +
-                            1,
+                        row +
+                        1,
                   ),
                   if (row != column.length - 1) const SizedBox(height: 4),
                 ],
@@ -235,9 +229,7 @@ class _CharacterDetailBoardSectionState
     required CharacterDetailBoardMember member,
     required int serialNumber,
   }) {
-    final temple = widget.collectionsController.templeForOwnerName(
-      member.name,
-    );
+    final temple = widget.collectionsController.templeForOwnerName(member.name);
 
     return CharacterDetailBoardMemberRow(
       member: member,
@@ -246,8 +238,9 @@ class _CharacterDetailBoardSectionState
       temple: temple,
       onTap: () => _openUser(member),
       onTempleTap: temple == null ? null : () => _openTempleAssetCard(temple),
-      onRevealStock:
-          widget.revealPrivateUserHoldings ? _revealMemberStock : null,
+      onRevealStock: widget.revealPrivateUserHoldings
+          ? _revealMemberStock
+          : null,
     );
   }
 
@@ -278,9 +271,11 @@ class _CharacterDetailBoardSectionState
         .toList();
     final result = <List<CharacterDetailBoardMember>>[];
 
-    for (var start = 0;
-        start < previewItems.length;
-        start += _BoardPreviewMetrics.rowsPerColumn) {
+    for (
+      var start = 0;
+      start < previewItems.length;
+      start += _BoardPreviewMetrics.rowsPerColumn
+    ) {
       final end = math.min(
         start + _BoardPreviewMetrics.rowsPerColumn,
         previewItems.length,
@@ -332,18 +327,16 @@ class _CharacterDetailBoardSectionState
       return;
     }
 
-    context.pushNamed(
-      'userDetail',
-      queryParameters: {'username': username},
-    );
+    context.pushNamed('userDetail', queryParameters: {'username': username});
   }
 
   /// 创建圣殿资产弹窗入口数据
   ///
   /// [temple] 董事会成员对应圣殿
   TempleAssetDialogSource _sourceForTemple(CharacterDetailTempleItem temple) {
-    final characterId =
-        temple.characterId > 0 ? temple.characterId : widget.header.characterId;
+    final characterId = temple.characterId > 0
+        ? temple.characterId
+        : widget.header.characterId;
 
     return TempleAssetDialogSource(
       ownerName: temple.ownerName,
@@ -410,14 +403,8 @@ class _BoardPreviewFailedState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: AppSafeAreaInsets.symmetricHorizontal(
-        context,
-        horizontal: 12,
-      ),
-      child: AppLoadFailedState(
-        message: message,
-        onActionPressed: onRetry,
-      ),
+      padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 12),
+      child: AppLoadFailedState(message: message, onActionPressed: onRetry),
     );
   }
 }
@@ -435,10 +422,7 @@ class _BoardPreviewEmptyState extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: AppSafeAreaInsets.symmetricHorizontal(
-        context,
-        horizontal: 24,
-      ),
+      padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 24),
       child: SizedBox(
         height: 88,
         child: Center(
@@ -471,10 +455,7 @@ class _BoardPreviewSkeleton extends StatelessWidget {
         final screenWidth = constraints.maxWidth.isFinite
             ? constraints.maxWidth
             : MediaQuery.sizeOf(context).width;
-        final columnWidth = math.max(
-          248.0,
-          math.min(318.0, screenWidth - 72),
-        );
+        final columnWidth = math.max(248.0, math.min(318.0, screenWidth - 72));
 
         return SnappingHorizontalListView(
           height: _BoardPreviewMetrics.height,
@@ -489,9 +470,11 @@ class _BoardPreviewSkeleton extends StatelessWidget {
           itemBuilder: (context, columnIndex) {
             return Column(
               children: [
-                for (var row = 0;
-                    row < _BoardPreviewMetrics.rowsPerColumn;
-                    row++) ...[
+                for (
+                  var row = 0;
+                  row < _BoardPreviewMetrics.rowsPerColumn;
+                  row++
+                ) ...[
                   const CharacterAssetRowSkeleton(
                     showLevel: false,
                     metricCount: 3,

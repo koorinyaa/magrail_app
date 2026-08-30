@@ -9,8 +9,8 @@ extension UserTempleSnapshotPageControllerQuery
   Future<bool> selectSort(UserTempleSnapshotSort nextSort) {
     final nextDirection = nextSort == _sort
         ? (_direction == UserTempleSnapshotSortDirection.descending
-            ? UserTempleSnapshotSortDirection.ascending
-            : UserTempleSnapshotSortDirection.descending)
+              ? UserTempleSnapshotSortDirection.ascending
+              : UserTempleSnapshotSortDirection.descending)
         : UserTempleSnapshotSortDirection.descending;
     _sort = nextSort;
     _direction = nextDirection;
@@ -39,31 +39,32 @@ extension UserTempleSnapshotPageControllerQuery
     _setChangingQuery(true);
     final previousQueryOperation = _queryChangeOperation;
     late final Future<bool> operation;
-    operation = _applyQueryChange(
-      generation,
-      previousQueryOperation,
-    ).then((success) {
-      if (!success && generation == _queryGeneration && !_isDisposed) {
-        _sort = _committedSort;
-        _direction = _committedDirection;
-        _searchKeyword = _committedSearchKeyword;
-        _levelPositions = _committedLevelPositions;
-        _levelIndexRevision = _committedLevelIndexRevision;
-        _notifyRefreshStateChanged();
-      } else if (success && generation == _queryGeneration && !_isDisposed) {
-        _committedSort = _sort;
-        _committedDirection = _direction;
-        _committedSearchKeyword = _searchKeyword;
-        _committedLevelPositions = _levelPositions;
-        _committedLevelIndexRevision = _levelIndexRevision;
-        _resumePagingAfterIndependentWindowCommit();
-      }
-      return success;
-    }).whenComplete(() {
-      if (identical(_queryChangeOperation, operation)) {
-        _queryChangeOperation = null;
-      }
-    });
+    operation = _applyQueryChange(generation, previousQueryOperation)
+        .then((success) {
+          if (!success && generation == _queryGeneration && !_isDisposed) {
+            _sort = _committedSort;
+            _direction = _committedDirection;
+            _searchKeyword = _committedSearchKeyword;
+            _levelPositions = _committedLevelPositions;
+            _levelIndexRevision = _committedLevelIndexRevision;
+            _notifyRefreshStateChanged();
+          } else if (success &&
+              generation == _queryGeneration &&
+              !_isDisposed) {
+            _committedSort = _sort;
+            _committedDirection = _direction;
+            _committedSearchKeyword = _searchKeyword;
+            _committedLevelPositions = _levelPositions;
+            _committedLevelIndexRevision = _levelIndexRevision;
+            _resumePagingAfterIndependentWindowCommit();
+          }
+          return success;
+        })
+        .whenComplete(() {
+          if (identical(_queryChangeOperation, operation)) {
+            _queryChangeOperation = null;
+          }
+        });
     _queryChangeOperation = operation;
     return operation;
   }

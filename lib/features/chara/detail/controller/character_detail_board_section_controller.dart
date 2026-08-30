@@ -15,8 +15,8 @@ class CharacterDetailBoardSectionController extends ChangeNotifier {
   CharacterDetailBoardSectionController({
     required CharacterDetailRepository repository,
     required int characterId,
-  })  : _repository = repository,
-        _characterId = characterId;
+  }) : _repository = repository,
+       _characterId = characterId;
 
   /// 董事会预览请求数量
   static const int previewPageSize = 20;

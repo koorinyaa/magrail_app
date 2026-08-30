@@ -37,10 +37,7 @@ class UserSettingsRouteExtra {
   ///
   /// [onSignedOut] 退出登录后的回调
   /// [onLiquidGlassChanged] 液态玻璃开关变化回调
-  const UserSettingsRouteExtra({
-    this.onSignedOut,
-    this.onLiquidGlassChanged,
-  });
+  const UserSettingsRouteExtra({this.onSignedOut, this.onLiquidGlassChanged});
 
   /// 退出登录后的回调
   final VoidCallback? onSignedOut;
@@ -270,11 +267,9 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
 
   /// 打开打赏页面
   void _openDonatePage() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) => const _DonatePage(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (context) => const _DonatePage()));
   }
 
   /// 打开关于页面
@@ -354,8 +349,9 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
 
       AppToast.info(
         context,
-        text:
-            value ? '已启用 $_bangumiMirrorHost 镜像' : '已关闭 $_bangumiMirrorHost 镜像',
+        text: value
+            ? '已启用 $_bangumiMirrorHost 镜像'
+            : '已关闭 $_bangumiMirrorHost 镜像',
       );
     } catch (_) {
       if (!mounted) {
@@ -369,10 +365,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
         useMirror: previousValue,
         mirrorHost: _bangumiMirrorHost,
       );
-      AppToast.error(
-        context,
-        text: '保存设置失败，请稍后重试',
-      );
+      AppToast.error(context, text: '保存设置失败，请稍后重试');
     }
   }
 
@@ -397,10 +390,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
         _useLiquidGlass = previousValue;
       });
       widget.onLiquidGlassChanged?.call(previousValue);
-      AppToast.error(
-        context,
-        text: '保存设置失败，请稍后重试',
-      );
+      AppToast.error(context, text: '保存设置失败，请稍后重试');
     }
   }
 
@@ -423,10 +413,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
       setState(() {
         _showBotAction = previousValue;
       });
-      AppToast.error(
-        context,
-        text: '保存设置失败，请稍后重试',
-      );
+      AppToast.error(context, text: '保存设置失败，请稍后重试');
     }
   }
 
@@ -449,10 +436,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
       setState(() {
         _revealPrivateUserHoldingsEnabled = previousValue;
       });
-      AppToast.error(
-        context,
-        text: '保存设置失败，请稍后重试',
-      );
+      AppToast.error(context, text: '保存设置失败，请稍后重试');
     }
   }
 
@@ -496,10 +480,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
       setState(() {
         _isSigningOut = false;
       });
-      AppToast.error(
-        context,
-        text: '退出登录失败，请稍后重试',
-      );
+      AppToast.error(context, text: '退出登录失败，请稍后重试');
       return;
     }
 

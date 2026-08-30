@@ -6,37 +6,22 @@ import 'package:magrail_app/features/chara/rank/model/character_rank_entry.dart'
 /// 角色排序类型
 enum CharacterRankSortType {
   /// 最高股息
-  highestRate(
-    label: '最高股息',
-    endpoint: 'chara/msrc',
-  ),
+  highestRate(label: '最高股息', endpoint: 'chara/msrc'),
 
   /// 最高市值
-  highestMarketValue(
-    label: '最高市值',
-    endpoint: 'chara/mvc',
-  ),
+  highestMarketValue(label: '最高市值', endpoint: 'chara/mvc'),
 
   /// 最大涨幅
-  maxRise(
-    label: '最大涨幅',
-    endpoint: 'chara/mrc',
-  ),
+  maxRise(label: '最大涨幅', endpoint: 'chara/mrc'),
 
   /// 最大跌幅
-  maxFall(
-    label: '最大跌幅',
-    endpoint: 'chara/mfc',
-  );
+  maxFall(label: '最大跌幅', endpoint: 'chara/mfc');
 
   /// 创建角色排序类型
   ///
   /// [label] 切换按钮文案
   /// [endpoint] 榜单接口路径
-  const CharacterRankSortType({
-    required this.label,
-    required this.endpoint,
-  });
+  const CharacterRankSortType({required this.label, required this.endpoint});
 
   /// 切换按钮文案
   final String label;
@@ -50,9 +35,8 @@ class CharacterRankRepository {
   /// 创建角色排序仓库
   ///
   /// [apiClient] Tinygrail API 客户端
-  const CharacterRankRepository({
-    required ApiClient apiClient,
-  }) : _apiClient = apiClient;
+  const CharacterRankRepository({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   /// 角色排序每页数量
   static const int pageSize = 20;

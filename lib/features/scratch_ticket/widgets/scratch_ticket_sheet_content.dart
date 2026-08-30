@@ -69,11 +69,7 @@ class _TicketChoiceGroup extends StatelessWidget {
       title: '环保刮刮乐',
       description: '每日可购买 3 次',
       priceText: Formatters.tinygrailCurrency(1000),
-      iconBuilder: (color) => Icon(
-        Icons.eco,
-        color: color,
-        size: 22,
-      ),
+      iconBuilder: (color) => Icon(Icons.eco, color: color, size: 22),
       selectedColor: _scratchTicketNormalColor,
       isSelected: !isLotus,
       isDisabled: isDisabled,
@@ -177,8 +173,8 @@ class _TicketChoiceCard extends StatelessWidget {
     final backgroundColor = isSelected
         ? selectedColor.withValues(alpha: isDark ? 0.18 : 0.1)
         : isDark
-            ? Colors.white.withValues(alpha: 0.06)
-            : Colors.black.withValues(alpha: 0.035);
+        ? Colors.white.withValues(alpha: 0.06)
+        : Colors.black.withValues(alpha: 0.035);
     final borderColor = isSelected
         ? selectedColor.withValues(alpha: 0.72)
         : colorScheme.outlineVariant.withValues(alpha: isDark ? 0.28 : 0.52);

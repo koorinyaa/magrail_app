@@ -74,8 +74,9 @@ class UserAssetAnalysisCoreHeader extends StatelessWidget {
     final isDark = colorScheme.brightness == Brightness.dark;
     final disableAnimations = MediaQuery.disableAnimationsOf(context);
     final primaryTextColor = isDark ? Colors.white : const Color(0xFF07161B);
-    final mutedTextColor =
-        isDark ? const Color(0xFFDCEAE6) : const Color(0xFF17343A);
+    final mutedTextColor = isDark
+        ? const Color(0xFFDCEAE6)
+        : const Color(0xFF17343A);
     final cachedDisplayName = analysis.nickname.trim().isEmpty
         ? analysis.username
         : analysis.nickname;

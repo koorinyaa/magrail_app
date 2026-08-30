@@ -41,7 +41,8 @@ Future<void> showCharacterTradeHistorySheet(
       const topGap = 32.0;
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
-      final heightCap = mediaQuery.size.height *
+      final heightCap =
+          mediaQuery.size.height *
           (mediaQuery.orientation == Orientation.landscape ? 0.9 : 0.86);
       final maxHeight = availableHeight.clamp(0.0, heightCap).toDouble();
 
@@ -134,9 +135,7 @@ class _CharacterTradeHistorySheetState
     return Padding(
       padding: EdgeInsets.only(bottom: mediaQuery.viewInsets.bottom),
       child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(28),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: backgroundColor,
@@ -172,9 +171,7 @@ class _CharacterTradeHistorySheetState
                   ),
                   const SizedBox(height: 14),
                   Flexible(
-                    child: _CharacterTradeHistoryBody(
-                      controller: _controller,
-                    ),
+                    child: _CharacterTradeHistoryBody(controller: _controller),
                   ),
                 ],
               ),

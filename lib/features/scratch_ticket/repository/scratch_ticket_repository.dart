@@ -1,4 +1,4 @@
-﻿import 'package:magrail_app/core/network/api_client.dart';
+import 'package:magrail_app/core/network/api_client.dart';
 import 'package:magrail_app/core/network/tinygrail_response.dart';
 import 'package:magrail_app/features/chara/model/tinygrail_character_reward_item.dart';
 
@@ -7,9 +7,8 @@ class ScratchTicketRepository {
   /// 创建刮刮乐仓库
   ///
   /// [apiClient] Tinygrail API 客户端
-  const ScratchTicketRepository({
-    required ApiClient apiClient,
-  }) : _apiClient = apiClient;
+  const ScratchTicketRepository({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   final ApiClient _apiClient;
 
@@ -40,15 +39,14 @@ class ScratchTicketRepository {
       isLotus ? 'event/scratch/bonus2/true' : 'event/scratch/bonus2',
     );
     final response =
-        TinygrailResponse<List<TinygrailCharacterRewardItem>>.fromJson(
-      json,
-      (value) {
-        return TinygrailResponseParser.asObjectList(
+        TinygrailResponse<List<TinygrailCharacterRewardItem>>.fromJson(json, (
           value,
-          TinygrailCharacterRewardItem.fromJson,
-        );
-      },
-    );
+        ) {
+          return TinygrailResponseParser.asObjectList(
+            value,
+            TinygrailCharacterRewardItem.fromJson,
+          );
+        });
 
     if (!response.isSuccess) {
       throw StateError(response.message ?? '刮刮乐施法失败');

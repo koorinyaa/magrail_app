@@ -11,12 +11,16 @@ import 'package:magrail_app/features/chara/widgets/character_full_list_sort_tool
 import 'package:magrail_app/features/chara/widgets/character_level_grouped_sliver_list.dart';
 
 // 角色筛选输入防抖，避免每次输入都立即重排完整列表
-const Duration _characterFullListSearchDebounceDelay =
-    Duration(milliseconds: 450);
+const Duration _characterFullListSearchDebounceDelay = Duration(
+  milliseconds: 450,
+);
 
 /// 角色全量列表二级页面交互
-mixin CharacterFullListPageStateMixin<ItemType,
-    WidgetType extends StatefulWidget> on State<WidgetType> {
+mixin CharacterFullListPageStateMixin<
+  ItemType,
+  WidgetType extends StatefulWidget
+>
+    on State<WidgetType> {
   /// 当前页面角色全量列表控制器
   CharacterFullListPageController<ItemType> get fullListController;
 
@@ -122,14 +126,17 @@ mixin CharacterFullListPageStateMixin<ItemType,
     if (!fullListController.hasFullData) {
       return child;
     }
-    final showLevelRail = fullListController.showsLevelHeaders &&
+    final showLevelRail =
+        fullListController.showsLevelHeaders &&
         fullListController.levelPositions.isNotEmpty &&
         fullListController.items.isNotEmpty;
     final mediaPadding = MediaQuery.paddingOf(context);
     final viewInsets = MediaQuery.viewInsetsOf(context);
-    final bottomInset =
-        viewInsets.bottom > 0 ? viewInsets.bottom : mediaPadding.bottom;
-    final railAreaTop = mediaPadding.top +
+    final bottomInset = viewInsets.bottom > 0
+        ? viewInsets.bottom
+        : mediaPadding.bottom;
+    final railAreaTop =
+        mediaPadding.top +
         SecondaryPageSliverAppBar.defaultToolbarHeight +
         CharacterFullListSortToolbar.toolbarHeight +
         8;
@@ -137,9 +144,10 @@ mixin CharacterFullListPageStateMixin<ItemType,
     final availableRailHeight =
         (MediaQuery.sizeOf(context).height - railAreaTop - railAreaBottom)
             .clamp(0.0, double.infinity);
-    final railHeight = (fullListController.levelPositions.length *
-            CharacterFullListLevelRail.itemExtent)
-        .clamp(0.0, availableRailHeight);
+    final railHeight =
+        (fullListController.levelPositions.length *
+                CharacterFullListLevelRail.itemExtent)
+            .clamp(0.0, availableRailHeight);
     final railTop = railAreaTop + (availableRailHeight - railHeight) / 2;
 
     return Stack(
@@ -277,8 +285,9 @@ mixin CharacterFullListPageStateMixin<ItemType,
       showLevelHeaders: previousHasLevelHeaders,
       levelOf: fullListController.characterLevelOf,
     );
-    final oldCharacterId =
-        fullListController.characterIdOf(previousItems[oldIndex]);
+    final oldCharacterId = fullListController.characterIdOf(
+      previousItems[oldIndex],
+    );
     var newIndex = replacementItems.indexWhere(
       (item) => fullListController.characterIdOf(item) == oldCharacterId,
     );
@@ -286,9 +295,10 @@ mixin CharacterFullListPageStateMixin<ItemType,
       final ratio = previousItems.length <= 1
           ? 0.0
           : oldIndex / (previousItems.length - 1);
-      newIndex = (ratio * (replacementItems.length - 1))
-          .round()
-          .clamp(0, replacementItems.length - 1);
+      newIndex = (ratio * (replacementItems.length - 1)).round().clamp(
+        0,
+        replacementItems.length - 1,
+      );
     }
     final newItemOffset = CharacterLevelListMetrics.itemOffsetForIndex(
       replacementItems,

@@ -53,7 +53,8 @@ Future<void> showTempleAssetLinkSheet(
       const topGap = 32.0;
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
-      final heightCap = mediaQuery.size.height *
+      final heightCap =
+          mediaQuery.size.height *
           (mediaQuery.orientation == Orientation.landscape ? 0.9 : 0.86);
       final maxHeight = availableHeight.clamp(0.0, heightCap).toDouble();
 
@@ -71,10 +72,7 @@ class TempleAssetLinkSheet extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [data] 圣殿资产卡片展示数据
-  const TempleAssetLinkSheet({
-    super.key,
-    required this.data,
-  });
+  const TempleAssetLinkSheet({super.key, required this.data});
 
   /// 圣殿资产卡片展示数据
   final TempleAssetCardData data;
@@ -175,7 +173,8 @@ class _TempleAssetLinkSheetState extends State<TempleAssetLinkSheet> {
                   Flexible(
                     child: LayoutBuilder(
                       builder: (context, constraints) {
-                        final showSearchBody = constraints.maxHeight >=
+                        final showSearchBody =
+                            constraints.maxHeight >=
                             _templeAssetLinkBodyVisibleMinHeight;
                         return Stack(
                           children: [
@@ -270,9 +269,7 @@ class _TempleAssetLinkSheetState extends State<TempleAssetLinkSheet> {
   Widget _buildGrid() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final layout = _TempleAssetLinkGridLayout.resolve(
-          constraints.maxWidth,
-        );
+        final layout = _TempleAssetLinkGridLayout.resolve(constraints.maxWidth);
 
         return CustomScrollView(
           controller: _scrollController,
@@ -285,17 +282,14 @@ class _TempleAssetLinkSheetState extends State<TempleAssetLinkSheet> {
                 crossAxisSpacing: _templeAssetLinkGridSpacing,
                 childAspectRatio: layout.childAspectRatio,
               ),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  _handleItemBuilt(index);
-                  return TempleAssetLinkTempleTile(
-                    item: _items[index],
-                    width: layout.tileWidth,
-                    onSelected: _selectTemple,
-                  );
-                },
-                childCount: _items.length,
-              ),
+              delegate: SliverChildBuilderDelegate((context, index) {
+                _handleItemBuilt(index);
+                return TempleAssetLinkTempleTile(
+                  item: _items[index],
+                  width: layout.tileWidth,
+                  onSelected: _selectTemple,
+                );
+              }, childCount: _items.length),
             ),
             PaginationFooterSliver(
               isLoadingMore: _isLoadingMore,
@@ -304,9 +298,7 @@ class _TempleAssetLinkSheetState extends State<TempleAssetLinkSheet> {
               completedLabel: '没有更多圣殿了',
               onRetry: () => unawaited(_retryNextPage()),
             ),
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 58),
-            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 58)),
           ],
         );
       },
@@ -408,10 +400,7 @@ class _TempleAssetLinkSheetState extends State<TempleAssetLinkSheet> {
         context,
         title: '',
         message: '',
-        content: TempleAssetLinkPreview(
-          source: widget.data,
-          target: item,
-        ),
+        content: TempleAssetLinkPreview(source: widget.data, target: item),
         confirmText: 'LINK',
         showCancelButton: false,
         onConfirm: () async {

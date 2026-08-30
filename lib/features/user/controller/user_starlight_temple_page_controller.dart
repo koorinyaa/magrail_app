@@ -15,8 +15,8 @@ class UserStarlightTemplePageController
     required UserAssetSnapshotRepository snapshotRepository,
     required String username,
     super.pageSize = defaultPageSize,
-  })  : _snapshotRepository = snapshotRepository,
-        _username = username.trim();
+  }) : _snapshotRepository = snapshotRepository,
+       _username = username.trim();
 
   /// 用户星光圣殿默认分页数量
   static const int defaultPageSize = 100;

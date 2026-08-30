@@ -6,10 +6,7 @@ class _TradeForm extends StatelessWidget {
   ///
   /// [controller] 交易区控制器
   /// [onSubmit] 提交委托回调
-  const _TradeForm({
-    required this.controller,
-    required this.onSubmit,
-  });
+  const _TradeForm({required this.controller, required this.onSubmit});
 
   /// 交易区控制器
   final CharacterDetailTradeSectionController controller;
@@ -28,10 +25,7 @@ class _TradeForm extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _TradeSideSwitch(
-          value: side,
-          onChanged: controller.selectSide,
-        ),
+        _TradeSideSwitch(value: side, onChanged: controller.selectSide),
         const SizedBox(height: 12),
         Row(
           children: [
@@ -63,9 +57,7 @@ class _TradeForm extends StatelessWidget {
         const SizedBox(height: 10),
         _TradeAccountSummary(
           balance: Formatters.tinygrailCurrency(controller.balance),
-          availableAmount: Formatters.groupedNumber(
-            controller.availableAmount,
-          ),
+          availableAmount: Formatters.groupedNumber(controller.availableAmount),
           balanceWarning: controller.isBuyTotalOverBalance,
           availableWarning: controller.isSellAmountOverAvailable,
         ),

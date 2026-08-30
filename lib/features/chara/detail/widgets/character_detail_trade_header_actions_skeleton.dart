@@ -41,18 +41,7 @@ class CharacterDetailTradeHeaderActionsSkeleton extends StatelessWidget {
           itemCount: isGameMaster ? 10 : 7,
           itemBuilder: (context, index) {
             final itemWidths = isGameMaster
-                ? [
-                    48.0,
-                    48.0,
-                    48.0,
-                    48.0,
-                    48.0,
-                    62.0,
-                    48.0,
-                    48.0,
-                    48.0,
-                    48.0,
-                  ]
+                ? [48.0, 48.0, 48.0, 48.0, 48.0, 62.0, 48.0, 48.0, 48.0, 48.0]
                 : [48.0, 48.0, 48.0, 48.0, 48.0, 48.0, 48.0];
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,

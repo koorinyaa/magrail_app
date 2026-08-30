@@ -4,7 +4,7 @@ import 'package:magrail_app/core/network/tinygrail_response.dart';
 class IcoCharacterEntry {
   /// 创建 ICO 角色条目
   ///
-  /// [id] ICO ID
+  /// [id] ICO 记录 ID
   /// [characterId] 角色 ID
   /// [name] 角色名称
   /// [icon] 角色头像地址
@@ -27,7 +27,7 @@ class IcoCharacterEntry {
     required this.bonus,
   });
 
-  /// ICO ID
+  /// ICO 记录 ID
   final int id;
 
   /// 角色 ID

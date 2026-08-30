@@ -47,7 +47,7 @@ class UserCharacterLevelVirtualSliver extends StatelessWidget {
 
   /// 角色条目点击回调
   final void Function(UserCharacterApiItem item, String? avatarHeroTag)?
-      onCharacterTap;
+  onCharacterTap;
 
   /// 构建用户角色等级虚拟列表
   ///

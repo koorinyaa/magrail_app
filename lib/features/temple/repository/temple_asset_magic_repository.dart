@@ -7,9 +7,8 @@ final class TempleAssetMagicRepository {
   /// 创建圣殿资产魔法道具仓库
   ///
   /// [apiClient] Tinygrail API 客户端
-  const TempleAssetMagicRepository({
-    required ApiClient apiClient,
-  }) : _apiClient = apiClient;
+  const TempleAssetMagicRepository({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   final ApiClient _apiClient;
 
@@ -107,9 +106,7 @@ final class TempleAssetMagicRepository {
   /// 精炼圣殿角色
   ///
   /// [characterId] 角色 ID
-  Future<String> refineTemple({
-    required int characterId,
-  }) {
+  Future<String> refineTemple({required int characterId}) {
     return _submitStringAction(
       path: 'magic/refine/$characterId',
       fallbackMessage: '精炼失败',

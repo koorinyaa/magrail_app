@@ -247,9 +247,7 @@ final class UserWealthRankingEntry extends RankingEntry {
       totalBalance: TinygrailResponseParser.asDouble(json['TotalBalance']),
       principal: TinygrailResponseParser.asDouble(json['Principal']),
       lastIndex: TinygrailResponseParser.asInt(json['LastIndex']),
-      lastActiveDate: TinygrailResponseParser.asString(
-        json['LastActiveDate'],
-      ),
+      lastActiveDate: TinygrailResponseParser.asString(json['LastActiveDate']),
       state: TinygrailResponseParser.asInt(json['State']),
       rank: rank,
     );

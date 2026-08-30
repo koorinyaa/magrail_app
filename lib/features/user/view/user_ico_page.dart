@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:magrail_app/core/widgets/paged_sliver_state.dart';
 import 'package:magrail_app/core/widgets/tinygrail_paged_sliver_page.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
@@ -134,10 +134,7 @@ class _UserIcoPageState extends State<UserIcoPage> {
   ///
   /// [item] 用户 ICO 条目
   /// [avatarHeroTag] 入口头像转场标识
-  void _openCharacterDetail(
-    UserIcoApiItem item,
-    String? avatarHeroTag,
-  ) {
+  void _openCharacterDetail(UserIcoApiItem item, String? avatarHeroTag) {
     openCharacterDetail(
       context,
       characterId: item.characterId,

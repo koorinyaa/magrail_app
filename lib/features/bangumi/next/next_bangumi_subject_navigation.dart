@@ -9,19 +9,14 @@ const nextBangumiSubjectRouteName = 'nextBangumiSubject';
 ///
 /// [context] 当前组件树上下文
 /// [subjectId] 条目 ID
-void openNextBangumiSubject(
-  BuildContext context, {
-  required int subjectId,
-}) {
+void openNextBangumiSubject(BuildContext context, {required int subjectId}) {
   if (subjectId <= 0) {
     return;
   }
 
   context.pushNamed(
     nextBangumiSubjectRouteName,
-    queryParameters: {
-      'subjectId': subjectId.toString(),
-    },
+    queryParameters: {'subjectId': subjectId.toString()},
   );
 }
 
@@ -33,8 +28,5 @@ void openNextBangumiSubjectFromSearchItem(
   BuildContext context,
   NextBangumiSubjectSearchItem item,
 ) {
-  openNextBangumiSubject(
-    context,
-    subjectId: item.subjectId,
-  );
+  openNextBangumiSubject(context, subjectId: item.subjectId);
 }

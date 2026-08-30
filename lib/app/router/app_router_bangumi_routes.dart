@@ -18,10 +18,7 @@ List<RouteBase> buildBangumiRoutes(AppDependencies dependencies) {
         return MaterialPage(
           key: state.pageKey,
           child: NextBangumiSubjectPage(
-            subjectId: int.tryParse(
-                  queryParameters['subjectId'] ?? '',
-                ) ??
-                0,
+            subjectId: int.tryParse(queryParameters['subjectId'] ?? '') ?? 0,
             characterRepository: dependencies.repositories.characterDetail,
             templeRepository: dependencies.repositories.temple,
             magicRepository: dependencies.repositories.templeAssetMagic,

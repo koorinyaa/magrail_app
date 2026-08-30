@@ -10,10 +10,7 @@ class TopWeekHistoryPage extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [repository] 每周萌王仓库
-  const TopWeekHistoryPage({
-    super.key,
-    required this.repository,
-  });
+  const TopWeekHistoryPage({super.key, required this.repository});
 
   /// 每周萌王仓库
   final TopWeekRepository repository;
@@ -31,9 +28,8 @@ class _TopWeekHistoryPageState extends State<TopWeekHistoryPage> {
   @override
   void initState() {
     super.initState();
-    _controller = TopWeekHistoryController(
-      repository: widget.repository,
-    )..initialize();
+    _controller = TopWeekHistoryController(repository: widget.repository)
+      ..initialize();
   }
 
   /// 释放往期萌王二级页面状态
@@ -84,11 +80,7 @@ class _TopWeekHistoryPageState extends State<TopWeekHistoryPage> {
                 height: appBarHeight,
                 child: CustomScrollView(
                   physics: const NeverScrollableScrollPhysics(),
-                  slivers: [
-                    SecondaryPageSliverAppBar(
-                      title: title,
-                    ),
-                  ],
+                  slivers: [SecondaryPageSliverAppBar(title: title)],
                 ),
               ),
               Positioned(

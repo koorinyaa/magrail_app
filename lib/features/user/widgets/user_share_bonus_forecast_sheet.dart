@@ -40,8 +40,9 @@ Future<void> showUserShareBonusForecastSheet(
       const topGap = 32.0;
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
-      final maxHeight =
-          availableHeight.clamp(0.0, mediaQuery.size.height).toDouble();
+      final maxHeight = availableHeight
+          .clamp(0.0, mediaQuery.size.height)
+          .toDouble();
 
       return ConstrainedBox(
         constraints: BoxConstraints(maxHeight: maxHeight),

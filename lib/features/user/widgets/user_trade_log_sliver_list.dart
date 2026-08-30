@@ -67,10 +67,7 @@ class UserTradeLogSkeletonSliverList extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [itemCount] 骨架条目数量
-  const UserTradeLogSkeletonSliverList({
-    super.key,
-    this.itemCount = 12,
-  });
+  const UserTradeLogSkeletonSliverList({super.key, this.itemCount = 12});
 
   /// 骨架条目数量
   final int itemCount;
@@ -82,9 +79,7 @@ class UserTradeLogSkeletonSliverList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverList.separated(
       itemBuilder: (context, index) {
-        return const UserAssetRecordListItem(
-          child: _UserTradeLogSkeletonRow(),
-        );
+        return const UserAssetRecordListItem(child: _UserTradeLogSkeletonRow());
       },
       separatorBuilder: (context, index) => const _UserTradeLogDivider(),
       itemCount: itemCount,

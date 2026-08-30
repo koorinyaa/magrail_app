@@ -132,56 +132,56 @@ class CharacterPoolRow extends StatelessWidget {
   CharacterAssetMetric _buildSortMetric(CharacterFullListSort selectedSort) {
     return switch (selectedSort) {
       CharacterFullListSort.level ||
-      CharacterFullListSort.circulation =>
-        CharacterAssetMetric(
-          label: '流通',
-          value: _formatCount(item.total),
-          isValueMuted: true,
-        ),
+      CharacterFullListSort.circulation => CharacterAssetMetric(
+        label: '流通',
+        value: _formatCount(item.total),
+        isValueMuted: true,
+      ),
       CharacterFullListSort.dividend => CharacterAssetMetric(
-          label: '股息',
-          value: '+${Formatters.tinygrailCurrency(item.singleDividend)}',
-          isValueMuted: true,
-        ),
+        label: '股息',
+        value: '+${Formatters.tinygrailCurrency(item.singleDividend)}',
+        isValueMuted: true,
+      ),
       CharacterFullListSort.towerRank => CharacterAssetMetric(
-          value: '通天塔 '
-              '${item.rank <= 0 ? '--' : '${Formatters.groupedNumber(item.rank)}名'}'
-              ' · 星之力 ${Formatters.groupedNumber(item.starForces)}',
-          isValueMuted: true,
-        ),
+        value:
+            '通天塔 '
+            '${item.rank <= 0 ? '--' : '${Formatters.groupedNumber(item.rank)}名'}'
+            ' · 星之力 ${Formatters.groupedNumber(item.starForces)}',
+        isValueMuted: true,
+      ),
       CharacterFullListSort.stars => CharacterAssetMetric(
-          value: '',
-          valueWidget: TowerStarsRow(
-            stars: item.stars,
-            iconSize: 10,
-            spacing: 1,
-            runSpacing: 0,
-          ),
-          isValueMuted: true,
+        value: '',
+        valueWidget: TowerStarsRow(
+          stars: item.stars,
+          iconSize: 10,
+          spacing: 1,
+          runSpacing: 0,
         ),
+        isValueMuted: true,
+      ),
       CharacterFullListSort.currentPrice => CharacterAssetMetric(
-          label: '当前价',
-          value: Formatters.tinygrailCurrency(item.current),
-          isValueMuted: true,
-        ),
+        label: '当前价',
+        value: Formatters.tinygrailCurrency(item.current),
+        isValueMuted: true,
+      ),
       CharacterFullListSort.fluctuation => CharacterAssetMetric(
-          label: '涨跌',
-          value: _formatFluctuation(item.fluctuation),
-          isValueMuted: true,
-          valueColor: CharacterAssetCurrentPriceChip.resolveCurrentPriceColor(
-            item.fluctuation,
-          ),
+        label: '涨跌',
+        value: _formatFluctuation(item.fluctuation),
+        isValueMuted: true,
+        valueColor: CharacterAssetCurrentPriceChip.resolveCurrentPriceColor(
+          item.fluctuation,
         ),
+      ),
       CharacterFullListSort.marketValue => CharacterAssetMetric(
-          label: '市值',
-          value: _formatMarketValue(item.marketValue),
-          isValueMuted: true,
-        ),
+        label: '市值',
+        value: _formatMarketValue(item.marketValue),
+        isValueMuted: true,
+      ),
       CharacterFullListSort.listedDate => CharacterAssetMetric(
-          label: '上市日期',
-          value: TinygrailFormatters.listedDate(item.listedDate),
-          isValueMuted: true,
-        ),
+        label: '上市日期',
+        value: TinygrailFormatters.listedDate(item.listedDate),
+        isValueMuted: true,
+      ),
       _ => _buildDefaultSecondaryMetric(),
     };
   }
@@ -190,15 +190,15 @@ class CharacterPoolRow extends StatelessWidget {
   CharacterAssetMetric _buildDefaultSecondaryMetric() {
     return switch (rowType) {
       CharacterPoolRowType.valhalla => CharacterAssetMetric(
-          label: '底价',
-          value: Formatters.tinygrailCurrency(item.price),
-          isValueMuted: true,
-        ),
+        label: '底价',
+        value: Formatters.tinygrailCurrency(item.price),
+        isValueMuted: true,
+      ),
       CharacterPoolRowType.gensokyo => CharacterAssetMetric(
-          label: '股息',
-          value: '+${Formatters.tinygrailCurrency(item.singleDividend)}',
-          isValueMuted: true,
-        ),
+        label: '股息',
+        value: '+${Formatters.tinygrailCurrency(item.singleDividend)}',
+        isValueMuted: true,
+      ),
     };
   }
 
@@ -206,13 +206,13 @@ class CharacterPoolRow extends StatelessWidget {
   Widget _buildTrailing() {
     return switch (rowType) {
       CharacterPoolRowType.valhalla => _CharacterPoolAuctionButton(
-          hasUserBid: auction != null,
-          onPressed: onAuctionPressed,
-        ),
+        hasUserBid: auction != null,
+        onPressed: onAuctionPressed,
+      ),
       CharacterPoolRowType.gensokyo => CharacterAssetCurrentPriceChip(
-          current: item.current,
-          fluctuation: item.fluctuation,
-        ),
+        current: item.current,
+        fluctuation: item.fluctuation,
+      ),
     };
   }
 
@@ -243,10 +243,7 @@ class CharacterPoolRow extends StatelessWidget {
   /// [value] 原始市值
   String _formatMarketValue(double value) {
     if (value.abs() >= 10000) {
-      return Formatters.tinygrailCompactValue(
-        value.truncate(),
-        prefix: '₵',
-      );
+      return Formatters.tinygrailCompactValue(value.truncate(), prefix: '₵');
     }
     return Formatters.tinygrailCurrency(value);
   }

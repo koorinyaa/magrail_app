@@ -90,7 +90,8 @@ class UserAssetSparsePageCache<T> {
     required Future<TinygrailPage<T>> Function({
       required int page,
       required int pageSize,
-    }) pageLoader,
+    })
+    pageLoader,
     required void Function() onChanged,
   }) {
     if (absoluteIndex < 0 || absoluteIndex >= _totalItems) {
@@ -107,20 +108,23 @@ class UserAssetSparsePageCache<T> {
     }
     final generation = _generation;
     late final Future<bool> operation;
-    operation = pageLoader(page: page, pageSize: pageSize).then((result) {
-      if (generation != _generation) {
-        return false;
-      }
-      _storePage(page, result.items);
-      onChanged();
-      return true;
-    }).catchError((Object _) {
-      return false;
-    }).whenComplete(() {
-      if (identical(_pageOperations[page], operation)) {
-        _pageOperations.remove(page);
-      }
-    });
+    operation = pageLoader(page: page, pageSize: pageSize)
+        .then((result) {
+          if (generation != _generation) {
+            return false;
+          }
+          _storePage(page, result.items);
+          onChanged();
+          return true;
+        })
+        .catchError((Object _) {
+          return false;
+        })
+        .whenComplete(() {
+          if (identical(_pageOperations[page], operation)) {
+            _pageOperations.remove(page);
+          }
+        });
     _pageOperations[page] = operation;
     return operation;
   }

@@ -12,6 +12,7 @@ import 'package:magrail_app/features/chara/model/tinygrail_character_reward_item
 class TinygrailCharacterRewardCard extends StatelessWidget {
   /// 创建 Tinygrail 角色抽奖卡片
   ///
+  /// [key] Flutter 组件标识
   /// [item] 角色抽奖条目
   /// [heroTag] 封面 Hero 标识
   /// [enableCoverPreview] 是否允许打开封面大图
@@ -82,23 +83,14 @@ class _RewardCover extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final coverUrl = TinygrailAssetUrls.getLargeCover(item.cover);
-    final image = TempleCoverImage(
-      coverUrl: coverUrl,
-      avatarUrl: '',
-    );
+    final image = TempleCoverImage(coverUrl: coverUrl, avatarUrl: '');
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
       child: Stack(
         fit: StackFit.expand,
         children: [
-          if (heroTag == null)
-            image
-          else
-            Hero(
-              tag: heroTag!,
-              child: image,
-            ),
+          if (heroTag == null) image else Hero(tag: heroTag!, child: image),
           Positioned(
             right: 8,
             top: 8,
@@ -149,9 +141,7 @@ class _RewardTitle extends StatelessWidget {
   /// 创建 Tinygrail 角色抽奖名称与价格区域
   ///
   /// [item] 角色抽奖条目
-  const _RewardTitle({
-    required this.item,
-  });
+  const _RewardTitle({required this.item});
 
   /// 角色抽奖条目
   final TinygrailCharacterRewardItem item;
@@ -195,10 +185,7 @@ class _RewardTitle extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 6),
-                      LevelBadge(
-                        level: item.level,
-                        isCompact: true,
-                      ),
+                      LevelBadge(level: item.level, isCompact: true),
                     ],
                   ),
                 ),
@@ -216,11 +203,7 @@ class _RewardTitle extends StatelessWidget {
   ///
   /// [context] 当前组件树上下文
   void _openCharacter(BuildContext context) {
-    openCharacterDetail(
-      context,
-      characterId: item.id,
-      name: item.name,
-    );
+    openCharacterDetail(context, characterId: item.id, name: item.name);
   }
 }
 
@@ -229,9 +212,7 @@ class _RewardAmountPill extends StatelessWidget {
   /// 创建 Tinygrail 角色抽奖获得数量胶囊
   ///
   /// [amount] 获得数量
-  const _RewardAmountPill({
-    required this.amount,
-  });
+  const _RewardAmountPill({required this.amount});
 
   /// 获得数量
   final int amount;
@@ -267,9 +248,7 @@ class _RewardPricePill extends StatelessWidget {
   /// 创建 Tinygrail 角色抽奖当前价格胶囊
   ///
   /// [price] 当前价格
-  const _RewardPricePill({
-    required this.price,
-  });
+  const _RewardPricePill({required this.price});
 
   /// 当前价格
   final double price;

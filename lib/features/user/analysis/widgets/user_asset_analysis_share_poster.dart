@@ -81,11 +81,7 @@ class UserAssetAnalysisSharePoster extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: isDark
-                      ? const [
-                          _darkPageTop,
-                          _darkPageMiddle,
-                          _darkPageBottom,
-                        ]
+                      ? const [_darkPageTop, _darkPageMiddle, _darkPageBottom]
                       : const [
                           _lightPageTop,
                           _lightPageMiddle,
@@ -164,9 +160,7 @@ class _SharePosterFooter extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         border: Border(
-          top: BorderSide(
-            color: colorScheme.onSurface.withValues(alpha: 0.09),
-          ),
+          top: BorderSide(color: colorScheme.onSurface.withValues(alpha: 0.09)),
         ),
       ),
       child: Padding(

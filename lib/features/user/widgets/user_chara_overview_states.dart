@@ -21,10 +21,7 @@ class UserCharaOverviewSkeletonSection extends StatelessWidget {
         PageSectionSliver(
           topSpacing: 12,
           title: '连接',
-          child: UserLinkOverviewCarousel(
-            links: null,
-            isLoading: true,
-          ),
+          child: UserLinkOverviewCarousel(links: null, isLoading: true),
         ),
         PageSectionSliver(
           topSpacing: 22,
@@ -38,18 +35,12 @@ class UserCharaOverviewSkeletonSection extends StatelessWidget {
         PageSectionSliver(
           topSpacing: 22,
           title: '角色',
-          child: UserCharacterAssetCarousel(
-            characters: null,
-            isLoading: true,
-          ),
+          child: UserCharacterAssetCarousel(characters: null, isLoading: true),
         ),
         PageSectionSliver(
           topSpacing: 22,
           title: 'ICO',
-          child: UserIcoAssetCarousel(
-            icos: null,
-            isLoading: true,
-          ),
+          child: UserIcoAssetCarousel(icos: null, isLoading: true),
         ),
       ],
     );
@@ -63,11 +54,7 @@ class UserOverviewMessage extends StatelessWidget {
   /// [key] Flutter 组件标识
   /// [message] 提示文案
   /// [onRetry] 重试回调
-  const UserOverviewMessage({
-    super.key,
-    required this.message,
-    this.onRetry,
-  });
+  const UserOverviewMessage({super.key, required this.message, this.onRetry});
 
   /// 提示文案
   final String message;

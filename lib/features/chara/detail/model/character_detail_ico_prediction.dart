@@ -42,9 +42,7 @@ class CharacterDetailIcoPrediction {
   /// 从 ICO 头部资料创建预测数据
   ///
   /// [info] ICO 头部资料
-  factory CharacterDetailIcoPrediction.fromInfo(
-    CharacterDetailIcoInfo info,
-  ) {
+  factory CharacterDetailIcoPrediction.fromInfo(CharacterDetailIcoInfo info) {
     return CharacterDetailIcoPrediction.fromTotals(
       total: info.total,
       users: info.users,

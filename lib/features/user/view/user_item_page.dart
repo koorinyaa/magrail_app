@@ -15,10 +15,7 @@ class UserItemPage extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [repository] 用户仓库
-  const UserItemPage({
-    super.key,
-    required this.repository,
-  });
+  const UserItemPage({super.key, required this.repository});
 
   /// 用户仓库
   final UserRepository repository;
@@ -36,9 +33,8 @@ class _UserItemPageState extends State<UserItemPage> {
   @override
   void initState() {
     super.initState();
-    _controller = UserItemPageController(
-      repository: widget.repository,
-    )..initialize();
+    _controller = UserItemPageController(repository: widget.repository)
+      ..initialize();
   }
 
   /// 释放用户道具二级页面状态
@@ -103,10 +99,7 @@ class _UserItemPageState extends State<UserItemPage> {
       return;
     }
 
-    AppToast.error(
-      context,
-      text: '刷新失败，请检查网络后重试',
-    );
+    AppToast.error(context, text: '刷新失败，请检查网络后重试');
   }
 
   /// 重试加载用户道具列表

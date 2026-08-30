@@ -70,7 +70,8 @@ class UserTempleLevelVirtualSliver extends StatelessWidget {
             context,
             left: UserTempleResponsiveGrid.horizontalPadding,
             top: UserTempleResponsiveGrid.topPadding,
-            right: UserTempleResponsiveGrid.horizontalPadding +
+            right:
+                UserTempleResponsiveGrid.horizontalPadding +
                 UserTempleResponsiveGrid.levelRailReservedWidth,
             bottom: 0,
           ),

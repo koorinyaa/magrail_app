@@ -87,8 +87,9 @@ class CharacterDetailUserAssetsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final disableAnimations = MediaQuery.disableAnimationsOf(context);
-    final duration =
-        disableAnimations ? Duration.zero : const Duration(milliseconds: 180);
+    final duration = disableAnimations
+        ? Duration.zero
+        : const Duration(milliseconds: 180);
 
     return AnimatedSwitcher(
       duration: duration,
@@ -96,41 +97,39 @@ class CharacterDetailUserAssetsSection extends StatelessWidget {
       switchOutCurve: Curves.easeOutCubic,
       child: switch (assets.status) {
         CharacterDetailUserAssetsStatus.signedOut => _UserAssetsMessage(
-            key: const ValueKey<String>('assets-signed-out'),
-            icon: Icons.login_rounded,
-            title: '未授权',
-            message: '部分功能需要授权才能使用',
-            actionLabel: '点击授权',
-            onActionPressed: onAuthorize,
-          ),
+          key: const ValueKey<String>('assets-signed-out'),
+          icon: Icons.login_rounded,
+          title: '未授权',
+          message: '部分功能需要授权才能使用',
+          actionLabel: '点击授权',
+          onActionPressed: onAuthorize,
+        ),
         CharacterDetailUserAssetsStatus.loading =>
           const TempleAssetCardSkeleton(
             key: ValueKey<String>('assets-loading'),
           ),
         CharacterDetailUserAssetsStatus.failure => _UserAssetsMessage(
-            key: const ValueKey<String>('assets-failure'),
-            icon: Icons.wifi_off_rounded,
-            message: assets.errorMessage ?? '获取当前用户资产失败',
-            actionLabel: '重试',
-            onActionPressed: () => unawaited(onRetry()),
-          ),
+          key: const ValueKey<String>('assets-failure'),
+          icon: Icons.wifi_off_rounded,
+          message: assets.errorMessage ?? '获取当前用户资产失败',
+          actionLabel: '重试',
+          onActionPressed: () => unawaited(onRetry()),
+        ),
         CharacterDetailUserAssetsStatus.ready => _UserAssetsListContent(
-            key: ValueKey<int?>(
-              assets.temple?.id,
-            ),
-            header: header,
-            character:
-                assets.character ?? const CharacterDetailUserCharacter.empty(),
-            temple: assets.temple,
-            currentUserDisplayName: currentUserDisplayName,
-            currentUserName: currentUserName,
-            repository: repository,
-            templeRepository: templeRepository,
-            magicRepository: magicRepository,
-            oosRepository: oosRepository,
-            userRepository: userRepository,
-            onActionCompleted: onRetry,
-          ),
+          key: ValueKey<int?>(assets.temple?.id),
+          header: header,
+          character:
+              assets.character ?? const CharacterDetailUserCharacter.empty(),
+          temple: assets.temple,
+          currentUserDisplayName: currentUserDisplayName,
+          currentUserName: currentUserName,
+          repository: repository,
+          templeRepository: templeRepository,
+          magicRepository: magicRepository,
+          oosRepository: oosRepository,
+          userRepository: userRepository,
+          onActionCompleted: onRetry,
+        ),
       },
     );
   }
@@ -208,11 +207,7 @@ class _UserAssetsMessage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 14),
       child: Row(
         children: [
-          Icon(
-            icon,
-            size: 18,
-            color: colorScheme.onSurfaceVariant,
-          ),
+          Icon(icon, size: 18, color: colorScheme.onSurfaceVariant),
           const SizedBox(width: 10),
           Expanded(
             child: Text(

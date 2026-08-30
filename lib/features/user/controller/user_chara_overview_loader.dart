@@ -9,9 +9,8 @@ class UserCharaOverviewLoader {
   /// 创建用户角色资产预览加载器
   ///
   /// [repository] 用户仓库
-  const UserCharaOverviewLoader({
-    required UserRepository repository,
-  }) : _repository = repository;
+  const UserCharaOverviewLoader({required UserRepository repository})
+    : _repository = repository;
 
   final UserRepository _repository;
 
@@ -27,9 +26,7 @@ class UserCharaOverviewLoader {
   /// 加载用户角色资产预览
   ///
   /// [username] 用户名
-  Future<UserCharaOverviewLoadResult> load({
-    required String username,
-  }) async {
+  Future<UserCharaOverviewLoadResult> load({required String username}) async {
     var links = const <UserLinkApiItem>[];
     var temples = const <UserTempleApiItem>[];
     var characters = const <UserCharacterApiItem>[];

@@ -213,10 +213,7 @@ class _AboutPageState extends State<_AboutPage> {
         _appIconTurns = nextValue ? 0.5 : 0;
       });
       widget.onHiddenFeaturesChanged(nextValue);
-      AppToast.info(
-        context,
-        text: nextValue ? '隐藏功能已开启' : '隐藏功能已关闭',
-      );
+      AppToast.info(context, text: nextValue ? '隐藏功能已开启' : '隐藏功能已关闭');
     } catch (_) {
       if (!mounted) {
         return;
@@ -258,10 +255,7 @@ class _AboutPageState extends State<_AboutPage> {
       }
 
       if (result.hasUpdate) {
-        await showAppUpdateDialog(
-          context,
-          controller: widget.updateController,
-        );
+        await showAppUpdateDialog(context, controller: widget.updateController);
       } else {
         AppToast.info(context, text: '已是最新版本');
       }

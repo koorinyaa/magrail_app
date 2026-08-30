@@ -81,14 +81,17 @@ class CharacterPoolPage extends StatefulWidget {
 /// 角色池二级页面状态
 class _CharacterPoolPageState extends State<CharacterPoolPage>
     with
-        CharacterFullListPageStateMixin<UserCharacterApiItem,
-            CharacterPoolPage> {
+        CharacterFullListPageStateMixin<
+          UserCharacterApiItem,
+          CharacterPoolPage
+        > {
   late final CharacterPoolPageController _controller;
 
   /// 当前角色池全量列表控制器
   @override
   CharacterPoolPageController get fullListController => _controller;
 
+  /// 判断当前角色池是否启用拍卖操作
   bool get _isAuctionEnabled => widget.rowType == CharacterPoolRowType.valhalla;
 
   /// 初始化角色池二级页面状态
@@ -174,10 +177,7 @@ class _CharacterPoolPageState extends State<CharacterPoolPage>
   ///
   /// [item] 角色池条目
   /// [avatarHeroTag] 头像转场标识
-  void _openCharacterDetail(
-    UserCharacterApiItem item,
-    String? avatarHeroTag,
-  ) {
+  void _openCharacterDetail(UserCharacterApiItem item, String? avatarHeroTag) {
     openCharacterDetail(
       context,
       characterId: item.characterId,
@@ -239,10 +239,7 @@ class _CharacterPoolPageState extends State<CharacterPoolPage>
         AppToast.error(context, text: '该功能需要授权后才能使用');
         return false;
       case UserAssetsFetchStatus.failure:
-        AppToast.error(
-          context,
-          text: result.message ?? '用户资产加载失败',
-        );
+        AppToast.error(context, text: result.message ?? '用户资产加载失败');
         return false;
     }
   }

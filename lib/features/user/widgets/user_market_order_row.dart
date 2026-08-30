@@ -151,10 +151,7 @@ class _UserMarketOrderAvatar extends StatelessWidget {
   ///
   /// [imageUrl] 角色头像地址
   /// [heroTag] 头像转场标识
-  const _UserMarketOrderAvatar({
-    required this.imageUrl,
-    required this.heroTag,
-  });
+  const _UserMarketOrderAvatar({required this.imageUrl, required this.heroTag});
 
   /// 角色头像地址
   final String imageUrl;

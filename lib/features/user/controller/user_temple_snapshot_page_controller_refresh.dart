@@ -25,7 +25,8 @@ extension UserTempleSnapshotPageControllerRefresh
     if (identical(_automaticRefreshOperation, operation)) {
       _automaticRefreshOperation = null;
     }
-    final shouldReportFailure = startedByAutomatic &&
+    final shouldReportFailure =
+        startedByAutomatic &&
         !success &&
         !_suppressAutomaticRefreshFailure &&
         !_isDisposed;
@@ -55,9 +56,7 @@ extension UserTempleSnapshotPageControllerRefresh
   /// 启动或复用圣殿刷新流程
   ///
   /// [blockPageLoading] 是否暂停页面分页交互
-  Future<bool> _startOrJoinTempleRefresh({
-    required bool blockPageLoading,
-  }) {
+  Future<bool> _startOrJoinTempleRefresh({required bool blockPageLoading}) {
     final existing = _templeRefreshOperation;
     if (existing != null) {
       return existing;
@@ -66,18 +65,19 @@ extension UserTempleSnapshotPageControllerRefresh
       _setPageBlockingRefresh(true);
     }
     late final Future<bool> operation;
-    operation = _refreshTemplesAndReloadVisibleWindow(
-      waitForQueryChange: !blockPageLoading,
-    ).whenComplete(() {
-      if (!identical(_templeRefreshOperation, operation)) {
-        return;
-      }
-      _templeRefreshOperation = null;
-      if (blockPageLoading) {
-        _setPageBlockingRefresh(false);
-        _resumeDeferredNextPageLoad();
-      }
-    });
+    operation =
+        _refreshTemplesAndReloadVisibleWindow(
+          waitForQueryChange: !blockPageLoading,
+        ).whenComplete(() {
+          if (!identical(_templeRefreshOperation, operation)) {
+            return;
+          }
+          _templeRefreshOperation = null;
+          if (blockPageLoading) {
+            _setPageBlockingRefresh(false);
+            _resumeDeferredNextPageLoad();
+          }
+        });
     _templeRefreshOperation = operation;
     return operation;
   }

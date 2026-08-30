@@ -18,6 +18,7 @@ class TowerRankingCarousel extends StatelessWidget {
   /// [isLoadFailed] 是否加载失败
   /// [onRetry] 重试回调
   /// [onEntryTap] 条目点击回调
+  /// [key] Flutter 组件标识
   const TowerRankingCarousel({
     super.key,
     required this.entries,
@@ -54,10 +55,7 @@ class TowerRankingCarousel extends StatelessWidget {
         final screenWidth = constraints.maxWidth.isFinite
             ? constraints.maxWidth
             : MediaQuery.sizeOf(context).width;
-        final columnWidth = math.max(
-          248.0,
-          math.min(318.0, screenWidth - 72),
-        );
+        final columnWidth = math.max(248.0, math.min(318.0, screenWidth - 72));
         final showSkeleton = isLoading && (entries == null || entries!.isEmpty);
 
         if (isLoadFailed &&
@@ -68,9 +66,7 @@ class TowerRankingCarousel extends StatelessWidget {
               context,
               horizontal: 24,
             ),
-            child: _TowerRankingErrorState(
-              onRetry: onRetry,
-            ),
+            child: _TowerRankingErrorState(onRetry: onRetry),
           );
         }
 
@@ -147,9 +143,11 @@ class TowerRankingCarousel extends StatelessWidget {
     final resolvedEntries = entries ?? const <TowerEntry>[];
     final result = <List<TowerEntry>>[];
 
-    for (var start = 0;
-        start < resolvedEntries.length;
-        start += rowsPerColumn) {
+    for (
+      var start = 0;
+      start < resolvedEntries.length;
+      start += rowsPerColumn
+    ) {
       final end = math.min(start + rowsPerColumn, resolvedEntries.length);
       result.add(resolvedEntries.sublist(start, end));
     }
@@ -163,9 +161,7 @@ class _TowerRankingErrorState extends StatelessWidget {
   /// 创建首页通天塔加载失败状态
   ///
   /// [onRetry] 重试回调
-  const _TowerRankingErrorState({
-    required this.onRetry,
-  });
+  const _TowerRankingErrorState({required this.onRetry});
 
   /// 重试回调
   final Future<void> Function() onRetry;

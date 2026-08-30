@@ -14,8 +14,8 @@ class CharacterDetailCollectionsController extends ChangeNotifier {
   CharacterDetailCollectionsController({
     required CharacterDetailRepository repository,
     required int characterId,
-  })  : _repository = repository,
-        _characterId = characterId;
+  }) : _repository = repository,
+       _characterId = characterId;
 
   static const int _linkPreviewLimit = 6;
   static const int _templePreviewLimit = 12;
@@ -67,10 +67,7 @@ class CharacterDetailCollectionsController extends ChangeNotifier {
 
   /// 固定资产与 LINK 合并列表
   List<CharacterDetailTempleItem> get mergedTemples {
-    return [
-      ..._temples,
-      ...validLinks,
-    ];
+    return [..._temples, ...validLinks];
   }
 
   /// LINK 一级预览列表
@@ -80,9 +77,9 @@ class CharacterDetailCollectionsController extends ChangeNotifier {
 
   /// 固定资产一级预览列表
   List<CharacterDetailTempleItem> get previewTemples {
-    return _hideDuplicateCovers(mergedTemples)
-        .take(_templePreviewLimit)
-        .toList(growable: false);
+    return _hideDuplicateCovers(
+      mergedTemples,
+    ).take(_templePreviewLimit).toList(growable: false);
   }
 
   /// 从合并后的圣殿与连接中查找拥有者条目

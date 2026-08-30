@@ -52,7 +52,8 @@ class SecondaryPageRefreshView extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final headerHeight = MediaQuery.paddingOf(context).top +
+    final headerHeight =
+        MediaQuery.paddingOf(context).top +
         SecondaryPageSliverAppBar.defaultToolbarHeight +
         (bottom?.preferredSize.height ?? 0);
 
@@ -142,7 +143,8 @@ class _SecondaryPageHeader extends StatelessWidget {
               children: [
                 SizedBox(height: MediaQuery.paddingOf(context).top),
                 SizedBox(
-                  height: SecondaryPageSliverAppBar.defaultToolbarHeight +
+                  height:
+                      SecondaryPageSliverAppBar.defaultToolbarHeight +
                       (bottom?.preferredSize.height ?? 0),
                   child: AppBar(
                     primary: false,
@@ -154,10 +156,7 @@ class _SecondaryPageHeader extends StatelessWidget {
                     forceMaterialTransparency: true,
                     leading: IconButton(
                       onPressed: () => Navigator.of(context).maybePop(),
-                      icon: const Icon(
-                        Icons.chevron_left_rounded,
-                        size: 30,
-                      ),
+                      icon: const Icon(Icons.chevron_left_rounded, size: 30),
                     ),
                     title: Text.rich(
                       TextSpan(
@@ -171,7 +170,7 @@ class _SecondaryPageHeader extends StatelessWidget {
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                                 fontFeatures: const [
-                                  FontFeature.tabularFigures()
+                                  FontFeature.tabularFigures(),
                                 ],
                               ),
                             ),

@@ -8,9 +8,8 @@ class TopWeekHistoryController extends ChangeNotifier {
   /// 创建往期萌王分页控制器
   ///
   /// [repository] 每周萌王仓库
-  TopWeekHistoryController({
-    required TopWeekRepository repository,
-  }) : _repository = repository;
+  TopWeekHistoryController({required TopWeekRepository repository})
+    : _repository = repository;
 
   final TopWeekRepository _repository;
   final Map<int, TinygrailPage<TopWeekHistoryApiItem>> _pages =
@@ -103,15 +102,8 @@ class TopWeekHistoryController extends ChangeNotifier {
   ///
   /// [page] 目标页码
   /// [force] 是否忽略已缓存数据重新请求
-  Future<void> loadPage(
-    int page, {
-    bool force = false,
-  }) async {
-    await _loadPage(
-      page,
-      force: force,
-      reportError: true,
-    );
+  Future<void> loadPage(int page, {bool force = false}) async {
+    await _loadPage(page, force: force, reportError: true);
   }
 
   /// 执行指定页加载
@@ -178,11 +170,7 @@ class TopWeekHistoryController extends ChangeNotifier {
       return;
     }
 
-    await _loadPage(
-      nextPage,
-      force: false,
-      reportError: false,
-    );
+    await _loadPage(nextPage, force: false, reportError: false);
   }
 
   /// 释放往期萌王分页控制器

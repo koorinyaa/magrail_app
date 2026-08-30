@@ -9,9 +9,8 @@ class CharacterTradeHistoryRepository {
   /// 创建角色交易记录仓库
   ///
   /// [apiClient] Tinygrail API 客户端
-  const CharacterTradeHistoryRepository({
-    required ApiClient apiClient,
-  }) : _apiClient = apiClient;
+  const CharacterTradeHistoryRepository({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   // 历史图表接口需要传入起始日期来覆盖完整查询范围
   static const String _historyStartDate = '2019-08-08';
@@ -28,15 +27,14 @@ class CharacterTradeHistoryRepository {
       'chara/charts/$characterId/$_historyStartDate',
     );
     final response =
-        TinygrailResponse<List<CharacterTradeHistoryItem>>.fromJson(
-      json,
-      (value) {
-        return TinygrailResponseParser.asObjectList(
+        TinygrailResponse<List<CharacterTradeHistoryItem>>.fromJson(json, (
           value,
-          CharacterTradeHistoryItem.fromJson,
-        );
-      },
-    );
+        ) {
+          return TinygrailResponseParser.asObjectList(
+            value,
+            CharacterTradeHistoryItem.fromJson,
+          );
+        });
 
     if (!response.isSuccess) {
       throw StateError(response.message ?? '获取交易记录失败');
@@ -51,7 +49,7 @@ class CharacterTradeHistoryRepository {
   /// [page] 页码
   /// [pageSize] 每页条目数
   Future<TinygrailPage<CharacterGmTradeHistoryItem>>
-      fetchCharacterGmTradeHistory({
+  fetchCharacterGmTradeHistory({
     required int characterId,
     required int page,
     required int pageSize,
@@ -61,19 +59,19 @@ class CharacterTradeHistoryRepository {
     );
     final response =
         TinygrailResponse<TinygrailPage<CharacterGmTradeHistoryItem>>.fromJson(
-      json,
-      (value) {
-        final valueJson = TinygrailResponseParser.asObjectMap(value);
-        if (valueJson == null) {
-          return null;
-        }
+          json,
+          (value) {
+            final valueJson = TinygrailResponseParser.asObjectMap(value);
+            if (valueJson == null) {
+              return null;
+            }
 
-        return TinygrailPage<CharacterGmTradeHistoryItem>.fromJson(
-          valueJson,
-          CharacterGmTradeHistoryItem.fromJson,
+            return TinygrailPage<CharacterGmTradeHistoryItem>.fromJson(
+              valueJson,
+              CharacterGmTradeHistoryItem.fromJson,
+            );
+          },
         );
-      },
-    );
 
     if (!response.isSuccess) {
       throw StateError(response.message ?? '获取 GM 交易记录失败');

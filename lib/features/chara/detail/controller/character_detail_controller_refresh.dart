@@ -1,5 +1,6 @@
 part of 'character_detail_controller.dart';
 
+/// 角色详情刷新操作
 extension _CharacterDetailControllerRefresh on CharacterDetailController {
   /// 刷新已上市头部补充数据
   ///
@@ -14,8 +15,9 @@ extension _CharacterDetailControllerRefresh on CharacterDetailController {
     final valhallaFuture = _repository.fetchValhallaCharacter(characterId);
     final gensokyoFuture = _repository.fetchGensokyoAmount(characterId);
     final poolFuture = _repository.fetchCharacterPoolAmount(characterId);
-    final boardMembersFuture =
-        _repository.fetchCharacterBoardMembers(characterId);
+    final boardMembersFuture = _repository.fetchCharacterBoardMembers(
+      characterId,
+    );
     final killVotesFuture = _repository.fetchKillVotes(characterId);
 
     final valhallaCharacter = await valhallaFuture;
@@ -37,7 +39,8 @@ extension _CharacterDetailControllerRefresh on CharacterDetailController {
 
     final cachedUserId = _currentUser?.userId ?? 0;
     final currentUserId = cachedUserId > 0 ? cachedUserId : null;
-    final hasCurrentUserKillVote = currentUserId != null &&
+    final hasCurrentUserKillVote =
+        currentUserId != null &&
         killVotes.any((vote) => vote.userId == currentUserId);
 
     _tradeHeaders[characterId] = tradeHeader.withSupplementalStats(

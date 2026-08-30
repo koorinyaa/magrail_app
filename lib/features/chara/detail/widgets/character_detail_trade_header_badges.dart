@@ -5,9 +5,7 @@ class _TradeHeaderBadges extends StatelessWidget {
   /// 创建已上市头部徽标组
   ///
   /// [header] 已上市角色头部资料
-  const _TradeHeaderBadges({
-    required this.header,
-  });
+  const _TradeHeaderBadges({required this.header});
 
   /// 已上市角色头部资料
   final CharacterDetailTradeHeader header;
@@ -68,9 +66,7 @@ class _TradeHeaderPriceChip extends StatelessWidget {
   /// 创建已上市头部价格 Chip
   ///
   /// [header] 已上市角色头部资料
-  const _TradeHeaderPriceChip({
-    required this.header,
-  });
+  const _TradeHeaderPriceChip({required this.header});
 
   /// 已上市角色头部资料
   final CharacterDetailTradeHeader header;
@@ -104,9 +100,7 @@ class _TradeHeaderTowerChip extends StatelessWidget {
   /// 创建已上市头部通天塔 Chip
   ///
   /// [header] 已上市角色头部资料
-  const _TradeHeaderTowerChip({
-    required this.header,
-  });
+  const _TradeHeaderTowerChip({required this.header});
 
   /// 已上市角色头部资料
   final CharacterDetailTradeHeader header;
@@ -139,10 +133,7 @@ class _TradeHeaderStatChip extends StatelessWidget {
   ///
   /// [label] 数据名称
   /// [value] 数据值
-  const _TradeHeaderStatChip({
-    required this.label,
-    required this.value,
-  });
+  const _TradeHeaderStatChip({required this.label, required this.value});
 
   /// 数据名称
   final String label;
@@ -155,9 +146,7 @@ class _TradeHeaderStatChip extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return _TradeHeaderInfoChip(
-      text: '$label $value',
-    );
+    return _TradeHeaderInfoChip(text: '$label $value');
   }
 }
 
@@ -214,9 +203,7 @@ class _TradeHeaderStarForcesSegment extends StatelessWidget {
   /// 创建已上市头部星之力片段
   ///
   /// [value] 星之力原始数值
-  const _TradeHeaderStarForcesSegment({
-    required this.value,
-  });
+  const _TradeHeaderStarForcesSegment({required this.value});
 
   /// 星之力原始数值
   final int value;
@@ -231,12 +218,7 @@ class _TradeHeaderStarForcesSegment extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          Symbols.auto_awesome,
-          size: 11,
-          fill: 0,
-          color: color,
-        ),
+        Icon(Symbols.auto_awesome, size: 11, fill: 0, color: color),
         const SizedBox(width: 2),
         _TradeHeaderChipText(
           text: Formatters.tinygrailCompactValue(value),
@@ -252,9 +234,7 @@ class _TradeHeaderChipDivider extends StatelessWidget {
   /// 创建已上市头部 Chip 分隔线
   ///
   /// [color] 分隔线颜色
-  const _TradeHeaderChipDivider({
-    required this.color,
-  });
+  const _TradeHeaderChipDivider({required this.color});
 
   /// 分隔线颜色
   final Color color;
@@ -282,10 +262,7 @@ class _TradeHeaderChipText extends StatelessWidget {
   ///
   /// [text] 显示文本
   /// [color] 文本颜色
-  const _TradeHeaderChipText({
-    required this.text,
-    this.color,
-  });
+  const _TradeHeaderChipText({required this.text, this.color});
 
   /// 显示文本
   final String text;
@@ -363,10 +340,7 @@ class _TradeHeaderChipShell extends StatelessWidget {
       color: colors.backgroundColor,
       borderRadius: BorderRadius.circular(999),
       clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onPressed,
-        child: content,
-      ),
+      child: InkWell(onTap: onPressed, child: content),
     );
   }
 }
@@ -428,11 +402,7 @@ class _TradeHeaderInfoChip extends StatelessWidget {
   /// [text] Chip 文本
   /// [icon] Chip 图标
   /// [accentColor] Chip 强调色
-  const _TradeHeaderInfoChip({
-    required this.text,
-    this.icon,
-    this.accentColor,
-  });
+  const _TradeHeaderInfoChip({required this.text, this.icon, this.accentColor});
 
   /// Chip 文本
   final String text;
@@ -456,11 +426,7 @@ class _TradeHeaderInfoChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(
-              icon,
-              size: 11,
-              color: colors.foregroundColor,
-            ),
+            Icon(icon, size: 11, color: colors.foregroundColor),
             const SizedBox(width: 4),
           ],
           Flexible(

@@ -15,10 +15,7 @@ class AllCharacterRankPage extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [repository] 角色排序仓库
-  const AllCharacterRankPage({
-    super.key,
-    required this.repository,
-  });
+  const AllCharacterRankPage({super.key, required this.repository});
 
   /// 角色排序仓库
   final CharacterRankRepository repository;
@@ -31,8 +28,10 @@ class AllCharacterRankPage extends StatefulWidget {
 /// 所有角色排序二级页面状态
 class _AllCharacterRankPageState extends State<AllCharacterRankPage>
     with
-        CharacterFullListPageStateMixin<CharacterRankEntry,
-            AllCharacterRankPage> {
+        CharacterFullListPageStateMixin<
+          CharacterRankEntry,
+          AllCharacterRankPage
+        > {
   late final AllCharacterFullListPageController _controller;
 
   /// 当前所有角色全量列表控制器
@@ -69,37 +68,40 @@ class _AllCharacterRankPageState extends State<AllCharacterRankPage>
       builder: (context, child) {
         final page =
             TinygrailPagedSliverPage<CharacterRankEntry, CharacterRankEntry>(
-          controller: _controller,
-          scrollController: fullListScrollController,
-          title: '所有角色',
-          titleSupplement: _buildTitleSupplement(),
-          appBarBottom: buildFullListSortToolbar(),
-          loadingSliver: const CharacterRankSkeletonSliverList(),
-          emptySliverBuilder: (context, controller) {
-            final isFiltering = _controller.searchKeyword.isNotEmpty;
-            return PagedSliverState(
-              title: isFiltering ? '未找到角色' : '暂无角色',
-              message: isFiltering ? '没有符合搜索条件的角色' : '当前没有可展示的角色',
-              icon:
-                  isFiltering ? Icons.search_off_rounded : Icons.inbox_rounded,
+              controller: _controller,
+              scrollController: fullListScrollController,
+              title: '所有角色',
+              titleSupplement: _buildTitleSupplement(),
+              appBarBottom: buildFullListSortToolbar(),
+              loadingSliver: const CharacterRankSkeletonSliverList(),
+              emptySliverBuilder: (context, controller) {
+                final isFiltering = _controller.searchKeyword.isNotEmpty;
+                return PagedSliverState(
+                  title: isFiltering ? '未找到角色' : '暂无角色',
+                  message: isFiltering ? '没有符合搜索条件的角色' : '当前没有可展示的角色',
+                  icon: isFiltering
+                      ? Icons.search_off_rounded
+                      : Icons.inbox_rounded,
+                );
+              },
+              contentSliversBuilder: (context, items, onItemBuilt) {
+                return [
+                  CharacterRankSliverList(
+                    items: items,
+                    selectedType: CharacterRankSortType.maxRise,
+                    localSort: _controller.hasFullData
+                        ? _controller.sort
+                        : null,
+                    showLevelHeaders: _controller.showsLevelHeaders,
+                    onItemBuilt: onItemBuilt,
+                    onCharacterTap: _openCharacterDetail,
+                  ),
+                ];
+              },
+              completedLabel: '没有更多角色了',
+              bottomContentPadding: fullListBottomContentPadding,
+              refreshErrorText: '数据刷新失败',
             );
-          },
-          contentSliversBuilder: (context, items, onItemBuilt) {
-            return [
-              CharacterRankSliverList(
-                items: items,
-                selectedType: CharacterRankSortType.maxRise,
-                localSort: _controller.hasFullData ? _controller.sort : null,
-                showLevelHeaders: _controller.showsLevelHeaders,
-                onItemBuilt: onItemBuilt,
-                onCharacterTap: _openCharacterDetail,
-              ),
-            ];
-          },
-          completedLabel: '没有更多角色了',
-          bottomContentPadding: fullListBottomContentPadding,
-          refreshErrorText: '数据刷新失败',
-        );
         return buildFullListOverlay(child: page);
       },
     );
@@ -118,10 +120,7 @@ class _AllCharacterRankPageState extends State<AllCharacterRankPage>
   ///
   /// [item] 角色排序条目
   /// [avatarHeroTag] 头像转场标识
-  void _openCharacterDetail(
-    CharacterRankEntry item,
-    String? avatarHeroTag,
-  ) {
+  void _openCharacterDetail(CharacterRankEntry item, String? avatarHeroTag) {
     openCharacterDetail(
       context,
       characterId: item.characterId,

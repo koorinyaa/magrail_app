@@ -67,7 +67,8 @@ class CharacterDetailLinkCard extends StatelessWidget {
   final void Function(
     CharacterDetailTempleItem ownerItem,
     CharacterDetailTempleItem linkedItem,
-  )? onLinkedAssetTap;
+  )?
+  onLinkedAssetTap;
 
   /// 根据卡片宽度计算卡片高度
   ///
@@ -111,15 +112,16 @@ class CharacterDetailLinkCard extends StatelessWidget {
             ),
             leftHeroTag: _heroTag(left, 'left'),
             onLeftCoverTap: () => _openImageViewer(context, left, 'left'),
-            onLeftCharacterTap:
-                onCharacterTap == null ? null : () => onCharacterTap!(left),
+            onLeftCharacterTap: onCharacterTap == null
+                ? null
+                : () => onCharacterTap!(left),
             onLeftAssetTap: currentOnLeft
                 ? (onTempleAssetTap == null
-                    ? null
-                    : () => onTempleAssetTap!(item))
+                      ? null
+                      : () => onTempleAssetTap!(item))
                 : (onLinkedAssetTap == null
-                    ? null
-                    : () => onLinkedAssetTap!(item, linked)),
+                      ? null
+                      : () => onLinkedAssetTap!(item, linked)),
             rightCoverUrl: TinygrailAssetUrls.getSmallCover(right.cover),
             rightAvatarUrl: TinygrailAssetUrls.normalizeAvatar(right.avatar),
             rightCharacterName: TinygrailFormatters.decodeHtmlEntities(
@@ -129,15 +131,16 @@ class CharacterDetailLinkCard extends StatelessWidget {
             ),
             rightHeroTag: _heroTag(right, 'right'),
             onRightCoverTap: () => _openImageViewer(context, right, 'right'),
-            onRightCharacterTap:
-                onCharacterTap == null ? null : () => onCharacterTap!(right),
+            onRightCharacterTap: onCharacterTap == null
+                ? null
+                : () => onCharacterTap!(right),
             onRightAssetTap: currentOnLeft
                 ? (onLinkedAssetTap == null
-                    ? null
-                    : () => onLinkedAssetTap!(item, linked))
+                      ? null
+                      : () => onLinkedAssetTap!(item, linked))
                 : (onTempleAssetTap == null
-                    ? null
-                    : () => onTempleAssetTap!(item)),
+                      ? null
+                      : () => onTempleAssetTap!(item)),
           ),
           const SizedBox(height: 8),
           Padding(
@@ -210,10 +213,7 @@ class _LinkOwnerButton extends StatelessWidget {
   ///
   /// [label] 拥有者展示文案
   /// [onTap] 点击回调
-  const _LinkOwnerButton({
-    required this.label,
-    this.onTap,
-  });
+  const _LinkOwnerButton({required this.label, this.onTap});
 
   /// 拥有者展示文案
   final String label;

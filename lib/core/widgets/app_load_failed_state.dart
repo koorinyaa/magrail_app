@@ -124,11 +124,7 @@ class AppLoadFailedState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              color: colorScheme.onSurfaceVariant,
-              size: 34,
-            ),
+            Icon(icon, color: colorScheme.onSurfaceVariant, size: 34),
             const SizedBox(height: 16),
             Text(
               title,

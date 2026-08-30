@@ -1,5 +1,6 @@
 part of '../temple_asset_magic_action_sheet.dart';
 
+/// 圣殿资产魔法道具搜索配置
 extension _TempleAssetMagicSearchConfig on _TempleAssetMagicActionSheetState {
   /// 构建魔法角色搜索面板
   Widget _buildCharacterSearchPanel() {
@@ -39,13 +40,13 @@ extension _TempleAssetMagicSearchConfig on _TempleAssetMagicActionSheetState {
       return const <int, int>{};
     }
 
-    final page =
-        await _data.actionContext!.userRepository.fetchUserCharacterPage(
-      username: 'blueleaf',
-      page: 1,
-      pageSize: characterIds.length,
-      characterIds: characterIds,
-    );
+    final page = await _data.actionContext!.userRepository
+        .fetchUserCharacterPage(
+          username: 'blueleaf',
+          page: 1,
+          pageSize: characterIds.length,
+          characterIds: characterIds,
+        );
     return <int, int>{
       for (final item in page.items) item.characterId: item.userTotal,
     };
@@ -54,7 +55,6 @@ extension _TempleAssetMagicSearchConfig on _TempleAssetMagicActionSheetState {
   /// 获取搜索结果第二行文案
   ///
   /// [item] 搜索条目
-
   /// [supplementValue] 附加数值
   String _searchSecondaryTextFor(
     TempleAssetMagicCharacterSearchItem item,

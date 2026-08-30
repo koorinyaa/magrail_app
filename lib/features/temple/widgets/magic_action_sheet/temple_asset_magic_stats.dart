@@ -1,12 +1,11 @@
 part of '../temple_asset_magic_action_sheet.dart';
 
+/// 圣殿资产魔法道具统计展示
 class _TempleAssetMagicAssetProgress extends StatelessWidget {
   /// 创建固定资产进度条
   ///
   /// [data] 固定资产卡片展示数据
-  const _TempleAssetMagicAssetProgress({
-    required this.data,
-  });
+  const _TempleAssetMagicAssetProgress({required this.data});
 
   /// 固定资产卡片展示数据
   final TempleAssetCardData data;
@@ -79,9 +78,7 @@ class _TempleAssetUserAssetStatsRow extends StatelessWidget {
   /// 创建用户资产数据行
   ///
   /// [items] 数据项
-  const _TempleAssetUserAssetStatsRow({
-    required this.items,
-  });
+  const _TempleAssetUserAssetStatsRow({required this.items});
 
   /// 数据项
   final List<_TempleAssetUserAssetStatsItem> items;
@@ -110,6 +107,7 @@ class _TempleAssetUserAssetStatsItem extends StatelessWidget {
   /// [value] 数值文案
   /// [showStarIcon] 是否显示星之力图标
   /// [starHighlighted] 星之力图标是否高亮
+  /// [accentColor] 数值强调色
   const _TempleAssetUserAssetStatsItem({
     required this.label,
     required this.value,
@@ -216,9 +214,7 @@ class _TempleAssetMagicInlineWarning extends StatelessWidget {
   /// 创建圣殿资产魔法道具内联警告
   ///
   /// [text] 警告文案
-  const _TempleAssetMagicInlineWarning({
-    required this.text,
-  });
+  const _TempleAssetMagicInlineWarning({required this.text});
 
   /// 警告文案
   final String text;
@@ -246,9 +242,7 @@ class _TempleAssetMagicProgressOverlay extends StatelessWidget {
   /// 创建圣殿资产魔法道具进度遮罩
   ///
   /// [text] 进度文案
-  const _TempleAssetMagicProgressOverlay({
-    required this.text,
-  });
+  const _TempleAssetMagicProgressOverlay({required this.text});
 
   /// 进度文案
   final String text;
@@ -292,10 +286,7 @@ class _TempleAssetMagicProgressOverlay extends StatelessWidget {
 ///
 /// [context] 当前组件树上下文
 /// [radius] 表面圆角
-BoxDecoration _insetDecoration(
-  BuildContext context, {
-  double radius = 18,
-}) {
+BoxDecoration _insetDecoration(BuildContext context, {double radius = 18}) {
   final colorScheme = Theme.of(context).colorScheme;
   final isDark = colorScheme.brightness == Brightness.dark;
 
@@ -305,9 +296,7 @@ BoxDecoration _insetDecoration(
         : colorScheme.surfaceContainerLowest,
     borderRadius: BorderRadius.circular(radius),
     border: Border.all(
-      color: colorScheme.outlineVariant.withValues(
-        alpha: isDark ? 0.24 : 0.54,
-      ),
+      color: colorScheme.outlineVariant.withValues(alpha: isDark ? 0.24 : 0.54),
     ),
   );
 }

@@ -19,10 +19,7 @@ class TowerRankingPage extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [repository] 通天塔仓库
-  const TowerRankingPage({
-    super.key,
-    required this.repository,
-  });
+  const TowerRankingPage({super.key, required this.repository});
 
   /// 通天塔页面使用的仓库
   final TowerRepository repository;
@@ -46,9 +43,8 @@ class _TowerRankingPageState extends State<TowerRankingPage> {
   @override
   void initState() {
     super.initState();
-    _controller = TowerRankingPageController(
-      repository: widget.repository,
-    )..initialize();
+    _controller = TowerRankingPageController(repository: widget.repository)
+      ..initialize();
     _scrollController.addListener(_handleScroll);
   }
 
@@ -74,7 +70,8 @@ class _TowerRankingPageState extends State<TowerRankingPage> {
         listenable: _controller,
         builder: (context, child) {
           final entries = _controller.entries;
-          final isStateOnlyContent = !_controller.isInitialLoading &&
+          final isStateOnlyContent =
+              !_controller.isInitialLoading &&
               (_controller.initialError != null || entries.isEmpty);
 
           return SecondaryPageRefreshView(
@@ -108,12 +105,9 @@ class _TowerRankingPageState extends State<TowerRankingPage> {
               else ...[
                 SliverFixedExtentList(
                   itemExtent: _listItemExtent,
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      return _TowerRankingEntryItem(entry: entries[index]);
-                    },
-                    childCount: entries.length,
-                  ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    return _TowerRankingEntryItem(entry: entries[index]);
+                  }, childCount: entries.length),
                 ),
                 _TowerRankingFooter(controller: _controller),
               ],
@@ -165,9 +159,7 @@ class _TowerRankingEntryItem extends StatelessWidget {
   /// 创建通天塔榜单条目外层
   ///
   /// [entry] 通天塔榜单条目
-  const _TowerRankingEntryItem({
-    required this.entry,
-  });
+  const _TowerRankingEntryItem({required this.entry});
 
   final TowerEntry entry;
 
@@ -197,12 +189,12 @@ class _TowerRankingEntryItem extends StatelessWidget {
         onTap: entry.characterId <= 0
             ? null
             : () => openCharacterDetail(
-                  context,
-                  characterId: entry.characterId,
-                  name: entry.name,
-                  avatarUrl: avatarUrl,
-                  avatarHeroTag: avatarHeroTag,
-                ),
+                context,
+                characterId: entry.characterId,
+                name: entry.name,
+                avatarUrl: avatarUrl,
+                avatarHeroTag: avatarHeroTag,
+              ),
       ),
     );
   }
@@ -213,9 +205,7 @@ class _TowerRankingFooter extends StatelessWidget {
   /// 创建通天塔榜单底部状态
   ///
   /// [controller] 通天塔二级榜单控制器
-  const _TowerRankingFooter({
-    required this.controller,
-  });
+  const _TowerRankingFooter({required this.controller});
 
   final TowerRankingPageController controller;
 
@@ -246,21 +236,18 @@ class _TowerRankingSkeletonList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverFixedExtentList(
       itemExtent: _TowerRankingPageState._listItemExtent,
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          return Padding(
-            padding: AppSafeAreaInsets.fromLTRB(
-              context,
-              left: 12,
-              top: 0,
-              right: 12,
-              bottom: 4,
-            ),
-            child: const TowerRankingSkeletonRow(),
-          );
-        },
-        childCount: 9,
-      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        return Padding(
+          padding: AppSafeAreaInsets.fromLTRB(
+            context,
+            left: 12,
+            top: 0,
+            right: 12,
+            bottom: 4,
+          ),
+          child: const TowerRankingSkeletonRow(),
+        );
+      }, childCount: 9),
     );
   }
 }
@@ -300,11 +287,7 @@ class _TowerRankingStateSliver extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                color: colorScheme.onSurfaceVariant,
-                size: 34,
-              ),
+              Icon(icon, color: colorScheme.onSurfaceVariant, size: 34),
               const SizedBox(height: 16),
               Text(
                 title,

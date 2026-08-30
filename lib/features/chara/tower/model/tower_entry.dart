@@ -24,13 +24,28 @@ class TowerEntry {
     required this.avatarUrl,
   });
 
+  /// 角色 ID
   final int characterId;
+
+  /// 排名
   final int rank;
+
+  /// 角色名称
   final String name;
+
+  /// 角色等级
   final int level;
+
+  /// ST 等级
   final int zeroCount;
+
+  /// 角色星级
   final int stars;
+
+  /// 星之力原始数值
   final int starForces;
+
+  /// 角色头像地址
   final String avatarUrl;
 
   /// 排名字体颜色

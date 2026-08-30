@@ -186,11 +186,7 @@ class _BotMagicCharacterSearchHeader extends StatelessWidget {
                   color: colorScheme.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(
-                  fallbackIcon,
-                  size: 20,
-                  color: colorScheme.primary,
-                ),
+                child: Icon(fallbackIcon, size: 20, color: colorScheme.primary),
               );
             },
           ),

@@ -64,9 +64,7 @@ final class CharacterDetailIcoParticipant {
   /// 从 JSON 创建角色详情 ICO 参与者资料
   ///
   /// [json] 原始参与者 JSON
-  factory CharacterDetailIcoParticipant.fromJson(
-    Map<String, Object?> json,
-  ) {
+  factory CharacterDetailIcoParticipant.fromJson(Map<String, Object?> json) {
     return CharacterDetailIcoParticipant(
       name: TinygrailResponseParser.asString(json['Name']),
       nickname: TinygrailResponseParser.asString(

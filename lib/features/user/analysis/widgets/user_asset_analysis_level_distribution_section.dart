@@ -52,10 +52,7 @@ class UserAssetAnalysisLevelDistributionSection extends StatelessWidget {
           accentColor: modeColor,
           trailing: onModeChanged == null
               ? _LevelModeBadge(mode: mode)
-              : _LevelModeSwitch(
-                  mode: mode,
-                  onChanged: onModeChanged!,
-                ),
+              : _LevelModeSwitch(mode: mode, onChanged: onModeChanged!),
         ),
         const SizedBox(height: 22),
         if (visibleBuckets.isEmpty)
@@ -63,9 +60,11 @@ class UserAssetAnalysisLevelDistributionSection extends StatelessWidget {
         else
           Column(
             children: [
-              for (var index = 0;
-                  index < visibleBuckets.length;
-                  index += 1) ...[
+              for (
+                var index = 0;
+                index < visibleBuckets.length;
+                index += 1
+              ) ...[
                 _LevelDistributionRow(
                   bucket: visibleBuckets[index],
                   value: _valueForBucket(visibleBuckets[index]),
@@ -99,10 +98,7 @@ class _LevelModeSwitch extends StatelessWidget {
   ///
   /// [mode] 当前模式
   /// [onChanged] 模式切换回调
-  const _LevelModeSwitch({
-    required this.mode,
-    required this.onChanged,
-  });
+  const _LevelModeSwitch({required this.mode, required this.onChanged});
 
   /// 当前模式
   final UserAssetAnalysisLevelDistributionMode mode;
@@ -207,10 +203,10 @@ class _LevelModeOption extends StatelessWidget {
             decoration: BoxDecoration(
               color: selected
                   ? isDark
-                      ? colorScheme.surfaceContainerHighest.withValues(
-                          alpha: 0.88,
-                        )
-                      : colorScheme.surface.withValues(alpha: 0.96)
+                        ? colorScheme.surfaceContainerHighest.withValues(
+                            alpha: 0.88,
+                          )
+                        : colorScheme.surface.withValues(alpha: 0.96)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(6),
               border: selected
@@ -289,8 +285,9 @@ class _LevelDistributionRow extends StatelessWidget {
     final isDark = colorScheme.brightness == Brightness.dark;
     final disableAnimations = MediaQuery.disableAnimationsOf(context);
     final color = _colorForMode(mode);
-    final ratio =
-        maxValue <= 0 ? 0.0 : (value / maxValue).clamp(0.035, 1).toDouble();
+    final ratio = maxValue <= 0
+        ? 0.0
+        : (value / maxValue).clamp(0.035, 1).toDouble();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

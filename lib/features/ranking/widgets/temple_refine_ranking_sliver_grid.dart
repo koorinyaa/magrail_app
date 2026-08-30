@@ -58,21 +58,19 @@ class TempleRefineRankingSliverGrid extends StatelessWidget {
           maxCrossAxisExtent: _maxCardExtent,
           mainAxisSpacing: _spacing,
           crossAxisSpacing: _spacing,
-          childAspectRatio: _cardAspectRatio /
+          childAspectRatio:
+              _cardAspectRatio /
               (1 + _infoHeight * _cardAspectRatio / _maxCardExtent),
         ),
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final item = items[index];
-            onItemBuilt(index);
+        delegate: SliverChildBuilderDelegate((context, index) {
+          final item = items[index];
+          onItemBuilt(index);
 
-            return _RefineRankingGridItem(
-              item: item,
-              onAssetTap: () => onAssetTap(item),
-            );
-          },
-          childCount: items.length,
-        ),
+          return _RefineRankingGridItem(
+            item: item,
+            onAssetTap: () => onAssetTap(item),
+          );
+        }, childCount: items.length),
       ),
     );
   }
@@ -84,10 +82,7 @@ class TempleRefineRankingSkeletonGrid extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [itemCount] 骨架条目数量
-  const TempleRefineRankingSkeletonGrid({
-    super.key,
-    this.itemCount = 20,
-  });
+  const TempleRefineRankingSkeletonGrid({super.key, this.itemCount = 20});
 
   /// 骨架条目数量
   final int itemCount;
@@ -110,18 +105,16 @@ class TempleRefineRankingSkeletonGrid extends StatelessWidget {
           maxCrossAxisExtent: TempleRefineRankingSliverGrid._maxCardExtent,
           mainAxisSpacing: TempleRefineRankingSliverGrid._spacing,
           crossAxisSpacing: TempleRefineRankingSliverGrid._spacing,
-          childAspectRatio: TempleRefineRankingSliverGrid._cardAspectRatio /
+          childAspectRatio:
+              TempleRefineRankingSliverGrid._cardAspectRatio /
               (1 +
                   TempleRefineRankingSliverGrid._infoHeight *
                       TempleRefineRankingSliverGrid._cardAspectRatio /
                       TempleRefineRankingSliverGrid._maxCardExtent),
         ),
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            return const _RefineRankingSkeletonItem();
-          },
-          childCount: itemCount,
-        ),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          return const _RefineRankingSkeletonItem();
+        }, childCount: itemCount),
       ),
     );
   }
@@ -133,10 +126,7 @@ class _RefineRankingGridItem extends StatelessWidget {
   ///
   /// [item] 精炼排行条目
   /// [onAssetTap] 圣殿资产入口点击回调
-  const _RefineRankingGridItem({
-    required this.item,
-    required this.onAssetTap,
-  });
+  const _RefineRankingGridItem({required this.item, required this.onAssetTap});
 
   /// 精炼排行条目
   final TempleRefineRankingEntry item;
@@ -197,10 +187,7 @@ class _RefineRankingGridItem extends StatelessWidget {
   ///
   /// [context] 当前组件树上下文
   /// [temple] 精炼排行条目
-  void _openImageViewer(
-    BuildContext context,
-    TempleRefineRankingEntry temple,
-  ) {
+  void _openImageViewer(BuildContext context, TempleRefineRankingEntry temple) {
     final coverUrl = TinygrailAssetUrls.getLargeCover(temple.cover);
     final avatarUrl = TinygrailAssetUrls.normalizeAvatar(temple.avatar);
     final imageUrl = coverUrl.isNotEmpty ? coverUrl : avatarUrl;
@@ -230,10 +217,7 @@ class _RefineRankingGridItem extends StatelessWidget {
       return;
     }
 
-    context.pushNamed(
-      'userDetail',
-      queryParameters: {'username': username},
-    );
+    context.pushNamed('userDetail', queryParameters: {'username': username});
   }
 
   /// 生成圣殿封面 Hero 标识
@@ -249,9 +233,7 @@ class _RefineRankingMeta extends StatelessWidget {
   /// 创建精炼排行元信息
   ///
   /// [item] 精炼排行条目
-  const _RefineRankingMeta({
-    required this.item,
-  });
+  const _RefineRankingMeta({required this.item});
 
   /// 精炼排行条目
   final TempleRefineRankingEntry item;
@@ -262,9 +244,7 @@ class _RefineRankingMeta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final timeText = TinygrailFormatters.shortRelativeTime(
-      item.lastActiveDate,
-    );
+    final timeText = TinygrailFormatters.shortRelativeTime(item.lastActiveDate);
     final timeColor = colorScheme.onSurfaceVariant.withValues(alpha: 0.72);
 
     return Padding(
@@ -277,11 +257,7 @@ class _RefineRankingMeta extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Icon(
-                  LucideIcons.clock3,
-                  size: 11,
-                  color: timeColor,
-                ),
+                Icon(LucideIcons.clock3, size: 11, color: timeColor),
                 const SizedBox(width: 3),
                 Flexible(
                   child: Text(
@@ -354,11 +330,7 @@ class _RefineRankingSkeletonMeta extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 2),
       child: Row(
         children: [
-          Bone(
-            width: 34,
-            height: 17,
-            borderRadius: BorderRadius.circular(7),
-          ),
+          Bone(width: 34, height: 17, borderRadius: BorderRadius.circular(7)),
           const SizedBox(width: 8),
           Expanded(
             child: Row(
@@ -391,9 +363,7 @@ class _RankBadge extends StatelessWidget {
   /// 创建排名徽标
   ///
   /// [rank] 当前排名
-  const _RankBadge({
-    required this.rank,
-  });
+  const _RankBadge({required this.rank});
 
   /// 当前排名
   final int rank;

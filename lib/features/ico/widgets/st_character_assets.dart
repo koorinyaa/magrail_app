@@ -39,7 +39,7 @@ class StCharacterSliverList extends StatelessWidget {
 
   /// 角色条目点击回调
   final void Function(StCharacterEntry item, String? avatarHeroTag)?
-      onCharacterTap;
+  onCharacterTap;
 
   /// 构建 ST 角色 sliver 列表
   ///
@@ -48,39 +48,36 @@ class StCharacterSliverList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverFixedExtentList(
       itemExtent: _StCharacterListMetrics.itemExtent,
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final item = items[index];
-          final avatarUrl = TinygrailAssetUrls.normalizeAvatar(item.icon);
-          final avatarHeroTag = createCharacterDetailAvatarHeroTag(
-            characterId: item.characterId,
-            avatarUrl: avatarUrl,
-            source: item,
-          );
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final item = items[index];
+        final avatarUrl = TinygrailAssetUrls.normalizeAvatar(item.icon);
+        final avatarHeroTag = createCharacterDetailAvatarHeroTag(
+          characterId: item.characterId,
+          avatarUrl: avatarUrl,
+          source: item,
+        );
 
-          onItemBuilt?.call(index);
-          return CharacterAssetListItemShell(
-            showDivider: index < items.length - 1,
-            child: StCharacterRow(
-              item: item,
-              sort: sort,
-              avatarHeroTag: avatarHeroTag,
-              onTap: onCharacterTap == null
-                  ? null
-                  : () => onCharacterTap?.call(item, avatarHeroTag),
-              contentPadding: AppSafeAreaInsets.fromLTRB(
-                context,
-                left: 18,
-                top: 0,
-                right: 18,
-                bottom: 0,
-              ),
-              tapBorderRadius: BorderRadius.zero,
+        onItemBuilt?.call(index);
+        return CharacterAssetListItemShell(
+          showDivider: index < items.length - 1,
+          child: StCharacterRow(
+            item: item,
+            sort: sort,
+            avatarHeroTag: avatarHeroTag,
+            onTap: onCharacterTap == null
+                ? null
+                : () => onCharacterTap?.call(item, avatarHeroTag),
+            contentPadding: AppSafeAreaInsets.fromLTRB(
+              context,
+              left: 18,
+              top: 0,
+              right: 18,
+              bottom: 0,
             ),
-          );
-        },
-        childCount: items.length,
-      ),
+            tapBorderRadius: BorderRadius.zero,
+          ),
+        );
+      }, childCount: items.length),
     );
   }
 }
@@ -91,10 +88,7 @@ class StCharacterSkeletonSliverList extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [itemCount] 骨架条目数量
-  const StCharacterSkeletonSliverList({
-    super.key,
-    this.itemCount = 24,
-  });
+  const StCharacterSkeletonSliverList({super.key, this.itemCount = 24});
 
   /// 骨架条目数量
   final int itemCount;
@@ -185,49 +179,50 @@ class StCharacterRow extends StatelessWidget {
   CharacterAssetMetric _buildSecondaryMetric() {
     return switch (sort) {
       CharacterFullListSort.dividend => CharacterAssetMetric(
-          label: '股息',
-          value: '+${Formatters.tinygrailCurrency(item.singleDividend)}',
-          isValueMuted: true,
-        ),
+        label: '股息',
+        value: '+${Formatters.tinygrailCurrency(item.singleDividend)}',
+        isValueMuted: true,
+      ),
       CharacterFullListSort.towerRank => CharacterAssetMetric(
-          value: '通天塔 '
-              '${item.rank <= 0 ? '--' : '${Formatters.groupedNumber(item.rank)}名'}'
-              ' · 星之力 ${Formatters.groupedNumber(item.starForces)}',
-          isValueMuted: true,
-        ),
+        value:
+            '通天塔 '
+            '${item.rank <= 0 ? '--' : '${Formatters.groupedNumber(item.rank)}名'}'
+            ' · 星之力 ${Formatters.groupedNumber(item.starForces)}',
+        isValueMuted: true,
+      ),
       CharacterFullListSort.stars => CharacterAssetMetric(
-          value: '',
-          valueWidget: TowerStarsRow(
-            stars: item.stars,
-            iconSize: 10,
-            spacing: 1,
-            runSpacing: 0,
-          ),
-          isValueMuted: true,
+        value: '',
+        valueWidget: TowerStarsRow(
+          stars: item.stars,
+          iconSize: 10,
+          spacing: 1,
+          runSpacing: 0,
         ),
+        isValueMuted: true,
+      ),
       CharacterFullListSort.fluctuation => CharacterAssetMetric(
-          label: '涨跌',
-          value: _formatFluctuation(item.fluctuation),
-          isValueMuted: true,
-          valueColor: CharacterAssetCurrentPriceChip.resolveCurrentPriceColor(
-            item.fluctuation,
-          ),
+        label: '涨跌',
+        value: _formatFluctuation(item.fluctuation),
+        isValueMuted: true,
+        valueColor: CharacterAssetCurrentPriceChip.resolveCurrentPriceColor(
+          item.fluctuation,
         ),
+      ),
       CharacterFullListSort.marketValue => CharacterAssetMetric(
-          label: '市值',
-          value: _formatMarketValue(item.marketValue),
-          isValueMuted: true,
-        ),
+        label: '市值',
+        value: _formatMarketValue(item.marketValue),
+        isValueMuted: true,
+      ),
       CharacterFullListSort.listedDate => CharacterAssetMetric(
-          label: '上市日期',
-          value: TinygrailFormatters.listedDate(item.listedDate),
-          isValueMuted: true,
-        ),
+        label: '上市日期',
+        value: TinygrailFormatters.listedDate(item.listedDate),
+        isValueMuted: true,
+      ),
       _ => CharacterAssetMetric(
-          label: '买卖',
-          value: '${_formatCount(item.bids)} / ${_formatCount(item.asks)}',
-          isValueMuted: true,
-        ),
+        label: '买卖',
+        value: '${_formatCount(item.bids)} / ${_formatCount(item.asks)}',
+        isValueMuted: true,
+      ),
     };
   }
 
@@ -258,10 +253,7 @@ class StCharacterRow extends StatelessWidget {
   /// [value] 原始市值
   String _formatMarketValue(double value) {
     if (value.abs() >= 10000) {
-      return Formatters.tinygrailCompactValue(
-        value.truncate(),
-        prefix: '₵',
-      );
+      return Formatters.tinygrailCompactValue(value.truncate(), prefix: '₵');
     }
     return Formatters.tinygrailCurrency(value);
   }

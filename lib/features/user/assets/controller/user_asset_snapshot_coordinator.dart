@@ -57,16 +57,16 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
     required UserRepository userRepository,
     required UserAssetSnapshotDatabase persistentDatabase,
     required UserAssetSnapshotDatabase temporaryDatabase,
-  })  : _persistentRepository = UserAssetSnapshotRepository(
-          userRepository: userRepository,
-          database: persistentDatabase,
-        ),
-        _temporaryRepository = UserAssetSnapshotRepository(
-          userRepository: userRepository,
-          database: temporaryDatabase,
-          protectCurrentUserSession: false,
-        ),
-        _temporaryDatabase = temporaryDatabase;
+  }) : _persistentRepository = UserAssetSnapshotRepository(
+         userRepository: userRepository,
+         database: persistentDatabase,
+       ),
+       _temporaryRepository = UserAssetSnapshotRepository(
+         userRepository: userRepository,
+         database: temporaryDatabase,
+         protectCurrentUserSession: false,
+       ),
+       _temporaryDatabase = temporaryDatabase;
 
   // 同一用户和数据类型的协调任务在页面、预览和冷启动之间合并
   final Map<String, Future<bool>> _operations = {};
@@ -101,8 +101,8 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
     if (resolvedUsername.isEmpty) {
       return;
     }
-    final sessionGeneration =
-        _persistentRepository.captureCurrentUserSessionGeneration();
+    final sessionGeneration = _persistentRepository
+        .captureCurrentUserSessionGeneration();
     if (sessionGeneration == null) {
       return;
     }
@@ -146,16 +146,19 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
       _touchOtherUser(resolvedUsername);
     }
     final repository = repositoryFor(isCurrentUser: isCurrentUser);
-    final sessionGeneration =
-        isCurrentUser ? repository.captureCurrentUserSessionGeneration() : null;
+    final sessionGeneration = isCurrentUser
+        ? repository.captureCurrentUserSessionGeneration()
+        : null;
     if (isCurrentUser && sessionGeneration == null) {
       return;
     }
-    final resolvedCharacterTotal = characterTotalItems ??
+    final resolvedCharacterTotal =
+        characterTotalItems ??
         await _probeTotalSafely(
           () => repository.probeCharacterTotalItems(resolvedUsername),
         );
-    final resolvedTempleTotal = templeTotalItems ??
+    final resolvedTempleTotal =
+        templeTotalItems ??
         await _probeTotalSafely(
           () => repository.probeTempleTotalItems(resolvedUsername),
         );
@@ -195,8 +198,9 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
       _touchOtherUser(resolvedUsername);
     }
     final repository = repositoryFor(isCurrentUser: isCurrentUser);
-    final sessionGeneration =
-        isCurrentUser ? repository.captureCurrentUserSessionGeneration() : null;
+    final sessionGeneration = isCurrentUser
+        ? repository.captureCurrentUserSessionGeneration()
+        : null;
     if (isCurrentUser && sessionGeneration == null) {
       return false;
     }
@@ -246,13 +250,13 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
       final now = DateTime.now();
       return switch (kind) {
         UserAssetSnapshotKind.characters => sourceState.isCharacterDataFreshAt(
-            now,
-            lifetime: repository.cacheLifetime,
-          ),
+          now,
+          lifetime: repository.cacheLifetime,
+        ),
         UserAssetSnapshotKind.temples => sourceState.isTempleDataFreshAt(
-            now,
-            lifetime: repository.cacheLifetime,
-          ),
+          now,
+          lifetime: repository.cacheLifetime,
+        ),
       };
     } catch (_) {
       // 本地数据库不可读时按快照不可用处理，由上层回退到网络刷新
@@ -320,16 +324,17 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
       retainOtherUser(username);
     }
     try {
-      final kinds = characterTotalItems != null &&
+      final kinds =
+          characterTotalItems != null &&
               templeTotalItems != null &&
               templeTotalItems < characterTotalItems
           ? const [
               UserAssetSnapshotKind.temples,
-              UserAssetSnapshotKind.characters
+              UserAssetSnapshotKind.characters,
             ]
           : const [
               UserAssetSnapshotKind.characters,
-              UserAssetSnapshotKind.temples
+              UserAssetSnapshotKind.temples,
             ];
       for (final kind in kinds) {
         await _refreshKind(
@@ -390,19 +395,19 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
     final repository = repositoryFor(isCurrentUser: isCurrentUser);
     final refreshOperation = switch (kind) {
       UserAssetSnapshotKind.characters => repository.refreshCharacters(
-          username: username,
-          nickname: nickname,
-          totalItemsHint: totalItemsHint,
-          priority: priority,
-          expectedSessionGeneration: sessionGeneration,
-        ),
+        username: username,
+        nickname: nickname,
+        totalItemsHint: totalItemsHint,
+        priority: priority,
+        expectedSessionGeneration: sessionGeneration,
+      ),
       UserAssetSnapshotKind.temples => repository.refreshTemples(
-          username: username,
-          nickname: nickname,
-          totalItemsHint: totalItemsHint,
-          priority: priority,
-          expectedSessionGeneration: sessionGeneration,
-        ),
+        username: username,
+        nickname: nickname,
+        totalItemsHint: totalItemsHint,
+        priority: priority,
+        expectedSessionGeneration: sessionGeneration,
+      ),
     };
     final existing = _operations[operationKey];
     if (existing != null) {
@@ -413,24 +418,25 @@ class UserAssetSnapshotCoordinator extends ChangeNotifier {
     operation = refreshOperation
         .then((_) => true, onError: (_) => false)
         .then((success) {
-      if (!_isDisposed) {
-        _lastEvent = UserAssetSnapshotEvent(
-          username: username,
-          isCurrentUser: isCurrentUser,
-          kind: kind,
-          success: success,
-        );
-        notifyListeners();
-      }
-      return success;
-    }).whenComplete(() {
-      if (identical(_operations[operationKey], operation)) {
-        _operations.remove(operationKey);
-      }
-      if (!isCurrentUser) {
-        unawaited(_evictOtherUsers());
-      }
-    });
+          if (!_isDisposed) {
+            _lastEvent = UserAssetSnapshotEvent(
+              username: username,
+              isCurrentUser: isCurrentUser,
+              kind: kind,
+              success: success,
+            );
+            notifyListeners();
+          }
+          return success;
+        })
+        .whenComplete(() {
+          if (identical(_operations[operationKey], operation)) {
+            _operations.remove(operationKey);
+          }
+          if (!isCurrentUser) {
+            unawaited(_evictOtherUsers());
+          }
+        });
     _operations[operationKey] = operation;
     return operation;
   }

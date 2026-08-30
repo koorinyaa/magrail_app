@@ -104,10 +104,7 @@ class CharacterAssetCurrentPriceChip extends StatelessWidget {
     }
 
     if (value.abs() >= 10000) {
-      return Formatters.tinygrailCompactValue(
-        value.truncate(),
-        prefix: '₵',
-      );
+      return Formatters.tinygrailCompactValue(value.truncate(), prefix: '₵');
     }
 
     return Formatters.tinygrailCurrency(value);

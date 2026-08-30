@@ -39,27 +39,30 @@ const String templeAssetMagicFisheyeRecentCharacterIdsKeyPrefix =
 /// 魔法道具角色搜索附加数值加载器
 ///
 /// [items] 当前批次角色搜索条目
-typedef TempleAssetMagicSearchSupplementLoader = Future<Map<int, int>> Function(
-  List<TempleAssetMagicCharacterSearchItem> items,
-);
+typedef TempleAssetMagicSearchSupplementLoader =
+    Future<Map<int, int>> Function(
+      List<TempleAssetMagicCharacterSearchItem> items,
+    );
 
 /// 魔法道具角色搜索第二行文案构造器
 ///
 /// [item] 角色搜索条目
 /// [supplementValue] 当前角色附加数值
-typedef TempleAssetMagicSearchSecondaryTextBuilder = String Function(
-  TempleAssetMagicCharacterSearchItem item,
-  int? supplementValue,
-);
+typedef TempleAssetMagicSearchSecondaryTextBuilder =
+    String Function(
+      TempleAssetMagicCharacterSearchItem item,
+      int? supplementValue,
+    );
 
 /// 魔法道具角色搜索选择回调
 ///
 /// [item] 角色搜索条目
 /// [supplementValue] 当前角色附加数值
-typedef TempleAssetMagicSearchSelected = void Function(
-  TempleAssetMagicCharacterSearchItem item,
-  int? supplementValue,
-);
+typedef TempleAssetMagicSearchSelected =
+    void Function(
+      TempleAssetMagicCharacterSearchItem item,
+      int? supplementValue,
+    );
 
 /// 保存魔法道具角色搜索最近使用记录
 ///
@@ -112,6 +115,7 @@ class TempleAssetMagicCharacterSearchPanel extends StatefulWidget {
   /// [onSelected] 角色选择回调
   /// [secondaryTextBuilder] 第二行文案构造器
   /// [supplementLoader] 静默附加数值加载器
+  /// [key] Flutter 组件标识
   const TempleAssetMagicCharacterSearchPanel({
     required this.header,
     required this.hintText,

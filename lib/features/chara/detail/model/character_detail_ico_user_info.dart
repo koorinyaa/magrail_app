@@ -5,9 +5,7 @@ class CharacterDetailIcoUserInfo {
   /// 创建角色详情当前用户 ICO 注资资料
   ///
   /// [amount] 当前用户已注资金额
-  const CharacterDetailIcoUserInfo({
-    required this.amount,
-  });
+  const CharacterDetailIcoUserInfo({required this.amount});
 
   /// 创建空的角色详情当前用户 ICO 注资资料
   const CharacterDetailIcoUserInfo.empty() : amount = 0;

@@ -1,4 +1,4 @@
-﻿import 'package:intl/intl.dart';
+import 'package:intl/intl.dart';
 
 /// 格式化工具
 class Formatters {
@@ -8,7 +8,10 @@ class Formatters {
   static const int _tenThousand = 10000;
   static const int _hundredMillion = 100000000;
 
+  /// 常规货币数字格式
   static final NumberFormat currency = NumberFormat('#,##0.##');
+
+  /// 常规缩略数字格式
   static final NumberFormat compact = NumberFormat.compact();
   static final NumberFormat _compactNumber = NumberFormat('0.##');
   static final NumberFormat _groupedNumber = NumberFormat('#,##0.##');
@@ -31,10 +34,7 @@ class Formatters {
   ///
   /// [value] 原始数值
   /// [fractionDigits] 最大小数位数
-  static String plainDecimal(
-    num value, {
-    int fractionDigits = 2,
-  }) {
+  static String plainDecimal(num value, {int fractionDigits = 2}) {
     return value
         .toStringAsFixed(fractionDigits)
         .replaceFirst(RegExp(r'\.?0+$'), '');
@@ -44,10 +44,7 @@ class Formatters {
   ///
   /// [value] 原始数值
   /// [prefix] 前缀文本
-  static String tinygrailCompactValue(
-    num value, {
-    String prefix = '',
-  }) {
+  static String tinygrailCompactValue(num value, {String prefix = ''}) {
     if (value.abs() < _tenThousand) {
       return '$prefix${_formatTruncatedDecimal(value, _compactNumber)}';
     }

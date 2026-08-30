@@ -18,8 +18,9 @@ Future<String?> _showTradeHeaderVoteKillSheet(BuildContext context) {
       const topGap = 32.0;
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
-      final maxHeight =
-          availableHeight.clamp(0.0, mediaQuery.size.height).toDouble();
+      final maxHeight = availableHeight
+          .clamp(0.0, mediaQuery.size.height)
+          .toDouble();
 
       return ConstrainedBox(
         constraints: BoxConstraints(maxHeight: maxHeight),
@@ -113,13 +114,9 @@ class _TradeHeaderVoteKillSheetState extends State<_TradeHeaderVoteKillSheet> {
                           const SizedBox(height: 18),
                           const _VoteKillSheetNotice(),
                           const SizedBox(height: 14),
-                          _VoteKillReasonField(
-                            controller: _reasonController,
-                          ),
+                          _VoteKillReasonField(controller: _reasonController),
                           const SizedBox(height: 18),
-                          _VoteKillSheetActions(
-                            onConfirm: _submit,
-                          ),
+                          _VoteKillSheetActions(onConfirm: _submit),
                         ],
                       ),
                     ),
@@ -187,11 +184,7 @@ class _VoteKillSheetNotice extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(
-              LucideIcons.triangleAlert,
-              size: 16,
-              color: foregroundColor,
-            ),
+            Icon(LucideIcons.triangleAlert, size: 16, color: foregroundColor),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -216,9 +209,7 @@ class _VoteKillReasonField extends StatelessWidget {
   /// 创建投票删除理由输入框
   ///
   /// [controller] 删除理由输入控制器
-  const _VoteKillReasonField({
-    required this.controller,
-  });
+  const _VoteKillReasonField({required this.controller});
 
   /// 删除理由输入控制器
   final TextEditingController controller;
@@ -289,9 +280,7 @@ class _VoteKillSheetActions extends StatelessWidget {
   /// 创建投票删除抽屉操作区
   ///
   /// [onConfirm] 确认回调
-  const _VoteKillSheetActions({
-    required this.onConfirm,
-  });
+  const _VoteKillSheetActions({required this.onConfirm});
 
   /// 确认回调
   final VoidCallback onConfirm;
@@ -308,9 +297,7 @@ class _VoteKillSheetActions extends StatelessWidget {
         foregroundColor: colorScheme.onPrimary,
         backgroundColor: colorScheme.primary,
         minimumSize: const Size.fromHeight(44),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(999),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
         textStyle: const TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w800,

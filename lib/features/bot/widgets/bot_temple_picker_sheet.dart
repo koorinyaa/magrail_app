@@ -155,7 +155,8 @@ class _BotTempleMultiSearchSheetState
                   Flexible(
                     child: LayoutBuilder(
                       builder: (context, constraints) {
-                        final showSearchBody = constraints.maxHeight >=
+                        final showSearchBody =
+                            constraints.maxHeight >=
                             _botTempleBlacklistBodyVisibleMinHeight;
                         return Stack(
                           children: [
@@ -272,19 +273,16 @@ class _BotTempleMultiSearchSheetState
                 crossAxisSpacing: _botTempleBlacklistGridSpacing,
                 childAspectRatio: layout.childAspectRatio,
               ),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  _handleItemBuilt(index);
-                  final item = _items[index];
-                  return _BotTempleBlacklistTile(
-                    item: item,
-                    width: layout.tileWidth,
-                    isSelected: _selected.containsKey(item.characterId),
-                    onPressed: () => _handleItemPressed(item),
-                  );
-                },
-                childCount: _items.length,
-              ),
+              delegate: SliverChildBuilderDelegate((context, index) {
+                _handleItemBuilt(index);
+                final item = _items[index];
+                return _BotTempleBlacklistTile(
+                  item: item,
+                  width: layout.tileWidth,
+                  isSelected: _selected.containsKey(item.characterId),
+                  onPressed: () => _handleItemPressed(item),
+                );
+              }, childCount: _items.length),
             ),
             PaginationFooterSliver(
               isLoadingMore: _isLoadingMore,
@@ -293,9 +291,7 @@ class _BotTempleMultiSearchSheetState
               completedLabel: '没有更多圣殿了',
               onRetry: () => unawaited(_retryNextPage()),
             ),
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 58),
-            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 58)),
           ],
         );
       },
@@ -311,10 +307,7 @@ class _BotTempleMultiSearchSheetState
 
     _lastSearchText = searchText;
     _searchDebounce?.cancel();
-    _searchDebounce = Timer(
-      const Duration(milliseconds: 450),
-      _loadFirstPage,
-    );
+    _searchDebounce = Timer(const Duration(milliseconds: 450), _loadFirstPage);
   }
 
   /// 加载第一页圣殿搜索结果
@@ -409,10 +402,7 @@ class _BotTempleMultiSearchSheetState
       }
 
       setState(() {
-        _items = <BotTempleOption>[
-          ..._items,
-          ...items,
-        ];
+        _items = <BotTempleOption>[..._items, ...items];
         _isLoadingMore = false;
         _syncPagination(
           requestedPage: requestedPage,
@@ -464,8 +454,9 @@ class _BotTempleMultiSearchSheetState
     required int totalPages,
     required int rawItemCount,
   }) {
-    final resolvedPage =
-        currentPage > requestedPage ? currentPage : requestedPage;
+    final resolvedPage = currentPage > requestedPage
+        ? currentPage
+        : requestedPage;
     _nextPage = resolvedPage + 1;
     _canLoadMore = rawItemCount > 0 && resolvedPage < totalPages;
   }

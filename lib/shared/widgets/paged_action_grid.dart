@@ -98,14 +98,12 @@ class _PagedActionGridState extends State<PagedActionGrid> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final columnCount = _resolveColumnCount(constraints.maxWidth);
-        final itemWidth = _resolveItemWidth(
-          constraints.maxWidth,
-          columnCount,
-        );
+        final itemWidth = _resolveItemWidth(constraints.maxWidth, columnCount);
         final pageItemCount = columnCount * _maxRowCount;
         final pageCount = (widget.itemCount / pageItemCount).ceil();
         final rowCount = _resolveRowCount(columnCount, pageItemCount);
-        final gridHeight = rowCount * widget.itemHeight +
+        final gridHeight =
+            rowCount * widget.itemHeight +
             (rowCount - 1) * widget.verticalSpacing;
         final safeCurrentPage = _currentPage.clamp(0, pageCount - 1).toInt();
         if (safeCurrentPage != _currentPage) {
@@ -156,9 +154,10 @@ class _PagedActionGridState extends State<PagedActionGrid> {
   ///
   /// [maxWidth] 可用最大宽度
   int _resolveColumnCount(double maxWidth) {
-    final rawColumnCount = ((maxWidth + widget.horizontalSpacing) /
-            (widget.minItemWidth + widget.horizontalSpacing))
-        .floor();
+    final rawColumnCount =
+        ((maxWidth + widget.horizontalSpacing) /
+                (widget.minItemWidth + widget.horizontalSpacing))
+            .floor();
     return rawColumnCount.clamp(1, widget.maxColumnCount).toInt();
   }
 
@@ -264,10 +263,7 @@ class _PagedActionGridPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lastItemIndex = (firstItemIndex + pageItemCount)
-        .clamp(
-          firstItemIndex,
-          itemCount,
-        )
+        .clamp(firstItemIndex, itemCount)
         .toInt();
 
     return Wrap(

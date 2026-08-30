@@ -1,5 +1,6 @@
 part of '../character_detail_repository.dart';
 
+/// 角色详情 ICO 查询
 extension CharacterDetailRepositoryIcoQueries on CharacterDetailRepository {
   /// 获取当前用户 ICO 注资资料
   ///
@@ -37,7 +38,7 @@ extension CharacterDetailRepositoryIcoQueries on CharacterDetailRepository {
   /// [page] 页码
   /// [pageSize] 每页数量
   Future<TinygrailPage<CharacterDetailIcoParticipant>>
-      fetchCharacterIcoParticipantPage({
+  fetchCharacterIcoParticipantPage({
     required int icoId,
     required int page,
     required int pageSize,
@@ -45,21 +46,20 @@ extension CharacterDetailRepositoryIcoQueries on CharacterDetailRepository {
     final json = await _apiClient.getJson<Map<String, Object?>>(
       'chara/initial/users/$icoId/$page/$pageSize',
     );
-    final response = TinygrailResponse<
-        TinygrailPage<CharacterDetailIcoParticipant>>.fromJson(
-      json,
-      (value) {
-        final valueJson = TinygrailResponseParser.asObjectMap(value);
-        if (valueJson == null) {
-          return null;
-        }
+    final response =
+        TinygrailResponse<
+          TinygrailPage<CharacterDetailIcoParticipant>
+        >.fromJson(json, (value) {
+          final valueJson = TinygrailResponseParser.asObjectMap(value);
+          if (valueJson == null) {
+            return null;
+          }
 
-        return TinygrailPage<CharacterDetailIcoParticipant>.fromJson(
-          valueJson,
-          CharacterDetailIcoParticipant.fromJson,
-        );
-      },
-    );
+          return TinygrailPage<CharacterDetailIcoParticipant>.fromJson(
+            valueJson,
+            CharacterDetailIcoParticipant.fromJson,
+          );
+        });
 
     final pageData = response.value;
     if (!response.isSuccess || pageData == null) {

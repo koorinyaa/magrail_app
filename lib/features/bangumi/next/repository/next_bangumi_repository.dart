@@ -15,21 +15,21 @@ import 'package:webview_flutter/webview_flutter.dart';
 class NextBangumiRepository {
   /// 创建 Next Bangumi API 仓库
   NextBangumiRepository()
-      : _cookieManager = WebViewCookieManager(),
-        _dio = Dio(
-          BaseOptions(
-            connectTimeout: const Duration(seconds: 15),
-            receiveTimeout: const Duration(seconds: 30),
-            responseType: ResponseType.json,
-            // Next Bangumi 镜像会拦截非浏览器客户端请求
-            headers: {
-              'User-Agent': _fallbackUserAgent,
-              Headers.acceptHeader: 'application/json, text/plain, */*',
-              'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-              Headers.contentTypeHeader: Headers.jsonContentType,
-            },
-          ),
-        ) {
+    : _cookieManager = WebViewCookieManager(),
+      _dio = Dio(
+        BaseOptions(
+          connectTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 30),
+          responseType: ResponseType.json,
+          // Next Bangumi 镜像会拦截非浏览器客户端请求
+          headers: {
+            'User-Agent': _fallbackUserAgent,
+            Headers.acceptHeader: 'application/json, text/plain, */*',
+            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+            Headers.contentTypeHeader: Headers.jsonContentType,
+          },
+        ),
+      ) {
     _dio.interceptors.add(
       InterceptorsWrapper(onRequest: _attachBangumiCookies),
     );
@@ -40,7 +40,8 @@ class NextBangumiRepository {
   static const _searchSubjectsUrl = '$_apiBaseUrl/search/subjects';
   static const _characterUrl = '$_apiBaseUrl/characters';
   static const _subjectUrl = '$_apiBaseUrl/subjects';
-  static const _fallbackUserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+  static const _fallbackUserAgent =
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
       'AppleWebKit/537.36 (KHTML, like Gecko) '
       'Chrome/126.0.0.0 Safari/537.36';
   static final Future<String?> _platformUserAgent = _loadPlatformUserAgent();
@@ -91,8 +92,10 @@ class NextBangumiRepository {
         );
       }
       final cookieHeader = cookies
-          .where((cookie) =>
-              cookie.name.trim().isNotEmpty && cookie.value.isNotEmpty)
+          .where(
+            (cookie) =>
+                cookie.name.trim().isNotEmpty && cookie.value.isNotEmpty,
+          )
           .map((cookie) => '${cookie.name}=${cookie.value}')
           .join('; ');
       if (cookieHeader.isNotEmpty) {
@@ -126,10 +129,7 @@ class NextBangumiRepository {
     try {
       final response = await _dio.post<dynamic>(
         TinygrailAssetUrls.normalizeBangumiUrl(_searchCharactersUrl),
-        queryParameters: {
-          'limit': limit,
-          'offset': offset,
-        },
+        queryParameters: {'limit': limit, 'offset': offset},
         data: {
           'filter': {'nsfw': true},
           'keyword': resolvedKeyword,
@@ -140,7 +140,8 @@ class NextBangumiRepository {
         throw const ApiException(message: '搜索 BGM 角色失败');
       }
 
-      final rawItems = TinygrailResponseParser.asObjectList(
+      final rawItems =
+          TinygrailResponseParser.asObjectList(
             responseJson['data'],
             NextBangumiCharacterSearchItem.fromJson,
           ) ??
@@ -179,10 +180,7 @@ class NextBangumiRepository {
     try {
       final response = await _dio.post<dynamic>(
         TinygrailAssetUrls.normalizeBangumiUrl(_searchSubjectsUrl),
-        queryParameters: {
-          'limit': limit,
-          'offset': offset,
-        },
+        queryParameters: {'limit': limit, 'offset': offset},
         data: {
           'filter': {
             'date': <Object?>[],
@@ -202,7 +200,8 @@ class NextBangumiRepository {
         throw const ApiException(message: '搜索 BGM 条目失败');
       }
 
-      final rawItems = TinygrailResponseParser.asObjectList(
+      final rawItems =
+          TinygrailResponseParser.asObjectList(
             responseJson['data'],
             NextBangumiSubjectSearchItem.fromJson,
           ) ??
@@ -229,9 +228,7 @@ class NextBangumiRepository {
 
     try {
       final response = await _dio.get<dynamic>(
-        TinygrailAssetUrls.normalizeBangumiUrl(
-          '$_characterUrl/$characterId',
-        ),
+        TinygrailAssetUrls.normalizeBangumiUrl('$_characterUrl/$characterId'),
       );
       final responseJson = TinygrailResponseParser.asObjectMap(response.data);
       if (responseJson == null) {
@@ -263,17 +260,15 @@ class NextBangumiRepository {
         TinygrailAssetUrls.normalizeBangumiUrl(
           '$_characterUrl/$characterId/relations',
         ),
-        queryParameters: {
-          'limit': limit,
-          'offset': offset,
-        },
+        queryParameters: {'limit': limit, 'offset': offset},
       );
       final responseJson = TinygrailResponseParser.asObjectMap(response.data);
       if (responseJson == null) {
         throw const ApiException(message: '获取 BGM 关联角色失败');
       }
 
-      final rawItems = TinygrailResponseParser.asObjectList(
+      final rawItems =
+          TinygrailResponseParser.asObjectList(
             responseJson['data'],
             NextBangumiSubjectCharacterItem.fromJson,
           ) ??
@@ -309,17 +304,15 @@ class NextBangumiRepository {
         TinygrailAssetUrls.normalizeBangumiUrl(
           '$_characterUrl/$characterId/casts',
         ),
-        queryParameters: {
-          'limit': limit,
-          'offset': offset,
-        },
+        queryParameters: {'limit': limit, 'offset': offset},
       );
       final responseJson = TinygrailResponseParser.asObjectMap(response.data);
       if (responseJson == null) {
         throw const ApiException(message: '获取 BGM 出演作品失败');
       }
 
-      final rawItems = TinygrailResponseParser.asObjectList(
+      final rawItems =
+          TinygrailResponseParser.asObjectList(
             responseJson['data'],
             _castSubjectFromJson,
           ) ??
@@ -346,9 +339,7 @@ class NextBangumiRepository {
 
     try {
       final response = await _dio.get<dynamic>(
-        TinygrailAssetUrls.normalizeBangumiUrl(
-          '$_subjectUrl/$subjectId',
-        ),
+        TinygrailAssetUrls.normalizeBangumiUrl('$_subjectUrl/$subjectId'),
       );
       final responseJson = TinygrailResponseParser.asObjectMap(response.data);
       if (responseJson == null) {
@@ -380,17 +371,15 @@ class NextBangumiRepository {
         TinygrailAssetUrls.normalizeBangumiUrl(
           '$_subjectUrl/$subjectId/characters',
         ),
-        queryParameters: {
-          'limit': limit,
-          'offset': offset,
-        },
+        queryParameters: {'limit': limit, 'offset': offset},
       );
       final responseJson = TinygrailResponseParser.asObjectMap(response.data);
       if (responseJson == null) {
         throw const ApiException(message: '获取 BGM 条目角色失败');
       }
 
-      final rawItems = TinygrailResponseParser.asObjectList(
+      final rawItems =
+          TinygrailResponseParser.asObjectList(
             responseJson['data'],
             NextBangumiSubjectCharacterItem.fromJson,
           ) ??
@@ -416,9 +405,7 @@ class NextBangumiRepository {
 /// 从出演作品 JSON 读取条目资料
 ///
 /// [json] 原始出演作品 JSON
-NextBangumiCharacterCastItem _castSubjectFromJson(
-  Map<String, Object?> json,
-) {
+NextBangumiCharacterCastItem _castSubjectFromJson(Map<String, Object?> json) {
   final subject = TinygrailResponseParser.asObjectMap(json['subject']);
   return NextBangumiCharacterCastItem(
     subject: NextBangumiSubjectSearchItem.fromSubjectJson(

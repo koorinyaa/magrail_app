@@ -171,9 +171,7 @@ class _TempleAssetStarbreakConfirmContent extends StatelessWidget {
     final currentName = TinygrailFormatters.decodeHtmlEntities(
       data.characterName,
     );
-    final targetName = TinygrailFormatters.decodeHtmlEntities(
-      target.name,
-    );
+    final targetName = TinygrailFormatters.decodeHtmlEntities(target.name);
     final rate = double.tryParse(rateText) ?? 0;
     final minDamage = (20 * rate).floor();
     final maxDamage = (200 * rate).floor();
@@ -234,8 +232,9 @@ class _TempleAssetStardustModeSelector extends StatelessWidget {
           final height = constraints.maxHeight;
           final curveWidth = math.min(height * 1.5, width * 0.16);
           final indicatorWidth = width / 2 + curveWidth * 1.5;
-          final indicatorLeft =
-              isDownSacrifices ? width / 2 - curveWidth / 2 : -curveWidth;
+          final indicatorLeft = isDownSacrifices
+              ? width / 2 - curveWidth / 2
+              : -curveWidth;
 
           return Stack(
             fit: StackFit.expand,
@@ -286,9 +285,7 @@ class _TempleAssetStardustModeClipper extends CustomClipper<Path> {
   /// 创建星光碎片模式选中背景裁剪器
   ///
   /// [curveWidth] 曲线区域宽度
-  const _TempleAssetStardustModeClipper({
-    required this.curveWidth,
-  });
+  const _TempleAssetStardustModeClipper({required this.curveWidth});
 
   /// 曲线区域宽度
   final double curveWidth;
@@ -314,14 +311,7 @@ class _TempleAssetStardustModeClipper extends CustomClipper<Path> {
         height,
       )
       ..lineTo(0, height)
-      ..cubicTo(
-        curveWidth / 2,
-        height,
-        curveWidth / 2,
-        0,
-        curveWidth,
-        0,
-      )
+      ..cubicTo(curveWidth / 2, height, curveWidth / 2, 0, curveWidth, 0)
       ..close();
     return path;
   }

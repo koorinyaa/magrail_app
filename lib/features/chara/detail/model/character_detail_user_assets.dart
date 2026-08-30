@@ -33,17 +33,17 @@ final class CharacterDetailUserAssets {
 
   /// 创建未登录的角色详情当前用户资产状态
   const CharacterDetailUserAssets.signedOut()
-      : status = CharacterDetailUserAssetsStatus.signedOut,
-        character = null,
-        temple = null,
-        errorMessage = null;
+    : status = CharacterDetailUserAssetsStatus.signedOut,
+      character = null,
+      temple = null,
+      errorMessage = null;
 
   /// 创建加载中的角色详情当前用户资产状态
   const CharacterDetailUserAssets.loading()
-      : status = CharacterDetailUserAssetsStatus.loading,
-        character = null,
-        temple = null,
-        errorMessage = null;
+    : status = CharacterDetailUserAssetsStatus.loading,
+      character = null,
+      temple = null,
+      errorMessage = null;
 
   /// 创建加载完成的角色详情当前用户资产状态
   ///
@@ -52,17 +52,16 @@ final class CharacterDetailUserAssets {
   const CharacterDetailUserAssets.ready({
     required CharacterDetailUserCharacter this.character,
     required this.temple,
-  })  : status = CharacterDetailUserAssetsStatus.ready,
-        errorMessage = null;
+  }) : status = CharacterDetailUserAssetsStatus.ready,
+       errorMessage = null;
 
   /// 创建加载失败的角色详情当前用户资产状态
   ///
   /// [errorMessage] 资产加载失败文案
-  const CharacterDetailUserAssets.failure({
-    this.errorMessage,
-  })  : status = CharacterDetailUserAssetsStatus.failure,
-        character = null,
-        temple = null;
+  const CharacterDetailUserAssets.failure({this.errorMessage})
+    : status = CharacterDetailUserAssetsStatus.failure,
+      character = null,
+      temple = null;
 
   /// 当前资产加载状态
   final CharacterDetailUserAssetsStatus status;

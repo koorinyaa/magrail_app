@@ -37,11 +37,12 @@ class UserAvatar extends StatelessWidget {
     final borderColor = isBanned
         ? const Color(0xFFEF4444)
         : isDark
-            ? Colors.white.withValues(alpha: 0.14)
-            : const Color(0xFFE1E4E8);
+        ? Colors.white.withValues(alpha: 0.14)
+        : const Color(0xFFE1E4E8);
     final isSmall = size <= 40;
-    final resolvedImageUrl =
-        imageUrl.isEmpty ? '' : TinygrailAssetUrls.normalizeAvatar(imageUrl);
+    final resolvedImageUrl = imageUrl.isEmpty
+        ? ''
+        : TinygrailAssetUrls.normalizeAvatar(imageUrl);
 
     return Container(
       width: size,

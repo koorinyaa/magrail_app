@@ -7,10 +7,7 @@ class CharacterDetailAuthGuideSection extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [onAuthorize] 打开 Tinygrail 授权页回调
-  const CharacterDetailAuthGuideSection({
-    super.key,
-    required this.onAuthorize,
-  });
+  const CharacterDetailAuthGuideSection({super.key, required this.onAuthorize});
 
   /// 打开 Tinygrail 授权页回调
   final VoidCallback onAuthorize;

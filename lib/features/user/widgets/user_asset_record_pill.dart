@@ -32,10 +32,12 @@ class UserAssetRecordPill extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
     final resolvedAccent = accentColor;
-    final backgroundColor = resolvedAccent ??
+    final backgroundColor =
+        resolvedAccent ??
         colorScheme.onSurfaceVariant.withValues(alpha: isDark ? 0.16 : 0.10);
-    final foregroundColor =
-        resolvedAccent == null ? colorScheme.onSurfaceVariant : Colors.white;
+    final foregroundColor = resolvedAccent == null
+        ? colorScheme.onSurfaceVariant
+        : Colors.white;
 
     return DecoratedBox(
       decoration: BoxDecoration(

@@ -18,10 +18,7 @@ class CharacterDetailIcoHeaderCard extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [info] ICO 头部资料
-  const CharacterDetailIcoHeaderCard({
-    super.key,
-    required this.info,
-  });
+  const CharacterDetailIcoHeaderCard({super.key, required this.info});
 
   /// ICO 头部资料
   final CharacterDetailIcoInfo info;
@@ -95,8 +92,9 @@ class _CharacterDetailIcoHeaderCardState
     }
 
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      final resolvedEndTime =
-          TinygrailFormatters.parseServerFutureTime(widget.info.end);
+      final resolvedEndTime = TinygrailFormatters.parseServerFutureTime(
+        widget.info.end,
+      );
       if (resolvedEndTime == null ||
           !resolvedEndTime.toLocal().isAfter(DateTime.now())) {
         _countdownTimer?.cancel();

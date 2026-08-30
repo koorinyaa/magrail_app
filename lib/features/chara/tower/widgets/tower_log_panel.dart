@@ -57,7 +57,8 @@ class TowerLogPanel extends StatelessWidget {
     return ListenableBuilder(
       listenable: controller,
       builder: (context, child) {
-        final isStateOnlyContent = !controller.isInitialLoading &&
+        final isStateOnlyContent =
+            !controller.isInitialLoading &&
             (controller.initialError != null ||
                 (controller.realtimeItems.isEmpty &&
                     controller.historyItems.isEmpty &&

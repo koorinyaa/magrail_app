@@ -39,7 +39,7 @@ class UserAuctionSliverList extends StatelessWidget {
 
   /// 角色详情点击回调
   final void Function(UserAuctionApiItem item, String? avatarHeroTag)?
-      onCharacterTap;
+  onCharacterTap;
 
   /// 取消竞拍回调
   final ValueChanged<UserAuctionApiItem>? onCancelAuction;
@@ -81,7 +81,8 @@ class UserAuctionSliverList extends StatelessWidget {
         return Padding(
           padding: AppSafeAreaInsets.fromLTRB(
             context,
-            left: UserAssetRecordListMetrics.horizontalPadding +
+            left:
+                UserAssetRecordListMetrics.horizontalPadding +
                 UserAssetRecordListMetrics.textIndent,
             top: 0,
             right: UserAssetRecordListMetrics.horizontalPadding,
@@ -107,10 +108,7 @@ class UserAuctionSkeletonSliverList extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [itemCount] 骨架条目数量
-  const UserAuctionSkeletonSliverList({
-    super.key,
-    this.itemCount = 12,
-  });
+  const UserAuctionSkeletonSliverList({super.key, this.itemCount = 12});
 
   /// 骨架条目数量
   final int itemCount;
@@ -131,7 +129,8 @@ class UserAuctionSkeletonSliverList extends StatelessWidget {
         return Padding(
           padding: AppSafeAreaInsets.fromLTRB(
             context,
-            left: UserAssetRecordListMetrics.horizontalPadding +
+            left:
+                UserAssetRecordListMetrics.horizontalPadding +
                 UserAssetRecordListMetrics.textIndent,
             top: 0,
             right: UserAssetRecordListMetrics.horizontalPadding,

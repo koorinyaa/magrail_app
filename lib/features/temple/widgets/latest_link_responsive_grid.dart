@@ -16,6 +16,7 @@ class LatestLinkResponsiveGrid extends StatelessWidget {
   /// [onUserTap] 用户名称点击回调
   /// [onItemBuilt] 条目构建回调
   /// [onAssetTap] 圣殿资产入口点击回调
+  /// [key] Flutter 组件标识
   const LatestLinkResponsiveGrid({
     super.key,
     required this.items,
@@ -72,28 +73,24 @@ class LatestLinkResponsiveGrid extends StatelessWidget {
               crossAxisCount: layout.crossAxisCount,
               mainAxisSpacing: _mainAxisSpacing,
               crossAxisSpacing: _crossAxisSpacing,
-              childAspectRatio: layout.cellWidth /
-                  LatestLinkCard.heightForWidth(
-                    layout.cardWidth,
-                  ),
+              childAspectRatio:
+                  layout.cellWidth /
+                  LatestLinkCard.heightForWidth(layout.cardWidth),
             ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                onItemBuilt?.call(index);
-                return Align(
-                  alignment: Alignment.topCenter,
-                  child: LatestLinkCard(
-                    pair: items[index],
-                    width: layout.cardWidth,
-                    heroTagPrefix: 'latest-link-page-cover',
-                    onCharacterTap: onCharacterTap,
-                    onUserTap: onUserTap,
-                    onAssetTap: onAssetTap,
-                  ),
-                );
-              },
-              childCount: items.length,
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              onItemBuilt?.call(index);
+              return Align(
+                alignment: Alignment.topCenter,
+                child: LatestLinkCard(
+                  pair: items[index],
+                  width: layout.cardWidth,
+                  heroTagPrefix: 'latest-link-page-cover',
+                  onCharacterTap: onCharacterTap,
+                  onUserTap: onUserTap,
+                  onAssetTap: onAssetTap,
+                ),
+              );
+            }, childCount: items.length),
           ),
         );
       },
@@ -120,9 +117,10 @@ class LatestLinkResponsiveGrid extends StatelessWidget {
       );
     }
 
-    final rawCount = ((contentWidth + _crossAxisSpacing) /
-            (_minCardWidth + _crossAxisSpacing))
-        .floor();
+    final rawCount =
+        ((contentWidth + _crossAxisSpacing) /
+                (_minCardWidth + _crossAxisSpacing))
+            .floor();
     final crossAxisCount = rawCount.clamp(1, _maxColumnCount).toInt();
     final cellWidth = math.max(
       0.0,
@@ -143,11 +141,9 @@ class LatestLinkResponsiveGrid extends StatelessWidget {
 class LatestLinkSkeletonGrid extends StatelessWidget {
   /// 创建最新连接自适应骨架网格
   ///
+  /// [key] Flutter 组件标识
   /// [itemCount] 骨架卡片数量
-  const LatestLinkSkeletonGrid({
-    super.key,
-    this.itemCount = 8,
-  });
+  const LatestLinkSkeletonGrid({super.key, this.itemCount = 8});
 
   /// 骨架卡片数量
   final int itemCount;
@@ -177,20 +173,16 @@ class LatestLinkSkeletonGrid extends StatelessWidget {
               crossAxisCount: layout.crossAxisCount,
               mainAxisSpacing: LatestLinkResponsiveGrid._mainAxisSpacing,
               crossAxisSpacing: LatestLinkResponsiveGrid._crossAxisSpacing,
-              childAspectRatio: layout.cellWidth /
-                  LatestLinkCard.heightForWidth(
-                    layout.cardWidth,
-                  ),
+              childAspectRatio:
+                  layout.cellWidth /
+                  LatestLinkCard.heightForWidth(layout.cardWidth),
             ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return Align(
-                  alignment: Alignment.topCenter,
-                  child: LatestLinkSkeletonCard(width: layout.cardWidth),
-                );
-              },
-              childCount: itemCount,
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              return Align(
+                alignment: Alignment.topCenter,
+                child: LatestLinkSkeletonCard(width: layout.cardWidth),
+              );
+            }, childCount: itemCount),
           ),
         );
       },

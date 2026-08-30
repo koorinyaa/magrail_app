@@ -73,8 +73,9 @@ class _CharacterDetailIcoStartSectionState
     extends State<CharacterDetailIcoStartSection> {
   static const double _minimumAmount = 10000;
 
-  final TextEditingController _amountController =
-      TextEditingController(text: '10000');
+  final TextEditingController _amountController = TextEditingController(
+    text: '10000',
+  );
   List<CharacterDetailKillVote>? _killVotes;
   bool _isSubmitting = false;
 
@@ -111,7 +112,8 @@ class _CharacterDetailIcoStartSectionState
   @override
   Widget build(BuildContext context) {
     final killVotes = _killVotes;
-    final hasRequiredKillVotes = killVotes != null &&
+    final hasRequiredKillVotes =
+        killVotes != null &&
         killVotes.length >= CharacterDetailTradeHeader.requiredKillVoteCount;
 
     return _IcoStartShell(
@@ -244,9 +246,7 @@ class _IcoStartShell extends StatelessWidget {
   /// 创建 ICO 启动卡片外壳
   ///
   /// [child] 卡片内容
-  const _IcoStartShell({
-    required this.child,
-  });
+  const _IcoStartShell({required this.child});
 
   /// 卡片内容
   final Widget child;
@@ -278,10 +278,7 @@ class _IcoStartShell extends StatelessWidget {
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: child,
-      ),
+      child: Padding(padding: const EdgeInsets.all(18), child: child),
     );
   }
 }
@@ -292,10 +289,7 @@ class _IcoStartHeader extends StatelessWidget {
   ///
   /// [characterId] 角色 ID
   /// [displayName] 角色显示名称
-  const _IcoStartHeader({
-    required this.characterId,
-    required this.displayName,
-  });
+  const _IcoStartHeader({required this.characterId, required this.displayName});
 
   /// 角色 ID
   final int characterId;
@@ -309,8 +303,9 @@ class _IcoStartHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final resolvedDisplayName =
-        displayName.trim().isEmpty ? '#$characterId' : displayName.trim();
+    final resolvedDisplayName = displayName.trim().isEmpty
+        ? '#$characterId'
+        : displayName.trim();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -429,9 +424,7 @@ class _IcoStartAmountField extends StatelessWidget {
   /// 创建 ICO 启动金额输入框
   ///
   /// [controller] 金额输入控制器
-  const _IcoStartAmountField({
-    required this.controller,
-  });
+  const _IcoStartAmountField({required this.controller});
 
   /// 金额输入控制器
   final TextEditingController controller;
@@ -453,9 +446,7 @@ class _IcoStartAmountField extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-      ],
+      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
       style: TextStyle(
         color: colorScheme.onSurface,
         fontSize: 16,

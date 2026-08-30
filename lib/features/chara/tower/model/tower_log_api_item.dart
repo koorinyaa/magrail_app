@@ -20,6 +20,23 @@ import 'package:magrail_app/core/network/tinygrail_response.dart';
 /// [type] 日志类型
 class TowerLogApiItem {
   /// 创建通天塔日志接口条目
+  ///
+  /// [icon] 角色头像地址
+  /// [id] 日志 ID
+  /// [characterId] 角色 ID
+  /// [characterName] 角色名称
+  /// [userId] 用户内部 ID
+  /// [userName] 用户名
+  /// [nickname] 用户昵称
+  /// [amount] 数量
+  /// [fromCharacterId] 来源角色 ID
+  /// [stars] 星级
+  /// [starForces] 星之力
+  /// [rank] 当前排名
+  /// [oldRank] 变动前排名
+  /// [loss] 变动损失
+  /// [logTime] 日志时间
+  /// [type] 日志类型
   const TowerLogApiItem({
     required this.icon,
     required this.id,

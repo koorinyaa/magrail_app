@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 /// 角色资产行骨架
@@ -108,8 +108,8 @@ class CharacterAssetRowSkeleton extends StatelessWidget {
                             height: index == 0 && primaryMetricAsPill
                                 ? 16
                                 : index == 0
-                                    ? 11
-                                    : 10,
+                                ? 11
+                                : 10,
                             borderRadius: BorderRadius.circular(
                               index == 0 && primaryMetricAsPill ? 999 : 5,
                             ),

@@ -5,9 +5,7 @@ class _TempleAssetActions extends StatelessWidget {
   /// 创建圣殿资产操作按钮行
   ///
   /// [data] 圣殿资产卡片展示数据
-  const _TempleAssetActions({
-    required this.data,
-  });
+  const _TempleAssetActions({required this.data});
 
   /// 圣殿资产卡片展示数据
   final TempleAssetCardData data;
@@ -30,10 +28,7 @@ class _TempleAssetActions extends StatelessWidget {
           children: [
             for (var index = 0; index < actions.length; index++) ...[
               if (index > 0) const SizedBox(width: 6),
-              _TempleAssetActionButton(
-                action: actions[index],
-                data: data,
-              ),
+              _TempleAssetActionButton(action: actions[index], data: data),
             ],
           ],
         ),
@@ -139,10 +134,7 @@ class _TempleAssetActionButton extends StatelessWidget {
   ///
   /// [action] 圣殿操作配置
   /// [data] 圣殿资产卡片展示数据
-  const _TempleAssetActionButton({
-    required this.action,
-    required this.data,
-  });
+  const _TempleAssetActionButton({required this.action, required this.data});
 
   /// 圣殿操作配置
   final _TempleAssetActionData action;
@@ -160,8 +152,9 @@ class _TempleAssetActionButton extends StatelessWidget {
     final backgroundColor = colorScheme.surfaceContainerHighest.withValues(
       alpha: isDark ? 0.20 : 0.38,
     );
-    final foregroundColor =
-        action.isDestructive ? colorScheme.error : colorScheme.onSurfaceVariant;
+    final foregroundColor = action.isDestructive
+        ? colorScheme.error
+        : colorScheme.onSurfaceVariant;
 
     return Material(
       color: backgroundColor,
@@ -176,10 +169,7 @@ class _TempleAssetActionButton extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _TempleAssetActionIcon(
-                action: action,
-                color: foregroundColor,
-              ),
+              _TempleAssetActionIcon(action: action, color: foregroundColor),
               const SizedBox(width: 4),
               Text(
                 action.label,
@@ -270,18 +260,11 @@ class _TempleAssetActionButton extends StatelessWidget {
         return;
       }
 
-      showTempleAssetMagicActionSheet(
-        context,
-        action: magicAction,
-        data: data,
-      );
+      showTempleAssetMagicActionSheet(context, action: magicAction, data: data);
       return;
     }
 
-    AppToast.info(
-      context,
-      text: '${action.toastLabel}后续接入',
-    );
+    AppToast.info(context, text: '${action.toastLabel}后续接入');
   }
 }
 
@@ -291,10 +274,7 @@ class _TempleAssetActionIcon extends StatelessWidget {
   ///
   /// [action] 圣殿操作配置
   /// [color] 图标颜色
-  const _TempleAssetActionIcon({
-    required this.action,
-    required this.color,
-  });
+  const _TempleAssetActionIcon({required this.action, required this.color});
 
   /// 圣殿操作配置
   final _TempleAssetActionData action;
@@ -317,11 +297,8 @@ class _TempleAssetActionIcon extends StatelessWidget {
             child: Image.asset(
               imageAsset,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Icon(
-                LucideIcons.imageOff,
-                size: 13,
-                color: color,
-              ),
+              errorBuilder: (context, error, stackTrace) =>
+                  Icon(LucideIcons.imageOff, size: 13, color: color),
             ),
           ),
         ),
@@ -329,19 +306,10 @@ class _TempleAssetActionIcon extends StatelessWidget {
     }
 
     if (action.usesStarPowerIcon) {
-      return Icon(
-        Symbols.auto_awesome,
-        size: 13,
-        fill: 0,
-        color: color,
-      );
+      return Icon(Symbols.auto_awesome, size: 13, fill: 0, color: color);
     }
 
-    return Icon(
-      action.icon ?? Icons.circle_outlined,
-      size: 13,
-      color: color,
-    );
+    return Icon(action.icon ?? Icons.circle_outlined, size: 13, color: color);
   }
 }
 
@@ -350,9 +318,7 @@ class _TempleAssetActionsSkeleton extends StatelessWidget {
   /// 创建圣殿资产操作骨架行
   ///
   /// [showResetAction] 是否只显示重置圣殿图片骨架
-  const _TempleAssetActionsSkeleton({
-    this.showResetAction = false,
-  });
+  const _TempleAssetActionsSkeleton({this.showResetAction = false});
 
   /// 是否只显示重置圣殿图片骨架
   final bool showResetAction;

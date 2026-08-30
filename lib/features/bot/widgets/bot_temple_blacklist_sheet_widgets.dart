@@ -62,11 +62,7 @@ class _BotTempleBlacklistHeader extends StatelessWidget {
                   color: iconColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(
-                  icon,
-                  size: 20,
-                  color: iconColor,
-                ),
+                child: Icon(icon, size: 20, color: iconColor),
               );
             },
           ),
@@ -83,9 +79,7 @@ class _BotTempleBlacklistInlineWarning extends StatelessWidget {
   /// 创建 bot 圣殿黑名单行内警告
   ///
   /// [text] 警告文本
-  const _BotTempleBlacklistInlineWarning({
-    required this.text,
-  });
+  const _BotTempleBlacklistInlineWarning({required this.text});
 
   /// 警告文本
   final String text;
@@ -122,9 +116,7 @@ class _BotTempleBlacklistEmptyText extends StatelessWidget {
   /// 创建 bot 圣殿黑名单空状态文本
   ///
   /// [text] 展示文本
-  const _BotTempleBlacklistEmptyText({
-    required this.text,
-  });
+  const _BotTempleBlacklistEmptyText({required this.text});
 
   /// 展示文本
   final String text;
@@ -386,9 +378,7 @@ class _BotTempleBlacklistSearchField extends StatelessWidget {
   /// 创建 bot 圣殿黑名单搜索框
   ///
   /// [controller] 输入控制器
-  const _BotTempleBlacklistSearchField({
-    required this.controller,
-  });
+  const _BotTempleBlacklistSearchField({required this.controller});
 
   /// 输入控制器
   final TextEditingController controller;

@@ -258,9 +258,9 @@ final class _IcoParticipantsGridMetrics {
   /// 参与者网格代理
   static const SliverGridDelegateWithMaxCrossAxisExtent delegate =
       SliverGridDelegateWithMaxCrossAxisExtent(
-    maxCrossAxisExtent: 220,
-    mainAxisExtent: 60,
-    mainAxisSpacing: 0,
-    crossAxisSpacing: 8,
-  );
+        maxCrossAxisExtent: 220,
+        mainAxisExtent: 60,
+        mainAxisSpacing: 0,
+        crossAxisSpacing: 8,
+      );
 }

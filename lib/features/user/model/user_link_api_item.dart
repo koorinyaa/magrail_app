@@ -10,10 +10,7 @@ class UserLinkApiItem {
   ///
   /// [temple] 连接左侧圣殿
   /// [link] 连接右侧圣殿
-  const UserLinkApiItem({
-    required this.temple,
-    required this.link,
-  });
+  const UserLinkApiItem({required this.temple, required this.link});
 
   /// 连接左侧圣殿
   final UserTempleApiItem temple;
@@ -80,9 +77,6 @@ class UserLinkApiItem {
 
   /// 转换为缓存 JSON
   Map<String, Object?> toJson() {
-    return {
-      ...temple.toJson(),
-      'Link': link?.toJson(),
-    };
+    return {...temple.toJson(), 'Link': link?.toJson()};
   }
 }

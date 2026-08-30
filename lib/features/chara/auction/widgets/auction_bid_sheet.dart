@@ -49,8 +49,9 @@ Future<void> showAuctionBidSheet(
       const topGap = 32.0;
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
-      final maxHeight =
-          availableHeight.clamp(0.0, mediaQuery.size.height).toDouble();
+      final maxHeight = availableHeight
+          .clamp(0.0, mediaQuery.size.height)
+          .toDouble();
 
       return ConstrainedBox(
         constraints: BoxConstraints(maxHeight: maxHeight),
@@ -168,9 +169,7 @@ class _AuctionBidSheetState extends State<AuctionBidSheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: mediaQuery.viewInsets.bottom),
       child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(28),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: backgroundColor,

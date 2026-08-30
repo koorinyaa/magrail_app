@@ -47,9 +47,7 @@ class TempleRefineRankingController
   ///
   /// [items] 接口返回条目
   @override
-  List<RankingEntry> convertPageItems(
-    List<RankingEntry> items,
-  ) {
+  List<RankingEntry> convertPageItems(List<RankingEntry> items) {
     return items;
   }
 }
@@ -98,9 +96,7 @@ class UserWealthRankingController
   ///
   /// [items] 接口返回条目
   @override
-  List<RankingEntry> convertPageItems(
-    List<RankingEntry> items,
-  ) {
+  List<RankingEntry> convertPageItems(List<RankingEntry> items) {
     return items;
   }
 }

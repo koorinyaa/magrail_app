@@ -66,8 +66,8 @@ final class UserAssetIdSnapshot {
   UserAssetIdSnapshot({
     required Iterable<int> characterIds,
     required Iterable<int> templeCharacterIds,
-  })  : characterIds = Set<int>.unmodifiable(characterIds),
-        templeCharacterIds = Set<int>.unmodifiable(templeCharacterIds);
+  }) : characterIds = Set<int>.unmodifiable(characterIds),
+       templeCharacterIds = Set<int>.unmodifiable(templeCharacterIds);
 
   /// 用户持有的唯一角色 ID
   final Set<int> characterIds;
@@ -171,10 +171,7 @@ class UserAssetSourceState {
   ///
   /// [now] 有效期判断基准时间
   /// [lifetime] 当前存储范围的有效期
-  bool isFreshAt(
-    DateTime now, {
-    Duration lifetime = userAssetCacheLifetime,
-  }) {
+  bool isFreshAt(DateTime now, {Duration lifetime = userAssetCacheLifetime}) {
     if (!revisions.isComplete) {
       return false;
     }

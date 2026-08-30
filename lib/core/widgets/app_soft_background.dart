@@ -8,10 +8,7 @@ class AppSoftBackground extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [isDark] 是否使用深色模式
-  const AppSoftBackground({
-    super.key,
-    required this.isDark,
-  });
+  const AppSoftBackground({super.key, required this.isDark});
 
   /// 是否使用深色模式
   final bool isDark;
@@ -26,9 +23,7 @@ class AppSoftBackground extends StatelessWidget {
     }
 
     return Positioned.fill(
-      child: CustomPaint(
-        painter: _SoftColorBlobPainter(isDark: isDark),
-      ),
+      child: CustomPaint(painter: _SoftColorBlobPainter(isDark: isDark)),
     );
   }
 }
@@ -38,9 +33,7 @@ class _SoftColorBlobPainter extends CustomPainter {
   /// 创建应用柔色色块绘制器
   ///
   /// [isDark] 是否使用深色模式
-  const _SoftColorBlobPainter({
-    required this.isDark,
-  });
+  const _SoftColorBlobPainter({required this.isDark});
 
   final bool isDark;
 

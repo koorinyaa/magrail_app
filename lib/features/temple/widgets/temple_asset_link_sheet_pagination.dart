@@ -97,10 +97,7 @@ extension _TempleAssetLinkSheetPagination on _TempleAssetLinkSheetState {
       }
 
       _setSheetState(() {
-        _items = <UserTempleApiItem>[
-          ..._items,
-          ...items,
-        ];
+        _items = <UserTempleApiItem>[..._items, ...items];
         _isLoadingMore = false;
         _syncPagination(
           requestedPage: requestedPage,
@@ -152,8 +149,9 @@ extension _TempleAssetLinkSheetPagination on _TempleAssetLinkSheetState {
     required int totalPages,
     required int rawItemCount,
   }) {
-    final resolvedPage =
-        currentPage > requestedPage ? currentPage : requestedPage;
+    final resolvedPage = currentPage > requestedPage
+        ? currentPage
+        : requestedPage;
     _nextPage = resolvedPage + 1;
     _canLoadMore = rawItemCount > 0 && resolvedPage < totalPages;
   }
@@ -168,8 +166,8 @@ extension _TempleAssetLinkSheetPagination on _TempleAssetLinkSheetState {
     }
 
     final maxIndex = itemCount - 1;
-    final triggerIndex =
-        (maxIndex - (_templeAssetLinkPageSize / 2).ceil()).clamp(0, maxIndex);
+    final triggerIndex = (maxIndex - (_templeAssetLinkPageSize / 2).ceil())
+        .clamp(0, maxIndex);
     if (index < triggerIndex || !_canLoadNextPage) {
       return;
     }

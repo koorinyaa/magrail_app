@@ -95,10 +95,7 @@ class _AuctionInfoSection extends StatelessWidget {
           ),
           if (error != null) ...[
             const SizedBox(height: 10),
-            _AuctionInlineMessage(
-              text: error,
-              isError: true,
-            ),
+            _AuctionInlineMessage(text: error, isError: true),
           ],
         ],
       ),
@@ -111,9 +108,7 @@ class _MyAuctionBidSection extends StatelessWidget {
   /// 创建我的出价区
   ///
   /// [auction] 当前拍卖详情
-  const _MyAuctionBidSection({
-    required this.auction,
-  });
+  const _MyAuctionBidSection({required this.auction});
 
   /// 当前拍卖详情
   final AuctionApiItem? auction;
@@ -157,10 +152,7 @@ class _AuctionSectionBlock extends StatelessWidget {
   ///
   /// [title] 区块标题
   /// [child] 区块内容
-  const _AuctionSectionBlock({
-    required this.title,
-    required this.child,
-  });
+  const _AuctionSectionBlock({required this.title, required this.child});
 
   /// 区块标题
   final String title;
@@ -278,10 +270,7 @@ class _AuctionInlineMessage extends StatelessWidget {
   ///
   /// [text] 提示文本
   /// [isError] 是否为错误提示
-  const _AuctionInlineMessage({
-    required this.text,
-    required this.isError,
-  });
+  const _AuctionInlineMessage({required this.text, required this.isError});
 
   /// 提示文本
   final String text;
@@ -295,8 +284,9 @@ class _AuctionInlineMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final foregroundColor =
-        isError ? colorScheme.error : colorScheme.onSurfaceVariant;
+    final foregroundColor = isError
+        ? colorScheme.error
+        : colorScheme.onSurfaceVariant;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -327,10 +317,7 @@ abstract final class _AuctionSurfaceStyle {
   ///
   /// [context] 当前组件树上下文
   /// [radius] 表面圆角
-  static BoxDecoration decoration(
-    BuildContext context, {
-    double radius = 18,
-  }) {
+  static BoxDecoration decoration(BuildContext context, {double radius = 18}) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
 

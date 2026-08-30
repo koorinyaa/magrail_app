@@ -11,13 +11,14 @@ class UserLinkPageController
   /// [repository] 用户仓库
   /// [username] 用户名
   /// [pageSize] 每页连接数量
+  /// [emptyPageScanLimit] 连续空页扫描上限
   UserLinkPageController({
     required UserRepository repository,
     required String username,
     super.pageSize = defaultPageSize,
     super.emptyPageScanLimit = 3,
-  })  : _repository = repository,
-        _username = username;
+  }) : _repository = repository,
+       _username = username;
 
   /// 用户连接二级页面默认分页数量
   static const int defaultPageSize = 12;

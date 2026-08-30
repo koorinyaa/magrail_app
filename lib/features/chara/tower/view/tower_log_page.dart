@@ -9,10 +9,7 @@ class TowerLogPage extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [repository] 通天塔仓库
-  const TowerLogPage({
-    super.key,
-    required this.repository,
-  });
+  const TowerLogPage({super.key, required this.repository});
 
   /// 通天塔仓库
   final TowerRepository repository;
@@ -31,9 +28,8 @@ class _TowerLogPageState extends State<TowerLogPage> {
   @override
   void initState() {
     super.initState();
-    _controller = TowerLogController(
-      repository: widget.repository,
-    )..initialize();
+    _controller = TowerLogController(repository: widget.repository)
+      ..initialize();
   }
 
   /// 释放通天塔日志二级页面状态

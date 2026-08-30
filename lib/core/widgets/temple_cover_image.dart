@@ -7,6 +7,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 class TempleCoverImage extends StatelessWidget {
   /// 创建圣殿封面图片
   ///
+  /// [key] Flutter 组件标识
   /// [coverUrl] 封面图片地址
   /// [avatarUrl] 头像图片地址
   /// [fit] 图片填充方式
@@ -103,9 +104,7 @@ class _TempleCoverPlaceholder extends StatelessWidget {
   /// 创建圣殿封面占位图
   ///
   /// [iconSize] 图标尺寸
-  const _TempleCoverPlaceholder({
-    required this.iconSize,
-  });
+  const _TempleCoverPlaceholder({required this.iconSize});
 
   /// 图标尺寸
   final double iconSize;
@@ -117,14 +116,8 @@ class _TempleCoverPlaceholder extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colors = isDark
-        ? const [
-            Color(0xFF27272A),
-            Color(0xFF18181B),
-          ]
-        : const [
-            Color(0xFFF4F4F5),
-            Color(0xFFE4E4E7),
-          ];
+        ? const [Color(0xFF27272A), Color(0xFF18181B)]
+        : const [Color(0xFFF4F4F5), Color(0xFFE4E4E7)];
     final iconColor = isDark
         ? const Color(0xFFA1A1AA).withValues(alpha: 0.86)
         : const Color(0xFFA1A1AA).withValues(alpha: 0.92);
@@ -138,11 +131,7 @@ class _TempleCoverPlaceholder extends StatelessWidget {
         ),
       ),
       child: Center(
-        child: Icon(
-          Icons.image_outlined,
-          size: iconSize,
-          color: iconColor,
-        ),
+        child: Icon(Icons.image_outlined, size: iconSize, color: iconColor),
       ),
     );
   }
@@ -194,9 +183,7 @@ class _TempleAvatarCoverFallback extends StatelessWidget {
                 return const _TempleCoverSkeleton();
               },
               errorWidget: (context, url, error) {
-                return _TempleCoverPlaceholder(
-                  iconSize: placeholderIconSize,
-                );
+                return _TempleCoverPlaceholder(iconSize: placeholderIconSize);
               },
             ),
           ),
@@ -211,10 +198,7 @@ class _TempleAvatarCoverFallback extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                Color(0x00000000),
-                Color(0x1F000000),
-              ],
+              colors: [Color(0x00000000), Color(0x1F000000)],
             ),
           ),
         ),

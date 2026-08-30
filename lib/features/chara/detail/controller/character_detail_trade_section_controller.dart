@@ -15,8 +15,8 @@ class CharacterDetailTradeSectionController extends ChangeNotifier {
     required CharacterDetailRepository repository,
     required int characterId,
     required double currentPrice,
-  })  : _repository = repository,
-        _characterId = characterId {
+  }) : _repository = repository,
+       _characterId = characterId {
     priceController = TextEditingController(
       text: _formatInputPrice(currentPrice),
     );
@@ -173,10 +173,7 @@ class CharacterDetailTradeSectionController extends ChangeNotifier {
         return;
       }
 
-      _loadError = resolveErrorMessage(
-        error,
-        fallback: '获取交易资料失败',
-      );
+      _loadError = resolveErrorMessage(error, fallback: '获取交易资料失败');
     } finally {
       if (_isCurrentLoad(loadSerial)) {
         _isLoading = false;
@@ -257,17 +254,17 @@ class CharacterDetailTradeSectionController extends ChangeNotifier {
       final isIceberg = _orderType == CharacterDetailTradeOrderType.iceberg;
       final message = switch (_side) {
         CharacterDetailTradeSide.buy => await _repository.bidCharacter(
-            characterId: _characterId,
-            price: price,
-            amount: amount,
-            isIceberg: isIceberg,
-          ),
+          characterId: _characterId,
+          price: price,
+          amount: amount,
+          isIceberg: isIceberg,
+        ),
         CharacterDetailTradeSide.sell => await _repository.askCharacter(
-            characterId: _characterId,
-            price: price,
-            amount: amount,
-            isIceberg: isIceberg,
-          ),
+          characterId: _characterId,
+          price: price,
+          amount: amount,
+          isIceberg: isIceberg,
+        ),
       };
       await reload(showLoading: false);
       return message;
@@ -308,10 +305,7 @@ class CharacterDetailTradeSectionController extends ChangeNotifier {
   ///
   /// [error] 原始错误
   /// [fallback] 兜底文案
-  static String resolveErrorMessage(
-    Object error, {
-    required String fallback,
-  }) {
+  static String resolveErrorMessage(Object error, {required String fallback}) {
     return resolveUserErrorMessage(error, fallback: fallback);
   }
 

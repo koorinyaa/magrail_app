@@ -14,8 +14,12 @@ part 'user_character_snapshot_page_controller_level.dart';
 part 'user_character_snapshot_page_controller_query.dart';
 
 /// 用户角色快照二级页面控制器
-class UserCharacterSnapshotPageController extends TinygrailPagedListController<
-    UserCharacterApiItem, UserCharacterApiItem> {
+class UserCharacterSnapshotPageController
+    extends
+        TinygrailPagedListController<
+          UserCharacterApiItem,
+          UserCharacterApiItem
+        > {
   /// 创建用户角色快照二级页面控制器
   ///
   /// [snapshotRepository] 用户资产快照仓库
@@ -40,22 +44,24 @@ class UserCharacterSnapshotPageController extends TinygrailPagedListController<
       int previousItemIndex,
       int replacementItemIndex,
       List<UserCharacterApiItem> items,
-    ) onBeforeCharacterDataReplaced,
+    )
+    onBeforeCharacterDataReplaced,
     required void Function(int absoluteIndex) onRestoreCharacterLevelAnchor,
     bool automaticRefreshEnabled = true,
     int initialAbsoluteIndex = 0,
     super.pageSize = defaultPageSize,
-  })  : _snapshotRepository = snapshotRepository,
-        _username = username.trim(),
-        _nickname = nickname.trim(),
-        _onAutomaticRefreshFailed = onAutomaticRefreshFailed,
-        _readVisibleCharacterIndex = readVisibleCharacterIndex,
-        _waitForScrollIdle = waitForScrollIdle,
-        _onBeforeCharacterDataReplaced = onBeforeCharacterDataReplaced,
-        _onRestoreCharacterLevelAnchor = onRestoreCharacterLevelAnchor,
-        _automaticRefreshEnabled = automaticRefreshEnabled,
-        _initialAbsoluteIndex =
-            initialAbsoluteIndex < 0 ? 0 : initialAbsoluteIndex;
+  }) : _snapshotRepository = snapshotRepository,
+       _username = username.trim(),
+       _nickname = nickname.trim(),
+       _onAutomaticRefreshFailed = onAutomaticRefreshFailed,
+       _readVisibleCharacterIndex = readVisibleCharacterIndex,
+       _waitForScrollIdle = waitForScrollIdle,
+       _onBeforeCharacterDataReplaced = onBeforeCharacterDataReplaced,
+       _onRestoreCharacterLevelAnchor = onRestoreCharacterLevelAnchor,
+       _automaticRefreshEnabled = automaticRefreshEnabled,
+       _initialAbsoluteIndex = initialAbsoluteIndex < 0
+           ? 0
+           : initialAbsoluteIndex;
 
   /// 用户角色快照本地分页数量
   static const int defaultPageSize = 100;
@@ -70,7 +76,8 @@ class UserCharacterSnapshotPageController extends TinygrailPagedListController<
     int previousItemIndex,
     int replacementItemIndex,
     List<UserCharacterApiItem> items,
-  ) _onBeforeCharacterDataReplaced;
+  )
+  _onBeforeCharacterDataReplaced;
   final void Function(int absoluteIndex) _onRestoreCharacterLevelAnchor;
   final bool _automaticRefreshEnabled;
   final int _initialAbsoluteIndex;
@@ -103,9 +110,7 @@ class UserCharacterSnapshotPageController extends TinygrailPagedListController<
   int? _levelIndexRevision;
   int? _committedLevelIndexRevision;
   final UserAssetSparsePageCache<UserCharacterApiItem> _levelPageCache =
-      UserAssetSparsePageCache<UserCharacterApiItem>(
-    pageSize: defaultPageSize,
-  );
+      UserAssetSparsePageCache<UserCharacterApiItem>(pageSize: defaultPageSize);
   int _levelLayoutVersion = 0;
   // 可视分页版本用于判断哈希一致时页面是否仍需同步
   int? _windowRevision;
@@ -127,13 +132,13 @@ class UserCharacterSnapshotPageController extends TinygrailPagedListController<
 
   /// 等级排序虚拟布局分组
   List<UserAssetLevelGroup> get levelGroups => [
-        for (final position in _levelPositions)
-          UserAssetLevelGroup(
-            level: position.level,
-            absoluteIndex: position.absoluteIndex,
-            itemCount: position.itemCount,
-          ),
-      ];
+    for (final position in _levelPositions)
+      UserAssetLevelGroup(
+        level: position.level,
+        absoluteIndex: position.absoluteIndex,
+        itemCount: position.itemCount,
+      ),
+  ];
 
   /// 等级排序虚拟布局版本
   int get levelLayoutVersion => _levelLayoutVersion;
@@ -211,19 +216,18 @@ class UserCharacterSnapshotPageController extends TinygrailPagedListController<
     }
     final targetPage = _windowFirstPage - 1;
     late final Future<int> operation;
-    operation = prependPage(
-      targetPage,
-      beforeCommit: beforeItemsPrepended,
-    ).then((count) {
-      if (count > 0 && !_isDisposed) {
-        _windowFirstPage = targetPage;
-      }
-      return count;
-    }).whenComplete(() {
-      if (identical(_prependPageOperation, operation)) {
-        _prependPageOperation = null;
-      }
-    });
+    operation = prependPage(targetPage, beforeCommit: beforeItemsPrepended)
+        .then((count) {
+          if (count > 0 && !_isDisposed) {
+            _windowFirstPage = targetPage;
+          }
+          return count;
+        })
+        .whenComplete(() {
+          if (identical(_prependPageOperation, operation)) {
+            _prependPageOperation = null;
+          }
+        });
     _prependPageOperation = operation;
     return operation;
   }
@@ -266,8 +270,9 @@ class UserCharacterSnapshotPageController extends TinygrailPagedListController<
       return;
     }
     final maxIndex = itemCount - 1;
-    final triggerIndex =
-        (maxIndex - itemPreloadThreshold).clamp(0, maxIndex).toInt();
+    final triggerIndex = (maxIndex - itemPreloadThreshold)
+        .clamp(0, maxIndex)
+        .toInt();
     if (index >= triggerIndex) {
       _shouldLoadNextPageAfterRefreshPause = true;
     }
@@ -309,10 +314,9 @@ class UserCharacterSnapshotPageController extends TinygrailPagedListController<
           expectedRevision: targetRevision,
         );
       } on StateError {
-        final latestRevision =
-            (await _snapshotRepository.readSourceState(_username))
-                ?.revisions
-                .characters;
+        final latestRevision = (await _snapshotRepository.readSourceState(
+          _username,
+        ))?.revisions.characters;
         if (latestRevision != null && latestRevision != targetRevision) {
           replacementRevision = latestRevision;
           continue;
@@ -321,12 +325,12 @@ class UserCharacterSnapshotPageController extends TinygrailPagedListController<
       }
       final replacementLevelIndex =
           replacementSort == UserCharacterSnapshotSort.level
-              ? await _snapshotRepository.readCharacterLevelIndex(
-                  username: _username,
-                  direction: replacementDirection,
-                  searchKeyword: replacementSearchKeyword,
-                )
-              : null;
+          ? await _snapshotRepository.readCharacterLevelIndex(
+              username: _username,
+              direction: replacementDirection,
+              searchKeyword: replacementSearchKeyword,
+            )
+          : null;
       if (replacementLevelIndex != null &&
           replacementLevelIndex.revision != targetRevision) {
         replacementRevision = replacementLevelIndex.revision;
@@ -364,18 +368,19 @@ class UserCharacterSnapshotPageController extends TinygrailPagedListController<
       final previousAnchorItem = isVirtualLevelList && anchorItemIndex != null
           ? levelItemAt(anchorItemIndex)
           : null;
-      final previousAnchorLevel = previousAnchorItem?.level ??
+      final previousAnchorLevel =
+          previousAnchorItem?.level ??
           (isVirtualLevelList ? _levelAtAbsoluteIndex(anchorItemIndex) : null);
       final visibleAbsoluteIndex = isVirtualLevelList
           ? anchorItemIndex ?? 0
           : anchorItemIndex == null
-              ? (_windowFirstPage - 1) * pageSize
-              : (_windowFirstPage - 1) * pageSize + anchorItemIndex;
+          ? (_windowFirstPage - 1) * pageSize
+          : (_windowFirstPage - 1) * pageSize + anchorItemIndex;
       var anchorAbsoluteIndex = replacementCountPage.totalItems <= 0
           ? 0
           : visibleAbsoluteIndex
-              .clamp(0, replacementCountPage.totalItems - 1)
-              .toInt();
+                .clamp(0, replacementCountPage.totalItems - 1)
+                .toInt();
       if (isVirtualLevelList && replacementCountPage.totalItems > 0) {
         final persistedAnchorIndex = previousAnchorItem == null
             ? null
@@ -386,7 +391,8 @@ class UserCharacterSnapshotPageController extends TinygrailPagedListController<
                 searchKeyword: replacementSearchKeyword,
                 expectedRevision: targetRevision,
               );
-        anchorAbsoluteIndex = persistedAnchorIndex ??
+        anchorAbsoluteIndex =
+            persistedAnchorIndex ??
             _fallbackLevelAbsoluteIndex(
               replacementLevelIndex?.positions ??
                   const <UserCharacterLevelPosition>[],
@@ -396,8 +402,9 @@ class UserCharacterSnapshotPageController extends TinygrailPagedListController<
             );
       }
       final anchorPage = anchorAbsoluteIndex ~/ pageSize + 1;
-      final firstPage =
-          (anchorPage - _refreshAdjacentPageCount).clamp(1, anchorPage).toInt();
+      final firstPage = (anchorPage - _refreshAdjacentPageCount)
+          .clamp(1, anchorPage)
+          .toInt();
       final lastPage = anchorPage + _refreshAdjacentPageCount;
       final followingPageCount = lastPage - firstPage;
       final success = await replaceFromPage(
@@ -412,10 +419,10 @@ class UserCharacterSnapshotPageController extends TinygrailPagedListController<
         beforeCommit: anchorItemIndex == null || isVirtualLevelList
             ? null
             : (replacementItems) => _onBeforeCharacterDataReplaced(
-                  anchorItemIndex,
-                  anchorAbsoluteIndex - (firstPage - 1) * pageSize,
-                  replacementItems,
-                ),
+                anchorItemIndex,
+                anchorAbsoluteIndex - (firstPage - 1) * pageSize,
+                replacementItems,
+              ),
         pageLoader: ({required page, required pageSize}) => _readRequiredPage(
           page: page,
           pageSize: pageSize,
@@ -426,24 +433,25 @@ class UserCharacterSnapshotPageController extends TinygrailPagedListController<
         return false;
       }
       if (!success) {
-        final queryChanged = generation != _queryGeneration ||
+        final queryChanged =
+            generation != _queryGeneration ||
             replacementSort != _sort ||
             replacementDirection != _direction ||
             replacementSearchKeyword != _searchKeyword;
         if (queryChanged) {
           continue;
         }
-        final latestRevision =
-            (await _snapshotRepository.readSourceState(_username))
-                ?.revisions
-                .characters;
+        final latestRevision = (await _snapshotRepository.readSourceState(
+          _username,
+        ))?.revisions.characters;
         if (latestRevision != null && latestRevision != targetRevision) {
           replacementRevision = latestRevision;
           continue;
         }
         return false;
       }
-      _levelPositions = replacementLevelIndex?.positions ??
+      _levelPositions =
+          replacementLevelIndex?.positions ??
           const <UserCharacterLevelPosition>[];
       _levelIndexRevision = replacementLevelIndex?.revision;
       _windowFirstPage = firstPage;
@@ -483,6 +491,6 @@ class UserCharacterSnapshotPageController extends TinygrailPagedListController<
   /// [items] 本地角色条目
   @override
   List<UserCharacterApiItem> convertPageItems(
-          List<UserCharacterApiItem> items) =>
-      items;
+    List<UserCharacterApiItem> items,
+  ) => items;
 }

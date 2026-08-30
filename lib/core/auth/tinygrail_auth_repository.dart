@@ -8,10 +8,10 @@ class TinygrailAuthRepository {
   /// 创建 Tinygrail 认证仓库
   ///
   /// [dio] Tinygrail API 客户端
-  /// [cookieJar] Tinygrail CookieJar
+  /// [cookieJar] Tinygrail CookieJar 实例
   TinygrailAuthRepository({required Dio dio, required CookieJar cookieJar})
-      : _dio = dio,
-        _cookieJar = cookieJar;
+    : _dio = dio,
+      _cookieJar = cookieJar;
 
   final Dio _dio;
   final CookieJar _cookieJar;

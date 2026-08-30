@@ -121,10 +121,7 @@ class _TowerRankingAvatar extends StatelessWidget {
   ///
   /// [imageUrl] 头像地址
   /// [heroTag] 头像转场标识
-  const _TowerRankingAvatar({
-    required this.imageUrl,
-    required this.heroTag,
-  });
+  const _TowerRankingAvatar({required this.imageUrl, required this.heroTag});
 
   /// 头像地址
   final String imageUrl;

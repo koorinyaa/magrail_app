@@ -1,12 +1,11 @@
 part of '../temple_asset_magic_action_sheet.dart';
 
+/// 圣殿资产魔法道具确认内容
 class _TempleAssetChaosConfirmContent extends StatelessWidget {
   /// 创建混沌魔方确认内容
   ///
   /// [data] 当前圣殿资产卡片展示数据
-  const _TempleAssetChaosConfirmContent({
-    required this.data,
-  });
+  const _TempleAssetChaosConfirmContent({required this.data});
 
   /// 当前圣殿资产卡片展示数据
   final TempleAssetCardData data;
@@ -113,9 +112,7 @@ class _TempleAssetMagicUnknownTargetPreview extends StatelessWidget {
   /// 创建魔法道具抽取确认中的未知目标角色
   ///
   /// [imageUrl] 预览角色头像地址
-  const _TempleAssetMagicUnknownTargetPreview({
-    required this.imageUrl,
-  });
+  const _TempleAssetMagicUnknownTargetPreview({required this.imageUrl});
 
   /// 预览角色头像地址
   final String imageUrl;

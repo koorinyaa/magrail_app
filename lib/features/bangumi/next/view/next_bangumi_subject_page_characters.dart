@@ -146,18 +146,15 @@ class _NextBangumiSubjectCharacterGrid extends StatelessWidget {
       ),
       sliver: SliverGrid(
         gridDelegate: _NextBangumiSubjectCharacterGridMetrics.delegate,
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final item = items[index];
-            onItemBuilt(index);
-            return NextBangumiCharacterGridItem(
-              item: item,
-              status: statuses[item.characterId],
-              onTap: () => onItemTap(item),
-            );
-          },
-          childCount: items.length,
-        ),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          final item = items[index];
+          onItemBuilt(index);
+          return NextBangumiCharacterGridItem(
+            item: item,
+            status: statuses[item.characterId],
+            onTap: () => onItemTap(item),
+          );
+        }, childCount: items.length),
       ),
     );
   }
@@ -183,12 +180,9 @@ class _NextBangumiSubjectCharacterSkeletonGrid extends StatelessWidget {
       ),
       sliver: SliverGrid(
         gridDelegate: _NextBangumiSubjectCharacterGridMetrics.delegate,
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            return const _NextBangumiSubjectCharacterSkeletonTile();
-          },
-          childCount: _NextBangumiSubjectPageState._subjectCharacterPageSize,
-        ),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          return const _NextBangumiSubjectCharacterSkeletonTile();
+        }, childCount: _NextBangumiSubjectPageState._subjectCharacterPageSize),
       ),
     );
   }
@@ -267,14 +261,8 @@ class _NextBangumiSubjectCharacterErrorSliver extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: AppSafeAreaInsets.symmetricHorizontal(
-          context,
-          horizontal: 16,
-        ),
-        child: AppLoadFailedState(
-          message: message,
-          onActionPressed: onRetry,
-        ),
+        padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 16),
+        child: AppLoadFailedState(message: message, onActionPressed: onRetry),
       ),
     );
   }
@@ -339,9 +327,9 @@ final class _NextBangumiSubjectCharacterGridMetrics {
   /// 条目角色网格代理
   static const SliverGridDelegateWithMaxCrossAxisExtent delegate =
       SliverGridDelegateWithMaxCrossAxisExtent(
-    maxCrossAxisExtent: 118,
-    mainAxisExtent: 136,
-    mainAxisSpacing: 14,
-    crossAxisSpacing: 10,
-  );
+        maxCrossAxisExtent: 118,
+        mainAxisExtent: 136,
+        mainAxisSpacing: 14,
+        crossAxisSpacing: 10,
+      );
 }

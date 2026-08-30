@@ -85,10 +85,7 @@ class CharacterSearchInputBar extends StatelessWidget {
         if (closeCallback != null) ...[
           const SizedBox(width: 10),
           GlassIconButton(
-            icon: Icon(
-              LucideIcons.x,
-              color: colorScheme.onSurfaceVariant,
-            ),
+            icon: Icon(LucideIcons.x, color: colorScheme.onSurfaceVariant),
             iconSize: 18,
             size: CharacterSearchInputBar.height,
             onPressed: closeCallback,

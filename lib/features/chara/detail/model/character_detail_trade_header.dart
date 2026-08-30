@@ -147,10 +147,7 @@ class CharacterDetailTradeHeader {
   ///
   /// [characterLevel] 圣殿对应角色等级
   /// [refine] 圣殿精炼等级
-  double templeDividend({
-    required int characterLevel,
-    required int refine,
-  }) {
+  double templeDividend({required int characterLevel, required int refine}) {
     // 500 名外的圣殿股息不受等级和精炼影响
     if (rank <= 0 || rank > 500) {
       return dividend;

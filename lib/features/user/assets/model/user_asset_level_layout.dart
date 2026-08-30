@@ -68,8 +68,8 @@ class UserAssetLevelLayout {
     required List<UserAssetLevelGroup> groups,
     required this.crossAxisCount,
     required this.version,
-  })  : assert(crossAxisCount > 0),
-        groups = List<UserAssetLevelGroup>.unmodifiable(groups) {
+  }) : assert(crossAxisCount > 0),
+       groups = List<UserAssetLevelGroup>.unmodifiable(groups) {
     var virtualIndex = 0;
     final starts = <int>[];
     for (final group in this.groups) {

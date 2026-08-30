@@ -25,9 +25,6 @@ class MainTopBar extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return AppPageTitleBar(
-      title: title,
-      onSearchPressed: onSearchPressed,
-    );
+    return AppPageTitleBar(title: title, onSearchPressed: onSearchPressed);
   }
 }

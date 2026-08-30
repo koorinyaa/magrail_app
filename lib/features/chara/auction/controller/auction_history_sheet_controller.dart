@@ -12,8 +12,8 @@ class AuctionHistorySheetController extends ChangeNotifier {
   AuctionHistorySheetController({
     required AuctionRepository repository,
     required int characterId,
-  })  : _repository = repository,
-        _characterId = characterId;
+  }) : _repository = repository,
+       _characterId = characterId;
 
   final AuctionRepository _repository;
   final int _characterId;
@@ -126,30 +126,21 @@ class AuctionHistorySheetController extends ChangeNotifier {
   ///
   /// [page] 目标页码
   Future<void> loadPage(int page) {
-    return _loadPage(
-      page,
-      reportError: true,
-    );
+    return _loadPage(page, reportError: true);
   }
 
   /// 预加载下一页拍卖记录
   ///
   /// [page] 当前页码
   Future<void> preloadNextPage(int page) {
-    return _loadPage(
-      page + 1,
-      reportError: false,
-    );
+    return _loadPage(page + 1, reportError: false);
   }
 
   /// 执行指定页码加载
   ///
   /// [page] 目标页码
   /// [reportError] 是否记录加载失败文案
-  Future<void> _loadPage(
-    int page, {
-    required bool reportError,
-  }) async {
+  Future<void> _loadPage(int page, {required bool reportError}) async {
     if (_loadingPages.contains(page) || page <= 0) {
       return;
     }

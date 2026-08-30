@@ -27,9 +27,8 @@ class CharacterDetailRepository {
   /// 创建角色详情仓库
   ///
   /// [apiClient] Tinygrail API 客户端
-  const CharacterDetailRepository({
-    required ApiClient apiClient,
-  }) : _apiClient = apiClient;
+  const CharacterDetailRepository({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   final ApiClient _apiClient;
 }

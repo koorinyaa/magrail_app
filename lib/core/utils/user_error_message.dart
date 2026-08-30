@@ -33,19 +33,16 @@ String resolveUserErrorMessage(Object? error, {required String fallback}) {
 ///
 /// [error] Dio 异常
 /// [fallback] 默认提示
-String _messageForDioException(
-  DioException error, {
-  required String fallback,
-}) {
+String _messageForDioException(DioException error, {required String fallback}) {
   return switch (error.type) {
     DioExceptionType.connectionTimeout => '连接服务器超时，请稍后重试',
     DioExceptionType.sendTimeout => '请求发送超时，请稍后重试',
     DioExceptionType.receiveTimeout => '服务器响应超时，请稍后重试',
     DioExceptionType.badCertificate => '服务器证书校验失败',
     DioExceptionType.badResponse => _messageForStatusCode(
-        error.response?.statusCode,
-        fallback: fallback,
-      ),
+      error.response?.statusCode,
+      fallback: fallback,
+    ),
     DioExceptionType.cancel => '请求已取消',
     DioExceptionType.connectionError => '网络连接失败，请检查网络后重试',
     DioExceptionType.unknown => fallback,

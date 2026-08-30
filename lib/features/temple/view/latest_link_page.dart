@@ -64,9 +64,8 @@ class _LatestLinkPageState extends State<LatestLinkPage> {
   @override
   void initState() {
     super.initState();
-    _controller = LatestLinkPageController(
-      repository: widget.repository,
-    )..initialize();
+    _controller = LatestLinkPageController(repository: widget.repository)
+      ..initialize();
   }
 
   /// 释放最新连接二级页面状态
@@ -132,10 +131,7 @@ class _LatestLinkPageState extends State<LatestLinkPage> {
   ///
   /// [pair] 最新连接展示组
   /// [item] 被点击的连接侧圣殿条目
-  void _openTempleAssetDialog(
-    LatestLinkPair pair,
-    LatestLinkApiItem item,
-  ) {
+  void _openTempleAssetDialog(LatestLinkPair pair, LatestLinkApiItem item) {
     unawaited(
       showTempleAssetCardDialogFromSource(
         context,

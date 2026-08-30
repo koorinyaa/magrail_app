@@ -48,11 +48,10 @@ class MainMobileNavigationDock extends StatelessWidget {
             maxWidth: _mainMobileNavigationDockMaxWidth,
           ),
           child: GlassTabBar.bottom(
-            tabs: [
-              for (final tab in dockTabs) _buildGlassTab(tab),
-            ],
-            quality:
-                useLiquidGlass ? GlassQuality.premium : GlassQuality.minimal,
+            tabs: [for (final tab in dockTabs) _buildGlassTab(tab)],
+            quality: useLiquidGlass
+                ? GlassQuality.premium
+                : GlassQuality.minimal,
             selectedIndex: selectedIndex < 0 ? 0 : selectedIndex,
             onTabSelected: (index) => onTabSelected(dockTabs[index]),
           ),
@@ -76,10 +75,7 @@ class MainMobileNavigationDock extends StatelessWidget {
   ///
   /// [tab] 导航标签
   /// [selected] 是否选中
-  Widget _buildTabIcon(
-    MainTab tab, {
-    required bool selected,
-  }) {
+  Widget _buildTabIcon(MainTab tab, {required bool selected}) {
     return Icon(
       selected ? tab.activeIcon : tab.icon,
       fill: tab == MainTab.character && selected ? 1 : 0,

@@ -28,10 +28,7 @@ extension _UserTemplePageScroll on _UserTemplePageState {
       AppToast.error(context, text: '等级跳转失败，请重试');
       return;
     }
-    _levelSliverController.jumpToLevel(
-      level,
-      _scrollController,
-    );
+    _levelSliverController.jumpToLevel(level, _scrollController);
     _isProgrammaticLevelJump = false;
   }
 
@@ -115,8 +112,9 @@ extension _UserTemplePageScroll on _UserTemplePageState {
     try {
       final currentItemIndex = _readVisibleTempleIndex() ?? previousItemIndex;
       final replacementIndexOffset = replacementItemIndex - previousItemIndex;
-      final oldIndex =
-          currentItemIndex.clamp(0, controller.items.length - 1).toInt();
+      final oldIndex = currentItemIndex
+          .clamp(0, controller.items.length - 1)
+          .toInt();
       final newIndex = (currentItemIndex + replacementIndexOffset)
           .clamp(0, replacementEntries.length - 1)
           .toInt();
@@ -253,8 +251,8 @@ extension _UserTemplePageScroll on _UserTemplePageState {
           controller != null && _sortShowsSupplementalValue(controller.sort),
       rightContentInset:
           controller?.sort == UserTempleSnapshotSort.characterLevel
-              ? UserTempleResponsiveGrid.levelRailReservedWidth
-              : 0,
+          ? UserTempleResponsiveGrid.levelRailReservedWidth
+          : 0,
     );
   }
 

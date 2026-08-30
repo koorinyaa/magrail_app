@@ -100,8 +100,9 @@ class _UserAssetsListContent extends StatelessWidget {
         level: temple?.level ?? 0,
         starForces: temple?.starForces ?? 0,
         refine: temple?.refine ?? 0,
-        primaryValue:
-            showAvailableSeparately ? '$availableText / $totalText' : totalText,
+        primaryValue: showAvailableSeparately
+            ? '$availableText / $totalText'
+            : totalText,
         primaryLabel: showAvailableSeparately ? '可用 / 持股' : '持股',
         tags: [
           TempleAssetCardTagData(
@@ -133,9 +134,7 @@ class _UserAssetsListContent extends StatelessWidget {
             label: '星之力',
             value: temple == null
                 ? '--'
-                : Formatters.tinygrailCompactValue(
-                    temple.starForces,
-                  ),
+                : Formatters.tinygrailCompactValue(temple.starForces),
             muted: temple == null,
             showStarIcon: true,
             starHighlighted: (temple?.starForces ?? 0) >= 10000,

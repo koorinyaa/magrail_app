@@ -25,7 +25,8 @@ extension UserCharacterSnapshotPageControllerRefresh
     if (identical(_automaticRefreshOperation, operation)) {
       _automaticRefreshOperation = null;
     }
-    final shouldReportFailure = startedByAutomatic &&
+    final shouldReportFailure =
+        startedByAutomatic &&
         !success &&
         !_suppressAutomaticRefreshFailure &&
         !_isDisposed;
@@ -55,9 +56,7 @@ extension UserCharacterSnapshotPageControllerRefresh
   /// 启动或复用角色刷新流程
   ///
   /// [blockPageLoading] 是否暂停页面分页交互
-  Future<bool> _startOrJoinCharacterRefresh({
-    required bool blockPageLoading,
-  }) {
+  Future<bool> _startOrJoinCharacterRefresh({required bool blockPageLoading}) {
     final existing = _characterRefreshOperation;
     if (existing != null) {
       return existing;
@@ -66,18 +65,19 @@ extension UserCharacterSnapshotPageControllerRefresh
       _setPageBlockingRefresh(true);
     }
     late final Future<bool> operation;
-    operation = _refreshCharactersAndReloadVisibleWindow(
-      waitForQueryChange: !blockPageLoading,
-    ).whenComplete(() {
-      if (!identical(_characterRefreshOperation, operation)) {
-        return;
-      }
-      _characterRefreshOperation = null;
-      if (blockPageLoading) {
-        _setPageBlockingRefresh(false);
-        _resumeDeferredNextPageLoad();
-      }
-    });
+    operation =
+        _refreshCharactersAndReloadVisibleWindow(
+          waitForQueryChange: !blockPageLoading,
+        ).whenComplete(() {
+          if (!identical(_characterRefreshOperation, operation)) {
+            return;
+          }
+          _characterRefreshOperation = null;
+          if (blockPageLoading) {
+            _setPageBlockingRefresh(false);
+            _resumeDeferredNextPageLoad();
+          }
+        });
     _characterRefreshOperation = operation;
     return operation;
   }

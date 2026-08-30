@@ -304,10 +304,7 @@ class _NextBangumiSubjectPageState extends State<NextBangumiSubjectPage> {
 
       setState(() {
         _isLoading = false;
-        _errorMessage = resolveUserErrorMessage(
-          error,
-          fallback: '获取 BGM 条目失败',
-        );
+        _errorMessage = resolveUserErrorMessage(error, fallback: '获取 BGM 条目失败');
       });
     }
   }
@@ -349,17 +346,18 @@ class _NextBangumiSubjectPageState extends State<NextBangumiSubjectPage> {
         limit: _subjectCharacterPageSize,
         offset: requestedOffset,
       );
-      final existingIds =
-          _subjectCharacters.map((item) => item.characterId).toSet();
+      final existingIds = _subjectCharacters
+          .map((item) => item.characterId)
+          .toSet();
       final items = reset
           ? page.items
           : page.items
-              .where((item) => !existingIds.contains(item.characterId))
-              .toList(growable: false);
-      final statuses =
-          await widget.characterRepository.fetchCharacterBasicInfoList(
-        items.map((item) => item.characterId).toList(growable: false),
-      );
+                .where((item) => !existingIds.contains(item.characterId))
+                .toList(growable: false);
+      final statuses = await widget.characterRepository
+          .fetchCharacterBasicInfoList(
+            items.map((item) => item.characterId).toList(growable: false),
+          );
       if (!mounted || requestId != _charactersRequestId) {
         return;
       }
@@ -452,8 +450,8 @@ class _NextBangumiSubjectPageState extends State<NextBangumiSubjectPage> {
     }
 
     final maxIndex = itemCount - 1;
-    final triggerIndex =
-        (maxIndex - (_subjectCharacterPageSize / 2).ceil()).clamp(0, maxIndex);
+    final triggerIndex = (maxIndex - (_subjectCharacterPageSize / 2).ceil())
+        .clamp(0, maxIndex);
     if (index < triggerIndex || !_canLoadNextSubjectCharacterPage) {
       return;
     }
@@ -498,14 +496,16 @@ class _NextBangumiSubjectPageState extends State<NextBangumiSubjectPage> {
     );
   }
 
+  /// 根据滚动位置更新顶部操作区和标题透明度
   void _handleScrollOffsetChanged() {
     if (!_scrollController.hasClients) {
       return;
     }
 
     final scrollOffset = _scrollController.offset;
-    final nextBlurProgress =
-        (scrollOffset / _topActionBlurExtent).clamp(0.0, 1.0).toDouble();
+    final nextBlurProgress = (scrollOffset / _topActionBlurExtent)
+        .clamp(0.0, 1.0)
+        .toDouble();
     if ((nextBlurProgress - _topActionBlurProgress.value).abs() >= 0.01) {
       _topActionBlurProgress.value = nextBlurProgress;
     }

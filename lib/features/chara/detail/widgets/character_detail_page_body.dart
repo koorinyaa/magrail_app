@@ -59,6 +59,7 @@ class CharacterDetailPageBody extends StatelessWidget {
   /// [onIcoStarted] ICO 启动成功回调
   /// [onVoteKill] 投票删除回调
   /// [onRevokeVote] 撤回投票回调
+  /// [oosRepository] Tinygrail OOS 仓库
   const CharacterDetailPageBody({
     super.key,
     required this.current,
@@ -157,7 +158,7 @@ class CharacterDetailPageBody extends StatelessWidget {
 
   /// 资产重组或股权融资成功回调
   final Future<void> Function(CharacterDetailSacrificeMode mode)
-      onSacrificeChanged;
+  onSacrificeChanged;
 
   /// 拍卖变更回调
   final Future<void> Function() onAuctionChanged;
@@ -196,70 +197,70 @@ class CharacterDetailPageBody extends StatelessWidget {
 
     return switch (pageType ?? CharacterDetailPageType.pending) {
       CharacterDetailPageType.pending => _CharacterDetailLoadingBody(
-          key: ValueKey<String>('loading-${currentItem.characterId}'),
-          isGameMaster: isGameMaster,
-        ),
+        key: ValueKey<String>('loading-${currentItem.characterId}'),
+        isGameMaster: isGameMaster,
+      ),
       CharacterDetailPageType.trade when tradeHeader == null =>
         _CharacterDetailLoadingBody(
           key: ValueKey<String>('loading-${currentItem.characterId}'),
           isGameMaster: isGameMaster,
         ),
       CharacterDetailPageType.trade => _CharacterDetailTradeBody(
-          key: ValueKey<String>('trade-${currentItem.characterId}'),
-          tradeHeader: tradeHeader!,
-          auctionRepository: auctionRepository,
-          tradeHistoryRepository: tradeHistoryRepository,
-          isGameMaster: isGameMaster,
-          onAuctionChanged: onAuctionChanged,
-          userAssets: userAssets,
-          showAuthGuide: showAuthGuide,
-          showTradeSection: showTradeSection,
-          currentUserName: currentUserName,
-          currentUserDisplayName: currentUserDisplayName,
-          repository: repository,
-          templeRepository: templeRepository,
-          magicRepository: magicRepository,
-          oosRepository: oosRepository,
-          userRepository: userRepository,
-          revealPrivateUserHoldings: revealPrivateUserHoldings,
-          collectionsRefreshSignal: collectionsRefreshSignal,
-          boardRefreshSignal: boardRefreshSignal,
-          onSacrificeChanged: onSacrificeChanged,
-          onAvatarChanged: onAvatarChanged,
-          onUserAssetsRetry: onUserAssetsRetry,
-          onAuthorize: onAuthorize,
-          onVoteKill: onVoteKill,
-          onRevokeVote: onRevokeVote,
-        ),
+        key: ValueKey<String>('trade-${currentItem.characterId}'),
+        tradeHeader: tradeHeader!,
+        auctionRepository: auctionRepository,
+        tradeHistoryRepository: tradeHistoryRepository,
+        isGameMaster: isGameMaster,
+        onAuctionChanged: onAuctionChanged,
+        userAssets: userAssets,
+        showAuthGuide: showAuthGuide,
+        showTradeSection: showTradeSection,
+        currentUserName: currentUserName,
+        currentUserDisplayName: currentUserDisplayName,
+        repository: repository,
+        templeRepository: templeRepository,
+        magicRepository: magicRepository,
+        oosRepository: oosRepository,
+        userRepository: userRepository,
+        revealPrivateUserHoldings: revealPrivateUserHoldings,
+        collectionsRefreshSignal: collectionsRefreshSignal,
+        boardRefreshSignal: boardRefreshSignal,
+        onSacrificeChanged: onSacrificeChanged,
+        onAvatarChanged: onAvatarChanged,
+        onUserAssetsRetry: onUserAssetsRetry,
+        onAuthorize: onAuthorize,
+        onVoteKill: onVoteKill,
+        onRevokeVote: onRevokeVote,
+      ),
       CharacterDetailPageType.ico when icoInfo == null =>
         _CharacterDetailLoadingBody(
           key: ValueKey<String>('loading-${currentItem.characterId}'),
           isGameMaster: isGameMaster,
         ),
       CharacterDetailPageType.ico => _CharacterDetailIcoBody(
-          key: ValueKey<String>('ico-${currentItem.characterId}'),
-          repository: repository,
-          icoInfo: icoInfo!,
-          onCharacterSynced: onAvatarChanged,
-        ),
+        key: ValueKey<String>('ico-${currentItem.characterId}'),
+        repository: repository,
+        icoInfo: icoInfo!,
+        onCharacterSynced: onAvatarChanged,
+      ),
       CharacterDetailPageType.initial => _CharacterDetailInitialBody(
-          key: ValueKey<String>('initial-${currentItem.characterId}'),
-          item: currentItem,
-          repository: repository,
-          isAuthorized: showTradeSection,
-          showAuthGuide: showAuthGuide,
-          currentUserBalance: currentUserBalance,
-          onAuthorize: onAuthorize,
-          onIcoStarted: onIcoStarted,
-        ),
+        key: ValueKey<String>('initial-${currentItem.characterId}'),
+        item: currentItem,
+        repository: repository,
+        isAuthorized: showTradeSection,
+        showAuthGuide: showAuthGuide,
+        currentUserBalance: currentUserBalance,
+        onAuthorize: onAuthorize,
+        onIcoStarted: onIcoStarted,
+      ),
       CharacterDetailPageType.failure => const SliverFillRemaining(
-          hasScrollBody: false,
-          child: _CharacterDetailCenteredMessage(
-            icon: Icons.account_circle_outlined,
-            title: '角色详情加载失败',
-            message: '请稍后重试',
-          ),
+        hasScrollBody: false,
+        child: _CharacterDetailCenteredMessage(
+          icon: Icons.account_circle_outlined,
+          title: '角色详情加载失败',
+          message: '请稍后重试',
         ),
+      ),
     };
   }
 }
@@ -329,10 +330,7 @@ class _CharacterDetailLoadingBody extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [isGameMaster] 当前用户是否为 GM
-  const _CharacterDetailLoadingBody({
-    super.key,
-    required this.isGameMaster,
-  });
+  const _CharacterDetailLoadingBody({super.key, required this.isGameMaster});
 
   /// 当前用户是否为 GM
   final bool isGameMaster;
@@ -348,9 +346,7 @@ class _CharacterDetailLoadingBody extends StatelessWidget {
         children: [
           const CharacterDetailTradeHeaderSkeleton(),
           const SizedBox(height: 12),
-          CharacterDetailTradeHeaderActionsSkeleton(
-            isGameMaster: isGameMaster,
-          ),
+          CharacterDetailTradeHeaderActionsSkeleton(isGameMaster: isGameMaster),
           const SizedBox(height: 12),
           const CharacterDetailUserAssetsSkeleton(),
           const SizedBox(height: 12),
@@ -389,6 +385,7 @@ class _CharacterDetailTradeBody extends StatelessWidget {
   /// [onAuthorize] 打开 Tinygrail 授权页回调
   /// [onVoteKill] 投票删除回调
   /// [onRevokeVote] 撤回投票回调
+  /// [oosRepository] Tinygrail OOS 仓库
   const _CharacterDetailTradeBody({
     super.key,
     required this.tradeHeader,
@@ -473,7 +470,7 @@ class _CharacterDetailTradeBody extends StatelessWidget {
 
   /// 资产重组或股权融资成功回调
   final Future<void> Function(CharacterDetailSacrificeMode mode)
-      onSacrificeChanged;
+  onSacrificeChanged;
 
   /// 头像更换成功回调
   final Future<void> Function() onAvatarChanged;
@@ -520,9 +517,7 @@ class _CharacterDetailTradeBody extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               if (showAuthGuide)
-                CharacterDetailAuthGuideSection(
-                  onAuthorize: onAuthorize,
-                )
+                CharacterDetailAuthGuideSection(onAuthorize: onAuthorize)
               else ...[
                 CharacterDetailUserAssetsSection(
                   header: tradeHeader,

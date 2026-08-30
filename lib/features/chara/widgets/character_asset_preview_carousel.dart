@@ -59,10 +59,7 @@ class CharacterAssetPreviewCarousel<T> extends StatelessWidget {
         final screenWidth = constraints.maxWidth.isFinite
             ? constraints.maxWidth
             : MediaQuery.sizeOf(context).width;
-        final columnWidth = math.max(
-          248.0,
-          math.min(318.0, screenWidth - 72),
-        );
+        final columnWidth = math.max(248.0, math.min(318.0, screenWidth - 72));
         final resolvedItems = items ?? <T>[];
         final showSkeleton = isLoading && resolvedItems.isEmpty;
 
@@ -77,8 +74,9 @@ class CharacterAssetPreviewCarousel<T> extends StatelessWidget {
         }
 
         final columns = _buildColumns(resolvedItems);
-        final columnCount =
-            showSkeleton ? _skeletonColumnCount : columns.length;
+        final columnCount = showSkeleton
+            ? _skeletonColumnCount
+            : columns.length;
 
         return SnappingHorizontalListView(
           height: 268,
@@ -139,9 +137,7 @@ class _CharacterAssetPreviewEmpty extends StatelessWidget {
   /// 创建角色资产横向预览空状态
   ///
   /// [message] 空状态文案
-  const _CharacterAssetPreviewEmpty({
-    required this.message,
-  });
+  const _CharacterAssetPreviewEmpty({required this.message});
 
   final String message;
 

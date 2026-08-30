@@ -29,10 +29,7 @@ class UserActionResolver {
             label: '每周分红',
           ),
         if (profile.showDaily)
-          const UserActionEntry(
-            type: UserActionType.dailyBonus,
-            label: '签到奖励',
-          ),
+          const UserActionEntry(type: UserActionType.dailyBonus, label: '签到奖励'),
         const UserActionEntry(type: UserActionType.balanceLog, label: '资金日志'),
         const UserActionEntry(type: UserActionType.myAuction, label: '我的拍卖'),
         const UserActionEntry(type: UserActionType.marketOrder, label: '委托订单'),
@@ -58,10 +55,7 @@ class UserActionResolver {
 
     return [
       if (showSyncRate)
-        const UserActionEntry(
-          type: UserActionType.syncRate,
-          label: '同步率',
-        ),
+        const UserActionEntry(type: UserActionType.syncRate, label: '同步率'),
       if (cachedUser != null)
         const UserActionEntry(
           type: UserActionType.dividendForecast,

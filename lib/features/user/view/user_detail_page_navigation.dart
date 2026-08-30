@@ -1,5 +1,6 @@
 part of 'user_detail_page.dart';
 
+/// 用户详情页导航操作
 extension _UserDetailPageNavigation on _UserDetailPageState {
   /// 打开用户设置二级页面
   void _openSettingsPage() {
@@ -10,27 +11,31 @@ extension _UserDetailPageNavigation on _UserDetailPageState {
         onLiquidGlassChanged: widget.onLiquidGlassChanged,
       ),
     );
-    unawaited(route.whenComplete(() {
-      if (mounted) {
-        _refreshVisibleActions();
-      }
-    }));
+    unawaited(
+      route.whenComplete(() {
+        if (mounted) {
+          _refreshVisibleActions();
+        }
+      }),
+    );
   }
 
   /// 打开刮刮乐购买弹层
   void _openScratchTicket() {
-    unawaited(showScratchTicketSheet(
-      context,
-      repository: widget.scratchTicketRepository,
-      characterRepository: widget.characterDetailRepository,
-      onCompleted: (_) {
-        if (!mounted) {
-          return;
-        }
+    unawaited(
+      showScratchTicketSheet(
+        context,
+        repository: widget.scratchTicketRepository,
+        characterRepository: widget.characterDetailRepository,
+        onCompleted: (_) {
+          if (!mounted) {
+            return;
+          }
 
-        unawaited(_controller.refresh(silent: true));
-      },
-    ));
+          unawaited(_controller.refresh(silent: true));
+        },
+      ),
+    );
   }
 
   /// 打开用户资金日志二级页面
@@ -110,10 +115,7 @@ extension _UserDetailPageNavigation on _UserDetailPageState {
 
     context.pushNamed(
       'userAssetAnalysis',
-      queryParameters: {
-        'username': profile.name,
-        'nickname': profile.nickname,
-      },
+      queryParameters: {'username': profile.name, 'nickname': profile.nickname},
     );
   }
 
@@ -130,10 +132,7 @@ extension _UserDetailPageNavigation on _UserDetailPageState {
 
     context.pushNamed(
       'userRedPacketLogs',
-      queryParameters: {
-        'username': profile.name,
-        'nickname': profile.nickname,
-      },
+      queryParameters: {'username': profile.name, 'nickname': profile.nickname},
     );
   }
 
@@ -148,15 +147,17 @@ extension _UserDetailPageNavigation on _UserDetailPageState {
       return;
     }
 
-    unawaited(showUserRedPacketSendSheet(
-      context,
-      repository: widget.repository,
-      username: profile.name,
-      nickname: profile.nickname,
-      onSuccess: () {
-        unawaited(_controller.refresh(silent: true));
-      },
-    ));
+    unawaited(
+      showUserRedPacketSendSheet(
+        context,
+        repository: widget.repository,
+        username: profile.name,
+        nickname: profile.nickname,
+        onSuccess: () {
+          unawaited(_controller.refresh(silent: true));
+        },
+      ),
+    );
   }
 
   /// 打开用户连接二级页面
@@ -262,10 +263,7 @@ extension _UserDetailPageNavigation on _UserDetailPageState {
   ///
   /// [item] 用户角色条目
   /// [avatarHeroTag] 入口头像转场标识
-  void _openCharacterDetail(
-    UserCharacterApiItem item,
-    String? avatarHeroTag,
-  ) {
+  void _openCharacterDetail(UserCharacterApiItem item, String? avatarHeroTag) {
     openCharacterDetail(
       context,
       characterId: item.characterId,
@@ -279,10 +277,7 @@ extension _UserDetailPageNavigation on _UserDetailPageState {
   ///
   /// [item] 用户 ICO 条目
   /// [avatarHeroTag] 入口头像转场标识
-  void _openIcoDetail(
-    UserIcoApiItem item,
-    String? avatarHeroTag,
-  ) {
+  void _openIcoDetail(UserIcoApiItem item, String? avatarHeroTag) {
     openCharacterDetail(
       context,
       characterId: item.characterId,

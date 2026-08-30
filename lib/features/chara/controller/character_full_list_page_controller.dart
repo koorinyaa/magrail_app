@@ -14,12 +14,13 @@ const int characterFullListRequestPageSize = 99999999;
 /// [replacementItems] 即将展示的新角色
 /// [previousHasLevelHeaders] 替换前是否包含等级标题
 /// [replacementHasLevelHeaders] 替换后是否包含等级标题
-typedef CharacterFullListReplacementCallback<ItemType> = void Function(
-  List<ItemType> previousItems,
-  List<ItemType> replacementItems, {
-  required bool previousHasLevelHeaders,
-  required bool replacementHasLevelHeaders,
-});
+typedef CharacterFullListReplacementCallback<ItemType> =
+    void Function(
+      List<ItemType> previousItems,
+      List<ItemType> replacementItems, {
+      required bool previousHasLevelHeaders,
+      required bool replacementHasLevelHeaders,
+    });
 
 /// 角色全量列表二级页面控制器
 abstract class CharacterFullListPageController<ItemType>
@@ -39,20 +40,20 @@ abstract class CharacterFullListPageController<ItemType>
     required Future<void> Function() waitForScrollIdle,
     CharacterFullListReplacementCallback<ItemType>? onBeforeFullItemsReplaced,
     VoidCallback? onDataRefreshFailed,
-  })  : assert(availableSorts.isNotEmpty),
-        assert(initialSort == null || availableSorts.contains(initialSort)),
-        _availableSorts = List<CharacterFullListSort>.unmodifiable(
-          availableSorts,
-        ),
-        _sort = initialSort,
-        _waitForScrollIdle = waitForScrollIdle,
-        _onBeforeFullItemsReplaced = onBeforeFullItemsReplaced,
-        _onDataRefreshFailed = onDataRefreshFailed;
+  }) : assert(availableSorts.isNotEmpty),
+       assert(initialSort == null || availableSorts.contains(initialSort)),
+       _availableSorts = List<CharacterFullListSort>.unmodifiable(
+         availableSorts,
+       ),
+       _sort = initialSort,
+       _waitForScrollIdle = waitForScrollIdle,
+       _onBeforeFullItemsReplaced = onBeforeFullItemsReplaced,
+       _onDataRefreshFailed = onDataRefreshFailed;
 
   final List<CharacterFullListSort> _availableSorts;
   final Future<void> Function() _waitForScrollIdle;
   final CharacterFullListReplacementCallback<ItemType>?
-      _onBeforeFullItemsReplaced;
+  _onBeforeFullItemsReplaced;
   final VoidCallback? _onDataRefreshFailed;
 
   List<ItemType>? _fullSourceItems;
@@ -367,13 +368,15 @@ abstract class CharacterFullListPageController<ItemType>
     final normalizedKeyword = RegExp(r'^#[0-9]+$').hasMatch(rawKeyword)
         ? rawKeyword.substring(1)
         : rawKeyword;
-    final displayItems = sourceItems.where((item) {
-      if (normalizedKeyword.isEmpty) {
-        return true;
-      }
-      return characterIdOf(item).toString().contains(normalizedKeyword) ||
-          characterNameOf(item).toLowerCase().contains(normalizedKeyword);
-    }).toList(growable: false);
+    final displayItems = sourceItems
+        .where((item) {
+          if (normalizedKeyword.isEmpty) {
+            return true;
+          }
+          return characterIdOf(item).toString().contains(normalizedKeyword) ||
+              characterNameOf(item).toLowerCase().contains(normalizedKeyword);
+        })
+        .toList(growable: false);
     if (_sort != null) {
       displayItems.sort(_compareItems);
     }
@@ -391,17 +394,14 @@ abstract class CharacterFullListPageController<ItemType>
     }
     final comparison = switch (sort) {
       CharacterFullListSort.towerRank => _compareTowerRanks(
-          sortValueOf(left, sort).toInt(),
-          sortValueOf(right, sort).toInt(),
-        ),
+        sortValueOf(left, sort).toInt(),
+        sortValueOf(right, sort).toInt(),
+      ),
       CharacterFullListSort.listedDate => _compareListedDates(
-          sortValueOf(left, sort).toInt(),
-          sortValueOf(right, sort).toInt(),
-        ),
-      _ => _compareValues(
-          sortValueOf(left, sort),
-          sortValueOf(right, sort),
-        ),
+        sortValueOf(left, sort).toInt(),
+        sortValueOf(right, sort).toInt(),
+      ),
+      _ => _compareValues(sortValueOf(left, sort), sortValueOf(right, sort)),
     };
     if (comparison != 0) {
       return comparison;

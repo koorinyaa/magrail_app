@@ -124,10 +124,7 @@ class _ThemeModePageState extends State<_ThemeModePage> {
       setState(() {
         _themeMode = previousMode;
       });
-      AppToast.error(
-        context,
-        text: '保存设置失败，请稍后重试',
-      );
+      AppToast.error(context, text: '保存设置失败，请稍后重试');
     } finally {
       if (mounted) {
         setState(() {

@@ -6,10 +6,7 @@ class _TradeSideSwitch extends StatelessWidget {
   ///
   /// [value] 当前交易方向
   /// [onChanged] 交易方向变化回调
-  const _TradeSideSwitch({
-    required this.value,
-    required this.onChanged,
-  });
+  const _TradeSideSwitch({required this.value, required this.onChanged});
 
   /// 当前交易方向
   final CharacterDetailTradeSide value;
@@ -117,10 +114,7 @@ class _TradeIcebergOption extends StatelessWidget {
   ///
   /// [value] 是否启用冰山委托
   /// [onChanged] 状态变化回调
-  const _TradeIcebergOption({
-    required this.value,
-    required this.onChanged,
-  });
+  const _TradeIcebergOption({required this.value, required this.onChanged});
 
   /// 是否启用冰山委托
   final bool value;
@@ -277,15 +271,12 @@ class _TradeSubmitButton extends StatelessWidget {
         onPressed: canSubmit ? () => unawaited(onSubmit()) : null,
         style: FilledButton.styleFrom(
           backgroundColor: accentColor,
-          disabledBackgroundColor:
-              colorScheme.surfaceContainerHighest.withValues(alpha: 0.56),
+          disabledBackgroundColor: colorScheme.surfaceContainerHighest
+              .withValues(alpha: 0.56),
           disabledForegroundColor: colorScheme.onSurfaceVariant,
           foregroundColor: Colors.white,
           shape: const StadiumBorder(),
-          textStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
-          ),
+          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
         ),
         child: Text(isSubmitting ? '提交中...' : label),
       ),
@@ -316,9 +307,7 @@ BoxDecoration _segmentedDecoration(BuildContext context) {
     ),
     borderRadius: BorderRadius.circular(13),
     border: Border.all(
-      color: colorScheme.outlineVariant.withValues(
-        alpha: isDark ? 0.30 : 0.56,
-      ),
+      color: colorScheme.outlineVariant.withValues(alpha: isDark ? 0.30 : 0.56),
     ),
   );
 }

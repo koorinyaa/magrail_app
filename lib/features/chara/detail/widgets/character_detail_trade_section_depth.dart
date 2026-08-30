@@ -56,7 +56,9 @@ class _TradeDepthPanel extends StatelessWidget {
                   onItemPressed: (item) {
                     onFormExpandRequested();
                     controller.fillFromDepth(
-                        CharacterDetailTradeSide.buy, item);
+                      CharacterDetailTradeSide.buy,
+                      item,
+                    );
                   },
                 ),
               ),
@@ -172,8 +174,9 @@ class _TradeDepthRow extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
     final backgroundColor = accentColor.withValues(alpha: isDark ? 0.16 : 0.12);
-    final priceText =
-        item.isIceberg ? '₵--' : Formatters.tinygrailCurrency(item.price);
+    final priceText = item.isIceberg
+        ? '₵--'
+        : Formatters.tinygrailCurrency(item.price);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
@@ -333,9 +336,7 @@ class _TradeDepthColumnEmptyState extends StatelessWidget {
   /// 创建角色详情单侧当前买卖单空态
   ///
   /// [text] 空态文案
-  const _TradeDepthColumnEmptyState({
-    required this.text,
-  });
+  const _TradeDepthColumnEmptyState({required this.text});
 
   /// 空态文案
   final String text;

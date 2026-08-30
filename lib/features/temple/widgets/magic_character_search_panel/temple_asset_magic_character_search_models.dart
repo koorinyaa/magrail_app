@@ -1,5 +1,6 @@
 part of '../temple_asset_magic_character_search_panel.dart';
 
+/// 魔法道具角色搜索展示条目
 final class TempleAssetMagicCharacterSearchItem {
   /// 创建魔法道具角色搜索展示条目
   ///
@@ -158,10 +159,7 @@ class _MagicRecentSearchItem {
   ///
   /// [item] 角色搜索条目
   /// [usedAt] 最近使用时间
-  const _MagicRecentSearchItem({
-    required this.item,
-    required this.usedAt,
-  });
+  const _MagicRecentSearchItem({required this.item, required this.usedAt});
 
   /// 角色搜索条目
   final TempleAssetMagicCharacterSearchItem item;
@@ -184,7 +182,8 @@ Future<List<_MagicRecentCharacterRecord>> _readRecentMagicCharacterRecords({
   }
 
   final preferences = await SharedPreferences.getInstance();
-  final values = preferences.getStringList(
+  final values =
+      preferences.getStringList(
         _recentMagicCharacterIdsKey(
           storageKeyPrefix: storageKeyPrefix,
           username: trimmedUsername,

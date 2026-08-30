@@ -8,9 +8,8 @@ class RankingRepository {
   /// 创建排行榜仓库
   ///
   /// [apiClient] Tinygrail API 客户端
-  const RankingRepository({
-    required ApiClient apiClient,
-  }) : _apiClient = apiClient;
+  const RankingRepository({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   final ApiClient _apiClient;
 
@@ -27,9 +26,9 @@ class RankingRepository {
     );
     final response =
         TinygrailResponse<TinygrailPage<TempleRefineRankingEntry>>.fromJson(
-      json,
-      (value) => _parseRefinePage(value, fallbackPage: page),
-    );
+          json,
+          (value) => _parseRefinePage(value, fallbackPage: page),
+        );
 
     final pageData = response.value;
     if (!response.isSuccess || pageData == null) {
@@ -87,11 +86,13 @@ class RankingRepository {
 
     final currentPage = TinygrailResponseParser.asInt(valueJson['CurrentPage']);
     final resolvedPage = currentPage > 0 ? currentPage : fallbackPage;
-    final itemsPerPage =
-        TinygrailResponseParser.asInt(valueJson['ItemsPerPage']);
+    final itemsPerPage = TinygrailResponseParser.asInt(
+      valueJson['ItemsPerPage'],
+    );
     final resolvedPageSize = itemsPerPage > 0 ? itemsPerPage : 20;
     return TinygrailPage<TempleRefineRankingEntry>(
-      items: _withRankingIndexes(
+      items:
+          _withRankingIndexes(
             valueJson['Items'],
             (itemJson) => TempleRefineRankingEntry.fromJson(
               itemJson.json,
@@ -166,10 +167,7 @@ final class _IndexedJson {
   ///
   /// [index] 原始数组索引
   /// [json] 原始条目 JSON
-  const _IndexedJson({
-    required this.index,
-    required this.json,
-  });
+  const _IndexedJson({required this.index, required this.json});
 
   /// 原始数组索引
   final int index;

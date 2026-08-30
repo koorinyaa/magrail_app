@@ -15,8 +15,8 @@ class AppBottomSheetHeader extends StatelessWidget {
     required this.title,
     required this.subtitle,
     this.iconColor,
-  })  : _icon = icon,
-        _leading = null;
+  }) : _icon = icon,
+       _leading = null;
 
   /// 创建带自定义左侧图标的底部抽屉标题
   ///
@@ -29,9 +29,9 @@ class AppBottomSheetHeader extends StatelessWidget {
     required Widget leading,
     required this.title,
     required this.subtitle,
-  })  : _icon = null,
-        _leading = leading,
-        iconColor = null;
+  }) : _icon = null,
+       _leading = leading,
+       iconColor = null;
 
   final IconData? _icon;
   final Widget? _leading;
@@ -58,17 +58,14 @@ class AppBottomSheetHeader extends StatelessWidget {
       children: [
         SizedBox.square(
           dimension: 44,
-          child: leading ??
+          child:
+              leading ??
               DecoratedBox(
                 decoration: BoxDecoration(
                   color: resolvedIconColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(
-                  _icon,
-                  size: 24,
-                  color: resolvedIconColor,
-                ),
+                child: Icon(_icon, size: 24, color: resolvedIconColor),
               ),
         ),
         const SizedBox(width: 12),

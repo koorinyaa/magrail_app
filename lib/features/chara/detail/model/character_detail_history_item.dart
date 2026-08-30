@@ -47,8 +47,9 @@ class CharacterDetailHistoryItem {
     }
 
     final nextName = name.trim().isNotEmpty ? name : cached.name;
-    final nextAvatarUrl =
-        avatarUrl.trim().isNotEmpty ? avatarUrl : cached.avatarUrl;
+    final nextAvatarUrl = avatarUrl.trim().isNotEmpty
+        ? avatarUrl
+        : cached.avatarUrl;
 
     return CharacterDetailHistoryItem(
       characterId: characterId,
@@ -70,10 +71,6 @@ class CharacterDetailHistoryItem {
 
   /// 转换为缓存 JSON
   Map<String, Object?> toJson() {
-    return {
-      'CharacterId': characterId,
-      'Name': name,
-      'AvatarUrl': avatarUrl,
-    };
+    return {'CharacterId': characterId, 'Name': name, 'AvatarUrl': avatarUrl};
   }
 }

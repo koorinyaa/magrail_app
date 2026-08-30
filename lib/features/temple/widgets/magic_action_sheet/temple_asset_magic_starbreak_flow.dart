@@ -14,11 +14,9 @@ extension _TempleAssetMagicStarbreakFlow on _TempleAssetMagicActionSheetState {
   }) async {
     final data = dataNotifier.value;
     final target = targetNotifier.value;
-    final validation =
-        _TempleAssetMagicDialogFlow(this)._validateDetachedStarbreakSubmit(
-      data: data,
-      target: target,
-    );
+    final validation = _TempleAssetMagicDialogFlow(
+      this,
+    )._validateDetachedStarbreakSubmit(data: data, target: target);
     if (validation != null) {
       if (dialogContext.mounted) {
         AppToast.error(dialogContext, text: validation);
@@ -48,10 +46,9 @@ extension _TempleAssetMagicStarbreakFlow on _TempleAssetMagicActionSheetState {
       if (dialogContext.mounted) {
         AppToast.error(
           dialogContext,
-          text: _TempleAssetMagicSubmitLogic(this)._messageForError(
-            error,
-            '闪光结晶失败',
-          ),
+          text: _TempleAssetMagicSubmitLogic(
+            this,
+          )._messageForError(error, '闪光结晶失败'),
         );
       }
       return null;
@@ -77,8 +74,9 @@ extension _TempleAssetMagicStarbreakFlow on _TempleAssetMagicActionSheetState {
     final refreshedTarget = result.target;
     if (refreshedTarget != null) {
       targetNotifier.value =
-          TempleAssetMagicCharacterSearchItem.fromUserCharacter(refreshedTarget)
-              .toSearchItem();
+          TempleAssetMagicCharacterSearchItem.fromUserCharacter(
+            refreshedTarget,
+          ).toSearchItem();
     }
   }
 }

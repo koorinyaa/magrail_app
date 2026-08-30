@@ -18,9 +18,7 @@ class AppUpdateRepository {
     final response = await _dio.get<Object?>(
       _latestReleaseApiUrl,
       options: Options(
-        headers: const {
-          'Accept': 'application/vnd.github+json',
-        },
+        headers: const {'Accept': 'application/vnd.github+json'},
       ),
     );
     final data = response.data;
@@ -35,9 +33,7 @@ class AppUpdateRepository {
     }
 
     final tagName = (data['tag_name'] as String? ?? '').trim();
-    final releaseUrl = Uri.tryParse(
-      (data['html_url'] as String? ?? '').trim(),
-    );
+    final releaseUrl = Uri.tryParse((data['html_url'] as String? ?? '').trim());
     if (tagName.isEmpty || releaseUrl == null) {
       throw StateError('检查更新失败');
     }

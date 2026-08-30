@@ -1,12 +1,11 @@
 part of '../character_detail_sacrifice_sheet.dart';
 
+/// 角色资产重组抽屉输入控件
 class _SacrificeAmountField extends StatelessWidget {
   /// 创建资产重组数量输入框
   ///
   /// [controller] 资产重组抽屉控制器
-  const _SacrificeAmountField({
-    required this.controller,
-  });
+  const _SacrificeAmountField({required this.controller});
 
   /// 资产重组抽屉控制器
   final CharacterDetailSacrificeSheetController controller;
@@ -81,9 +80,7 @@ class _SacrificeQuickButtons extends StatelessWidget {
   /// 创建资产重组快捷数量按钮组
   ///
   /// [controller] 资产重组抽屉控制器
-  const _SacrificeQuickButtons({
-    required this.controller,
-  });
+  const _SacrificeQuickButtons({required this.controller});
 
   /// 资产重组抽屉控制器
   final CharacterDetailSacrificeSheetController controller;
@@ -97,10 +94,7 @@ class _SacrificeQuickButtons extends StatelessWidget {
 
     if (controller.mode == CharacterDetailSacrificeMode.financing) {
       children.add(
-        _SacrificeQuickButton(
-          text: 'max',
-          onPressed: controller.fillMaxAmount,
-        ),
+        _SacrificeQuickButton(text: 'max', onPressed: controller.fillMaxAmount),
       );
     } else {
       children.addAll([
@@ -116,10 +110,7 @@ class _SacrificeQuickButtons extends StatelessWidget {
           text: '12500',
           onPressed: () => controller.fillAmount(12500),
         ),
-        _SacrificeQuickButton(
-          text: 'max',
-          onPressed: controller.fillMaxAmount,
-        ),
+        _SacrificeQuickButton(text: 'max', onPressed: controller.fillMaxAmount),
         _SacrificeQuickButton(
           text: '补塔',
           onPressed: controller.fillTempleAmount,
@@ -144,10 +135,7 @@ class _SacrificeQuickButton extends StatelessWidget {
   ///
   /// [text] 按钮文案
   /// [onPressed] 点击回调
-  const _SacrificeQuickButton({
-    required this.text,
-    required this.onPressed,
-  });
+  const _SacrificeQuickButton({required this.text, required this.onPressed});
 
   /// 按钮文案
   final String text;
@@ -227,8 +215,8 @@ class _SacrificeSubmitButton extends StatelessWidget {
         : '资产重组';
     final buttonColor =
         controller.mode == CharacterDetailSacrificeMode.financing
-            ? const Color(0xFFF25C62)
-            : const Color(0xFF17C964);
+        ? const Color(0xFFF25C62)
+        : const Color(0xFF17C964);
 
     return SizedBox(
       height: 42,
@@ -236,8 +224,8 @@ class _SacrificeSubmitButton extends StatelessWidget {
         style: FilledButton.styleFrom(
           backgroundColor: buttonColor,
           foregroundColor: colorScheme.onPrimary,
-          disabledBackgroundColor:
-              colorScheme.surfaceContainerHighest.withValues(alpha: 0.68),
+          disabledBackgroundColor: colorScheme.surfaceContainerHighest
+              .withValues(alpha: 0.68),
           disabledForegroundColor: colorScheme.onSurfaceVariant,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(999),
@@ -316,15 +304,9 @@ class _SacrificeSheetSkeleton extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-          Bone(
-            height: 34,
-            borderRadius: BorderRadius.circular(14),
-          ),
+          Bone(height: 34, borderRadius: BorderRadius.circular(14)),
           const SizedBox(height: 14),
-          Bone(
-            height: 54,
-            borderRadius: BorderRadius.circular(16),
-          ),
+          Bone(height: 54, borderRadius: BorderRadius.circular(16)),
           const SizedBox(height: 10),
           Wrap(
             spacing: 7,
@@ -358,10 +340,7 @@ class _SacrificeSheetSkeleton extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          Bone(
-            height: 42,
-            borderRadius: BorderRadius.circular(999),
-          ),
+          Bone(height: 42, borderRadius: BorderRadius.circular(999)),
         ],
       ),
     );

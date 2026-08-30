@@ -6,10 +6,7 @@ class _AssetProportionSourceLegend extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [mode] 资产占比统计模式
-  const _AssetProportionSourceLegend({
-    super.key,
-    required this.mode,
-  });
+  const _AssetProportionSourceLegend({super.key, required this.mode});
 
   /// 资产占比统计模式
   final UserAssetAnalysisAssetProportionMode mode;
@@ -156,10 +153,10 @@ class _AssetProportionModeOption extends StatelessWidget {
             decoration: BoxDecoration(
               color: selected
                   ? isDark
-                      ? colorScheme.surfaceContainerHighest.withValues(
-                          alpha: 0.88,
-                        )
-                      : colorScheme.surface.withValues(alpha: 0.96)
+                        ? colorScheme.surfaceContainerHighest.withValues(
+                            alpha: 0.88,
+                          )
+                        : colorScheme.surface.withValues(alpha: 0.96)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(6),
               border: selected
@@ -239,10 +236,7 @@ class _AssetProportionSourceLegendItem extends StatelessWidget {
             color: color,
             shape: BoxShape.circle,
             boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.38),
-                blurRadius: 7,
-              ),
+              BoxShadow(color: color.withValues(alpha: 0.38), blurRadius: 7),
             ],
           ),
         ),
@@ -302,10 +296,7 @@ class _CharacterPackingCanvas extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           _PackingDust(isDark: isDark),
-          _PackingGuideLine(
-            angle: -0.28,
-            color: orbitColor,
-          ),
+          _PackingGuideLine(angle: -0.28, color: orbitColor),
           _PackingGuideLine(
             angle: 0.72,
             color: orbitColor.withValues(alpha: 0.68),
@@ -372,7 +363,8 @@ class _PackingDust extends StatelessWidget {
               for (var index = 0; index < 26; index += 1)
                 Positioned(
                   left: constraints.maxWidth * (((index * 47) % 97) / 100),
-                  top: constraints.maxHeight *
+                  top:
+                      constraints.maxHeight *
                       ((((index * 71) + 13) % 97) / 100),
                   child: Container(
                     width: index % 6 == 0 ? 2.0 : 1.0,
@@ -398,10 +390,7 @@ class _PackingGuideLine extends StatelessWidget {
   ///
   /// [angle] 引导线旋转弧度
   /// [color] 引导线颜色
-  const _PackingGuideLine({
-    required this.angle,
-    required this.color,
-  });
+  const _PackingGuideLine({required this.angle, required this.color});
 
   /// 引导线旋转弧度
   final double angle;
@@ -423,11 +412,7 @@ class _PackingGuideLine extends StatelessWidget {
             height: 1,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Colors.transparent,
-                  color,
-                  Colors.transparent,
-                ],
+                colors: [Colors.transparent, color, Colors.transparent],
               ),
             ),
           ),

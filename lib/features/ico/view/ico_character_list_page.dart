@@ -24,10 +24,7 @@ class IcoCharacterListPage extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [controller] 一级页共享的 ICO 角色控制器
-  const IcoCharacterListPage({
-    super.key,
-    required this.controller,
-  });
+  const IcoCharacterListPage({super.key, required this.controller});
 
   /// 一级页共享的 ICO 角色控制器
   final IcoCharacterController controller;
@@ -100,10 +97,7 @@ class _IcoCharacterListPageState extends State<IcoCharacterListPage> {
     final items = controller.items;
     if (controller.isInitialLoading) {
       return const <Widget>[
-        CharacterAssetSkeletonSliverList(
-          showTrailing: true,
-          trailingWidth: 84,
-        ),
+        CharacterAssetSkeletonSliverList(showTrailing: true, trailingWidth: 84),
       ];
     }
     if (controller.isLoadFailed && !controller.hasLoadedData) {
@@ -127,13 +121,11 @@ class _IcoCharacterListPageState extends State<IcoCharacterListPage> {
       ];
     }
     return <Widget>[
-      IcoCharacterSliverList(
-        items: items,
-        onIcoTap: _openIcoCharacterDetail,
-      ),
+      IcoCharacterSliverList(items: items, onIcoTap: _openIcoCharacterDetail),
       SliverToBoxAdapter(
         child: SizedBox(
-          height: CharacterSearchInputBar.height +
+          height:
+              CharacterSearchInputBar.height +
               48 +
               MediaQuery.paddingOf(context).bottom,
         ),
@@ -145,8 +137,9 @@ class _IcoCharacterListPageState extends State<IcoCharacterListPage> {
   Widget _buildSearchBar() {
     final mediaPadding = MediaQuery.paddingOf(context);
     final viewInsets = MediaQuery.viewInsetsOf(context);
-    final bottomInset =
-        viewInsets.bottom > 0 ? viewInsets.bottom : mediaPadding.bottom;
+    final bottomInset = viewInsets.bottom > 0
+        ? viewInsets.bottom
+        : mediaPadding.bottom;
     return Positioned(
       left: mediaPadding.left + 20,
       right: mediaPadding.right + 20,
@@ -219,10 +212,7 @@ class _IcoCharacterListPageState extends State<IcoCharacterListPage> {
   ///
   /// [item] ICO 角色条目
   /// [avatarHeroTag] 头像转场标识
-  void _openIcoCharacterDetail(
-    IcoCharacterEntry item,
-    String? avatarHeroTag,
-  ) {
+  void _openIcoCharacterDetail(IcoCharacterEntry item, String? avatarHeroTag) {
     openCharacterDetail(
       context,
       characterId: item.characterId,

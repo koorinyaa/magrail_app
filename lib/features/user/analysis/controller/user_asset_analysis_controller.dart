@@ -14,9 +14,9 @@ class UserAssetAnalysisController extends ChangeNotifier {
     required UserAssetAnalysisRepository repository,
     required String username,
     required String nickname,
-  })  : _repository = repository,
-        _username = username.trim(),
-        _nickname = nickname.trim();
+  }) : _repository = repository,
+       _username = username.trim(),
+       _nickname = nickname.trim();
 
   final UserAssetAnalysisRepository _repository;
   final String _username;
@@ -113,10 +113,7 @@ class UserAssetAnalysisController extends ChangeNotifier {
         return;
       }
 
-      _errorMessage = resolveUserErrorMessage(
-        error,
-        fallback: '加载资产分析失败',
-      );
+      _errorMessage = resolveUserErrorMessage(error, fallback: '加载资产分析失败');
       _isInitialLoading = false;
       _notifyIfActive();
       return;
@@ -175,10 +172,7 @@ class UserAssetAnalysisController extends ChangeNotifier {
         return false;
       }
 
-      _errorMessage = resolveUserErrorMessage(
-        error,
-        fallback: '获取资产分析失败',
-      );
+      _errorMessage = resolveUserErrorMessage(error, fallback: '获取资产分析失败');
       return false;
     } finally {
       if (!_isDisposed) {
@@ -225,7 +219,8 @@ class UserAssetAnalysisController extends ChangeNotifier {
         _analysisTotalSteps = progress.totalSteps;
     }
     _progressLabel = progress.label;
-    final completedSteps = _characterCompletedSteps +
+    final completedSteps =
+        _characterCompletedSteps +
         _templeCompletedSteps +
         _analysisCompletedSteps;
     final totalSteps =

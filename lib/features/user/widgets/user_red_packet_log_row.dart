@@ -10,10 +10,7 @@ class UserRedPacketLogRow extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [item] 红包记录条目
-  const UserRedPacketLogRow({
-    super.key,
-    required this.item,
-  });
+  const UserRedPacketLogRow({super.key, required this.item});
 
   /// 红包记录条目
   final UserRedPacketLogApiItem item;
@@ -96,8 +93,8 @@ class UserRedPacketLogRow extends StatelessWidget {
     final sign = item.change > 0
         ? '+'
         : item.change < 0
-            ? '-'
-            : '';
+        ? '-'
+        : '';
     return '$sign${Formatters.tinygrailCurrency(item.change.abs())}';
   }
 }
@@ -107,9 +104,7 @@ class _RedPacketDescription extends StatelessWidget {
   /// 创建用户红包记录描述
   ///
   /// [text] 描述文本
-  const _RedPacketDescription({
-    required this.text,
-  });
+  const _RedPacketDescription({required this.text});
 
   /// 描述文本
   final String text;

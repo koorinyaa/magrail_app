@@ -151,13 +151,14 @@ class TempleAssetMagicCharacterSearchPanelState
   Widget _buildSearchResultList() {
     final recentRowCount =
         _TempleAssetMagicCharacterSearchData(this)._shouldShowRecent
-            ? _recentResults.length * 2
-            : 0;
-    final searchRowCount =
-        _searchResults.isEmpty ? 0 : _searchResults.length * 2 - 1;
+        ? _recentResults.length * 2
+        : 0;
+    final searchRowCount = _searchResults.isEmpty
+        ? 0
+        : _searchResults.length * 2 - 1;
     final hasFooter =
         _TempleAssetMagicCharacterSearchData(this)._isInitialSearchMode &&
-            _searchResults.isNotEmpty;
+        _searchResults.isNotEmpty;
     final itemCount = recentRowCount + searchRowCount + (hasFooter ? 1 : 0);
 
     return ListView.builder(
@@ -216,8 +217,9 @@ class TempleAssetMagicCharacterSearchPanelState
     return _TempleAssetMagicSearchRow(
       item: item,
       secondaryText: widget.secondaryTextBuilder(item, supplementValue),
-      usedTimeText:
-          _TempleAssetMagicCharacterSearchData(this)._recentTimeText(usedAt),
+      usedTimeText: _TempleAssetMagicCharacterSearchData(
+        this,
+      )._recentTimeText(usedAt),
       onTap: () => widget.onSelected(item, supplementValue),
     );
   }
@@ -326,15 +328,17 @@ class TempleAssetMagicCharacterSearchPanelState
       final items = searchItems
           .map(TempleAssetMagicCharacterSearchItem.fromSearchItem)
           .toList(growable: false);
-      final supplementValues = await _TempleAssetMagicCharacterSearchData(this)
-          ._loadSupplementValues(items);
+      final supplementValues = await _TempleAssetMagicCharacterSearchData(
+        this,
+      )._loadSupplementValues(items);
       if (!mounted || requestId != _searchRequestId) {
         return;
       }
 
       setState(() {
-        _TempleAssetMagicCharacterSearchData(this)
-            ._replaceSupplementValues(items, supplementValues);
+        _TempleAssetMagicCharacterSearchData(
+          this,
+        )._replaceSupplementValues(items, supplementValues);
         _searchResults = items;
         _isSearching = false;
       });
@@ -381,8 +385,9 @@ class TempleAssetMagicCharacterSearchPanelState
         pageSize: _magicSearchPageSize,
         sort: 'desc',
       );
-      final recentItems = await _TempleAssetMagicCharacterSearchData(this)
-          ._loadRecentSearchItems(username);
+      final recentItems = await _TempleAssetMagicCharacterSearchData(
+        this,
+      )._loadRecentSearchItems(username);
       final items = page.items
           .map(TempleAssetMagicCharacterSearchItem.fromUserCharacter)
           .toList(growable: false);
@@ -390,15 +395,17 @@ class TempleAssetMagicCharacterSearchPanelState
         ...recentItems.map((item) => item.item),
         ...items,
       ];
-      final supplementValues = await _TempleAssetMagicCharacterSearchData(this)
-          ._loadSupplementValues(supplementItems);
+      final supplementValues = await _TempleAssetMagicCharacterSearchData(
+        this,
+      )._loadSupplementValues(supplementItems);
       if (!mounted || requestId != _searchRequestId) {
         return;
       }
 
       setState(() {
-        _TempleAssetMagicCharacterSearchData(this)
-            ._replaceSupplementValues(supplementItems, supplementValues);
+        _TempleAssetMagicCharacterSearchData(
+          this,
+        )._replaceSupplementValues(supplementItems, supplementValues);
         _recentResults = recentItems;
         _searchResults = items;
         _isSearching = false;
@@ -423,8 +430,9 @@ class TempleAssetMagicCharacterSearchPanelState
 
   /// 加载初始角色列表下一页
   Future<void> _loadNextInitialSearchPage() async {
-    if (!_TempleAssetMagicCharacterSearchData(this)
-        ._canLoadNextInitialSearchPage) {
+    if (!_TempleAssetMagicCharacterSearchData(
+      this,
+    )._canLoadNextInitialSearchPage) {
       return;
     }
 
@@ -447,14 +455,16 @@ class TempleAssetMagicCharacterSearchPanelState
         pageSize: _magicSearchPageSize,
         sort: 'desc',
       );
-      final existingIds =
-          _searchResults.map((item) => item.characterId).toSet();
+      final existingIds = _searchResults
+          .map((item) => item.characterId)
+          .toSet();
       final items = page.items
           .where((item) => !existingIds.contains(item.characterId))
           .map(TempleAssetMagicCharacterSearchItem.fromUserCharacter)
           .toList(growable: false);
-      final supplementValues = await _TempleAssetMagicCharacterSearchData(this)
-          ._loadSupplementValues(items);
+      final supplementValues = await _TempleAssetMagicCharacterSearchData(
+        this,
+      )._loadSupplementValues(items);
       if (!mounted ||
           requestId != _searchRequestId ||
           !_TempleAssetMagicCharacterSearchData(this)._isInitialSearchMode) {
@@ -462,8 +472,9 @@ class TempleAssetMagicCharacterSearchPanelState
       }
 
       setState(() {
-        _TempleAssetMagicCharacterSearchData(this)
-            ._replaceSupplementValues(items, supplementValues);
+        _TempleAssetMagicCharacterSearchData(
+          this,
+        )._replaceSupplementValues(items, supplementValues);
         _searchResults = <TempleAssetMagicCharacterSearchItem>[
           ..._searchResults,
           ...items,
@@ -524,8 +535,9 @@ class TempleAssetMagicCharacterSearchPanelState
     required int totalPages,
     required int rawItemCount,
   }) {
-    final resolvedPage =
-        currentPage > requestedPage ? currentPage : requestedPage;
+    final resolvedPage = currentPage > requestedPage
+        ? currentPage
+        : requestedPage;
     _initialNextPage = resolvedPage + 1;
     _initialCanLoadMore = rawItemCount > 0 && resolvedPage < totalPages;
   }
@@ -544,11 +556,14 @@ class TempleAssetMagicCharacterSearchPanelState
     }
 
     final maxIndex = itemCount - 1;
-    final triggerIndex =
-        (maxIndex - (_magicSearchPageSize / 2).ceil()).clamp(0, maxIndex);
+    final triggerIndex = (maxIndex - (_magicSearchPageSize / 2).ceil()).clamp(
+      0,
+      maxIndex,
+    );
     if (index < triggerIndex ||
-        !_TempleAssetMagicCharacterSearchData(this)
-            ._canLoadNextInitialSearchPage) {
+        !_TempleAssetMagicCharacterSearchData(
+          this,
+        )._canLoadNextInitialSearchPage) {
       return;
     }
 
@@ -571,12 +586,15 @@ class TempleAssetMagicCharacterSearchPanelState
 
     try {
       final requestId = _searchRequestId;
-      final items = await _TempleAssetMagicCharacterSearchData(this)
-          ._loadRecentSearchItems(username);
-      final supplementItems =
-          items.map((item) => item.item).toList(growable: false);
-      final supplementValues = await _TempleAssetMagicCharacterSearchData(this)
-          ._loadSupplementValues(supplementItems);
+      final items = await _TempleAssetMagicCharacterSearchData(
+        this,
+      )._loadRecentSearchItems(username);
+      final supplementItems = items
+          .map((item) => item.item)
+          .toList(growable: false);
+      final supplementValues = await _TempleAssetMagicCharacterSearchData(
+        this,
+      )._loadSupplementValues(supplementItems);
       if (!mounted || requestId != _searchRequestId) {
         return;
       }
@@ -585,8 +603,9 @@ class TempleAssetMagicCharacterSearchPanelState
         for (final item in items) item.item.characterId: item.item,
       };
       setState(() {
-        _TempleAssetMagicCharacterSearchData(this)
-            ._replaceSupplementValues(supplementItems, supplementValues);
+        _TempleAssetMagicCharacterSearchData(
+          this,
+        )._replaceSupplementValues(supplementItems, supplementValues);
         _recentResults = items;
         if (refreshedItemById.isNotEmpty) {
           _searchResults = [

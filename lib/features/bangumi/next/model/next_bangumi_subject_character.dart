@@ -69,9 +69,7 @@ final class NextBangumiSubjectCharacterItem {
   /// 从 JSON 创建 Next Bangumi 条目角色
   ///
   /// [json] 原始条目角色 JSON
-  factory NextBangumiSubjectCharacterItem.fromJson(
-    Map<String, Object?> json,
-  ) {
+  factory NextBangumiSubjectCharacterItem.fromJson(Map<String, Object?> json) {
     final character = TinygrailResponseParser.asObjectMap(json['character']);
     final images = TinygrailResponseParser.asObjectMap(character?['images']);
 

@@ -121,8 +121,9 @@ class TempleApiItem {
         ? null
         : TinygrailResponseParser.asObjectMap(json['Link']);
     final rawName = TinygrailResponseParser.asString(json['Name']);
-    final rawCharacterName =
-        TinygrailResponseParser.asString(json['CharacterName']);
+    final rawCharacterName = TinygrailResponseParser.asString(
+      json['CharacterName'],
+    );
 
     return TempleApiItem(
       nickname: isLinkedTemple
@@ -149,10 +150,7 @@ class TempleApiItem {
       create: TinygrailResponseParser.asString(json['Create']),
       link: linkJson == null
           ? null
-          : TempleApiItem._fromJson(
-              linkJson,
-              isLinkedTemple: true,
-            ),
+          : TempleApiItem._fromJson(linkJson, isLinkedTemple: true),
     );
   }
 }

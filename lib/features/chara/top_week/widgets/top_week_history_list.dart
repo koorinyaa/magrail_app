@@ -33,7 +33,8 @@ class TopWeekHistoryList extends StatelessWidget {
   static const double _rankAvatarGap = 6;
   static const double _avatarSize = 48;
   static const double _avatarTextGap = 10;
-  static const double _dividerIndent = _horizontalPadding +
+  static const double _dividerIndent =
+      _horizontalPadding +
       _rankWidth +
       _rankAvatarGap +
       _avatarSize +
@@ -54,9 +55,7 @@ class TopWeekHistoryList extends StatelessWidget {
         return const TopWeekHistoryDivider();
       },
       itemBuilder: (context, index) {
-        return _TopWeekHistoryListItem(
-          item: items[index],
-        );
+        return _TopWeekHistoryListItem(item: items[index]);
       },
     );
   }
@@ -67,9 +66,7 @@ class _TopWeekHistoryListItem extends StatelessWidget {
   /// 创建往期萌王条目
   ///
   /// [item] 往期萌王接口条目
-  const _TopWeekHistoryListItem({
-    required this.item,
-  });
+  const _TopWeekHistoryListItem({required this.item});
 
   /// 往期萌王接口条目
   final TopWeekHistoryApiItem item;
@@ -224,10 +221,7 @@ class _TopWeekHistoryAvatar extends StatelessWidget {
   ///
   /// [imageUrl] 头像地址
   /// [heroTag] 头像转场标识
-  const _TopWeekHistoryAvatar({
-    required this.imageUrl,
-    required this.heroTag,
-  });
+  const _TopWeekHistoryAvatar({required this.imageUrl, required this.heroTag});
 
   /// 头像地址
   final String imageUrl;
@@ -263,9 +257,7 @@ class _TopWeekHistoryNameRow extends StatelessWidget {
   /// 创建往期萌王名称行
   ///
   /// [item] 往期萌王接口条目
-  const _TopWeekHistoryNameRow({
-    required this.item,
-  });
+  const _TopWeekHistoryNameRow({required this.item});
 
   /// 往期萌王接口条目
   final TopWeekHistoryApiItem item;
@@ -290,17 +282,14 @@ class _TopWeekHistoryNameRow extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: colorScheme.onSurface,
-                        fontWeight: FontWeight.w700,
-                        height: 1.1,
-                      ),
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w700,
+                    height: 1.1,
+                  ),
                 ),
               ),
               const SizedBox(width: 6),
-              LevelBadge(
-                level: item.characterLevel,
-                isCompact: true,
-              ),
+              LevelBadge(level: item.characterLevel, isCompact: true),
             ],
           ),
         ),
@@ -312,6 +301,8 @@ class _TopWeekHistoryNameRow extends StatelessWidget {
 /// 往期萌王列表分隔线
 class TopWeekHistoryDivider extends StatelessWidget {
   /// 创建往期萌王列表分隔线
+  ///
+  /// [key] Flutter 组件标识
   const TopWeekHistoryDivider({super.key});
 
   /// 构建往期萌王列表分隔线
@@ -347,10 +338,7 @@ class _TopWeekHistoryRankText extends StatelessWidget {
   ///
   /// [rank] 当前排名
   /// [color] 排名颜色
-  const _TopWeekHistoryRankText({
-    required this.rank,
-    required this.color,
-  });
+  const _TopWeekHistoryRankText({required this.rank, required this.color});
 
   /// 当前排名
   final int rank;
@@ -388,10 +376,7 @@ class _TopWeekHistoryPeopleCount extends StatelessWidget {
   ///
   /// [value] 人数文本
   /// [color] 文本颜色
-  const _TopWeekHistoryPeopleCount({
-    required this.value,
-    required this.color,
-  });
+  const _TopWeekHistoryPeopleCount({required this.value, required this.color});
 
   /// 人数文本
   final String value;
@@ -411,18 +396,14 @@ class _TopWeekHistoryPeopleCount extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.group_rounded,
-              size: 14,
-              color: color,
-            ),
+            Icon(Icons.group_rounded, size: 14, color: color),
             const SizedBox(width: 3),
             Text(
               value,
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.w700,
-                  ),
+                color: color,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ],
         ),

@@ -58,15 +58,12 @@ class _UserAssetSnapshotRefreshScheduler {
     final task = _queue.removeAt(0);
     _runningTask = task;
     Future.sync(() => task.action(task.totalItemsHint))
-        .then(
-      task.completer.complete,
-      onError: task.completer.completeError,
-    )
+        .then(task.completer.complete, onError: task.completer.completeError)
         .whenComplete(() {
-      _tasks.remove(task.key);
-      _runningTask = null;
-      _pump();
-    });
+          _tasks.remove(task.key);
+          _runningTask = null;
+          _pump();
+        });
   }
 }
 

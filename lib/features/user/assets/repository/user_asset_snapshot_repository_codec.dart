@@ -112,11 +112,7 @@ _DeserializedSnapshotRows _deserializeUserAssetSnapshotRows(
     ],
     temples: [
       for (final row in record.templeRows)
-        _decodeSnapshotRow(
-          row,
-          UserTempleApiItem.fromJson,
-          (item) => item.id,
-        ),
+        _decodeSnapshotRow(row, UserTempleApiItem.fromJson, (item) => item.id),
     ],
   );
 }

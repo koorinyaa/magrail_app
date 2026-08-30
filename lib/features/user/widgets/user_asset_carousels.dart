@@ -1,4 +1,4 @@
-﻿import 'dart:math' as math;
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
@@ -43,7 +43,7 @@ class UserCharacterAssetCarousel extends StatelessWidget {
 
   /// 角色条目点击回调
   final void Function(UserCharacterApiItem item, String? avatarHeroTag)?
-      onCharacterTap;
+  onCharacterTap;
 
   /// 构建用户角色资产横向栏
   ///
@@ -197,10 +197,7 @@ class _UserAssetCarousel<T> extends StatelessWidget {
         final screenWidth = constraints.maxWidth.isFinite
             ? constraints.maxWidth
             : MediaQuery.sizeOf(context).width;
-        final columnWidth = math.max(
-          248.0,
-          math.min(318.0, screenWidth - 72),
-        );
+        final columnWidth = math.max(248.0, math.min(318.0, screenWidth - 72));
         final resolvedItems = items ?? <T>[];
         final showSkeleton = isLoading && resolvedItems.isEmpty;
 
@@ -215,8 +212,9 @@ class _UserAssetCarousel<T> extends StatelessWidget {
         }
 
         final columns = _buildColumns(resolvedItems);
-        final columnCount =
-            showSkeleton ? _skeletonColumnCount : columns.length;
+        final columnCount = showSkeleton
+            ? _skeletonColumnCount
+            : columns.length;
 
         return SnappingHorizontalListView(
           height: 268,
@@ -280,9 +278,7 @@ class _UserAssetInlineEmpty extends StatelessWidget {
   /// 创建用户资产行内空状态
   ///
   /// [message] 空状态文案
-  const _UserAssetInlineEmpty({
-    required this.message,
-  });
+  const _UserAssetInlineEmpty({required this.message});
 
   /// 空状态文案
   final String message;

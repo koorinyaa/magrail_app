@@ -48,7 +48,8 @@ Future<void> showUserTempleRepairSheet(
       const topGap = 32.0;
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
-      final heightCap = mediaQuery.size.height *
+      final heightCap =
+          mediaQuery.size.height *
           (mediaQuery.orientation == Orientation.landscape ? 0.9 : 0.8);
       final maxHeight = availableHeight.clamp(0.0, heightCap).toDouble();
       return ConstrainedBox(
@@ -245,7 +246,8 @@ class _UserTempleRepairSheetState extends State<UserTempleRepairSheet> {
         ),
         const SizedBox(height: 12),
         FilledButton(
-          onPressed: _controller.selectedCount > 0 &&
+          onPressed:
+              _controller.selectedCount > 0 &&
                   !_controller.isSubmitting &&
                   !_controller.isRefreshing
               ? () => unawaited(_submitRepairs())
@@ -280,9 +282,7 @@ class _UserTempleRepairSheetState extends State<UserTempleRepairSheet> {
       return;
     }
 
-    final progress = ValueNotifier<String>(
-      '已完成 0/$selectedCount，成功 0，失败 0',
-    );
+    final progress = ValueNotifier<String>('已完成 0/$selectedCount，成功 0，失败 0');
     final rootNavigator = Navigator.of(context, rootNavigator: true);
     var isLoadingDialogVisible = true;
     var didCompleteRepairs = false;
@@ -312,10 +312,7 @@ class _UserTempleRepairSheetState extends State<UserTempleRepairSheet> {
             return;
           }
           if (failed > 0) {
-            AppToast.error(
-              context,
-              text: '补塔完成：成功 $succeeded，失败 $failed',
-            );
+            AppToast.error(context, text: '补塔完成：成功 $succeeded，失败 $failed');
           } else {
             AppToast.info(context, text: '已补充 $succeeded 座圣殿');
           }

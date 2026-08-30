@@ -117,10 +117,7 @@ class _CharacterTradeHistorySkeletonBlock extends StatelessWidget {
         color: color,
         borderRadius: BorderRadius.circular(radius),
       ),
-      child: SizedBox(
-        width: width,
-        height: height,
-      ),
+      child: SizedBox(width: width, height: height),
     );
   }
 }

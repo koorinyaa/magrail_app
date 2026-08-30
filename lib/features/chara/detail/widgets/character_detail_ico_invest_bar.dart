@@ -114,9 +114,7 @@ class _CharacterDetailIcoInvestBarState
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
         padding: EdgeInsets.only(bottom: viewInsets.bottom),
-        child: _IcoInvestSurface(
-          child: _buildContent(context),
-        ),
+        child: _IcoInvestSurface(child: _buildContent(context)),
       ),
     );
   }
@@ -287,10 +285,7 @@ class _CharacterDetailIcoInvestBarState
       setState(() {
         _isSubmitting = false;
       });
-      AppToast.error(
-        context,
-        text: _errorText(error, fallback: '注资失败'),
-      );
+      AppToast.error(context, text: _errorText(error, fallback: '注资失败'));
     }
   }
 

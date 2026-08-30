@@ -4,23 +4,24 @@ import 'package:flutter/material.dart';
 class AppMaterialTheme {
   /// 创建应用浅色主题
   static ThemeData light() {
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: _AppColors.accent,
-      brightness: Brightness.light,
-    ).copyWith(
-      primary: _AppColors.accent,
-      onPrimary: Colors.white,
-      surface: _AppColors.surface,
-      onSurface: _AppColors.text,
-      onSurfaceVariant: _AppColors.subtleText,
-      surfaceContainerLowest: _AppColors.background,
-      surfaceContainerLow: _AppColors.surfaceSoft,
-      surfaceContainer: _AppColors.surfaceSoft,
-      surfaceContainerHigh: _AppColors.surfaceSoft,
-      surfaceContainerHighest: _AppColors.surfaceSoft,
-      outline: _AppColors.outline,
-      outlineVariant: _AppColors.outline,
-    );
+    final colorScheme =
+        ColorScheme.fromSeed(
+          seedColor: _AppColors.accent,
+          brightness: Brightness.light,
+        ).copyWith(
+          primary: _AppColors.accent,
+          onPrimary: Colors.white,
+          surface: _AppColors.surface,
+          onSurface: _AppColors.text,
+          onSurfaceVariant: _AppColors.subtleText,
+          surfaceContainerLowest: _AppColors.background,
+          surfaceContainerLow: _AppColors.surfaceSoft,
+          surfaceContainer: _AppColors.surfaceSoft,
+          surfaceContainerHigh: _AppColors.surfaceSoft,
+          surfaceContainerHighest: _AppColors.surfaceSoft,
+          outline: _AppColors.outline,
+          outlineVariant: _AppColors.outline,
+        );
 
     return _buildTheme(
       colorScheme: colorScheme,
@@ -30,22 +31,23 @@ class AppMaterialTheme {
 
   /// 创建应用深色主题
   static ThemeData dark() {
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: _AppColors.accent,
-      brightness: Brightness.dark,
-    ).copyWith(
-      primary: _AppColors.accent,
-      surface: const Color(0xFF18181B),
-      onSurface: const Color(0xFFFAFAFA),
-      onSurfaceVariant: const Color(0xFFA1A1AA),
-      surfaceContainerLowest: const Color(0xFF111113),
-      surfaceContainerLow: const Color(0xFF202024),
-      surfaceContainer: const Color(0xFF27272A),
-      surfaceContainerHigh: const Color(0xFF2F2F33),
-      surfaceContainerHighest: const Color(0xFF3F3F46),
-      outline: const Color(0xFF3F3F46),
-      outlineVariant: const Color(0xFF3F3F46),
-    );
+    final colorScheme =
+        ColorScheme.fromSeed(
+          seedColor: _AppColors.accent,
+          brightness: Brightness.dark,
+        ).copyWith(
+          primary: _AppColors.accent,
+          surface: const Color(0xFF18181B),
+          onSurface: const Color(0xFFFAFAFA),
+          onSurfaceVariant: const Color(0xFFA1A1AA),
+          surfaceContainerLowest: const Color(0xFF111113),
+          surfaceContainerLow: const Color(0xFF202024),
+          surfaceContainer: const Color(0xFF27272A),
+          surfaceContainerHigh: const Color(0xFF2F2F33),
+          surfaceContainerHighest: const Color(0xFF3F3F46),
+          outline: const Color(0xFF3F3F46),
+          outlineVariant: const Color(0xFF3F3F46),
+        );
 
     return _buildTheme(
       colorScheme: colorScheme,
@@ -100,9 +102,7 @@ class AppMaterialTheme {
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: colorScheme.inverseSurface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
     );
   }

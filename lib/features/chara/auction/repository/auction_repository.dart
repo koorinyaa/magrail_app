@@ -8,18 +8,15 @@ class AuctionRepository {
   /// 创建拍卖仓库
   ///
   /// [apiClient] Tinygrail API 客户端
-  const AuctionRepository({
-    required ApiClient apiClient,
-  }) : _apiClient = apiClient;
+  const AuctionRepository({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   final ApiClient _apiClient;
 
   /// 获取角色当前拍卖列表
   ///
   /// [characterIds] 角色 ID 列表
-  Future<List<AuctionApiItem>> fetchAuctionList(
-    List<int> characterIds,
-  ) async {
+  Future<List<AuctionApiItem>> fetchAuctionList(List<int> characterIds) async {
     if (characterIds.isEmpty) {
       return const <AuctionApiItem>[];
     }
@@ -28,15 +25,14 @@ class AuctionRepository {
       'chara/auction/list',
       data: characterIds,
     );
-    final response = TinygrailResponse<List<AuctionApiItem>>.fromJson(
-      json,
-      (value) {
-        return TinygrailResponseParser.asObjectList(
-          value,
-          AuctionApiItem.fromJson,
-        );
-      },
-    );
+    final response = TinygrailResponse<List<AuctionApiItem>>.fromJson(json, (
+      value,
+    ) {
+      return TinygrailResponseParser.asObjectList(
+        value,
+        AuctionApiItem.fromJson,
+      );
+    });
 
     if (!response.isSuccess) {
       throw StateError(response.message ?? '获取拍卖列表失败');
@@ -52,9 +48,7 @@ class AuctionRepository {
     List<int> characterIds,
   ) async {
     final auctions = await fetchAuctionList(characterIds);
-    return {
-      for (final auction in auctions) auction.characterId: auction,
-    };
+    return {for (final auction in auctions) auction.characterId: auction};
   }
 
   /// 获取单个角色当前拍卖

@@ -31,8 +31,9 @@ class _TempleAssetMagicActionSheetState
   void initState() {
     super.initState();
     _data = widget.data;
-    _amountController.text =
-        _TempleAssetMagicStateQueries(this)._defaultAmountText;
+    _amountController.text = _TempleAssetMagicStateQueries(
+      this,
+    )._defaultAmountText;
   }
 
   /// 更新外部传入的圣殿资产数据
@@ -79,9 +80,7 @@ class _TempleAssetMagicActionSheetState
       child: Padding(
         padding: EdgeInsets.only(bottom: mediaQuery.viewInsets.bottom),
         child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(28),
-          ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: backgroundColor,
@@ -114,18 +113,22 @@ class _TempleAssetMagicActionSheetState
                         const AppBottomSheetDragHandle(),
                         const SizedBox(height: 10),
                         Flexible(
-                          child: _TempleAssetMagicStateQueries(this)
-                                  ._isShowingCharacterSearch
-                              ? _TempleAssetMagicSearchConfig(this)
-                                  ._buildCharacterSearchPanel()
+                          child:
+                              _TempleAssetMagicStateQueries(
+                                this,
+                              )._isShowingCharacterSearch
+                              ? _TempleAssetMagicSearchConfig(
+                                  this,
+                                )._buildCharacterSearchPanel()
                               : SingleChildScrollView(
                                   child: _buildBody(context),
                                 ),
                         ),
                       ],
                     ),
-                    if (_TempleAssetMagicStateQueries(this)
-                            ._isShowingCharacterSearch &&
+                    if (_TempleAssetMagicStateQueries(
+                          this,
+                        )._isShowingCharacterSearch &&
                         _isSubmitting &&
                         _progressText.isNotEmpty)
                       Positioned.fill(
@@ -212,7 +215,8 @@ class _TempleAssetMagicActionSheetState
     final requiredStockAmount =
         ((requiredStarForces - requiredTempleAmount) / 2).ceil();
     final actionContext = _data.actionContext!;
-    final canFillStar = requiredStarForces > 0 &&
+    final canFillStar =
+        requiredStarForces > 0 &&
         _data.sacrifices > 0 &&
         _data.assets >= requiredTempleAmount &&
         actionContext.availableAmount >= requiredStockAmount;
@@ -267,23 +271,23 @@ class _TempleAssetMagicActionSheetState
                 text: '10000',
                 onPressed: _isSubmitting
                     ? null
-                    : () =>
-                        _TempleAssetMagicStateQueries(this)._fillAmount(10000),
+                    : () => _TempleAssetMagicStateQueries(
+                        this,
+                      )._fillAmount(10000),
               ),
               _TempleAssetMagicQuickButtonData(
                 text: '全部',
                 onPressed: _isSubmitting
                     ? null
-                    : () => _TempleAssetMagicStateQueries(this)
-                        ._fillAmount(math.max(0, _data.assets)),
+                    : () => _TempleAssetMagicStateQueries(
+                        this,
+                      )._fillAmount(math.max(0, _data.assets)),
               ),
             ],
           ),
         ],
         if (_isFillStar && !canFillStar)
-          const _TempleAssetMagicInlineWarning(
-            text: '固定资产或活股数量不足',
-          ),
+          const _TempleAssetMagicInlineWarning(text: '固定资产或活股数量不足'),
         const SizedBox(height: 16),
         SizedBox(
           height: 42,
@@ -296,9 +300,7 @@ class _TempleAssetMagicActionSheetState
             onPressed: !_isSubmitting && (!_isFillStar || canFillStar)
                 ? _submitStarForcesAction
                 : null,
-            child: Text(
-              _isSubmitting ? '处理中' : (_isFillStar ? '冲星' : '转化'),
-            ),
+            child: Text(_isSubmitting ? '处理中' : (_isFillStar ? '冲星' : '转化')),
           ),
         ),
       ],
@@ -321,27 +323,38 @@ class _TempleAssetMagicActionSheetState
     final searchItem = item.toSearchItem();
     if (widget.action == TempleAssetMagicAction.fisheye) {
       unawaited(
-        _TempleAssetMagicDialogFlow(this)
-            ._showFisheyeConfirmDialog(searchItem, supplementValue ?? 0),
+        _TempleAssetMagicDialogFlow(
+          this,
+        )._showFisheyeConfirmDialog(searchItem, supplementValue ?? 0),
       );
       return;
     }
 
     setState(() {
       _selectedCharacter = searchItem;
-      _amountController.text =
-          _TempleAssetMagicStateQueries(this)._defaultAmountText;
+      _amountController.text = _TempleAssetMagicStateQueries(
+        this,
+      )._defaultAmountText;
     });
     _stardustDownSacrificesNotifier.value = false;
     if (widget.action == TempleAssetMagicAction.guidepost) {
-      unawaited(_TempleAssetMagicGuidepostFlow(this)
-          ._showGuidepostConfirmDialog(searchItem));
+      unawaited(
+        _TempleAssetMagicGuidepostFlow(
+          this,
+        )._showGuidepostConfirmDialog(searchItem),
+      );
     } else if (widget.action == TempleAssetMagicAction.stardust) {
-      unawaited(_TempleAssetMagicStardustFlow(this)
-          ._showStardustConfirmDialog(searchItem));
+      unawaited(
+        _TempleAssetMagicStardustFlow(
+          this,
+        )._showStardustConfirmDialog(searchItem),
+      );
     } else if (widget.action == TempleAssetMagicAction.starbreak) {
-      unawaited(_TempleAssetMagicDialogFlow(this)
-          ._showDetachedStarbreakConfirmDialog(searchItem));
+      unawaited(
+        _TempleAssetMagicDialogFlow(
+          this,
+        )._showDetachedStarbreakConfirmDialog(searchItem),
+      );
     }
   }
 
@@ -372,8 +385,9 @@ class _TempleAssetMagicActionSheetState
     final submittingFillStar = _isFillStar;
 
     try {
-      final message =
-          await _TempleAssetMagicSubmitLogic(this)._submitStarForces();
+      final message = await _TempleAssetMagicSubmitLogic(
+        this,
+      )._submitStarForces();
       if (!mounted) {
         return;
       }
@@ -392,8 +406,9 @@ class _TempleAssetMagicActionSheetState
 
       if (submittingFillStar) {
         try {
-          await _TempleAssetMagicDialogFlow(this)
-              ._refreshAfterMagicAction(null);
+          await _TempleAssetMagicDialogFlow(
+            this,
+          )._refreshAfterMagicAction(null);
         } catch (_) {}
         if (mounted && _data.starForces >= 10000) {
           setState(() {
@@ -408,7 +423,9 @@ class _TempleAssetMagicActionSheetState
       AppToast.error(
         context,
         text: _TempleAssetMagicSubmitLogic(this)._messageForError(
-            error, '${_TempleAssetMagicStateQueries(this)._actionLabel}失败'),
+          error,
+          '${_TempleAssetMagicStateQueries(this)._actionLabel}失败',
+        ),
       );
     } finally {
       if (mounted) {

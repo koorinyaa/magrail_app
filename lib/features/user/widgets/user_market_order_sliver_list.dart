@@ -35,7 +35,7 @@ class UserMarketOrderSliverList extends StatelessWidget {
 
   /// 委托订单点击回调
   final void Function(UserMarketOrderApiItem item, String? avatarHeroTag)?
-      onOrderTap;
+  onOrderTap;
 
   /// 构建用户委托订单 sliver 列表
   ///
@@ -74,10 +74,7 @@ class UserMarketOrderSkeletonSliverList extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [itemCount] 骨架条目数量
-  const UserMarketOrderSkeletonSliverList({
-    super.key,
-    this.itemCount = 12,
-  });
+  const UserMarketOrderSkeletonSliverList({super.key, this.itemCount = 12});
 
   /// 骨架条目数量
   final int itemCount;
@@ -113,7 +110,8 @@ class _UserMarketOrderDivider extends StatelessWidget {
     return Padding(
       padding: AppSafeAreaInsets.fromLTRB(
         context,
-        left: UserAssetRecordListMetrics.horizontalPadding +
+        left:
+            UserAssetRecordListMetrics.horizontalPadding +
             UserAssetRecordListMetrics.textIndent,
         top: 0,
         right: UserAssetRecordListMetrics.horizontalPadding,

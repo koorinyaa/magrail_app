@@ -70,8 +70,9 @@ class UserBalanceLogRow extends StatelessWidget {
                         padding: const EdgeInsets.only(left: 6),
                         child: UserAssetRecordPill(
                           text: _formatCurrencyChange(item.change),
-                          accentColor:
-                              item.change > 0 ? _increaseColor : _decreaseColor,
+                          accentColor: item.change > 0
+                              ? _increaseColor
+                              : _decreaseColor,
                         ),
                       ),
                     if (item.amount != 0)
@@ -133,10 +134,7 @@ class UserBalanceLogRow extends StatelessWidget {
   String _formatCurrencyChange(double value) {
     final sign = value > 0 ? '+' : '-';
     if (value.abs() >= _compactChangeThreshold) {
-      return '$sign${Formatters.tinygrailCompactValue(
-        value.abs(),
-        prefix: '₵',
-      )}';
+      return '$sign${Formatters.tinygrailCompactValue(value.abs(), prefix: '₵')}';
     }
 
     return '$sign${Formatters.tinygrailCurrency(value.abs())}';
@@ -157,10 +155,7 @@ class _BalanceLogDescription extends StatelessWidget {
   ///
   /// [text] 描述文本
   /// [onCharacterTap] 角色 ID 点击回调
-  const _BalanceLogDescription({
-    required this.text,
-    this.onCharacterTap,
-  });
+  const _BalanceLogDescription({required this.text, this.onCharacterTap});
 
   /// 描述文本
   final String text;
@@ -241,11 +236,7 @@ class _BalanceLogDescription extends StatelessWidget {
     }
 
     if (lastIndex < text.length) {
-      parts.add(
-        _BalanceLogDescriptionPart(
-          text: text.substring(lastIndex),
-        ),
-      );
+      parts.add(_BalanceLogDescriptionPart(text: text.substring(lastIndex)));
     }
 
     return parts;
@@ -258,10 +249,7 @@ final class _BalanceLogDescriptionPart {
   ///
   /// [text] 片段文本
   /// [characterId] 角色 ID
-  const _BalanceLogDescriptionPart({
-    required this.text,
-    this.characterId,
-  });
+  const _BalanceLogDescriptionPart({required this.text, this.characterId});
 
   /// 片段文本
   final String text;

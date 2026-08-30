@@ -37,24 +37,21 @@ class UserWealthRankingSliverList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverFixedExtentList(
       itemExtent: _itemExtent,
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final item = items[index];
-          onItemBuilt(index);
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final item = items[index];
+        onItemBuilt(index);
 
-          return Padding(
-            padding: AppSafeAreaInsets.fromLTRB(
-              context,
-              left: 12,
-              top: 0,
-              right: 12,
-              bottom: 6,
-            ),
-            child: _WealthRankingRow(item: item),
-          );
-        },
-        childCount: items.length,
-      ),
+        return Padding(
+          padding: AppSafeAreaInsets.fromLTRB(
+            context,
+            left: 12,
+            top: 0,
+            right: 12,
+            bottom: 6,
+          ),
+          child: _WealthRankingRow(item: item),
+        );
+      }, childCount: items.length),
     );
   }
 }
@@ -65,10 +62,7 @@ class UserWealthRankingSkeletonList extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [itemCount] 骨架条目数量
-  const UserWealthRankingSkeletonList({
-    super.key,
-    this.itemCount = 20,
-  });
+  const UserWealthRankingSkeletonList({super.key, this.itemCount = 20});
 
   /// 骨架条目数量
   final int itemCount;
@@ -80,21 +74,18 @@ class UserWealthRankingSkeletonList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverFixedExtentList(
       itemExtent: UserWealthRankingSliverList._itemExtent,
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          return Padding(
-            padding: AppSafeAreaInsets.fromLTRB(
-              context,
-              left: 12,
-              top: 0,
-              right: 12,
-              bottom: 6,
-            ),
-            child: const _WealthRankingSkeletonRow(),
-          );
-        },
-        childCount: itemCount,
-      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        return Padding(
+          padding: AppSafeAreaInsets.fromLTRB(
+            context,
+            left: 12,
+            top: 0,
+            right: 12,
+            bottom: 6,
+          ),
+          child: const _WealthRankingSkeletonRow(),
+        );
+      }, childCount: itemCount),
     );
   }
 }
@@ -225,9 +216,7 @@ class _WealthRankingRow extends StatelessWidget {
   /// 创建番市首富排行行
   ///
   /// [item] 番市首富排行条目
-  const _WealthRankingRow({
-    required this.item,
-  });
+  const _WealthRankingRow({required this.item});
 
   /// 番市首富排行条目
   final UserWealthRankingEntry item;
@@ -333,10 +322,7 @@ class _WealthRankingRow extends StatelessWidget {
                     SizedBox(
                       height: 14,
                       child: Text(
-                        '总资产 ${Formatters.tinygrailCompactValue(
-                          item.assets,
-                          prefix: '₵',
-                        )}',
+                        '总资产 ${Formatters.tinygrailCompactValue(item.assets, prefix: '₵')}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -367,10 +353,7 @@ class _WealthRankingRow extends StatelessWidget {
       return;
     }
 
-    context.pushNamed(
-      'userDetail',
-      queryParameters: {'username': item.name},
-    );
+    context.pushNamed('userDetail', queryParameters: {'username': item.name});
   }
 }
 
@@ -379,9 +362,7 @@ class _WealthMetricLine extends StatelessWidget {
   /// 创建番市首富指标行
   ///
   /// [item] 番市首富排行条目
-  const _WealthMetricLine({
-    required this.item,
-  });
+  const _WealthMetricLine({required this.item});
 
   /// 番市首富排行条目
   final UserWealthRankingEntry item;
@@ -405,10 +386,7 @@ class _WealthMetricLine extends StatelessWidget {
         children: [
           Flexible(
             child: Text(
-              '股息 ${Formatters.tinygrailCompactValue(
-                item.share,
-                prefix: '₵',
-              )}',
+              '股息 ${Formatters.tinygrailCompactValue(item.share, prefix: '₵')}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: textStyle,
@@ -417,10 +395,7 @@ class _WealthMetricLine extends StatelessWidget {
           const SizedBox(width: 8),
           Flexible(
             child: Text(
-              '流动 ${Formatters.tinygrailCompactValue(
-                item.totalBalance,
-                prefix: '₵',
-              )}',
+              '流动 ${Formatters.tinygrailCompactValue(item.totalBalance, prefix: '₵')}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: textStyle,
@@ -429,10 +404,7 @@ class _WealthMetricLine extends StatelessWidget {
           const SizedBox(width: 8),
           Flexible(
             child: Text(
-              '初始 ${Formatters.tinygrailCompactValue(
-                item.principal,
-                prefix: '₵',
-              )}',
+              '初始 ${Formatters.tinygrailCompactValue(item.principal, prefix: '₵')}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: textStyle,
@@ -449,9 +421,7 @@ class _RankChangeBadge extends StatelessWidget {
   /// 创建排名变化徽标
   ///
   /// [item] 番市首富排行条目
-  const _RankChangeBadge({
-    required this.item,
-  });
+  const _RankChangeBadge({required this.item});
 
   /// 番市首富排行条目
   final UserWealthRankingEntry item;

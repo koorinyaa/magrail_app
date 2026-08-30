@@ -129,8 +129,8 @@ class _ScratchTicketResultSheetRoutePageState
       curve: Curves.easeOutCubic,
       reverseCurve: Curves.easeInCubic,
     );
-    final barrierOpacity =
-        (1 - (_dragOffset / maxHeight).clamp(0.0, 0.45)).toDouble();
+    final barrierOpacity = (1 - (_dragOffset / maxHeight).clamp(0.0, 0.45))
+        .toDouble();
 
     return Material(
       type: MaterialType.transparency,
@@ -219,14 +219,8 @@ class _ScratchTicketResultSheetRoutePageState
       return;
     }
 
-    _resetAnimation = Tween<double>(
-      begin: _dragOffset,
-      end: 0,
-    ).animate(
-      CurvedAnimation(
-        parent: _resetController,
-        curve: Curves.easeOutCubic,
-      ),
+    _resetAnimation = Tween<double>(begin: _dragOffset, end: 0).animate(
+      CurvedAnimation(parent: _resetController, curve: Curves.easeOutCubic),
     );
     _resetController.forward(from: 0);
   }

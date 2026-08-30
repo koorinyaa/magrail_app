@@ -6,6 +6,7 @@ class AppActivityConfig {
   const AppActivityConfig._();
 
   /// 正式版本使用的活跃统计接口
-  static final Uri? endpoint =
-      kReleaseMode ? Uri.https('metrics.fuyuake.top', '/v1/activity') : null;
+  static final Uri? endpoint = kReleaseMode
+      ? Uri.https('metrics.fuyuake.top', '/v1/activity')
+      : null;
 }

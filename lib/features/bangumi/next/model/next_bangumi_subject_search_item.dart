@@ -68,9 +68,7 @@ final class NextBangumiSubjectSearchItem {
   /// 从 JSON 创建 Next Bangumi 条目搜索结果条目
   ///
   /// [json] 原始搜索结果 JSON
-  factory NextBangumiSubjectSearchItem.fromJson(
-    Map<String, Object?> json,
-  ) {
+  factory NextBangumiSubjectSearchItem.fromJson(Map<String, Object?> json) {
     return NextBangumiSubjectSearchItem.fromSubjectJson(json);
   }
 

@@ -158,10 +158,7 @@ class _TinygrailAuthPageState extends State<TinygrailAuthPage> {
         useMirror: previousValue,
         mirrorHost: _bangumiMirrorHost,
       );
-      AppToast.error(
-        context,
-        text: '保存设置失败，请稍后重试',
-      );
+      AppToast.error(context, text: '保存设置失败，请稍后重试');
     } finally {
       if (mounted) {
         setState(() {
@@ -256,9 +253,7 @@ class _TinygrailAuthPageState extends State<TinygrailAuthPage> {
         return;
       }
 
-      await _showErrorDialog(
-        resolveUserErrorMessage(error, fallback: '授权失败'),
-      );
+      await _showErrorDialog(resolveUserErrorMessage(error, fallback: '授权失败'));
     } finally {
       if (mounted) {
         setState(() {
@@ -365,10 +360,7 @@ class _AuthMirrorSwitchTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Switch(
-              value: value,
-              onChanged: isUpdating ? null : onChanged,
-            ),
+            Switch(value: value, onChanged: isUpdating ? null : onChanged),
           ],
         ),
       ),

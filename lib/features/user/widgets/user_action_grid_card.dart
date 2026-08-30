@@ -130,27 +130,17 @@ class _UserActionGridItem extends StatelessWidget {
   ///
   /// [colorScheme] 当前主题色板
   /// [foregroundColor] 普通入口前景色
-  Widget _buildActionIcon(
-    ColorScheme colorScheme,
-    Color foregroundColor,
-  ) {
+  Widget _buildActionIcon(ColorScheme colorScheme, Color foregroundColor) {
     final icon = _iconForType(action.type);
     if (icon != null) {
-      return Icon(
-        icon,
-        size: 22,
-        color: foregroundColor,
-      );
+      return Icon(icon, size: 22, color: foregroundColor);
     }
 
     final syncRate = this.syncRate;
     if (syncRate == null) {
       return const SizedBox.square(dimension: 22);
     }
-    return _UserSyncRateIndicator(
-      syncRate: syncRate,
-      colorScheme: colorScheme,
-    );
+    return _UserSyncRateIndicator(syncRate: syncRate, colorScheme: colorScheme);
   }
 
   /// 判断菜单入口是否需要强调

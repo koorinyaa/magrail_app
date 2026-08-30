@@ -48,10 +48,7 @@ class UserLinkOverviewCarousel extends StatelessWidget {
 
     if (!showSkeleton && resolvedLinks.isEmpty) {
       return Padding(
-        padding: AppSafeAreaInsets.symmetricHorizontal(
-          context,
-          horizontal: 24,
-        ),
+        padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 24),
         child: const _UserOverviewInlineEmpty(message: '暂无连接'),
       );
     }
@@ -69,9 +66,7 @@ class UserLinkOverviewCarousel extends StatelessWidget {
       clipBehavior: Clip.none,
       itemBuilder: (context, index) {
         if (showSkeleton) {
-          return const _UserLinkSkeletonCard(
-            width: UserLinkCard.defaultWidth,
-          );
+          return const _UserLinkSkeletonCard(width: UserLinkCard.defaultWidth);
         }
 
         return UserLinkCard(
@@ -133,10 +128,7 @@ class UserTempleOverviewCarousel extends StatelessWidget {
 
     if (!showSkeleton && resolvedTemples.isEmpty) {
       return Padding(
-        padding: AppSafeAreaInsets.symmetricHorizontal(
-          context,
-          horizontal: 24,
-        ),
+        padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 24),
         child: const _UserOverviewInlineEmpty(message: '暂无圣殿'),
       );
     }
@@ -194,9 +186,7 @@ class _UserOverviewInlineEmpty extends StatelessWidget {
   /// 创建用户角色资产行内空状态
   ///
   /// [message] 空状态文案
-  const _UserOverviewInlineEmpty({
-    required this.message,
-  });
+  const _UserOverviewInlineEmpty({required this.message});
 
   /// 空状态文案
   final String message;
@@ -229,9 +219,7 @@ class _UserLinkSkeletonCard extends StatelessWidget {
   /// 创建用户连接加载骨架卡片
   ///
   /// [width] 卡片宽度
-  const _UserLinkSkeletonCard({
-    required this.width,
-  });
+  const _UserLinkSkeletonCard({required this.width});
 
   /// 卡片宽度
   final double width;
@@ -252,11 +240,7 @@ class _UserLinkSkeletonCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(24),
           ),
           const SizedBox(height: 8),
-          Bone(
-            width: 66,
-            height: 22,
-            borderRadius: BorderRadius.circular(999),
-          ),
+          Bone(width: 66, height: 22, borderRadius: BorderRadius.circular(999)),
         ],
       ),
     );
@@ -269,10 +253,7 @@ class _UserTempleSkeletonCard extends StatelessWidget {
   ///
   /// [width] 卡片宽度
   /// [height] 卡片高度
-  const _UserTempleSkeletonCard({
-    required this.width,
-    required this.height,
-  });
+  const _UserTempleSkeletonCard({required this.width, required this.height});
 
   /// 卡片宽度
   final double width;

@@ -1,5 +1,6 @@
 part of 'character_detail_controller.dart';
 
+/// 角色详情用户资产状态操作
 extension _CharacterDetailControllerUserAssets on CharacterDetailController {
   /// 静默刷新当前用户在指定角色上的资产
   ///
@@ -52,8 +53,9 @@ extension _CharacterDetailControllerUserAssets on CharacterDetailController {
           results[0] as TinygrailPage<UserCharacterApiItem>;
       final templePage = results[1] as TinygrailPage<UserTempleApiItem>;
       if (_isDisposed ||
-          !_CharacterDetailControllerRefresh(this)
-              ._isExpectedCharacterRefresh(characterId, refreshGeneration)) {
+          !_CharacterDetailControllerRefresh(
+            this,
+          )._isExpectedCharacterRefresh(characterId, refreshGeneration)) {
         return;
       }
 
@@ -75,8 +77,9 @@ extension _CharacterDetailControllerUserAssets on CharacterDetailController {
       }
     } catch (error) {
       if (_isDisposed ||
-          !_CharacterDetailControllerRefresh(this)
-              ._isExpectedCharacterRefresh(characterId, refreshGeneration)) {
+          !_CharacterDetailControllerRefresh(
+            this,
+          )._isExpectedCharacterRefresh(characterId, refreshGeneration)) {
         return;
       }
 

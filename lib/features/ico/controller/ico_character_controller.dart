@@ -11,9 +11,8 @@ class IcoCharacterController extends ChangeNotifier {
   /// 创建 ICO 角色全量列表控制器
   ///
   /// [repository] ICO 角色仓库
-  IcoCharacterController({
-    required IcoCharacterRepository repository,
-  }) : _repository = repository;
+  IcoCharacterController({required IcoCharacterRepository repository})
+    : _repository = repository;
 
   /// ICO 一级页面预览数量
   static const int previewItemCount = 24;
@@ -173,13 +172,15 @@ class IcoCharacterController extends ChangeNotifier {
     final normalizedKeyword = RegExp(r'^#[0-9]+$').hasMatch(rawKeyword)
         ? rawKeyword.substring(1)
         : rawKeyword;
-    final displayItems = sourceItems.where((item) {
-      if (normalizedKeyword.isEmpty) {
-        return true;
-      }
-      return item.characterId.toString().contains(normalizedKeyword) ||
-          item.name.toLowerCase().contains(normalizedKeyword);
-    }).toList(growable: false);
+    final displayItems = sourceItems
+        .where((item) {
+          if (normalizedKeyword.isEmpty) {
+            return true;
+          }
+          return item.characterId.toString().contains(normalizedKeyword) ||
+              item.name.toLowerCase().contains(normalizedKeyword);
+        })
+        .toList(growable: false);
     if (_selectedSort != IcoCharacterSort.endingSoon) {
       displayItems.sort(_compareItems);
     }
@@ -196,10 +197,10 @@ class IcoCharacterController extends ChangeNotifier {
       IcoCharacterSort.maxValue => right.total.compareTo(left.total),
       IcoCharacterSort.maxUsers => right.users.compareTo(left.users),
       IcoCharacterSort.recentActive => _compareTime(
-          left.last,
-          right.last,
-          latestFirst: true,
-        ),
+        left.last,
+        right.last,
+        latestFirst: true,
+      ),
     };
     return comparison != 0
         ? comparison
@@ -211,11 +212,7 @@ class IcoCharacterController extends ChangeNotifier {
   /// [left] 左侧 ICO 角色
   /// [right] 右侧 ICO 角色
   int _compareEndingSoon(IcoCharacterEntry left, IcoCharacterEntry right) {
-    final comparison = _compareTime(
-      left.end,
-      right.end,
-      latestFirst: false,
-    );
+    final comparison = _compareTime(left.end, right.end, latestFirst: false);
     return comparison != 0
         ? comparison
         : left.characterId.compareTo(right.characterId);
@@ -226,11 +223,7 @@ class IcoCharacterController extends ChangeNotifier {
   /// [left] 左侧服务端时间
   /// [right] 右侧服务端时间
   /// [latestFirst] 是否将较新的时间排在前面
-  int _compareTime(
-    String left,
-    String right, {
-    required bool latestFirst,
-  }) {
+  int _compareTime(String left, String right, {required bool latestFirst}) {
     final leftTime = TinygrailFormatters.parseServerTime(left);
     final rightTime = TinygrailFormatters.parseServerTime(right);
     if (leftTime == null || rightTime == null) {

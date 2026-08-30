@@ -23,8 +23,8 @@ class UserAssetSnapshotDatabase {
   UserAssetSnapshotDatabase({
     String databasePath = 'user_assets.sqlite',
     Duration cacheLifetime = userAssetCacheLifetime,
-  })  : _databasePath = databasePath,
-        _cacheLifetime = cacheLifetime;
+  }) : _databasePath = databasePath,
+       _cacheLifetime = cacheLifetime;
 
   // 同一路径在应用进程内共享单连接，持久化快照与临时快照保持存储隔离
   static final Map<String, sqflite.Database> _databases = {};
@@ -247,8 +247,7 @@ class UserAssetSnapshotDatabase {
                 'FROM $_characterTableName c '
                 'WHERE c.username = ? ${searchFilter.clause}',
                 [username, ...searchFilter.arguments],
-              ))
-                  .firstOrNull?['total_count'],
+              )).firstOrNull?['total_count'],
             );
       final rows = await transaction.rawQuery(
         'SELECT c.character_id, c.payload_json '
@@ -256,12 +255,7 @@ class UserAssetSnapshotDatabase {
         'WHERE c.username = ? ${searchFilter.clause} '
         'ORDER BY ${_characterOrderBy(sort, direction)} '
         'LIMIT ? OFFSET ?',
-        [
-          username,
-          ...searchFilter.arguments,
-          pageSize,
-          (page - 1) * pageSize,
-        ],
+        [username, ...searchFilter.arguments, pageSize, (page - 1) * pageSize],
       );
       return TinygrailPage(
         items: List<UserAssetSnapshotPayload>.unmodifiable(
@@ -336,8 +330,9 @@ class UserAssetSnapshotDatabase {
         'WHERE username = ? AND star_forces >= ?',
         [username, starlightTempleStarForcesThreshold],
       );
-      final totalItems =
-          countRows.isEmpty ? 0 : _rowInt(countRows.first['total_count']);
+      final totalItems = countRows.isEmpty
+          ? 0
+          : _rowInt(countRows.first['total_count']);
       final rows = await transaction.query(
         _templeTableName,
         columns: const ['temple_id', 'payload_json'],
@@ -427,8 +422,7 @@ class UserAssetSnapshotDatabase {
                 'SELECT COUNT(*) AS total_count FROM $_templeTableName t '
                 'WHERE t.username = ? ${searchFilter.clause}',
                 [username, ...searchFilter.arguments],
-              ))
-                  .firstOrNull?['total_count'],
+              )).firstOrNull?['total_count'],
             );
       final rows = await transaction.rawQuery(
         'SELECT t.temple_id, t.character_id, t.name, t.assets, '
@@ -437,12 +431,7 @@ class UserAssetSnapshotDatabase {
         't.payload_json FROM $_templeTableName t '
         'WHERE t.username = ? ${searchFilter.clause} '
         'ORDER BY ${_templeOrderBy(sort, direction)} LIMIT ? OFFSET ?',
-        [
-          username,
-          ...searchFilter.arguments,
-          pageSize,
-          (page - 1) * pageSize,
-        ],
+        [username, ...searchFilter.arguments, pageSize, (page - 1) * pageSize],
       );
       return TinygrailPage(
         items: List<UserTempleSnapshotPayload>.unmodifiable(

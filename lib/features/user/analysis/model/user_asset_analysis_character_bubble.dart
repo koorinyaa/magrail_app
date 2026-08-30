@@ -20,8 +20,9 @@ List<UserAssetAnalysisCharacterBubble> buildUserAssetAnalysisCharacterBubbles({
       return _MutableCharacterBubble(character.characterId);
     });
     bubble.applyCharacter(character);
-    bubble.characterDividend +=
-        userAssetAnalysisCharacterTotalDividend(character);
+    bubble.characterDividend += userAssetAnalysisCharacterTotalDividend(
+      character,
+    );
     bubble.characterShares += character.userTotal;
   }
   for (final temple in temples) {
@@ -38,19 +39,18 @@ List<UserAssetAnalysisCharacterBubble> buildUserAssetAnalysisCharacterBubbles({
 
   final result =
       bubbles.values.map((bubble) => bubble.toBubble()).where((bubble) {
-    return bubble.totalDividend > 0 || bubble.totalAssets > 0;
-  }).toList()
-        ..sort((a, b) {
-          final dividendCompare = b.totalDividend.compareTo(a.totalDividend);
-          if (dividendCompare != 0) {
-            return dividendCompare;
-          }
-          final assetsCompare = b.totalAssets.compareTo(a.totalAssets);
-          if (assetsCompare != 0) {
-            return assetsCompare;
-          }
-          return a.characterId.compareTo(b.characterId);
-        });
+        return bubble.totalDividend > 0 || bubble.totalAssets > 0;
+      }).toList()..sort((a, b) {
+        final dividendCompare = b.totalDividend.compareTo(a.totalDividend);
+        if (dividendCompare != 0) {
+          return dividendCompare;
+        }
+        final assetsCompare = b.totalAssets.compareTo(a.totalAssets);
+        if (assetsCompare != 0) {
+          return assetsCompare;
+        }
+        return a.characterId.compareTo(b.characterId);
+      });
   return List<UserAssetAnalysisCharacterBubble>.unmodifiable(result);
 }
 
@@ -80,9 +80,7 @@ class UserAssetAnalysisCharacterBubble {
   /// 从缓存 JSON 创建角色圆图气泡
   ///
   /// [json] 角色圆图气泡 JSON
-  factory UserAssetAnalysisCharacterBubble.fromJson(
-    Map<String, Object?> json,
-  ) {
+  factory UserAssetAnalysisCharacterBubble.fromJson(Map<String, Object?> json) {
     if (!json.containsKey('characterShares') ||
         !json.containsKey('templeAssets')) {
       throw const FormatException('角色气泡缓存字段缺失');
@@ -95,12 +93,8 @@ class UserAssetAnalysisCharacterBubble {
       characterDividend: TinygrailResponseParser.asDouble(
         json['characterDividend'],
       ),
-      templeDividend: TinygrailResponseParser.asDouble(
-        json['templeDividend'],
-      ),
-      characterShares: TinygrailResponseParser.asInt(
-        json['characterShares'],
-      ),
+      templeDividend: TinygrailResponseParser.asDouble(json['templeDividend']),
+      characterShares: TinygrailResponseParser.asInt(json['characterShares']),
       templeAssets: TinygrailResponseParser.asInt(json['templeAssets']),
     );
   }

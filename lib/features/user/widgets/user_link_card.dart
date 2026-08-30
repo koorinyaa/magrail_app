@@ -86,10 +86,7 @@ class UserLinkCard extends StatelessWidget {
 
     return SizedBox(
       width: width,
-      height: heightForWidth(
-        width,
-        showConnectionValue: showConnectionValue,
-      ),
+      height: heightForWidth(width, showConnectionValue: showConnectionValue),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -102,8 +99,9 @@ class UserLinkCard extends StatelessWidget {
             ),
             leftHeroTag: heroTagFor(heroTagPrefix, left),
             onLeftCoverTap: () => _openImageViewer(context, left),
-            onLeftCharacterTap:
-                onCharacterTap == null ? null : () => onCharacterTap!(left),
+            onLeftCharacterTap: onCharacterTap == null
+                ? null
+                : () => onCharacterTap!(left),
             onLeftAssetTap: onAssetTap == null ? null : () => onAssetTap!(left),
             rightCoverUrl: TinygrailAssetUrls.getSmallCover(right.cover),
             rightAvatarUrl: TinygrailAssetUrls.normalizeAvatar(right.avatar),
@@ -112,10 +110,12 @@ class UserLinkCard extends StatelessWidget {
             ),
             rightHeroTag: heroTagFor(heroTagPrefix, right),
             onRightCoverTap: () => _openImageViewer(context, right),
-            onRightCharacterTap:
-                onCharacterTap == null ? null : () => onCharacterTap!(right),
-            onRightAssetTap:
-                onAssetTap == null ? null : () => onAssetTap!(right),
+            onRightCharacterTap: onCharacterTap == null
+                ? null
+                : () => onCharacterTap!(right),
+            onRightAssetTap: onAssetTap == null
+                ? null
+                : () => onAssetTap!(right),
           ),
           if (showConnectionValue) ...[
             const SizedBox(height: 8),
@@ -142,10 +142,7 @@ class UserLinkCard extends StatelessWidget {
   ///
   /// [context] 当前组件树上下文
   /// [temple] 用户圣殿接口条目
-  void _openImageViewer(
-    BuildContext context,
-    UserTempleApiItem temple,
-  ) {
+  void _openImageViewer(BuildContext context, UserTempleApiItem temple) {
     final coverUrl = TinygrailAssetUrls.getLargeCover(temple.cover);
     final avatarUrl = TinygrailAssetUrls.normalizeAvatar(temple.avatar);
     final imageUrl = coverUrl.isNotEmpty ? coverUrl : avatarUrl;

@@ -1,5 +1,6 @@
 part of '../temple_asset_magic_action_sheet.dart';
 
+/// 圣殿资产魔法道具确认弹窗流程
 extension _TempleAssetMagicDialogFlow on _TempleAssetMagicActionSheetState {
   /// 显示鲤鱼之眼目标确认弹窗
   ///
@@ -45,17 +46,18 @@ extension _TempleAssetMagicDialogFlow on _TempleAssetMagicActionSheetState {
         }
 
         try {
-          message =
-              await _TempleAssetMagicSubmitLogic(this)._submitFisheyeForTarget(
-            consumeCharacterId: data.characterId,
-            targetCharacterId: item.characterId,
-          );
+          message = await _TempleAssetMagicSubmitLogic(this)
+              ._submitFisheyeForTarget(
+                consumeCharacterId: data.characterId,
+                targetCharacterId: item.characterId,
+              );
         } catch (error) {
           if (dialogContext.mounted) {
             AppToast.error(
               dialogContext,
-              text: _TempleAssetMagicSubmitLogic(this)
-                  ._messageForError(error, '鲤鱼之眼失败'),
+              text: _TempleAssetMagicSubmitLogic(
+                this,
+              )._messageForError(error, '鲤鱼之眼失败'),
             );
           }
           return false;
@@ -146,11 +148,9 @@ extension _TempleAssetMagicDialogFlow on _TempleAssetMagicActionSheetState {
                 return _TempleAssetStarbreakConfirmContent(
                   data: currentData,
                   target: currentTarget,
-                  rateText:
-                      _TempleAssetMagicStateQueries(this)._starbreakRateForData(
-                    currentData,
-                    currentTarget,
-                  ),
+                  rateText: _TempleAssetMagicStateQueries(
+                    this,
+                  )._starbreakRateForData(currentData, currentTarget),
                 );
               },
             );
@@ -161,10 +161,10 @@ extension _TempleAssetMagicDialogFlow on _TempleAssetMagicActionSheetState {
         onConfirm: () async {
           final message = await _TempleAssetMagicStarbreakFlow(this)
               ._submitDetachedStarbreakFromDialog(
-            dialogContext: dialogContext,
-            dataNotifier: dataNotifier,
-            targetNotifier: targetNotifier,
-          );
+                dialogContext: dialogContext,
+                dataNotifier: dataNotifier,
+                targetNotifier: targetNotifier,
+              );
           if (message != null && dialogContext.mounted) {
             AppToast.info(dialogContext, text: message);
           }
@@ -216,9 +216,7 @@ extension _TempleAssetMagicDialogFlow on _TempleAssetMagicActionSheetState {
     required Future<TinygrailCharacterRewardItem?> Function() onRetry,
   }) async {
     final targetContext = dialogContext ?? context;
-    final resultNotifier = ValueNotifier<TinygrailCharacterRewardItem>(
-      result,
-    );
+    final resultNotifier = ValueNotifier<TinygrailCharacterRewardItem>(result);
     var isResultDialogOpen = true;
 
     try {
@@ -252,8 +250,9 @@ extension _TempleAssetMagicDialogFlow on _TempleAssetMagicActionSheetState {
 
   /// 从混沌魔方确认区显示结果弹窗
   Future<void> _showChaosResultDialogFromConfirm() async {
-    final result =
-        await _TempleAssetMagicChaosFlow(this)._submitChaosCubeFromDialog();
+    final result = await _TempleAssetMagicChaosFlow(
+      this,
+    )._submitChaosCubeFromDialog();
     if (result == null || !mounted) {
       return;
     }
@@ -269,8 +268,9 @@ extension _TempleAssetMagicDialogFlow on _TempleAssetMagicActionSheetState {
     await _showMagicDrawResultDialog(
       result,
       dialogContext: dialogContext,
-      onRetry: () => _TempleAssetMagicChaosFlow(this)
-          ._submitChaosCubeFromResultDialog(dialogContext),
+      onRetry: () => _TempleAssetMagicChaosFlow(
+        this,
+      )._submitChaosCubeFromResultDialog(dialogContext),
     );
   }
 

@@ -13,10 +13,7 @@ extension _TempleAssetMagicGuidepostFlow on _TempleAssetMagicActionSheetState {
       context,
       title: '',
       message: '',
-      content: _TempleAssetGuidepostConfirmContent(
-        data: _data,
-        target: item,
-      ),
+      content: _TempleAssetGuidepostConfirmContent(data: _data, target: item),
       confirmText: 'POST',
       showCancelButton: false,
       onConfirm: () async {
@@ -69,8 +66,9 @@ extension _TempleAssetMagicGuidepostFlow on _TempleAssetMagicActionSheetState {
     });
 
     try {
-      final result =
-          await _TempleAssetMagicSubmitLogic(this)._submitGuidepost();
+      final result = await _TempleAssetMagicSubmitLogic(
+        this,
+      )._submitGuidepost();
       if (!mounted) {
         return null;
       }

@@ -103,9 +103,10 @@ Future<void> showTempleAssetCardDialogFromSource(
         opacity: curvedAnimation,
         child: ScaleTransition(
           scale: animation.drive(
-            Tween<double>(begin: 0.98, end: 1).chain(
-              CurveTween(curve: Curves.easeOutCubic),
-            ),
+            Tween<double>(
+              begin: 0.98,
+              end: 1,
+            ).chain(CurveTween(curve: Curves.easeOutCubic)),
           ),
           child: child,
         ),
@@ -184,10 +185,7 @@ class _TempleAssetSourceDialogContentState
       builder: (context, snapshot) {
         final data = snapshot.data;
         if (data != null) {
-          return TempleAssetCard(
-            data: data,
-            enableCoverPreview: false,
-          );
+          return TempleAssetCard(data: data, enableCoverPreview: false);
         }
 
         if (snapshot.hasError) {
@@ -257,8 +255,9 @@ class _TempleAssetSourceDialogContentState
         characterIds: [widget.source.characterId],
       ),
       if (_shouldShowActions)
-        widget.characterRepository
-            .fetchCurrentUserTrading(widget.source.characterId)
+        widget.characterRepository.fetchCurrentUserTrading(
+          widget.source.characterId,
+        )
       else
         Future<CharacterDetailUserTrading?>.value(),
     ]);
@@ -269,10 +268,7 @@ class _TempleAssetSourceDialogContentState
     if (temple == null) {
       throw StateError('圣殿不存在或已失效');
     }
-    return _buildData(
-      temple: temple,
-      trading: trading,
-    );
+    return _buildData(temple: temple, trading: trading);
   }
 
   /// 查找当前角色对应的圣殿
@@ -426,10 +422,7 @@ class _TempleAssetDialogFailedPanel extends StatelessWidget {
           ),
         ],
       ),
-      child: AppLoadFailedState(
-        message: message,
-        onActionPressed: onRetry,
-      ),
+      child: AppLoadFailedState(message: message, onActionPressed: onRetry),
     );
   }
 }

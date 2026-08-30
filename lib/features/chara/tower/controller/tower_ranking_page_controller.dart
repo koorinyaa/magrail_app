@@ -12,8 +12,8 @@ class TowerRankingPageController extends ChangeNotifier {
   TowerRankingPageController({
     required TowerRepository repository,
     this.pageSize = 20,
-  })  : assert(pageSize > 0),
-        _repository = repository {
+  }) : assert(pageSize > 0),
+       _repository = repository {
     _nextPage = _segmentStartPage;
   }
 
@@ -97,14 +97,17 @@ class TowerRankingPageController extends ChangeNotifier {
     return entries.isEmpty ? null : _pageErrors[_nextPage];
   }
 
+  /// 计算通天塔榜单允许加载的最大页码
   int get _maxPage {
     return (displayLimit / pageSize).ceil();
   }
 
+  /// 计算当前通天塔分段的起始页码
   int get _segmentStartPage {
     return ((selectedStartRank - 1) ~/ pageSize) + 1;
   }
 
+  /// 计算当前通天塔分段的结束页码
   int get _segmentEndPage {
     final page = ((selectedEndRank - 1) ~/ pageSize) + 1;
     return page > _maxPage ? _maxPage : page;
@@ -160,19 +163,12 @@ class TowerRankingPageController extends ChangeNotifier {
   ///
   /// [page] 目标页码
   /// [force] 是否忽略已加载状态重新请求
-  Future<void> loadPage(
-    int page, {
-    bool force = false,
-  }) async {
+  Future<void> loadPage(int page, {bool force = false}) async {
     if (_isDisposed) {
       return;
     }
 
-    final entries = await _loadPage(
-      page,
-      force: force,
-      reportError: true,
-    );
+    final entries = await _loadPage(page, force: force, reportError: true);
 
     if (_isDisposed || entries == null) {
       return;
@@ -244,22 +240,23 @@ class TowerRankingPageController extends ChangeNotifier {
         return null;
       }
 
-      final entries = items
-          .map(
-            (item) => TowerEntry(
-              characterId: item.characterId,
-              rank: item.rank,
-              name: item.name,
-              level: item.level,
-              zeroCount: item.zeroCount,
-              stars: item.stars,
-              starForces: item.starForces,
-              avatarUrl: TinygrailAssetUrls.normalizeAvatar(item.icon),
-            ),
-          )
-          .where((entry) => entry.rank > 0 && entry.rank <= displayLimit)
-          .toList(growable: false)
-        ..sort((a, b) => a.rank.compareTo(b.rank));
+      final entries =
+          items
+              .map(
+                (item) => TowerEntry(
+                  characterId: item.characterId,
+                  rank: item.rank,
+                  name: item.name,
+                  level: item.level,
+                  zeroCount: item.zeroCount,
+                  stars: item.stars,
+                  starForces: item.starForces,
+                  avatarUrl: TinygrailAssetUrls.normalizeAvatar(item.icon),
+                ),
+              )
+              .where((entry) => entry.rank > 0 && entry.rank <= displayLimit)
+              .toList(growable: false)
+            ..sort((a, b) => a.rank.compareTo(b.rank));
 
       _pageErrors.remove(page);
       return entries;

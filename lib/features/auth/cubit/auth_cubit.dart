@@ -1,4 +1,4 @@
-﻿import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:magrail_app/core/auth/tinygrail_auth_repository.dart';
 import 'package:magrail_app/core/utils/user_error_message.dart';
@@ -27,17 +27,14 @@ class AuthState {
   ///
   /// [status] 授权状态
   /// [errorMessage] 错误说明
-  const AuthState._({
-    required this.status,
-    this.errorMessage,
-  });
+  const AuthState._({required this.status, this.errorMessage});
 
   /// 创建“检查中”状态
   const AuthState.checking() : this._(status: AuthStatus.checking);
 
   /// 创建“未授权”状态
   const AuthState.unauthenticated()
-      : this._(status: AuthStatus.unauthenticated);
+    : this._(status: AuthStatus.unauthenticated);
 
   /// 创建“授权中”状态
   const AuthState.authenticating() : this._(status: AuthStatus.authenticating);
@@ -49,9 +46,12 @@ class AuthState {
   ///
   /// [errorMessage] 失败原因
   const AuthState.failure(String errorMessage)
-      : this._(status: AuthStatus.failure, errorMessage: errorMessage);
+    : this._(status: AuthStatus.failure, errorMessage: errorMessage);
 
+  /// 当前授权状态
   final AuthStatus status;
+
+  /// 授权失败说明
   final String? errorMessage;
 
   /// 判断是否忙碌

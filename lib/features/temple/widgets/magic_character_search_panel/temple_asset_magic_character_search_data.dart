@@ -1,5 +1,6 @@
 part of '../temple_asset_magic_character_search_panel.dart';
 
+/// 圣殿资产魔法道具搜索数据操作
 extension _TempleAssetMagicCharacterSearchData
     on TempleAssetMagicCharacterSearchPanelState {
   /// 加载搜索条目附加数值
@@ -37,9 +38,7 @@ extension _TempleAssetMagicCharacterSearchData
       return;
     }
 
-    _loadedSupplementIds.addAll(
-      items.map((item) => item.characterId),
-    );
+    _loadedSupplementIds.addAll(items.map((item) => item.characterId));
     _supplementValues.addAll(values);
   }
 
@@ -61,9 +60,9 @@ extension _TempleAssetMagicCharacterSearchData
       username: username,
       page: 1,
       pageSize: records.length,
-      characterIds: records.map((record) => record.characterId).toList(
-            growable: false,
-          ),
+      characterIds: records
+          .map((record) => record.characterId)
+          .toList(growable: false),
     );
     final itemById = <int, UserCharacterApiItem>{
       for (final item in page.items) item.characterId: item,

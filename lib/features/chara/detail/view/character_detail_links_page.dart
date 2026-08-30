@@ -151,10 +151,7 @@ class _CharacterDetailLinksPageState extends State<CharacterDetailLinksPage> {
               else
                 for (var index = 0; index < groups.length; index++) ...[
                   SliverToBoxAdapter(
-                    child: SizedBox(
-                      key: _groupKeys[index],
-                      height: 0,
-                    ),
+                    child: SizedBox(key: _groupKeys[index], height: 0),
                   ),
                   CharacterDetailLinkGrid(
                     items: groups[index].items,
@@ -229,7 +226,8 @@ class _CharacterDetailLinksPageState extends State<CharacterDetailLinksPage> {
       return;
     }
 
-    final triggerY = MediaQuery.paddingOf(context).top +
+    final triggerY =
+        MediaQuery.paddingOf(context).top +
         SecondaryPageSliverAppBar.defaultToolbarHeight +
         _LinkGroupAppBarBottom.height +
         1;
@@ -292,10 +290,7 @@ class _CharacterDetailLinksPageState extends State<CharacterDetailLinksPage> {
       return;
     }
 
-    context.pushNamed(
-      'userDetail',
-      queryParameters: {'username': username},
-    );
+    context.pushNamed('userDetail', queryParameters: {'username': username});
   }
 
   /// 打开左侧圣殿资产卡片弹窗
@@ -349,7 +344,8 @@ class _CharacterDetailLinksPageState extends State<CharacterDetailLinksPage> {
     CharacterDetailTempleItem item, {
     int? characterId,
   }) {
-    final resolvedCharacterId = characterId ??
+    final resolvedCharacterId =
+        characterId ??
         (item.characterId > 0 ? item.characterId : widget.characterId);
 
     return TempleAssetDialogSource(

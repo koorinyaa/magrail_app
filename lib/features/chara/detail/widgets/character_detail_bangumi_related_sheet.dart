@@ -90,7 +90,8 @@ Future<void> _showCharacterBangumiRelatedSheet(
       const topGap = 32.0;
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
-      final heightCap = mediaQuery.size.height *
+      final heightCap =
+          mediaQuery.size.height *
           (mediaQuery.orientation == Orientation.landscape ? 0.9 : 0.72);
       final maxHeight = availableHeight.clamp(0.0, heightCap).toDouble();
 
@@ -218,11 +219,7 @@ class _CharacterBangumiRelatedSheetHeader extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return AppBottomSheetHeader(
-      icon: icon,
-      title: title,
-      subtitle: subtitle,
-    );
+    return AppBottomSheetHeader(icon: icon, title: title, subtitle: subtitle);
   }
 }
 
@@ -298,10 +295,7 @@ class _CharacterBangumiRelatedEmptyState extends StatelessWidget {
 ///
 /// [characterId] 角色 ID
 /// [characterName] 角色名称
-String _characterBangumiRelatedSubtitle(
-  int characterId,
-  String characterName,
-) {
+String _characterBangumiRelatedSubtitle(int characterId, String characterName) {
   final name = TinygrailFormatters.decodeHtmlEntities(characterName).trim();
   return '#$characterId 「${name.isEmpty ? '角色' : name}」';
 }

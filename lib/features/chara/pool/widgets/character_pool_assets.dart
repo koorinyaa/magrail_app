@@ -59,7 +59,7 @@ class CharacterPoolSliverList extends StatelessWidget {
 
   /// 角色条目点击回调
   final void Function(UserCharacterApiItem item, String? avatarHeroTag)?
-      onCharacterTap;
+  onCharacterTap;
 
   /// 竞拍按钮点击回调
   final ValueChanged<UserCharacterApiItem>? onAuctionPressed;

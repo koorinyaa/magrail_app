@@ -50,7 +50,7 @@ class CharacterRankCarousel extends StatelessWidget {
 
   /// 角色条目点击回调
   final void Function(CharacterRankEntry item, String? avatarHeroTag)?
-      onCharacterTap;
+  onCharacterTap;
 
   /// 构建角色排序横向预览栏
   ///
@@ -120,7 +120,7 @@ class CharacterRankSliverList extends StatelessWidget {
 
   /// 角色条目点击回调
   final void Function(CharacterRankEntry item, String? avatarHeroTag)?
-      onCharacterTap;
+  onCharacterTap;
 
   /// 构建角色排序 sliver 列表
   ///
@@ -195,10 +195,7 @@ class CharacterRankSkeletonSliverList extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [itemCount] 骨架条目数量
-  const CharacterRankSkeletonSliverList({
-    super.key,
-    this.itemCount = 20,
-  });
+  const CharacterRankSkeletonSliverList({super.key, this.itemCount = 20});
 
   /// 骨架条目数量
   final int itemCount;
@@ -272,10 +269,7 @@ class CharacterRankRow extends StatelessWidget {
       avatarHeroTag: avatarHeroTag,
       level: item.level,
       zeroCount: item.zeroCount,
-      metrics: [
-        _buildPrimaryMetric(),
-        _buildSecondaryMetric(),
-      ],
+      metrics: [_buildPrimaryMetric(), _buildSecondaryMetric()],
       trailing: CharacterAssetCurrentPriceChip(
         current: item.current,
         fluctuation: item.fluctuation,
@@ -317,7 +311,8 @@ class CharacterRankRow extends StatelessWidget {
     }
     if (selectedSort == CharacterFullListSort.towerRank) {
       return CharacterAssetMetric(
-        value: '通天塔 '
+        value:
+            '通天塔 '
             '${item.rank <= 0 ? '--' : '${Formatters.groupedNumber(item.rank)}名'}'
             ' · 星之力 ${Formatters.groupedNumber(item.starForces)}',
         isValueMuted: true,
@@ -352,8 +347,8 @@ class CharacterRankRow extends StatelessWidget {
 
     final fluctuationColor =
         CharacterAssetCurrentPriceChip.resolveCurrentPriceColor(
-      item.fluctuation,
-    );
+          item.fluctuation,
+        );
     return CharacterAssetMetric(
       label: '涨跌',
       value: _formatFluctuation(item.fluctuation),
@@ -367,10 +362,7 @@ class CharacterRankRow extends StatelessWidget {
   /// [value] 市值
   String _formatMarketValue(double value) {
     if (value.abs() >= 10000) {
-      return Formatters.tinygrailCompactValue(
-        value.truncate(),
-        prefix: '₵',
-      );
+      return Formatters.tinygrailCompactValue(value.truncate(), prefix: '₵');
     }
 
     return Formatters.tinygrailCurrency(value);
@@ -389,6 +381,7 @@ class CharacterRankRow extends StatelessWidget {
   }
 }
 
+/// 角色排序横向预览主体
 class _CharacterRankCarouselBody extends StatelessWidget {
   /// 创建角色排序横向预览主体
   ///
@@ -411,7 +404,7 @@ class _CharacterRankCarouselBody extends StatelessWidget {
   final bool isLoading;
   final String emptyMessage;
   final Widget Function(BuildContext context, CharacterRankEntry item)
-      itemBuilder;
+  itemBuilder;
 
   /// 构建角色排序横向预览主体
   ///
@@ -423,10 +416,7 @@ class _CharacterRankCarouselBody extends StatelessWidget {
         final screenWidth = constraints.maxWidth.isFinite
             ? constraints.maxWidth
             : MediaQuery.sizeOf(context).width;
-        final columnWidth = math.max(
-          248.0,
-          math.min(318.0, screenWidth - 72),
-        );
+        final columnWidth = math.max(248.0, math.min(318.0, screenWidth - 72));
         final resolvedItems = items ?? <CharacterRankEntry>[];
         final showSkeleton = isLoading && resolvedItems.isEmpty;
 
@@ -441,8 +431,9 @@ class _CharacterRankCarouselBody extends StatelessWidget {
         }
 
         final columns = _buildColumns(resolvedItems);
-        final columnCount =
-            showSkeleton ? _skeletonColumnCount : columns.length;
+        final columnCount = showSkeleton
+            ? _skeletonColumnCount
+            : columns.length;
 
         return SnappingHorizontalListView(
           height: 268,
@@ -498,13 +489,12 @@ class _CharacterRankCarouselBody extends StatelessWidget {
   }
 }
 
+/// 角色排序预览空状态
 class _CharacterRankInlineEmpty extends StatelessWidget {
   /// 创建角色排序预览空状态
   ///
   /// [message] 空状态文案
-  const _CharacterRankInlineEmpty({
-    required this.message,
-  });
+  const _CharacterRankInlineEmpty({required this.message});
 
   final String message;
 

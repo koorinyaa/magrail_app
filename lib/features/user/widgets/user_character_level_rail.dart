@@ -47,8 +47,10 @@ class _UserCharacterLevelRailState extends State<UserCharacterLevelRail> {
           return const SizedBox.shrink();
         }
         final height =
-            (widget.positions.length * UserCharacterLevelRail.itemExtent)
-                .clamp(0.0, constraints.maxHeight);
+            (widget.positions.length * UserCharacterLevelRail.itemExtent).clamp(
+              0.0,
+              constraints.maxHeight,
+            );
         final resolvedItemExtent = height / widget.positions.length;
         final fontSize = resolvedItemExtent.clamp(9.0, 11.0);
         return Align(
@@ -114,11 +116,7 @@ class _UserCharacterLevelRailState extends State<UserCharacterLevelRail> {
   /// [dy] 轨道内纵向位置
   /// [height] 轨道高度
   /// [deduplicateDrag] 是否过滤拖动过程中重复的等级
-  void _selectAt(
-    double dy,
-    double height, {
-    bool deduplicateDrag = false,
-  }) {
+  void _selectAt(double dy, double height, {bool deduplicateDrag = false}) {
     if (widget.positions.isEmpty || height <= 0) {
       return;
     }

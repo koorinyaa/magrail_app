@@ -60,7 +60,8 @@ class _CharacterDetailIcoCountdown {
     final seconds = difference.inSeconds.remainder(60);
 
     return _CharacterDetailIcoCountdown(
-      remainingText: '${_padCountdownNumber(days)}天 '
+      remainingText:
+          '${_padCountdownNumber(days)}天 '
           '${_padCountdownNumber(hours)}时 '
           '${_padCountdownNumber(minutes)}分 '
           '${_padCountdownNumber(seconds)}秒',

@@ -93,7 +93,7 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
   final UserAssetLevelSliverController _levelSliverController =
       UserAssetLevelSliverController();
   late TinygrailPagedListController<UserCharacterApiItem, UserCharacterApiItem>
-      _controller;
+  _controller;
   UserCharacterSnapshotPageController? _snapshotController;
   OtherUserCharacterPageController? _backendController;
   bool _isLoadingPreviousPage = false;
@@ -231,8 +231,9 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
       completedLabel: '没有更多角色了',
       showPaginationFooter: () =>
           !(currentController?.usesVirtualLevelList ?? false),
-      bottomContentPadding:
-          currentController == null ? 24 : CharacterSearchInputBar.height + 48,
+      bottomContentPadding: currentController == null
+          ? 24
+          : CharacterSearchInputBar.height + 48,
     );
     if (currentController == null) {
       return page;
@@ -243,14 +244,16 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
       builder: (context, child) {
         final showLevelRail =
             currentController.sort == UserCharacterSnapshotSort.level &&
-                currentController.levelPositions.isNotEmpty &&
-                !currentController.isInitialLoading &&
-                currentController.items.isNotEmpty;
+            currentController.levelPositions.isNotEmpty &&
+            !currentController.isInitialLoading &&
+            currentController.items.isNotEmpty;
         final mediaPadding = MediaQuery.paddingOf(context);
         final viewInsets = MediaQuery.viewInsetsOf(context);
-        final bottomInset =
-            viewInsets.bottom > 0 ? viewInsets.bottom : mediaPadding.bottom;
-        final railAreaTop = mediaPadding.top +
+        final bottomInset = viewInsets.bottom > 0
+            ? viewInsets.bottom
+            : mediaPadding.bottom;
+        final railAreaTop =
+            mediaPadding.top +
             SecondaryPageSliverAppBar.defaultToolbarHeight +
             UserCharacterSortToolbar.toolbarHeight +
             8;
@@ -259,9 +262,10 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
         final availableRailHeight =
             (MediaQuery.sizeOf(context).height - railAreaTop - railAreaBottom)
                 .clamp(0.0, double.infinity);
-        final railHeight = (currentController.levelPositions.length *
-                UserCharacterLevelRail.itemExtent)
-            .clamp(0.0, availableRailHeight);
+        final railHeight =
+            (currentController.levelPositions.length *
+                    UserCharacterLevelRail.itemExtent)
+                .clamp(0.0, availableRailHeight);
         final railTop = railAreaTop + (availableRailHeight - railHeight) / 2;
         return Stack(
           children: [
@@ -363,10 +367,7 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
       AppToast.error(context, text: '等级跳转失败，请重试');
       return;
     }
-    _levelSliverController.jumpToLevel(
-      level,
-      _scrollController,
-    );
+    _levelSliverController.jumpToLevel(level, _scrollController);
     _isProgrammaticLevelJump = false;
   }
 
@@ -382,8 +383,9 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
     if (controller.usesVirtualLevelList) {
       return _levelSliverController.visibleAbsoluteIndex;
     }
-    final listOffset =
-        _scrollController.offset.clamp(0.0, double.infinity).toDouble();
+    final listOffset = _scrollController.offset
+        .clamp(0.0, double.infinity)
+        .toDouble();
     final itemIndex = UserCharacterAssetSliverList.itemIndexAtListOffset(
       controller.items,
       listOffset,
@@ -457,8 +459,9 @@ class _UserCharacterPageState extends State<UserCharacterPage> {
       final currentItemIndex =
           _readVisibleCharacterIndex() ?? previousItemIndex;
       final replacementIndexOffset = replacementItemIndex - previousItemIndex;
-      final oldIndex =
-          currentItemIndex.clamp(0, controller.items.length - 1).toInt();
+      final oldIndex = currentItemIndex
+          .clamp(0, controller.items.length - 1)
+          .toInt();
       final newIndex = (currentItemIndex + replacementIndexOffset)
           .clamp(0, replacementItems.length - 1)
           .toInt();

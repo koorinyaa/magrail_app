@@ -10,10 +10,12 @@ extension _CharacterSearchPageBangumiLogic on _CharacterSearchPageState {
     final bottomInset = mediaQuery.viewInsets.bottom > 0
         ? mediaQuery.viewInsets.bottom
         : mediaQuery.padding.bottom;
-    final resultRowCount =
-        _bangumiResults.isEmpty ? 0 : _bangumiResults.length * 2 - 1;
-    final emptyText =
-        _bangumiResults.isEmpty ? _bangumiEmptyTextForCurrentKeyword : null;
+    final resultRowCount = _bangumiResults.isEmpty
+        ? 0
+        : _bangumiResults.length * 2 - 1;
+    final emptyText = _bangumiResults.isEmpty
+        ? _bangumiEmptyTextForCurrentKeyword
+        : null;
     final hasFooter = _bangumiResults.isNotEmpty;
     final itemCount =
         1 + resultRowCount + (emptyText == null ? 0 : 1) + (hasFooter ? 1 : 0);
@@ -59,10 +61,7 @@ extension _CharacterSearchPageBangumiLogic on _CharacterSearchPageState {
           item: item,
           status: status,
           avatarUrl: avatarUrl,
-          onTap: () => _selectBangumiCharacter(
-            item,
-            avatarUrl,
-          ),
+          onTap: () => _selectBangumiCharacter(item, avatarUrl),
         );
       },
     );
@@ -293,8 +292,9 @@ extension _CharacterSearchPageBangumiLogic on _CharacterSearchPageState {
         limit: _bangumiSearchPageSize,
         offset: requestedOffset,
       );
-      final existingIds =
-          _bangumiResults.map((item) => item.characterId).toSet();
+      final existingIds = _bangumiResults
+          .map((item) => item.characterId)
+          .toSet();
       final items = page.items
           .where((item) => !existingIds.contains(item.characterId))
           .toList(growable: false);
@@ -382,8 +382,10 @@ extension _CharacterSearchPageBangumiLogic on _CharacterSearchPageState {
     }
 
     final maxIndex = itemCount - 1;
-    final triggerIndex =
-        (maxIndex - (_bangumiSearchPageSize / 2).ceil()).clamp(0, maxIndex);
+    final triggerIndex = (maxIndex - (_bangumiSearchPageSize / 2).ceil()).clamp(
+      0,
+      maxIndex,
+    );
     if (index < triggerIndex || !_canLoadNextBangumiSearchPage) {
       return;
     }

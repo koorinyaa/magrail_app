@@ -6,10 +6,7 @@ class TempleLinkValueChip extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [valueLabel] 连接值文本
-  const TempleLinkValueChip({
-    super.key,
-    required this.valueLabel,
-  });
+  const TempleLinkValueChip({super.key, required this.valueLabel});
 
   /// 连接值文本
   final String valueLabel;

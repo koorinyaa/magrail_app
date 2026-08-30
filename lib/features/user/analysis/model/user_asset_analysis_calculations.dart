@@ -42,9 +42,7 @@ double userAssetAnalysisTempleSingleDividend(UserTempleApiItem item) {
 /// 计算角色持股星光股息
 ///
 /// [item] 用户角色条目
-double userAssetAnalysisCharacterStarlightDividend(
-  UserCharacterApiItem item,
-) {
+double userAssetAnalysisCharacterStarlightDividend(UserCharacterApiItem item) {
   return item.userAmount * _starlightDividendPerStar * item.stars;
 }
 

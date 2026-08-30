@@ -18,8 +18,8 @@ class UserAssetAnalysisRepository {
   const UserAssetAnalysisRepository({
     required UserAssetSnapshotRepository snapshotRepository,
     required UserAssetAnalysisDatabase database,
-  })  : _snapshotRepository = snapshotRepository,
-        _database = database;
+  }) : _snapshotRepository = snapshotRepository,
+       _database = database;
 
   final UserAssetSnapshotRepository _snapshotRepository;
   final UserAssetAnalysisDatabase _database;

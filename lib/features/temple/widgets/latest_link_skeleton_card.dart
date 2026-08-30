@@ -6,11 +6,9 @@ import 'package:skeletonizer/skeletonizer.dart';
 class LatestLinkSkeletonCard extends StatelessWidget {
   /// 创建最新连接加载骨架卡片
   ///
+  /// [key] Flutter 组件标识
   /// [width] 卡片宽度
-  const LatestLinkSkeletonCard({
-    super.key,
-    required this.width,
-  });
+  const LatestLinkSkeletonCard({super.key, required this.width});
 
   /// 卡片宽度
   final double width;

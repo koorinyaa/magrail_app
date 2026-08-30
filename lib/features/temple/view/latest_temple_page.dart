@@ -63,9 +63,8 @@ class _LatestTemplePageState extends State<LatestTemplePage> {
   @override
   void initState() {
     super.initState();
-    _controller = LatestTemplePageController(
-      repository: widget.repository,
-    )..initialize();
+    _controller = LatestTemplePageController(repository: widget.repository)
+      ..initialize();
   }
 
   /// 释放最新圣殿二级页面状态
@@ -122,10 +121,7 @@ class _LatestTemplePageState extends State<LatestTemplePage> {
   ///
   /// [item] 最新圣殿条目
   void _openUser(TempleApiItem item) {
-    context.pushNamed(
-      'userDetail',
-      queryParameters: {'username': item.name},
-    );
+    context.pushNamed('userDetail', queryParameters: {'username': item.name});
   }
 
   /// 打开圣殿资产弹窗

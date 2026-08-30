@@ -126,11 +126,12 @@ extension _BotConfigPageValueHelpers on _BotConfigPageState {
   ///
   /// [config] 当前 bot 配置
   String _configFingerprint(BotConfig config) {
-    final fields = config
-        .toFormFields()
-        .map((entry) => '${entry.key}=${entry.value}')
-        .toList()
-      ..sort();
+    final fields =
+        config
+            .toFormFields()
+            .map((entry) => '${entry.key}=${entry.value}')
+            .toList()
+          ..sort();
     return fields.join('&');
   }
 }

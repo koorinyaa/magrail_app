@@ -29,10 +29,7 @@ class LatestTemplePageController
     required int page,
     required int pageSize,
   }) {
-    return _repository.fetchLatestTemplePage(
-      page: page,
-      pageSize: pageSize,
-    );
+    return _repository.fetchLatestTemplePage(page: page, pageSize: pageSize);
   }
 
   /// 转换最新圣殿展示条目

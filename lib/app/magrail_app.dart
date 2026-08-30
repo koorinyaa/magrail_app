@@ -95,8 +95,8 @@ class _MagrailAppState extends State<MagrailApp> {
           actions: <Type, Action<Intent>>{
             EditableTextTapOutsideIntent:
                 CallbackAction<EditableTextTapOutsideIntent>(
-              onInvoke: _unfocusEditableText,
-            ),
+                  onInvoke: _unfocusEditableText,
+                ),
           },
           child: AnnotatedRegion<SystemUiOverlayStyle>(
             value: _buildSystemOverlayStyle(brightness),
@@ -222,8 +222,9 @@ class _MagrailAppState extends State<MagrailApp> {
       statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
       systemNavigationBarColor: Colors.transparent,
       systemNavigationBarDividerColor: Colors.transparent,
-      systemNavigationBarIconBrightness:
-          isDark ? Brightness.light : Brightness.dark,
+      systemNavigationBarIconBrightness: isDark
+          ? Brightness.light
+          : Brightness.dark,
       systemStatusBarContrastEnforced: false,
       systemNavigationBarContrastEnforced: false,
     );

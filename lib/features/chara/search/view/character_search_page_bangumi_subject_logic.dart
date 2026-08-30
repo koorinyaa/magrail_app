@@ -129,10 +129,7 @@ extension _CharacterSearchPageBangumiSubjectLogic on _CharacterSearchPageState {
       _updateSearchState(() {
         _hasSearched = true;
         _isSearching = false;
-        _errorMessage = _messageForError(
-          error,
-          fallback: '搜索 BGM 条目失败',
-        );
+        _errorMessage = _messageForError(error, fallback: '搜索 BGM 条目失败');
       });
     }
   }
@@ -161,8 +158,9 @@ extension _CharacterSearchPageBangumiSubjectLogic on _CharacterSearchPageState {
         limit: _bangumiSearchPageSize,
         offset: requestedOffset,
       );
-      final existingIds =
-          _bangumiSubjectResults.map((item) => item.subjectId).toSet();
+      final existingIds = _bangumiSubjectResults
+          .map((item) => item.subjectId)
+          .toSet();
       final items = page.items
           .where((item) => !existingIds.contains(item.subjectId))
           .toList(growable: false);
@@ -246,8 +244,10 @@ extension _CharacterSearchPageBangumiSubjectLogic on _CharacterSearchPageState {
     }
 
     final maxIndex = itemCount - 1;
-    final triggerIndex =
-        (maxIndex - (_bangumiSearchPageSize / 2).ceil()).clamp(0, maxIndex);
+    final triggerIndex = (maxIndex - (_bangumiSearchPageSize / 2).ceil()).clamp(
+      0,
+      maxIndex,
+    );
     if (index < triggerIndex || !_canLoadNextBangumiSubjectSearchPage) {
       return;
     }

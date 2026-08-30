@@ -21,10 +21,10 @@ final class UserTempleRepairSheetController extends ChangeNotifier {
     required CharacterDetailRepository characterRepository,
     required UserTempleSnapshotPageController pageController,
     required String username,
-  })  : _snapshotRepository = snapshotRepository,
-        _characterRepository = characterRepository,
-        _pageController = pageController,
-        _username = username.trim();
+  }) : _snapshotRepository = snapshotRepository,
+       _characterRepository = characterRepository,
+       _pageController = pageController,
+       _username = username.trim();
 
   // 批量补塔最多同时提交三个资产重组请求
   static const int _maxConcurrentRepairs = 3;
@@ -76,11 +76,11 @@ final class UserTempleRepairSheetController extends ChangeNotifier {
 
   /// 当前选择的可补塔圣殿
   List<UserTempleRepairEntry> get selectedEntries => [
-        for (final entry in _entries)
-          if (entry.canRepair &&
-              _selectedCharacterIds.contains(entry.temple.characterId))
-            entry,
-      ];
+    for (final entry in _entries)
+      if (entry.canRepair &&
+          _selectedCharacterIds.contains(entry.temple.characterId))
+        entry,
+  ];
 
   /// 初始化抽屉并加载补塔数据
   Future<bool> initialize() {
@@ -98,13 +98,12 @@ final class UserTempleRepairSheetController extends ChangeNotifier {
       return existing;
     }
     late final Future<bool> operation;
-    operation = _loadRepairEntries(
-      preserveSelection: preserveSelection,
-    ).whenComplete(() {
-      if (identical(_reloadOperation, operation)) {
-        _reloadOperation = null;
-      }
-    });
+    operation = _loadRepairEntries(preserveSelection: preserveSelection)
+        .whenComplete(() {
+          if (identical(_reloadOperation, operation)) {
+            _reloadOperation = null;
+          }
+        });
     _reloadOperation = operation;
     return operation;
   }
@@ -155,12 +154,8 @@ final class UserTempleRepairSheetController extends ChangeNotifier {
   /// [onProgress] 单项任务完成后的进度回调
   /// [onRepairsCompleted] 全部补塔请求完成回调，依次传递成功和失败数量
   Future<bool> submitSelected({
-    required void Function(
-      int completed,
-      int total,
-      int succeeded,
-      int failed,
-    ) onProgress,
+    required void Function(int completed, int total, int succeeded, int failed)
+    onProgress,
     required void Function(int succeeded, int failed) onRepairsCompleted,
   }) async {
     final targets = selectedEntries;
@@ -283,8 +278,9 @@ final class UserTempleRepairSheetController extends ChangeNotifier {
         ));
       }
       indexedEntries.sort((left, right) {
-        final damagedComparison =
-            right.entry.damagedAmount.compareTo(left.entry.damagedAmount);
+        final damagedComparison = right.entry.damagedAmount.compareTo(
+          left.entry.damagedAmount,
+        );
         return damagedComparison != 0
             ? damagedComparison
             : left.originalIndex.compareTo(right.originalIndex);
@@ -313,10 +309,7 @@ final class UserTempleRepairSheetController extends ChangeNotifier {
       if (_isDisposed) {
         return false;
       }
-      _errorMessage = resolveUserErrorMessage(
-        error,
-        fallback: '获取受损圣殿失败',
-      );
+      _errorMessage = resolveUserErrorMessage(error, fallback: '获取受损圣殿失败');
       return false;
     } finally {
       if (!_isDisposed) {

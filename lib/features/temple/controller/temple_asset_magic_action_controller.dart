@@ -18,10 +18,7 @@ final class TempleAssetMagicStarbreakRefreshResult {
   ///
   /// [data] 刷新后的圣殿资产卡片数据
   /// [target] 刷新后的目标角色数据
-  const TempleAssetMagicStarbreakRefreshResult({
-    this.data,
-    this.target,
-  });
+  const TempleAssetMagicStarbreakRefreshResult({this.data, this.target});
 
   /// 刷新后的圣殿资产卡片数据
   final TempleAssetCardData? data;
@@ -142,8 +139,8 @@ final class TempleAssetMagicActionController {
   }) async {
     final requiredStarForces = math.max(0, 10000 - data.starForces);
     final requiredTempleAmount = math.min(data.assets, requiredStarForces);
-    var remainingStockAmount =
-        ((requiredStarForces - requiredTempleAmount) / 2).ceil();
+    var remainingStockAmount = ((requiredStarForces - requiredTempleAmount) / 2)
+        .ceil();
 
     if (requiredTempleAmount > 0) {
       await data.actionContext!.magicRepository.convertStarForces(
@@ -269,7 +266,7 @@ final class TempleAssetMagicActionController {
   /// [data] 当前圣殿资产卡片数据
   /// [targetCharacterId] 目标角色 ID
   Future<TempleAssetMagicStarbreakRefreshResult>
-      refreshDetachedStarbreakDialogData({
+  refreshDetachedStarbreakDialogData({
     required TempleAssetCardData data,
     required int targetCharacterId,
   }) async {

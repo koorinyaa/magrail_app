@@ -92,16 +92,14 @@ Future<void> showTempleAssetMagicActionSheet(
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
       // 列表型抽屉保留顶部拖拽空间，避免内容贴到屏幕顶部
-      final heightCap = mediaQuery.size.height *
+      final heightCap =
+          mediaQuery.size.height *
           (mediaQuery.orientation == Orientation.landscape ? 0.9 : 0.86);
       final maxHeight = availableHeight.clamp(0.0, heightCap).toDouble();
 
       return ConstrainedBox(
         constraints: BoxConstraints(maxHeight: maxHeight),
-        child: _TempleAssetMagicActionSheet(
-          action: action,
-          data: data,
-        ),
+        child: _TempleAssetMagicActionSheet(action: action, data: data),
       );
     },
   );

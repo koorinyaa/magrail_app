@@ -1,12 +1,11 @@
 part of '../temple_asset_magic_action_sheet.dart';
 
+/// 圣殿资产魔法道具确认预览
 class _TempleAssetMagicTemplePreview extends StatelessWidget {
   /// 创建魔法道具确认中的当前圣殿
   ///
   /// [data] 当前圣殿资产卡片展示数据
-  const _TempleAssetMagicTemplePreview({
-    required this.data,
-  });
+  const _TempleAssetMagicTemplePreview({required this.data});
 
   /// 当前圣殿资产卡片展示数据
   final TempleAssetCardData data;
@@ -33,7 +32,7 @@ class _TempleAssetMagicTemplePreview extends StatelessWidget {
     );
     final assetLabel = data.hasTemple
         ? '${Formatters.groupedNumber(data.assets)} / '
-            '${Formatters.groupedNumber(data.sacrifices)}'
+              '${Formatters.groupedNumber(data.sacrifices)}'
         : '-- / --';
 
     return Column(
@@ -75,8 +74,9 @@ class _TempleAssetMagicTemplePreview extends StatelessWidget {
                             Positioned(
                               left: 6,
                               top: 6,
-                              child:
-                                  _TempleAssetMagicTempleLevelBadge(data: data),
+                              child: _TempleAssetMagicTempleLevelBadge(
+                                data: data,
+                              ),
                             ),
                         ],
                       ),
@@ -125,9 +125,7 @@ class _TempleAssetMagicTempleLevelBadge extends StatelessWidget {
   /// 创建魔法道具确认中的圣殿等级胶囊
   ///
   /// [data] 当前圣殿资产卡片展示数据
-  const _TempleAssetMagicTempleLevelBadge({
-    required this.data,
-  });
+  const _TempleAssetMagicTempleLevelBadge({required this.data});
 
   /// 当前圣殿资产卡片展示数据
   final TempleAssetCardData data;
@@ -179,10 +177,7 @@ class _TempleAssetMagicTargetPreview extends StatelessWidget {
   ///
   /// [target] 已选择的目标角色
   /// [stockText] 目标角色胶囊文案
-  const _TempleAssetMagicTargetPreview({
-    required this.target,
-    this.stockText,
-  });
+  const _TempleAssetMagicTargetPreview({required this.target, this.stockText});
 
   /// 已选择的目标角色
   final CharacterDetailSearchItem target;

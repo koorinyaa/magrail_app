@@ -39,10 +39,7 @@ class _DonatePage extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 18),
-                    _DonateQrCard(
-                      title: '支付宝',
-                      assetName: _donateAlipayAsset,
-                    ),
+                    _DonateQrCard(title: '支付宝', assetName: _donateAlipayAsset),
                     SizedBox(height: 16),
                     _DonateQrCard(
                       title: '微信支付',
@@ -65,10 +62,7 @@ class _DonateQrCard extends StatelessWidget {
   ///
   /// [title] 收款码标题
   /// [assetName] 收款码资源路径
-  const _DonateQrCard({
-    required this.title,
-    required this.assetName,
-  });
+  const _DonateQrCard({required this.title, required this.assetName});
 
   /// 收款码标题
   final String title;
@@ -127,10 +121,7 @@ class _DonateQrCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       child: Hero(
                         tag: heroTag,
-                        child: Image.asset(
-                          assetName,
-                          fit: BoxFit.contain,
-                        ),
+                        child: Image.asset(assetName, fit: BoxFit.contain),
                       ),
                     ),
                   ),
@@ -159,10 +150,7 @@ class _DonateQrCard extends StatelessWidget {
           );
         },
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
-          );
+          return FadeTransition(opacity: animation, child: child);
         },
       ),
     );

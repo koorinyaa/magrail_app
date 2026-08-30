@@ -24,15 +24,12 @@ final class CharacterDetailTradeDepth {
   ///
   /// [asks] 卖单深度
   /// [bids] 买单深度
-  const CharacterDetailTradeDepth({
-    required this.asks,
-    required this.bids,
-  });
+  const CharacterDetailTradeDepth({required this.asks, required this.bids});
 
   /// 创建空深度信息
   const CharacterDetailTradeDepth.empty()
-      : asks = const <CharacterDetailTradeDepthItem>[],
-        bids = const <CharacterDetailTradeDepthItem>[];
+    : asks = const <CharacterDetailTradeDepthItem>[],
+      bids = const <CharacterDetailTradeDepthItem>[];
 
   /// 卖单深度
   final List<CharacterDetailTradeDepthItem> asks;
@@ -45,12 +42,14 @@ final class CharacterDetailTradeDepth {
   /// [json] 原始深度信息 JSON
   factory CharacterDetailTradeDepth.fromJson(Map<String, Object?> json) {
     return CharacterDetailTradeDepth(
-      asks: TinygrailResponseParser.asObjectList(
+      asks:
+          TinygrailResponseParser.asObjectList(
             json['Asks'],
             CharacterDetailTradeDepthItem.fromJson,
           ) ??
           const <CharacterDetailTradeDepthItem>[],
-      bids: TinygrailResponseParser.asObjectList(
+      bids:
+          TinygrailResponseParser.asObjectList(
             json['Bids'],
             CharacterDetailTradeDepthItem.fromJson,
           ) ??
@@ -121,14 +120,14 @@ final class CharacterDetailUserTrading {
 
   /// 创建空的当前用户角色交易资料
   const CharacterDetailUserTrading.empty()
-      : id = 0,
-        balance = 0,
-        amount = 0,
-        sacrifices = 0,
-        asks = const <CharacterDetailTradeOrder>[],
-        bids = const <CharacterDetailTradeOrder>[],
-        askHistory = const <CharacterDetailTradeHistoryOrder>[],
-        bidHistory = const <CharacterDetailTradeHistoryOrder>[];
+    : id = 0,
+      balance = 0,
+      amount = 0,
+      sacrifices = 0,
+      asks = const <CharacterDetailTradeOrder>[],
+      bids = const <CharacterDetailTradeOrder>[],
+      askHistory = const <CharacterDetailTradeHistoryOrder>[],
+      bidHistory = const <CharacterDetailTradeHistoryOrder>[];
 
   /// 当前用户内部 ID
   final int id;
@@ -181,22 +180,26 @@ final class CharacterDetailUserTrading {
       balance: TinygrailResponseParser.asDouble(json['Balance']),
       amount: TinygrailResponseParser.asInt(json['Amount']),
       sacrifices: TinygrailResponseParser.asInt(json['Sacrifices']),
-      asks: TinygrailResponseParser.asObjectList(
+      asks:
+          TinygrailResponseParser.asObjectList(
             json['Asks'],
             CharacterDetailTradeOrder.fromJson,
           ) ??
           const <CharacterDetailTradeOrder>[],
-      bids: TinygrailResponseParser.asObjectList(
+      bids:
+          TinygrailResponseParser.asObjectList(
             json['Bids'],
             CharacterDetailTradeOrder.fromJson,
           ) ??
           const <CharacterDetailTradeOrder>[],
-      askHistory: TinygrailResponseParser.asObjectList(
+      askHistory:
+          TinygrailResponseParser.asObjectList(
             json['AskHistory'],
             CharacterDetailTradeHistoryOrder.fromJson,
           ) ??
           const <CharacterDetailTradeHistoryOrder>[],
-      bidHistory: TinygrailResponseParser.asObjectList(
+      bidHistory:
+          TinygrailResponseParser.asObjectList(
             json['BidHistory'],
             CharacterDetailTradeHistoryOrder.fromJson,
           ) ??
@@ -324,9 +327,7 @@ final class CharacterDetailTradeHistoryOrder {
   /// 从 JSON 创建角色详情历史成交委托
   ///
   /// [json] 原始历史成交 JSON
-  factory CharacterDetailTradeHistoryOrder.fromJson(
-    Map<String, Object?> json,
-  ) {
+  factory CharacterDetailTradeHistoryOrder.fromJson(Map<String, Object?> json) {
     return CharacterDetailTradeHistoryOrder(
       id: TinygrailResponseParser.asInt(json['Id']),
       userId: TinygrailResponseParser.asInt(json['UserId']),

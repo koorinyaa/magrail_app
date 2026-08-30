@@ -45,7 +45,8 @@ class TinygrailPagedTab<T, R> {
   final Widget Function(
     BuildContext context,
     TinygrailPagedListController<T, R> controller,
-  ) emptySliverBuilder;
+  )
+  emptySliverBuilder;
 
   /// 内容 sliver 构建器
   final TinygrailPagedContentSliversBuilder<T> contentSliversBuilder;
@@ -85,10 +86,10 @@ class TinygrailTabbedPagedSliverPage<T, R> extends StatefulWidget {
     this.scrollToTopToken = 0,
     this.useBlurHeader = true,
     this.useSecondaryTitleStyle = false,
-  })  : assert(tabs.length > 0),
-        assert(initialIndex >= 0),
-        assert(initialIndex < tabs.length),
-        assert(bottomContentPadding >= 0);
+  }) : assert(tabs.length > 0),
+       assert(initialIndex >= 0),
+       assert(initialIndex < tabs.length),
+       assert(bottomContentPadding >= 0);
 
   /// 页面标题
   final String title;
@@ -154,7 +155,8 @@ class _TinygrailTabbedPagedSliverPageState<T, R>
   /// [oldWidget] 更新前的组件配置
   @override
   void didUpdateWidget(
-      covariant TinygrailTabbedPagedSliverPage<T, R> oldWidget) {
+    covariant TinygrailTabbedPagedSliverPage<T, R> oldWidget,
+  ) {
     super.didUpdateWidget(oldWidget);
     if (_selectedIndex >= widget.tabs.length) {
       _selectedIndex = widget.tabs.length - 1;
@@ -179,8 +181,9 @@ class _TinygrailTabbedPagedSliverPageState<T, R>
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final backgroundColor =
-        widget.useBlurHeader ? colorScheme.surface : Colors.transparent;
+    final backgroundColor = widget.useBlurHeader
+        ? colorScheme.surface
+        : Colors.transparent;
     final headerHeight = _TinygrailTabbedPageHeader.visibleHeight(
       context,
       useSecondaryTitleStyle: widget.useSecondaryTitleStyle,
@@ -220,12 +223,7 @@ class _TinygrailTabbedPagedSliverPageState<T, R>
           ? Stack(
               children: [
                 Positioned.fill(child: pageView),
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: header,
-                ),
+                Positioned(top: 0, left: 0, right: 0, child: header),
               ],
             )
           : Column(

@@ -149,9 +149,7 @@ class UserAssetAnalysis {
       characterTotalItems: TinygrailResponseParser.asInt(
         json['characterTotalItems'],
       ),
-      templeTotalItems: TinygrailResponseParser.asInt(
-        json['templeTotalItems'],
-      ),
+      templeTotalItems: TinygrailResponseParser.asInt(json['templeTotalItems']),
       starlightTempleCount: TinygrailResponseParser.asInt(
         json['starlightTempleCount'],
       ),
@@ -177,9 +175,7 @@ class UserAssetAnalysis {
             ) ??
             const <UserAssetAnalysisCharacterBubble>[],
       ),
-      templeCoverage: TinygrailResponseParser.asDouble(
-        json['templeCoverage'],
-      ),
+      templeCoverage: TinygrailResponseParser.asDouble(json['templeCoverage']),
       sourceRevisions: UserAssetDataRevisions.fromJson(sourceRevisionsJson),
     );
   }
@@ -246,12 +242,11 @@ class _UserAssetAnalysisMetrics {
     final templeDividend = _sumDouble(
       temples.map(userAssetAnalysisTempleTotalDividend),
     );
-    final starlightDividend = _sumDouble(
+    final starlightDividend =
+        _sumDouble(
           characters.map(userAssetAnalysisCharacterStarlightDividend),
         ) +
-        _sumDouble(
-          temples.map(userAssetAnalysisTempleStarlightDividend),
-        );
+        _sumDouble(temples.map(userAssetAnalysisTempleStarlightDividend));
     final totalDividend = characterDividend + templeDividend;
     final characterIds = {
       for (final item in characters)
@@ -284,13 +279,12 @@ class _UserAssetAnalysisMetrics {
           share: 0,
         ),
       ],
-      levelBuckets: _buildLevelBuckets(
-        characters,
-        temples,
-      ),
+      levelBuckets: _buildLevelBuckets(characters, temples),
       characterBubbles: _buildCachedCharacterBubbles(characterBubbles),
-      templeCoverage:
-          _safeShare(templeCharacterIds.length, characterIds.length),
+      templeCoverage: _safeShare(
+        templeCharacterIds.length,
+        characterIds.length,
+      ),
     );
   }
 
@@ -305,7 +299,8 @@ class _UserAssetAnalysisMetrics {
       selectedById[bubble.characterId] = bubble;
     }
 
-    final byAssets = [...bubbles]..sort((a, b) {
+    final byAssets = [...bubbles]
+      ..sort((a, b) {
         final assetsCompare = b.totalAssets.compareTo(a.totalAssets);
         if (assetsCompare != 0) {
           return assetsCompare;
@@ -336,8 +331,9 @@ class _UserAssetAnalysisMetrics {
         return _MutableLevelBucket(level);
       });
       bucket.totalShares += character.userTotal;
-      bucket.characterDividend +=
-          userAssetAnalysisCharacterTotalDividend(character);
+      bucket.characterDividend += userAssetAnalysisCharacterTotalDividend(
+        character,
+      );
     }
     for (final temple in temples) {
       final level = temple.characterLevel;
@@ -402,9 +398,7 @@ class UserAssetAnalysisDividendSegment {
   /// 从缓存 JSON 创建股息构成分段
   ///
   /// [json] 股息构成分段 JSON
-  factory UserAssetAnalysisDividendSegment.fromJson(
-    Map<String, Object?> json,
-  ) {
+  factory UserAssetAnalysisDividendSegment.fromJson(Map<String, Object?> json) {
     return UserAssetAnalysisDividendSegment(
       label: TinygrailResponseParser.asString(json['label']),
       value: TinygrailResponseParser.asDouble(json['value']),
@@ -423,11 +417,7 @@ class UserAssetAnalysisDividendSegment {
 
   /// 转换为股息构成分段缓存 JSON
   Map<String, Object?> toJson() {
-    return {
-      'label': label,
-      'value': value,
-      'share': share,
-    };
+    return {'label': label, 'value': value, 'share': share};
   }
 }
 
@@ -449,18 +439,14 @@ class UserAssetAnalysisLevelBucket {
   /// 从缓存 JSON 创建等级分布
   ///
   /// [json] 等级分布 JSON
-  factory UserAssetAnalysisLevelBucket.fromJson(
-    Map<String, Object?> json,
-  ) {
+  factory UserAssetAnalysisLevelBucket.fromJson(Map<String, Object?> json) {
     return UserAssetAnalysisLevelBucket(
       level: TinygrailResponseParser.asInt(json['level']),
       totalShares: TinygrailResponseParser.asInt(json['totalShares']),
       characterDividend: TinygrailResponseParser.asDouble(
         json['characterDividend'],
       ),
-      templeDividend: TinygrailResponseParser.asDouble(
-        json['templeDividend'],
-      ),
+      templeDividend: TinygrailResponseParser.asDouble(json['templeDividend']),
     );
   }
 

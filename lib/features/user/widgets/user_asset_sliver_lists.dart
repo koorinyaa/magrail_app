@@ -62,7 +62,7 @@ class UserCharacterAssetSliverList extends StatelessWidget {
 
   /// 角色条目点击回调
   final void Function(UserCharacterApiItem item, String? avatarHeroTag)?
-      onCharacterTap;
+  onCharacterTap;
 
   /// 构建用户角色资产 sliver 列表
   ///
@@ -184,7 +184,8 @@ class UserCharacterAssetSliverList extends StatelessWidget {
           items[index].level != items[index - 1].level) {
         headerCount += 1;
       }
-      final itemOffset = index * itemExtent +
+      final itemOffset =
+          index * itemExtent +
           (showLevelHeaders ? headerCount * levelHeaderExtent : 0);
       if (resolvedOffset < itemOffset + itemExtent) {
         return index;
@@ -255,7 +256,7 @@ class UserCharacterAssetListItem extends StatelessWidget {
 
   /// 角色条目点击回调
   final void Function(UserCharacterApiItem item, String? avatarHeroTag)?
-      onCharacterTap;
+  onCharacterTap;
 
   /// 构建用户角色资产列表条目
   ///
@@ -381,30 +382,27 @@ class UserIcoAssetSliverList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverFixedExtentList(
       itemExtent: _IcoAssetSliverListMetrics.itemExtent,
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final item = items[index];
-          final avatarUrl = TinygrailAssetUrls.normalizeAvatar(item.icon);
-          final avatarHeroTag = createCharacterDetailAvatarHeroTag(
-            characterId: item.characterId,
-            avatarUrl: avatarUrl,
-            source: item,
-          );
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final item = items[index];
+        final avatarUrl = TinygrailAssetUrls.normalizeAvatar(item.icon);
+        final avatarHeroTag = createCharacterDetailAvatarHeroTag(
+          characterId: item.characterId,
+          avatarUrl: avatarUrl,
+          source: item,
+        );
 
-          onItemBuilt?.call(index);
-          return _AssetListItem(
-            child: UserIcoAssetRow(
-              item: item,
-              avatarHeroTag: avatarHeroTag,
-              hideInvestment: hideInvestment,
-              onTap: onIcoTap == null
-                  ? null
-                  : () => onIcoTap?.call(item, avatarHeroTag),
-            ),
-          );
-        },
-        childCount: items.length,
-      ),
+        onItemBuilt?.call(index);
+        return _AssetListItem(
+          child: UserIcoAssetRow(
+            item: item,
+            avatarHeroTag: avatarHeroTag,
+            hideInvestment: hideInvestment,
+            onTap: onIcoTap == null
+                ? null
+                : () => onIcoTap?.call(item, avatarHeroTag),
+          ),
+        );
+      }, childCount: items.length),
     );
   }
 }
@@ -414,9 +412,7 @@ class _AssetListItem extends StatelessWidget {
   /// 创建用户资产列表条目外层
   ///
   /// [child] 条目主体
-  const _AssetListItem({
-    required this.child,
-  });
+  const _AssetListItem({required this.child});
 
   /// 条目主体
   final Widget child;

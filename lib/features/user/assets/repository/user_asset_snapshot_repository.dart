@@ -49,9 +49,9 @@ class UserAssetSnapshotRepository {
     required UserRepository userRepository,
     required UserAssetSnapshotDatabase database,
     bool protectCurrentUserSession = true,
-  })  : _userRepository = userRepository,
-        _database = database,
-        _protectCurrentUserSession = protectCurrentUserSession;
+  }) : _userRepository = userRepository,
+       _database = database,
+       _protectCurrentUserSession = protectCurrentUserSession;
 
   // 全量资产快照先用 1 条探测总数，再用总数一次取完整列表
   static const int _totalProbePageSize = 1;
@@ -61,7 +61,7 @@ class UserAssetSnapshotRepository {
 
   // 同一用户的角色全量请求合并，避免启动刷新与页面刷新重复访问服务器
   static final Map<String, Future<_AllCharactersResult>>
-      _characterFetchOperations = {};
+  _characterFetchOperations = {};
 
   // 同一用户的圣殿全量请求合并，避免启动刷新与页面刷新重复访问服务器
   static final Map<String, Future<_AllTemplesResult>> _templeFetchOperations =
@@ -351,11 +351,8 @@ class UserAssetSnapshotRepository {
   /// [username] 用户名
   /// [direction] 等级排序方向
   /// [searchKeyword] 角色 ID 或名称筛选词
-  Future<
-      ({
-        List<UserCharacterLevelPosition> positions,
-        int revision,
-      })> readCharacterLevelIndex({
+  Future<({List<UserCharacterLevelPosition> positions, int revision})>
+  readCharacterLevelIndex({
     required String username,
     required UserCharacterSnapshotSortDirection direction,
     required String searchKeyword,
@@ -504,11 +501,8 @@ class UserAssetSnapshotRepository {
   /// [username] 用户名
   /// [direction] 排序方向
   /// [searchKeyword] 角色 ID 或名称筛选词
-  Future<
-      ({
-        List<UserTempleLevelPosition> positions,
-        int revision,
-      })> readTempleLevelIndex({
+  Future<({List<UserTempleLevelPosition> positions, int revision})>
+  readTempleLevelIndex({
     required String username,
     required UserTempleSnapshotSortDirection direction,
     required String searchKeyword,

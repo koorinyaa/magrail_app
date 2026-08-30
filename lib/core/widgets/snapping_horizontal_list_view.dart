@@ -109,8 +109,10 @@ class _SnappingHorizontalListViewState
       builder: (context, constraints) {
         final padding = widget.padding.resolve(Directionality.of(context));
         final viewportWidth = _resolveViewportWidth(context, constraints);
-        final contentWidth =
-            math.max(1.0, viewportWidth - padding.left - padding.right);
+        final contentWidth = math.max(
+          1.0,
+          viewportWidth - padding.left - padding.right,
+        );
         _handleContentWidthChanged(contentWidth);
         final resolvedPadding = EdgeInsetsDirectional.only(
           start: padding.left,

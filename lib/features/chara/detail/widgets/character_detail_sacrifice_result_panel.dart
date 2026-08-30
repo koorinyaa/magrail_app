@@ -13,6 +13,7 @@ class CharacterDetailSacrificeResultPanel extends StatelessWidget {
   /// [mode] 本次提交类型
   /// [result] 提交结果
   /// [onComplete] 完成回调
+  /// [key] Flutter 组件标识
   const CharacterDetailSacrificeResultPanel({
     super.key,
     required this.mode,
@@ -331,10 +332,7 @@ class _SacrificeResultLootSlot extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 6),
-            _SacrificeResultCountChip(
-              count: item.count,
-              itemColor: itemColor,
-            ),
+            _SacrificeResultCountChip(count: item.count, itemColor: itemColor),
           ],
         ),
       ),
@@ -348,10 +346,7 @@ class _SacrificeResultItemIcon extends StatelessWidget {
   ///
   /// [item] 掉落道具
   /// [itemColor] 道具强调色
-  const _SacrificeResultItemIcon({
-    required this.item,
-    required this.itemColor,
-  });
+  const _SacrificeResultItemIcon({required this.item, required this.itemColor});
 
   /// 掉落道具
   final CharacterDetailSacrificeItem item;
@@ -367,8 +362,9 @@ class _SacrificeResultItemIcon extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
     final rawIcon = item.icon.trim();
-    final icon =
-        rawIcon.isEmpty ? '' : TinygrailAssetUrls.normalizeAvatar(rawIcon);
+    final icon = rawIcon.isEmpty
+        ? ''
+        : TinygrailAssetUrls.normalizeAvatar(rawIcon);
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -470,9 +466,7 @@ class _SacrificeResultEmptyDrop extends StatelessWidget {
   /// 创建资产重组无掉落状态
   ///
   /// [accentColor] 强调色
-  const _SacrificeResultEmptyDrop({
-    required this.accentColor,
-  });
+  const _SacrificeResultEmptyDrop({required this.accentColor});
 
   /// 强调色
   final Color accentColor;
@@ -501,11 +495,7 @@ class _SacrificeResultEmptyDrop extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         child: Row(
           children: [
-            Icon(
-              LucideIcons.packageOpen,
-              size: 22,
-              color: accentColor,
-            ),
+            Icon(LucideIcons.packageOpen, size: 22, color: accentColor),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -540,10 +530,7 @@ Color _sacrificeResultAccentColor(CharacterDetailSacrificeMode mode) {
 ///
 /// [item] 掉落道具
 /// [fallback] 兜底颜色
-Color _sacrificeLootColor(
-  CharacterDetailSacrificeItem item,
-  Color fallback,
-) {
+Color _sacrificeLootColor(CharacterDetailSacrificeItem item, Color fallback) {
   if (item.count >= 6) {
     return const Color(0xFFF5A524);
   }

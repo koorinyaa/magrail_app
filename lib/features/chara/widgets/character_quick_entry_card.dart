@@ -147,9 +147,7 @@ class _CharacterPortalCardState extends State<_CharacterPortalCard>
         borderRadius: radius,
         boxShadow: [
           BoxShadow(
-            color: widget.accent.withValues(
-              alpha: isDark ? 0.07 : 0.1,
-            ),
+            color: widget.accent.withValues(alpha: isDark ? 0.07 : 0.1),
             blurRadius: 24,
             spreadRadius: -8,
             offset: const Offset(0, 10),
@@ -181,9 +179,7 @@ class _CharacterPortalCardState extends State<_CharacterPortalCard>
             splashColor: widget.accent.withValues(alpha: 0.14),
             highlightColor: widget.accent.withValues(alpha: 0.07),
             borderRadius: radius,
-            child: _buildCardContent(
-              foregroundColor: foregroundColor,
-            ),
+            child: _buildCardContent(foregroundColor: foregroundColor),
           ),
         ),
       ),
@@ -219,9 +215,7 @@ class _CharacterPortalCardState extends State<_CharacterPortalCard>
               softWrap: false,
               overflow: TextOverflow.visible,
               style: TextStyle(
-                color: foregroundColor.withValues(
-                  alpha: 0.08,
-                ),
+                color: foregroundColor.withValues(alpha: 0.08),
                 fontSize: isProminent ? 39 : 22,
                 fontWeight: FontWeight.w900,
                 fontStyle: FontStyle.italic,
@@ -248,9 +242,7 @@ class _CharacterPortalCardState extends State<_CharacterPortalCard>
         Positioned(
           right: isProminent ? 14 : 9,
           top: isProminent ? 13 : 9,
-          child: _buildArtwork(
-            size: isProminent ? 58 : 26,
-          ),
+          child: _buildArtwork(size: isProminent ? 58 : 26),
         ),
         Positioned(
           left: isProminent ? 14 : 10,
@@ -295,41 +287,32 @@ class _CharacterPortalCardState extends State<_CharacterPortalCard>
   Widget _buildArtwork({required double size}) {
     final logoGradient = Theme.of(context).brightness == Brightness.light
         ? const RadialGradient(
-            colors: [
-              Color(0xFFFFFFFF),
-              Color(0xFFFFFFFF),
-              Color(0x00FFFFFF),
-            ],
+            colors: [Color(0xFFFFFFFF), Color(0xFFFFFFFF), Color(0x00FFFFFF)],
             stops: [0, 0.7, 1],
           )
-        : const RadialGradient(
-            colors: [Color(0xFFFFFFFF), Color(0x00FFFFFF)],
-          );
+        : const RadialGradient(colors: [Color(0xFFFFFFFF), Color(0x00FFFFFF)]);
     return SizedBox.square(
       dimension: size,
       child: switch (widget.artwork) {
         _PortalArtwork.tinygrailLogo => ShaderMask(
-            blendMode: BlendMode.dstIn,
-            shaderCallback: (bounds) => logoGradient.createShader(bounds),
-            child: ClipOval(
-              child: Image.asset(
-                'assets/images/tinygrail/tinygrail_logo.jpg',
-                fit: BoxFit.cover,
-              ),
+          blendMode: BlendMode.dstIn,
+          shaderCallback: (bounds) => logoGradient.createShader(bounds),
+          child: ClipOval(
+            child: Image.asset(
+              'assets/images/tinygrail/tinygrail_logo.jpg',
+              fit: BoxFit.cover,
             ),
           ),
+        ),
         _PortalArtwork.torii => SvgPicture.asset(
-            'assets/icons/torii.svg',
-            colorFilter: ColorFilter.mode(
-              widget.accent,
-              BlendMode.srcIn,
-            ),
-          ),
+          'assets/icons/torii.svg',
+          colorFilter: ColorFilter.mode(widget.accent, BlendMode.srcIn),
+        ),
         _PortalArtwork.delistingWarning => Icon(
-            LucideIcons.calendarClock,
-            size: size,
-            color: widget.accent,
-          ),
+          LucideIcons.calendarClock,
+          size: size,
+          color: widget.accent,
+        ),
       },
     );
   }

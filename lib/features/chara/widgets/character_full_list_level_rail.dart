@@ -116,11 +116,7 @@ class _CharacterFullListLevelRailState
   /// [dy] 轨道内纵向位置
   /// [height] 轨道高度
   /// [deduplicateDrag] 是否过滤拖动过程中重复的等级
-  void _selectAt(
-    double dy,
-    double height, {
-    bool deduplicateDrag = false,
-  }) {
+  void _selectAt(double dy, double height, {bool deduplicateDrag = false}) {
     if (widget.positions.isEmpty || height <= 0) {
       return;
     }

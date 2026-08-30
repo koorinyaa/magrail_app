@@ -13,10 +13,7 @@ class UserItemRow extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [item] 用户道具条目
-  const UserItemRow({
-    super.key,
-    required this.item,
-  });
+  const UserItemRow({super.key, required this.item});
 
   /// 用户道具条目
   final UserItemApiItem item;
@@ -143,9 +140,7 @@ class _UserItemIcon extends StatelessWidget {
   /// 创建用户道具图标
   ///
   /// [imageUrl] 图标地址
-  const _UserItemIcon({
-    required this.imageUrl,
-  });
+  const _UserItemIcon({required this.imageUrl});
 
   /// 图标地址
   final String imageUrl;

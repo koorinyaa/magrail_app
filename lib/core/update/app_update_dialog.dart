@@ -60,7 +60,8 @@ String _updateMessage({
   required AppReleaseInfo release,
 }) {
   final body = _compactReleaseBody(release.body);
-  final baseMessage = '当前版本：$currentVersion\n'
+  final baseMessage =
+      '当前版本：$currentVersion\n'
       '最新版本：${release.version}';
   if (body.isEmpty) {
     return baseMessage;

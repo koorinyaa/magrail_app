@@ -67,11 +67,7 @@ class IcoCharacterSliverList extends StatelessWidget {
   /// [key] Flutter 组件标识
   /// [items] ICO 角色条目
   /// [onIcoTap] ICO 条目点击回调
-  const IcoCharacterSliverList({
-    super.key,
-    required this.items,
-    this.onIcoTap,
-  });
+  const IcoCharacterSliverList({super.key, required this.items, this.onIcoTap});
 
   /// ICO 角色条目
   final List<IcoCharacterEntry> items;
@@ -86,37 +82,34 @@ class IcoCharacterSliverList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverFixedExtentList(
       itemExtent: _IcoCharacterListMetrics.itemExtent,
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final item = items[index];
-          final avatarUrl = TinygrailAssetUrls.normalizeAvatar(item.icon);
-          final avatarHeroTag = createCharacterDetailAvatarHeroTag(
-            characterId: item.characterId,
-            avatarUrl: avatarUrl,
-            source: item,
-          );
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final item = items[index];
+        final avatarUrl = TinygrailAssetUrls.normalizeAvatar(item.icon);
+        final avatarHeroTag = createCharacterDetailAvatarHeroTag(
+          characterId: item.characterId,
+          avatarUrl: avatarUrl,
+          source: item,
+        );
 
-          return CharacterAssetListItemShell(
-            showDivider: index < items.length - 1,
-            child: IcoCharacterRow(
-              item: item,
-              avatarHeroTag: avatarHeroTag,
-              onTap: onIcoTap == null
-                  ? null
-                  : () => onIcoTap?.call(item, avatarHeroTag),
-              contentPadding: AppSafeAreaInsets.fromLTRB(
-                context,
-                left: 18,
-                top: 0,
-                right: 18,
-                bottom: 0,
-              ),
-              tapBorderRadius: BorderRadius.zero,
+        return CharacterAssetListItemShell(
+          showDivider: index < items.length - 1,
+          child: IcoCharacterRow(
+            item: item,
+            avatarHeroTag: avatarHeroTag,
+            onTap: onIcoTap == null
+                ? null
+                : () => onIcoTap?.call(item, avatarHeroTag),
+            contentPadding: AppSafeAreaInsets.fromLTRB(
+              context,
+              left: 18,
+              top: 0,
+              right: 18,
+              bottom: 0,
             ),
-          );
-        },
-        childCount: items.length,
-      ),
+            tapBorderRadius: BorderRadius.zero,
+          ),
+        );
+      }, childCount: items.length),
     );
   }
 }

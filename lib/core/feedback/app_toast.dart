@@ -106,10 +106,7 @@ class AppToast {
   ///
   /// [context] 当前组件树上下文
   /// [text] 提示正文
-  static void info(
-    BuildContext context, {
-    required String text,
-  }) {
+  static void info(BuildContext context, {required String text}) {
     show(context, text: text);
   }
 
@@ -117,15 +114,8 @@ class AppToast {
   ///
   /// [context] 当前组件树上下文
   /// [text] 提示正文
-  static void error(
-    BuildContext context, {
-    required String text,
-  }) {
-    show(
-      context,
-      text: text,
-      variant: AppToastVariant.error,
-    );
+  static void error(BuildContext context, {required String text}) {
+    show(context, text: text, variant: AppToastVariant.error);
   }
 }
 
@@ -186,10 +176,7 @@ class _AppToastOverlayState extends State<_AppToastOverlay>
       curve: Curves.easeOutCubic,
       reverseCurve: Curves.easeOutCubic,
     );
-    _scaleAnimation = Tween<double>(
-      begin: 0.92,
-      end: 1,
-    ).animate(
+    _scaleAnimation = Tween<double>(begin: 0.92, end: 1).animate(
       CurvedAnimation(
         parent: _controller,
         curve: Curves.easeOutCubic,
@@ -259,8 +246,9 @@ class _AppToastOverlayState extends State<_AppToastOverlay>
   double _resolveBottomPadding(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-    final dockHeight =
-        screenWidth < 360 ? _compactDockHeight : _regularDockHeight;
+    final dockHeight = screenWidth < 360
+        ? _compactDockHeight
+        : _regularDockHeight;
 
     // 底部 dock 使用 SafeArea 和 10dp 底部间距，这里叠加系统安全区后再留出提示间距
     final dockPadding =
@@ -303,7 +291,8 @@ class _AppToastPill extends StatelessWidget {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final toastMaxWidth = (screenWidth - 64).clamp(200.0, 360.0).toDouble();
     final textColor = _resolveTextColor(context, variant);
-    final textStyle = theme.textTheme.bodySmall?.copyWith(
+    final textStyle =
+        theme.textTheme.bodySmall?.copyWith(
           color: textColor,
           fontSize: 13,
           fontWeight: FontWeight.w700,
@@ -390,9 +379,7 @@ class _AppToastPill extends StatelessWidget {
     final isDark = colorScheme.brightness == Brightness.dark;
 
     return (isDark ? const Color(0xFF2A2A2D) : const Color(0xFFECECEF))
-        .withValues(
-      alpha: isDark ? 0.92 : 0.96,
-    );
+        .withValues(alpha: isDark ? 0.92 : 0.96);
   }
 
   /// 解析轻提示正文颜色

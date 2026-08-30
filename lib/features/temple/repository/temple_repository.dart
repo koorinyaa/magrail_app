@@ -9,9 +9,8 @@ class TempleRepository {
   /// 创建圣殿仓库
   ///
   /// [apiClient] Tinygrail API 客户端
-  const TempleRepository({
-    required ApiClient apiClient,
-  }) : _apiClient = apiClient;
+  const TempleRepository({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   final ApiClient _apiClient;
 
@@ -56,16 +55,15 @@ class TempleRepository {
       'chara/link/last/$page/$pageSize',
     );
     final response =
-        TinygrailResponse<TinygrailPage<LatestLinkApiItem>>.fromJson(
-      json,
-      (value) {
-        final valueJson = TinygrailResponseParser.asObjectMap(value);
-        if (valueJson == null) {
-          return null;
-        }
-        return TinygrailPage.fromJson(valueJson, LatestLinkApiItem.fromJson);
-      },
-    );
+        TinygrailResponse<TinygrailPage<LatestLinkApiItem>>.fromJson(json, (
+          value,
+        ) {
+          final valueJson = TinygrailResponseParser.asObjectMap(value);
+          if (valueJson == null) {
+            return null;
+          }
+          return TinygrailPage.fromJson(valueJson, LatestLinkApiItem.fromJson);
+        });
 
     if (!response.isSuccess || response.value == null) {
       throw StateError(response.message ?? '获取最新连接失败');
@@ -171,9 +169,7 @@ class TempleRepository {
   /// 拆除圣殿
   ///
   /// [characterId] 圣殿角色 ID
-  Future<String> destroyTemple({
-    required int characterId,
-  }) async {
+  Future<String> destroyTemple({required int characterId}) async {
     final json = await _apiClient.postJson<Map<String, Object?>>(
       'chara/temple/destroy/$characterId',
     );

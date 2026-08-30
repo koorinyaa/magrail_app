@@ -9,9 +9,8 @@ class TowerRepository {
   /// 创建通天塔仓库
   ///
   /// [apiClient] Tinygrail API 客户端
-  const TowerRepository({
-    required ApiClient apiClient,
-  }) : _apiClient = apiClient;
+  const TowerRepository({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   final ApiClient _apiClient;
 
@@ -28,10 +27,8 @@ class TowerRepository {
     );
     final response = TinygrailResponse<List<TowerApiItem>>.fromJson(
       json,
-      (value) => TinygrailResponseParser.asObjectList(
-        value,
-        TowerApiItem.fromJson,
-      ),
+      (value) =>
+          TinygrailResponseParser.asObjectList(value, TowerApiItem.fromJson),
     );
 
     if (!response.isSuccess) {

@@ -9,10 +9,7 @@ class AppFatalErrorView extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [report] 可复制的错误报告
-  const AppFatalErrorView({
-    super.key,
-    required this.report,
-  });
+  const AppFatalErrorView({super.key, required this.report});
 
   /// 可复制的错误报告
   final AppErrorReport report;
@@ -111,9 +108,7 @@ class _AppFatalErrorViewState extends State<AppFatalErrorView> {
   Future<void> _copyReport() async {
     try {
       final reportText = await widget.report.toClipboardText();
-      await Clipboard.setData(
-        ClipboardData(text: reportText),
-      );
+      await Clipboard.setData(ClipboardData(text: reportText));
       if (!mounted) {
         return;
       }

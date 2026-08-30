@@ -60,7 +60,8 @@ class CharacterDetailTempleCard extends StatelessWidget {
   final void Function(
     CharacterDetailTempleItem ownerItem,
     CharacterDetailTempleItem linkedItem,
-  )? onLinkedAssetTap;
+  )?
+  onLinkedAssetTap;
 
   /// 根据卡片宽度计算整体高度
   ///
@@ -94,8 +95,9 @@ class CharacterDetailTempleCard extends StatelessWidget {
       heroTag: _heroTag(item),
       showCharacterInfo: false,
       onTap: () => _openImageViewer(context, item),
-      onCharacterTap:
-          onCharacterTap == null ? null : () => onCharacterTap!(item),
+      onCharacterTap: onCharacterTap == null
+          ? null
+          : () => onCharacterTap!(item),
       onUserTap: onOwnerTap == null ? null : () => onOwnerTap!(item),
       onAssetTap: onAssetTap == null ? null : () => onAssetTap!(item),
       onLinkTap: linkedTemple == null ? null : () => _openLinkDialog(context),
@@ -120,11 +122,7 @@ class CharacterDetailTempleCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: width,
-            height: width / 3 * 4,
-            child: cover,
-          ),
+          SizedBox(width: width, height: width / 3 * 4, child: cover),
           const SizedBox(height: 8),
           _CharacterTempleAssetProgress(item: item),
         ],
@@ -155,25 +153,22 @@ class CharacterDetailTempleCard extends StatelessWidget {
         return TempleLinkCard(
           width: cardWidth,
           leftCoverUrl: TinygrailAssetUrls.getSmallCover(leftTemple.cover),
-          leftAvatarUrl: TinygrailAssetUrls.normalizeAvatar(
-            leftTemple.avatar,
-          ),
+          leftAvatarUrl: TinygrailAssetUrls.normalizeAvatar(leftTemple.avatar),
           leftCharacterName: TinygrailFormatters.decodeHtmlEntities(
             leftTemple.displayCharacterName(
               currentOnLeft ? fallbackCharacterName : '连接角色',
             ),
           ),
           onLeftCoverTap: () => _openImageViewer(context, leftTemple),
-          onLeftCharacterTap:
-              onCharacterTap == null ? null : () => onCharacterTap!(leftTemple),
+          onLeftCharacterTap: onCharacterTap == null
+              ? null
+              : () => onCharacterTap!(leftTemple),
           onLeftAssetTap: currentOnLeft
               ? (onAssetTap == null ? null : () => onAssetTap!(item))
               : (onLinkedAssetTap == null
-                  ? null
-                  : () => onLinkedAssetTap!(item, linkedTemple)),
-          rightCoverUrl: TinygrailAssetUrls.getSmallCover(
-            rightTemple.cover,
-          ),
+                    ? null
+                    : () => onLinkedAssetTap!(item, linkedTemple)),
+          rightCoverUrl: TinygrailAssetUrls.getSmallCover(rightTemple.cover),
           rightAvatarUrl: TinygrailAssetUrls.normalizeAvatar(
             rightTemple.avatar,
           ),
@@ -188,8 +183,8 @@ class CharacterDetailTempleCard extends StatelessWidget {
               : () => onCharacterTap!(rightTemple),
           onRightAssetTap: currentOnLeft
               ? (onLinkedAssetTap == null
-                  ? null
-                  : () => onLinkedAssetTap!(item, linkedTemple))
+                    ? null
+                    : () => onLinkedAssetTap!(item, linkedTemple))
               : (onAssetTap == null ? null : () => onAssetTap!(item)),
         );
       },
@@ -237,9 +232,7 @@ class _CharacterTempleAssetProgress extends StatelessWidget {
   /// 创建角色详情固定资产进度条
   ///
   /// [item] 角色详情圣殿条目
-  const _CharacterTempleAssetProgress({
-    required this.item,
-  });
+  const _CharacterTempleAssetProgress({required this.item});
 
   /// 进度条区域高度
   static const double height = 26;

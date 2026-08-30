@@ -4,8 +4,12 @@ import 'package:magrail_app/features/user/model/user_character_api_item.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
 
 /// 其他用户角色二级页面控制器
-class OtherUserCharacterPageController extends TinygrailPagedListController<
-    UserCharacterApiItem, UserCharacterApiItem> {
+class OtherUserCharacterPageController
+    extends
+        TinygrailPagedListController<
+          UserCharacterApiItem,
+          UserCharacterApiItem
+        > {
   /// 创建其他用户角色二级页面控制器
   ///
   /// [repository] 用户仓库
@@ -15,8 +19,8 @@ class OtherUserCharacterPageController extends TinygrailPagedListController<
     required UserRepository repository,
     required String username,
     super.pageSize = defaultPageSize,
-  })  : _repository = repository,
-        _username = username;
+  }) : _repository = repository,
+       _username = username;
 
   /// 其他用户角色二级页面默认分页数量
   static const int defaultPageSize = 24;

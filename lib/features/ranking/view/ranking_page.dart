@@ -114,10 +114,7 @@ class _RankingPageState extends State<RankingPage> {
       scrollResetToken: widget.scrollResetToken,
       scrollToTopToken: widget.scrollToTopToken,
       useBlurHeader: false,
-      tabs: [
-        _buildRefineTab(),
-        _buildWealthTab(),
-      ],
+      tabs: [_buildRefineTab(), _buildWealthTab()],
       onTabPrepared: _handleTabPrepared,
     );
   }
@@ -136,8 +133,9 @@ class _RankingPageState extends State<RankingPage> {
         );
       },
       contentSliversBuilder: (context, items, onItemBuilt) {
-        final refineItems =
-            items.whereType<TempleRefineRankingEntry>().toList(growable: false);
+        final refineItems = items.whereType<TempleRefineRankingEntry>().toList(
+          growable: false,
+        );
 
         return [
           TempleRefineRankingSliverGrid(
@@ -165,8 +163,9 @@ class _RankingPageState extends State<RankingPage> {
         );
       },
       contentSliversBuilder: (context, items, onItemBuilt) {
-        final wealthItems =
-            items.whereType<UserWealthRankingEntry>().toList(growable: false);
+        final wealthItems = items.whereType<UserWealthRankingEntry>().toList(
+          growable: false,
+        );
 
         return [
           UserWealthRankingSliverList(

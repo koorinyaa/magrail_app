@@ -161,6 +161,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
   bool _isUpdatingUserBanState = false;
   int _shownFailureNotificationToken = 0;
 
+  /// 判断当前是否为用户详情二级页面
   bool get _isSecondary => widget.entryMode == UserDetailEntryMode.secondary;
 
   /// 初始化用户详情页状态
@@ -211,8 +212,9 @@ class _UserDetailPageState extends State<UserDetailPage> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: systemOverlayStyle,
       child: Scaffold(
-        backgroundColor:
-            isDark ? const Color(0xFF111318) : const Color(0xFFF5F7FB),
+        backgroundColor: isDark
+            ? const Color(0xFF111318)
+            : const Color(0xFFF5F7FB),
         body: Stack(
           children: [
             AppSoftBackground(isDark: isDark),
@@ -230,7 +232,8 @@ class _UserDetailPageState extends State<UserDetailPage> {
                         ..._buildContentSlivers(context),
                         SliverToBoxAdapter(
                           child: SizedBox(
-                            height: (widget.reserveDockPadding ? 116 : 24) +
+                            height:
+                                (widget.reserveDockPadding ? 116 : 24) +
                                 MediaQuery.paddingOf(context).bottom,
                           ),
                         ),
@@ -277,8 +280,9 @@ class _UserDetailPageState extends State<UserDetailPage> {
   /// 根据滚动位置更新顶部操作区状态
   void _handleScrollOffsetChanged() {
     final scrollOffset = _scrollController.offset;
-    final nextBlurProgress =
-        (scrollOffset / _topActionBlurExtent).clamp(0.0, 1.0).toDouble();
+    final nextBlurProgress = (scrollOffset / _topActionBlurExtent)
+        .clamp(0.0, 1.0)
+        .toDouble();
     if ((nextBlurProgress - _topActionBlurProgress.value).abs() >= 0.01) {
       _topActionBlurProgress.value = nextBlurProgress;
     }
@@ -319,9 +323,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
     final profile = _controller.profile;
     if (_controller.isLoading && profile == null) {
       return [
-        _buildTopContentSliver(
-          child: const UserDetailSkeleton(),
-        ),
+        _buildTopContentSliver(child: const UserDetailSkeleton()),
         const UserCharaOverviewSkeletonSection(),
       ];
     }
@@ -349,10 +351,13 @@ class _UserDetailPageState extends State<UserDetailPage> {
       ];
     }
 
-    final actions = _controller.visibleActions().where((action) {
-      return widget.preferences.showBotAction ||
-          action.type != UserActionType.bot;
-    }).toList(growable: false);
+    final actions = _controller
+        .visibleActions()
+        .where((action) {
+          return widget.preferences.showBotAction ||
+              action.type != UserActionType.bot;
+        })
+        .toList(growable: false);
 
     return [
       _buildTopContentSliver(
@@ -391,7 +396,8 @@ class _UserDetailPageState extends State<UserDetailPage> {
         isLoading: _controller.isCharaLoading,
         isLoadFailed: _controller.isCharaLoadFailed,
         hidePrivateValues: _hidePrivateAssetValues,
-        onRevealHoldings: !_controller.isCurrentUser &&
+        onRevealHoldings:
+            !_controller.isCurrentUser &&
                 widget.preferences.hiddenFeaturesEnabled &&
                 widget.preferences.revealPrivateUserHoldingsEnabled
             ? _revealCharacterHoldings
@@ -412,9 +418,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
   /// 构建用户详情顶部内容 sliver
   ///
   /// [child] 顶部内容主体
-  Widget _buildTopContentSliver({
-    required Widget child,
-  }) {
+  Widget _buildTopContentSliver({required Widget child}) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
@@ -465,10 +469,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
   ///
   /// [type] 用户菜单入口类型
   /// [value] 是否操作中
-  void _setActionBusyState(
-    UserActionType type, {
-    required bool value,
-  }) {
+  void _setActionBusyState(UserActionType type, {required bool value}) {
     if (!mounted) {
       return;
     }

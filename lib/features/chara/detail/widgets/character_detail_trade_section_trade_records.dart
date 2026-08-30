@@ -22,7 +22,8 @@ Future<void> showCharacterDetailTradeRecordsSheet(
       const topGap = 32.0;
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
-      final heightCap = mediaQuery.size.height *
+      final heightCap =
+          mediaQuery.size.height *
           (mediaQuery.orientation == Orientation.landscape ? 0.9 : 0.72);
       final maxHeight = availableHeight.clamp(0.0, heightCap).toDouble();
 
@@ -39,9 +40,7 @@ class _TradeRecordsSheet extends StatelessWidget {
   /// 创建角色详情成交记录底部抽屉
   ///
   /// [controller] 交易区控制器
-  const _TradeRecordsSheet({
-    required this.controller,
-  });
+  const _TradeRecordsSheet({required this.controller});
 
   /// 交易区控制器
   final CharacterDetailTradeSectionController controller;
@@ -61,9 +60,7 @@ class _TradeRecordsSheet extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(bottom: mediaQuery.viewInsets.bottom),
       child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(28),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: backgroundColor,
@@ -148,10 +145,7 @@ class _TradeRecordsTabs extends StatelessWidget {
   ///
   /// [bids] 买入成交列表
   /// [asks] 卖出成交列表
-  const _TradeRecordsTabs({
-    required this.bids,
-    required this.asks,
-  });
+  const _TradeRecordsTabs({required this.bids, required this.asks});
 
   /// 买入成交列表
   final List<CharacterDetailTradeHistoryOrder> bids;
@@ -284,10 +278,7 @@ class _TradeRecordsList extends StatelessWidget {
       itemCount: sortedOrders.length,
       separatorBuilder: (context, index) => const _TradeOrdersDivider(),
       itemBuilder: (context, index) {
-        return _TradeRecordRow(
-          order: sortedOrders[index],
-          isBid: isBid,
-        );
+        return _TradeRecordRow(order: sortedOrders[index], isBid: isBid);
       },
     );
   }
@@ -316,10 +307,7 @@ class _TradeRecordRow extends StatelessWidget {
   ///
   /// [order] 历史成交委托
   /// [isBid] 是否买入成交
-  const _TradeRecordRow({
-    required this.order,
-    required this.isBid,
-  });
+  const _TradeRecordRow({required this.order, required this.isBid});
 
   /// 历史成交委托
   final CharacterDetailTradeHistoryOrder order;
@@ -449,9 +437,7 @@ class _TradeRecordsEmptyState extends StatelessWidget {
   /// 创建角色详情成交记录空态
   ///
   /// [text] 空态文案
-  const _TradeRecordsEmptyState({
-    required this.text,
-  });
+  const _TradeRecordsEmptyState({required this.text});
 
   /// 空态文案
   final String text;

@@ -79,24 +79,20 @@ Future<bool> showAppConfirmDialog(
         Tween<Offset>(
           begin: const Offset(0, 0.16),
           end: Offset.zero,
-        ).chain(
-          CurveTween(curve: Curves.easeOutCubic),
-        ),
+        ).chain(CurveTween(curve: Curves.easeOutCubic)),
       );
       final scaleAnimation = animation.drive(
-        Tween<double>(begin: 0.98, end: 1).chain(
-          CurveTween(curve: Curves.easeOutCubic),
-        ),
+        Tween<double>(
+          begin: 0.98,
+          end: 1,
+        ).chain(CurveTween(curve: Curves.easeOutCubic)),
       );
 
       return FadeTransition(
         opacity: fadeAnimation,
         child: SlideTransition(
           position: slideAnimation,
-          child: ScaleTransition(
-            scale: scaleAnimation,
-            child: child,
-          ),
+          child: ScaleTransition(scale: scaleAnimation, child: child),
         ),
       );
     },
@@ -360,11 +356,7 @@ class _AppConfirmDialogHeader extends StatelessWidget {
             ),
             child: Padding(
               padding: const EdgeInsets.all(10),
-              child: Icon(
-                icon,
-                size: 20,
-                color: colorScheme.onSurface,
-              ),
+              child: Icon(icon, size: 20, color: colorScheme.onSurface),
             ),
           ),
         if (hasIcon && hasTitle) const SizedBox(height: 18),
@@ -457,9 +449,7 @@ class _AppConfirmDialogActionButtonsState
       backgroundColor: cancelBackgroundColor,
       minimumSize: const Size.fromHeight(40),
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(999),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
       textStyle: const TextStyle(
         fontSize: 13,
         fontWeight: FontWeight.w700,
@@ -503,8 +493,9 @@ class _AppConfirmDialogActionButtonsState
           const SizedBox(height: 6),
           TextButton(
             style: cancelButtonStyle,
-            onPressed:
-                _isConfirming ? null : () => Navigator.of(context).pop(false),
+            onPressed: _isConfirming
+                ? null
+                : () => Navigator.of(context).pop(false),
             child: Text(widget.cancelText),
           ),
         ],

@@ -31,9 +31,7 @@ class _SharePreviewThemeSwitch extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.black.withValues(alpha: 0.26),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.14),
-            ),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(3),
@@ -107,9 +105,7 @@ class _SharePreviewThemeOption extends StatelessWidget {
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(17),
               border: selected
-                  ? Border.all(
-                      color: Colors.white.withValues(alpha: 0.16),
-                    )
+                  ? Border.all(color: Colors.white.withValues(alpha: 0.16))
                   : null,
             ),
             child: Icon(

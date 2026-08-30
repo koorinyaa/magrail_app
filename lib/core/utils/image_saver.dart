@@ -30,10 +30,7 @@ class ImageSaveResult {
   ///
   /// [status] 保存状态
   /// [message] 提示文案
-  const ImageSaveResult({
-    required this.status,
-    required this.message,
-  });
+  const ImageSaveResult({required this.status, required this.message});
 
   /// 保存状态
   final ImageSaveStatus status;
@@ -90,11 +87,7 @@ Future<ImageSaveResult> saveImageBytesToGallery(
       );
     }
 
-    await Gal.putImageBytes(
-      bytes,
-      album: 'magrail',
-      name: imageName,
-    );
+    await Gal.putImageBytes(bytes, album: 'magrail', name: imageName);
     return const ImageSaveResult(
       status: ImageSaveStatus.success,
       message: '图片已保存',

@@ -6,11 +6,8 @@ import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 /// [context] 当前组件树上下文
 /// [item] 当前角色条目
 /// [index] 当前角色在完整展示列表中的下标
-typedef CharacterLevelItemBuilder<ItemType> = Widget Function(
-  BuildContext context,
-  ItemType item,
-  int index,
-);
+typedef CharacterLevelItemBuilder<ItemType> =
+    Widget Function(BuildContext context, ItemType item, int index);
 
 /// 角色等级分组列表
 class CharacterLevelGroupedSliverList<ItemType> extends StatelessWidget {
@@ -64,13 +61,10 @@ class CharacterLevelGroupedSliverList<ItemType> extends StatelessWidget {
           ),
           SliverFixedExtentList(
             itemExtent: CharacterLevelListMetrics.itemExtent,
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final itemIndex = group.start + index;
-                return itemBuilder(context, items[itemIndex], itemIndex);
-              },
-              childCount: group.end - group.start,
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              final itemIndex = group.start + index;
+              return itemBuilder(context, items[itemIndex], itemIndex);
+            }, childCount: group.end - group.start),
           ),
         ],
       ],
@@ -84,10 +78,7 @@ class CharacterFullListLevelHeader extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [level] 角色等级
-  const CharacterFullListLevelHeader({
-    super.key,
-    required this.level,
-  });
+  const CharacterFullListLevelHeader({super.key, required this.level});
 
   /// 角色等级
   final int level;

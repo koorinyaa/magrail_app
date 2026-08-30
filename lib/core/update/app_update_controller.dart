@@ -44,8 +44,8 @@ class AppUpdateController extends ChangeNotifier {
   AppUpdateController({
     required AppUpdateRepository repository,
     required AppPreferences preferences,
-  })  : _repository = repository,
-        _preferences = preferences;
+  }) : _repository = repository,
+       _preferences = preferences;
 
   final AppUpdateRepository _repository;
   final AppPreferences _preferences;
@@ -135,7 +135,8 @@ class AppUpdateController extends ChangeNotifier {
       final packageInfo = await PackageInfo.fromPlatform();
       final currentVersion = packageInfo.version.trim();
       final release = await _repository.fetchLatestRelease();
-      final hasUpdate = release != null &&
+      final hasUpdate =
+          release != null &&
           _compareVersions(release.version, currentVersion) > 0;
 
       _currentVersion = currentVersion;

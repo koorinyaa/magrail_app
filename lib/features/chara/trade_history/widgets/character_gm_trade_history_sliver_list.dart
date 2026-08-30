@@ -92,10 +92,7 @@ class _CharacterGmTradeHistoryRow extends StatelessWidget {
   ///
   /// [item] 角色 GM 交易记录条目
   /// [onUserTap] 用户点击回调
-  const _CharacterGmTradeHistoryRow({
-    required this.item,
-    this.onUserTap,
-  });
+  const _CharacterGmTradeHistoryRow({required this.item, this.onUserTap});
 
   /// 角色 GM 交易记录条目
   final CharacterGmTradeHistoryItem item;
@@ -122,9 +119,7 @@ class _CharacterGmTradeHistoryRow extends StatelessWidget {
               const Expanded(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: [
-                    UserAssetRecordPill(text: '交易'),
-                  ],
+                  children: [UserAssetRecordPill(text: '交易')],
                 ),
               ),
               const SizedBox(width: 8),

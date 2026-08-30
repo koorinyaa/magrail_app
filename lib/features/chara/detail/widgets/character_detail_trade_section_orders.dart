@@ -24,7 +24,8 @@ Future<void> showCharacterDetailTradeOrdersSheet(
       const topGap = 32.0;
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
-      final heightCap = mediaQuery.size.height *
+      final heightCap =
+          mediaQuery.size.height *
           (mediaQuery.orientation == Orientation.landscape ? 0.9 : 0.72);
       final maxHeight = availableHeight.clamp(0.0, heightCap).toDouble();
 
@@ -70,9 +71,7 @@ class _TradeOrdersSheet extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(bottom: mediaQuery.viewInsets.bottom),
       child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(28),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: backgroundColor,
@@ -107,12 +106,8 @@ class _TradeOrdersSheet extends StatelessWidget {
                       listenable: controller,
                       builder: (context, _) {
                         final trading = controller.trading;
-                        final bids = trading.activeBids.toList(
-                          growable: false,
-                        );
-                        final asks = trading.activeAsks.toList(
-                          growable: false,
-                        );
+                        final bids = trading.activeBids.toList(growable: false);
+                        final asks = trading.activeAsks.toList(growable: false);
 
                         return Column(
                           mainAxisSize: MainAxisSize.min,

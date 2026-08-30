@@ -7,10 +7,7 @@ class MainNavigationBackground extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [isDark] 是否使用深色模式
-  const MainNavigationBackground({
-    super.key,
-    required this.isDark,
-  });
+  const MainNavigationBackground({super.key, required this.isDark});
 
   /// 是否使用深色模式
   final bool isDark;

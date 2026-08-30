@@ -130,10 +130,7 @@ class _UserAssetAnalysisPageState extends State<UserAssetAnalysisPage> {
           animation: _controller,
           builder: (context, child) {
             return CustomScrollView(
-              slivers: [
-                _buildAppBar(context),
-                ..._buildBodySlivers(context),
-              ],
+              slivers: [_buildAppBar(context), ..._buildBodySlivers(context)],
             );
           },
         ),
@@ -162,8 +159,9 @@ class _UserAssetAnalysisPageState extends State<UserAssetAnalysisPage> {
       stretch: analysis != null,
       expandedHeight: analysis == null ? null : expandedHeight,
       toolbarHeight: 54,
-      backgroundColor:
-          isDark ? const Color(0xFF07111A) : const Color(0xFFEAF7F4),
+      backgroundColor: isDark
+          ? const Color(0xFF07111A)
+          : const Color(0xFFEAF7F4),
       foregroundColor: foregroundColor,
       surfaceTintColor: Colors.transparent,
       scrolledUnderElevation: 0,
@@ -198,10 +196,7 @@ class _UserAssetAnalysisPageState extends State<UserAssetAnalysisPage> {
         ),
       ],
       flexibleSpace: analysis == null
-          ? UserAssetAnalysisCoreBackground(
-              isDark: isDark,
-              intensity: 0,
-            )
+          ? UserAssetAnalysisCoreBackground(isDark: isDark, intensity: 0)
           : FlexibleSpaceBar(
               collapseMode: CollapseMode.parallax,
               stretchModes: const [StretchMode.zoomBackground],
@@ -211,7 +206,8 @@ class _UserAssetAnalysisPageState extends State<UserAssetAnalysisPage> {
                 analysisAgeLabel: _controller.analysisAgeLabel,
                 isRefreshing: _controller.isRefreshing,
                 progressLabel: _controller.progressLabel,
-                hasRefreshError: !_controller.isRefreshing &&
+                hasRefreshError:
+                    !_controller.isRefreshing &&
                     _controller.errorMessage != null,
                 onCharactersTap: _openUserCharacters,
                 onTemplesTap: _openUserTemples,
@@ -361,10 +357,7 @@ class _UserAssetAnalysisPageState extends State<UserAssetAnalysisPage> {
       return;
     }
 
-    AppToast.error(
-      context,
-      text: _controller.errorMessage ?? '刷新资产分析失败',
-    );
+    AppToast.error(context, text: _controller.errorMessage ?? '刷新资产分析失败');
   }
 }
 
@@ -374,10 +367,7 @@ class _RefreshAction extends StatelessWidget {
   ///
   /// [isBusy] 是否正在加载
   /// [onPressed] 刷新按钮点击回调
-  const _RefreshAction({
-    required this.isBusy,
-    required this.onPressed,
-  });
+  const _RefreshAction({required this.isBusy, required this.onPressed});
 
   /// 是否正在加载
   final bool isBusy;

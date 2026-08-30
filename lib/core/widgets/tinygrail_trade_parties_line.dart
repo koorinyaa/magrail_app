@@ -99,10 +99,7 @@ class _TinygrailTradePartiesLineState extends State<TinygrailTradePartiesLine> {
       TextSpan(
         style: userStyle,
         children: [
-          TextSpan(
-            text: widget.sellerLabel,
-            recognizer: _sellerRecognizer,
-          ),
+          TextSpan(text: widget.sellerLabel, recognizer: _sellerRecognizer),
           WidgetSpan(
             alignment: PlaceholderAlignment.middle,
             child: Padding(
@@ -114,10 +111,7 @@ class _TinygrailTradePartiesLineState extends State<TinygrailTradePartiesLine> {
               ),
             ),
           ),
-          TextSpan(
-            text: widget.buyerLabel,
-            recognizer: _buyerRecognizer,
-          ),
+          TextSpan(text: widget.buyerLabel, recognizer: _buyerRecognizer),
         ],
       ),
       softWrap: true,

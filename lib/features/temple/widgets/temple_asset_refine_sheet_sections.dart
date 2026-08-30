@@ -10,11 +10,9 @@ import 'package:magrail_app/shared/widgets/app_bottom_sheet_header.dart';
 class TempleAssetRefineHeader extends StatelessWidget {
   /// 创建圣殿资产精炼标题
   ///
+  /// [key] Flutter 组件标识
   /// [data] 圣殿资产卡片展示数据
-  const TempleAssetRefineHeader({
-    super.key,
-    required this.data,
-  });
+  const TempleAssetRefineHeader({super.key, required this.data});
 
   /// 圣殿资产卡片展示数据
   final TempleAssetCardData data;
@@ -24,8 +22,9 @@ class TempleAssetRefineHeader extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final characterName =
-        data.characterName.trim().isEmpty ? '角色名称' : data.characterName.trim();
+    final characterName = data.characterName.trim().isEmpty
+        ? '角色名称'
+        : data.characterName.trim();
     return AppBottomSheetHeader(
       icon: LucideIcons.sparkles,
       title: '精炼',
@@ -38,6 +37,7 @@ class TempleAssetRefineHeader extends StatelessWidget {
 class TempleAssetRefineTransferPreview extends StatelessWidget {
   /// 创建圣殿资产精炼状态预览
   ///
+  /// [key] Flutter 组件标识
   /// [data] 圣殿资产卡片展示数据
   /// [costText] 本次精炼 cc 消耗文案
   const TempleAssetRefineTransferPreview({
@@ -65,11 +65,7 @@ class TempleAssetRefineTransferPreview extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Expanded(
-              child: _TempleAssetRefineTemplePreview(
-                data: data,
-              ),
-            ),
+            Expanded(child: _TempleAssetRefineTemplePreview(data: data)),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6),
               child: Icon(
@@ -236,6 +232,7 @@ class _TempleAssetRefineTemplePreview extends StatelessWidget {
 class TempleAssetRefineLevelBadge extends StatelessWidget {
   /// 创建圣殿资产精炼等级胶囊
   ///
+  /// [key] Flutter 组件标识
   /// [data] 圣殿资产卡片展示数据
   /// [refine] 精炼等级覆盖值
   const TempleAssetRefineLevelBadge({

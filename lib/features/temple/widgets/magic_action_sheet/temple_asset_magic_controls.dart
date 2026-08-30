@@ -39,11 +39,7 @@ class _TempleAssetMagicImageIcon extends StatelessWidget {
                   color: colorScheme.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(
-                  fallbackIcon,
-                  size: 20,
-                  color: colorScheme.primary,
-                ),
+                child: Icon(fallbackIcon, size: 20, color: colorScheme.primary),
               );
             },
           ),
@@ -81,34 +77,35 @@ class _TempleAssetMagicSheetHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final resolvedCharacterName =
-        characterName.trim().isEmpty ? '角色名称' : characterName.trim();
+    final resolvedCharacterName = characterName.trim().isEmpty
+        ? '角色名称'
+        : characterName.trim();
     final subtitle = '#$characterId 「$resolvedCharacterName」';
     final iconWidget = switch (action) {
       TempleAssetMagicAction.guidepost => const _TempleAssetMagicImageIcon(
-          imageAsset: TempleAssetMagicAssets.guidepostIcon,
-          fallbackIcon: LucideIcons.mapPinned,
-        ),
+        imageAsset: TempleAssetMagicAssets.guidepostIcon,
+        fallbackIcon: LucideIcons.mapPinned,
+      ),
       TempleAssetMagicAction.chaosCube => const _TempleAssetMagicImageIcon(
-          imageAsset: TempleAssetMagicAssets.chaosCubeIcon,
-          fallbackIcon: LucideIcons.dices,
-        ),
+        imageAsset: TempleAssetMagicAssets.chaosCubeIcon,
+        fallbackIcon: LucideIcons.dices,
+      ),
       TempleAssetMagicAction.fisheye => const _TempleAssetMagicImageIcon(
-          imageAsset: TempleAssetMagicAssets.fisheyeIcon,
-          fallbackIcon: LucideIcons.eye,
-        ),
+        imageAsset: TempleAssetMagicAssets.fisheyeIcon,
+        fallbackIcon: LucideIcons.eye,
+      ),
       TempleAssetMagicAction.stardust => const _TempleAssetMagicImageIcon(
-          imageAsset: TempleAssetMagicAssets.stardustIcon,
-          fallbackIcon: LucideIcons.sparkles,
-        ),
+        imageAsset: TempleAssetMagicAssets.stardustIcon,
+        fallbackIcon: LucideIcons.sparkles,
+      ),
       TempleAssetMagicAction.starbreak => const _TempleAssetMagicImageIcon(
-          imageAsset: TempleAssetMagicAssets.starbreakIcon,
-          fallbackIcon: LucideIcons.flame,
-        ),
+        imageAsset: TempleAssetMagicAssets.starbreakIcon,
+        fallbackIcon: LucideIcons.flame,
+      ),
       TempleAssetMagicAction.starForces => _TempleAssetMagicSymbolIcon(
-          icon: Symbols.auto_awesome,
-          color: colorScheme.primary,
-        ),
+        icon: Symbols.auto_awesome,
+        color: colorScheme.primary,
+      ),
     };
 
     return AppBottomSheetHeader.customLeading(
@@ -137,10 +134,7 @@ class _TempleAssetMagicSymbolIcon extends StatelessWidget {
   ///
   /// [icon] 符号图标
   /// [color] 图标颜色
-  const _TempleAssetMagicSymbolIcon({
-    required this.icon,
-    required this.color,
-  });
+  const _TempleAssetMagicSymbolIcon({required this.icon, required this.color});
 
   /// 符号图标
   final IconData icon;
@@ -160,11 +154,7 @@ class _TempleAssetMagicSymbolIcon extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(10),
-        child: Icon(
-          icon,
-          size: 20,
-          color: color,
-        ),
+        child: Icon(icon, size: 20, color: color),
       ),
     );
   }
@@ -262,9 +252,7 @@ class _TempleAssetMagicQuickButtons extends StatelessWidget {
   /// 创建圣殿资产魔法道具快捷数量按钮组
   ///
   /// [buttons] 快捷数量按钮配置
-  const _TempleAssetMagicQuickButtons({
-    required this.buttons,
-  });
+  const _TempleAssetMagicQuickButtons({required this.buttons});
 
   /// 快捷数量按钮配置
   final List<_TempleAssetMagicQuickButtonData> buttons;

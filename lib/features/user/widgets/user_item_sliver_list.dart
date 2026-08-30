@@ -10,10 +10,7 @@ class UserItemSliverList extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [items] 用户道具条目
-  const UserItemSliverList({
-    super.key,
-    required this.items,
-  });
+  const UserItemSliverList({super.key, required this.items});
 
   /// 用户道具条目
   final List<UserItemApiItem> items;
@@ -25,9 +22,7 @@ class UserItemSliverList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverList.separated(
       itemBuilder: (context, index) {
-        return UserAssetRecordListItem(
-          child: UserItemRow(item: items[index]),
-        );
+        return UserAssetRecordListItem(child: UserItemRow(item: items[index]));
       },
       separatorBuilder: (context, index) => const _UserItemDivider(),
       itemCount: items.length,
@@ -41,10 +36,7 @@ class UserItemSkeletonSliverList extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [itemCount] 骨架条目数量
-  const UserItemSkeletonSliverList({
-    super.key,
-    this.itemCount = 9,
-  });
+  const UserItemSkeletonSliverList({super.key, this.itemCount = 9});
 
   /// 骨架条目数量
   final int itemCount;
@@ -56,9 +48,7 @@ class UserItemSkeletonSliverList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverList.separated(
       itemBuilder: (context, index) {
-        return const UserAssetRecordListItem(
-          child: _UserItemSkeletonRow(),
-        );
+        return const UserAssetRecordListItem(child: _UserItemSkeletonRow());
       },
       separatorBuilder: (context, index) => const _UserItemDivider(),
       itemCount: itemCount,
@@ -124,9 +114,7 @@ class _UserItemSkeletonRow extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Expanded(
-                        child: Bone.text(width: 132, fontSize: 15),
-                      ),
+                      Expanded(child: Bone.text(width: 132, fontSize: 15)),
                     ],
                   ),
                   SizedBox(height: 7),

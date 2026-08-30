@@ -14,10 +14,7 @@ class _TempleAssetSkeletonMetrics extends StatelessWidget {
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _TempleAssetSkeletonSummary(),
-        _TempleAssetSkeletonProgress(),
-      ],
+      children: [_TempleAssetSkeletonSummary(), _TempleAssetSkeletonProgress()],
     );
   }
 }

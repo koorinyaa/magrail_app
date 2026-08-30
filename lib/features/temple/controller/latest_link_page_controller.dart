@@ -14,12 +14,9 @@ class LatestLinkPageController
   LatestLinkPageController({
     required TempleRepository repository,
     int pairPageSize = defaultPairPageSize,
-  })  : assert(pairPageSize > 0),
-        _repository = repository,
-        super(
-          pageSize: pairPageSize * 2,
-          emptyPageScanLimit: 3,
-        );
+  }) : assert(pairPageSize > 0),
+       _repository = repository,
+       super(pageSize: pairPageSize * 2, emptyPageScanLimit: 3);
 
   /// 最新连接二级页面默认每页展示连接组数量
   static const int defaultPairPageSize = 12;
@@ -44,10 +41,7 @@ class LatestLinkPageController
     required int page,
     required int pageSize,
   }) {
-    return _repository.fetchLatestLinkPage(
-      page: page,
-      pageSize: pageSize,
-    );
+    return _repository.fetchLatestLinkPage(page: page, pageSize: pageSize);
   }
 
   /// 转换可展示的最新连接组

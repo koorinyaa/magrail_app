@@ -24,10 +24,10 @@ final class CharacterDetailSacrificeSheetController extends ChangeNotifier {
     required UserRepository userRepository,
     required int characterId,
     required String currentUserName,
-  })  : _repository = repository,
-        _userRepository = userRepository,
-        _characterId = characterId,
-        _currentUserName = currentUserName {
+  }) : _repository = repository,
+       _userRepository = userRepository,
+       _characterId = characterId,
+       _currentUserName = currentUserName {
     amountController.addListener(_handleAmountChanged);
   }
 

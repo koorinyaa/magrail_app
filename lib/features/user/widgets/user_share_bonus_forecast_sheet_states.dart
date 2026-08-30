@@ -43,9 +43,7 @@ class _SkeletonBlock extends StatelessWidget {
   /// 创建骨架块
   ///
   /// [height] 骨架高度
-  const _SkeletonBlock({
-    required this.height,
-  });
+  const _SkeletonBlock({required this.height});
 
   /// 骨架高度
   final double height;
@@ -56,8 +54,8 @@ class _SkeletonBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme.outlineVariant.withValues(
-          alpha: Theme.of(context).brightness == Brightness.dark ? 0.26 : 0.36,
-        );
+      alpha: Theme.of(context).brightness == Brightness.dark ? 0.26 : 0.36,
+    );
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -82,7 +80,8 @@ class _SkeletonStatTile extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final width = (MediaQuery.sizeOf(context).width -
+    final width =
+        (MediaQuery.sizeOf(context).width -
             AppSafeAreaInsets.horizontalSum(context) -
             48) /
         2;

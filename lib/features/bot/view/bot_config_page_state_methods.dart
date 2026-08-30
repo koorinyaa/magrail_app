@@ -19,7 +19,8 @@ extension _BotConfigPageStateMethods on _BotConfigPageState {
   /// [config] 当前 bot 配置
   List<Widget> _buildAppBarActions(BotConfig? config) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isDisabled = config == null ||
+    final isDisabled =
+        config == null ||
         _controller.isLoading ||
         _controller.isSaving ||
         _controller.isRevoking;
@@ -106,10 +107,7 @@ extension _BotConfigPageStateMethods on _BotConfigPageState {
 
     try {
       if (showLoading) {
-        await _runWithLoading(
-          message: '正在保存配置',
-          request: _controller.save,
-        );
+        await _runWithLoading(message: '正在保存配置', request: _controller.save);
       } else {
         await _controller.save();
       }
@@ -129,10 +127,7 @@ extension _BotConfigPageStateMethods on _BotConfigPageState {
 
       AppToast.error(
         context,
-        text: resolveUserErrorMessage(
-          error,
-          fallback: '保存失败，请稍后重试',
-        ),
+        text: resolveUserErrorMessage(error, fallback: '保存失败，请稍后重试'),
       );
       return false;
     }
@@ -176,10 +171,7 @@ extension _BotConfigPageStateMethods on _BotConfigPageState {
 
       AppToast.error(
         context,
-        text: resolveUserErrorMessage(
-          error,
-          fallback: '取消授权失败，请稍后重试',
-        ),
+        text: resolveUserErrorMessage(error, fallback: '取消授权失败，请稍后重试'),
       );
     }
   }
@@ -272,8 +264,9 @@ extension _BotConfigPageStateMethods on _BotConfigPageState {
       secondaryTextBuilder: useFisheyeSupplement
           ? _fisheyeSearchSecondaryTextFor
           : TempleAssetMagicCharacterSearchPanel.defaultSecondaryText,
-      supplementLoader:
-          useFisheyeSupplement ? _loadFisheyeGensokyoAmounts : null,
+      supplementLoader: useFisheyeSupplement
+          ? _loadFisheyeGensokyoAmounts
+          : null,
     );
     if (!mounted || item == null) {
       return;
@@ -457,8 +450,9 @@ extension _BotConfigPageStateMethods on _BotConfigPageState {
           for (final item in items) {
             _controller.rememberTempleOption(item);
           }
-          config.templeBlacklist =
-              items.map((item) => item.characterId).toList(growable: false);
+          config.templeBlacklist = items
+              .map((item) => item.characterId)
+              .toList(growable: false);
         });
       },
     );
@@ -543,10 +537,12 @@ extension _BotConfigPageStateMethods on _BotConfigPageState {
     }
 
     _syncedTextConfig = config;
-    _icoInvestmentController.text =
-        Formatters.plainDecimal(config.icoInvestmentAmount);
-    _icoReserveController.text =
-        Formatters.plainDecimal(config.icoReserveAmount);
+    _icoInvestmentController.text = Formatters.plainDecimal(
+      config.icoInvestmentAmount,
+    );
+    _icoReserveController.text = Formatters.plainDecimal(
+      config.icoReserveAmount,
+    );
     _recordConfigSnapshot(config);
   }
 

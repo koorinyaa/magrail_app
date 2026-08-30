@@ -40,12 +40,12 @@ const String botGuidepostActionIconAsset = TempleAssetMagicAssets.guidepostIcon;
 const String botFisheyeActionIconAsset = TempleAssetMagicAssets.fisheyeIcon;
 
 /// bot 圣殿分页搜索加载回调
-typedef BotTemplePagedSearchLoader = Future<TinygrailPage<BotTempleOption>>
-    Function({
-  required int page,
-  required int pageSize,
-  required String keyword,
-});
+typedef BotTemplePagedSearchLoader =
+    Future<TinygrailPage<BotTempleOption>> Function({
+      required int page,
+      required int pageSize,
+      required String keyword,
+    });
 
 /// 打开 bot 圣殿单选抽屉
 ///
@@ -77,7 +77,8 @@ Future<BotTempleOption?> showBotTemplePickerSheet(
       const topGap = 32.0;
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
-      final heightCap = mediaQuery.size.height *
+      final heightCap =
+          mediaQuery.size.height *
           (mediaQuery.orientation == Orientation.landscape ? 0.9 : 0.86);
       final maxHeight = availableHeight.clamp(0.0, heightCap).toDouble();
 
@@ -130,7 +131,8 @@ Future<void> showBotTempleMultiPickerSheet(
       const topGap = 32.0;
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
-      final heightCap = mediaQuery.size.height *
+      final heightCap =
+          mediaQuery.size.height *
           (mediaQuery.orientation == Orientation.landscape ? 0.9 : 0.86);
       final maxHeight = availableHeight.clamp(0.0, heightCap).toDouble();
 
@@ -194,7 +196,8 @@ Future<BotCharacterOption?> showBotMagicCharacterPickerSheet(
       const topGap = 32.0;
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
-      final heightCap = mediaQuery.size.height *
+      final heightCap =
+          mediaQuery.size.height *
           (mediaQuery.orientation == Orientation.landscape ? 0.9 : 0.86);
       final maxHeight = availableHeight.clamp(0.0, heightCap).toDouble();
 

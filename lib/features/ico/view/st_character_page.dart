@@ -15,10 +15,7 @@ class StCharacterPage extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [repository] ST 角色仓库
-  const StCharacterPage({
-    super.key,
-    required this.repository,
-  });
+  const StCharacterPage({super.key, required this.repository});
 
   /// ST 角色仓库
   final StCharacterRepository repository;
@@ -67,35 +64,36 @@ class _StCharacterPageState extends State<StCharacterPage>
       builder: (context, child) {
         final page =
             TinygrailPagedSliverPage<StCharacterEntry, StCharacterEntry>(
-          controller: _controller,
-          scrollController: fullListScrollController,
-          title: 'ST',
-          titleSupplement: _buildTitleSupplement(),
-          appBarBottom: buildFullListSortToolbar(),
-          loadingSliver: const StCharacterSkeletonSliverList(),
-          emptySliverBuilder: (context, controller) {
-            final isFiltering = _controller.searchKeyword.isNotEmpty;
-            return PagedSliverState(
-              title: isFiltering ? '未找到角色' : '暂无 ST 角色',
-              message: isFiltering ? '没有符合搜索条件的角色' : '当前没有可展示的 ST 角色',
-              icon:
-                  isFiltering ? Icons.search_off_rounded : Icons.inbox_rounded,
+              controller: _controller,
+              scrollController: fullListScrollController,
+              title: 'ST',
+              titleSupplement: _buildTitleSupplement(),
+              appBarBottom: buildFullListSortToolbar(),
+              loadingSliver: const StCharacterSkeletonSliverList(),
+              emptySliverBuilder: (context, controller) {
+                final isFiltering = _controller.searchKeyword.isNotEmpty;
+                return PagedSliverState(
+                  title: isFiltering ? '未找到角色' : '暂无 ST 角色',
+                  message: isFiltering ? '没有符合搜索条件的角色' : '当前没有可展示的 ST 角色',
+                  icon: isFiltering
+                      ? Icons.search_off_rounded
+                      : Icons.inbox_rounded,
+                );
+              },
+              contentSliversBuilder: (context, items, onItemBuilt) {
+                return [
+                  StCharacterSliverList(
+                    items: items,
+                    sort: _controller.hasFullData ? _controller.sort : null,
+                    onItemBuilt: onItemBuilt,
+                    onCharacterTap: _openCharacterDetail,
+                  ),
+                ];
+              },
+              completedLabel: '没有更多 ST 角色了',
+              bottomContentPadding: fullListBottomContentPadding,
+              refreshErrorText: '数据刷新失败',
             );
-          },
-          contentSliversBuilder: (context, items, onItemBuilt) {
-            return [
-              StCharacterSliverList(
-                items: items,
-                sort: _controller.hasFullData ? _controller.sort : null,
-                onItemBuilt: onItemBuilt,
-                onCharacterTap: _openCharacterDetail,
-              ),
-            ];
-          },
-          completedLabel: '没有更多 ST 角色了',
-          bottomContentPadding: fullListBottomContentPadding,
-          refreshErrorText: '数据刷新失败',
-        );
         return buildFullListOverlay(child: page);
       },
     );
@@ -114,10 +112,7 @@ class _StCharacterPageState extends State<StCharacterPage>
   ///
   /// [item] ST 角色条目
   /// [avatarHeroTag] 头像转场标识
-  void _openCharacterDetail(
-    StCharacterEntry item,
-    String? avatarHeroTag,
-  ) {
+  void _openCharacterDetail(StCharacterEntry item, String? avatarHeroTag) {
     openCharacterDetail(
       context,
       characterId: item.characterId,

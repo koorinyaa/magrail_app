@@ -163,9 +163,7 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
       return;
     }
 
-    unawaited(
-      _switchToCharacter(item),
-    );
+    unawaited(_switchToCharacter(item));
   }
 
   /// 释放角色详情页状态
@@ -197,8 +195,9 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: systemOverlayStyle,
       child: Scaffold(
-        backgroundColor:
-            isDark ? const Color(0xFF111318) : const Color(0xFFF5F7FB),
+        backgroundColor: isDark
+            ? const Color(0xFF111318)
+            : const Color(0xFFF5F7FB),
         body: Stack(
           children: [
             AppSoftBackground(isDark: isDark),
@@ -213,18 +212,19 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
                   final currentUserDisplayName = currentUser == null
                       ? ''
                       : currentUser.nickname.trim().isNotEmpty
-                          ? currentUser.nickname.trim()
-                          : currentUser.name.trim();
+                      ? currentUser.nickname.trim()
+                      : currentUser.name.trim();
                   final currentPageType = _controller.currentPageType;
                   final currentIcoInfo = _controller.currentIcoInfo;
                   final showIcoInvestBar =
                       currentPageType == CharacterDetailPageType.ico &&
-                          currentIcoInfo != null &&
-                          _controller.isAuthorized;
+                      currentIcoInfo != null &&
+                      _controller.isAuthorized;
                   final revealPrivateUserHoldings =
                       widget.preferences.hiddenFeaturesEnabled &&
-                          widget.preferences.revealPrivateUserHoldingsEnabled;
-                  final bottomPadding = MediaQuery.paddingOf(context).bottom +
+                      widget.preferences.revealPrivateUserHoldingsEnabled;
+                  final bottomPadding =
+                      MediaQuery.paddingOf(context).bottom +
                       (showIcoInvestBar ? 156 : 24);
 
                   return CustomScrollView(
@@ -250,7 +250,8 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
                         tradeHeader: _controller.currentTradeHeader,
                         icoInfo: currentIcoInfo,
                         userAssets: _controller.currentUserAssets,
-                        showAuthGuide: _controller.hasResolvedCurrentUser &&
+                        showAuthGuide:
+                            _controller.hasResolvedCurrentUser &&
                             !_controller.isAuthorized,
                         showTradeSection: _controller.isAuthorized,
                         currentUserName: currentUserName,
@@ -289,7 +290,8 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
               listenable: _controller,
               builder: (context, _) {
                 final currentIcoInfo = _controller.currentIcoInfo;
-                final showIcoInvestBar = _controller.currentPageType ==
+                final showIcoInvestBar =
+                    _controller.currentPageType ==
                         CharacterDetailPageType.ico &&
                     currentIcoInfo != null &&
                     _controller.isAuthorized;
@@ -378,8 +380,9 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
     }
 
     final scrollOffset = _scrollController.offset;
-    final nextBlurProgress =
-        (scrollOffset / _topActionBlurExtent).clamp(0.0, 1.0).toDouble();
+    final nextBlurProgress = (scrollOffset / _topActionBlurExtent)
+        .clamp(0.0, 1.0)
+        .toDouble();
     if ((nextBlurProgress - _topActionBlurProgress.value).abs() >= 0.01) {
       _topActionBlurProgress.value = nextBlurProgress;
     }

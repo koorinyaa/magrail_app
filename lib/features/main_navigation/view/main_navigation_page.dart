@@ -153,8 +153,9 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor:
-          isDark ? const Color(0xFF111318) : const Color(0xFFF5F7FB),
+      backgroundColor: isDark
+          ? const Color(0xFF111318)
+          : const Color(0xFFF5F7FB),
       extendBody: true,
       body: Stack(
         children: [
@@ -197,50 +198,50 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   Widget _buildTabContent() {
     return switch (_currentTab) {
       MainTab.home => MainHomeView(
-          scrollController: _homeScrollController,
-          authRepository: widget.authRepository,
-          preferences: widget.preferences,
-          topWeekRepository: widget.topWeekRepository,
-          auctionRepository: widget.auctionRepository,
-          characterDetailRepository: widget.characterDetailRepository,
-          towerRepository: widget.towerRepository,
-          templeRepository: widget.templeRepository,
-          templeAssetMagicRepository: widget.templeAssetMagicRepository,
-          oosRepository: widget.oosRepository,
-          userRepository: widget.userRepository,
-        ),
+        scrollController: _homeScrollController,
+        authRepository: widget.authRepository,
+        preferences: widget.preferences,
+        topWeekRepository: widget.topWeekRepository,
+        auctionRepository: widget.auctionRepository,
+        characterDetailRepository: widget.characterDetailRepository,
+        towerRepository: widget.towerRepository,
+        templeRepository: widget.templeRepository,
+        templeAssetMagicRepository: widget.templeAssetMagicRepository,
+        oosRepository: widget.oosRepository,
+        userRepository: widget.userRepository,
+      ),
       MainTab.ranking => RankingPage(
-          repository: widget.rankingRepository,
-          characterDetailRepository: widget.characterDetailRepository,
-          templeRepository: widget.templeRepository,
-          magicRepository: widget.templeAssetMagicRepository,
-          oosRepository: widget.oosRepository,
-          userRepository: widget.userRepository,
-          bottomContentPadding: 92,
-          scrollResetToken: _rankingScrollResetToken,
-          scrollToTopToken: _rankingScrollToTopToken,
-        ),
+        repository: widget.rankingRepository,
+        characterDetailRepository: widget.characterDetailRepository,
+        templeRepository: widget.templeRepository,
+        magicRepository: widget.templeAssetMagicRepository,
+        oosRepository: widget.oosRepository,
+        userRepository: widget.userRepository,
+        bottomContentPadding: 92,
+        scrollResetToken: _rankingScrollResetToken,
+        scrollToTopToken: _rankingScrollToTopToken,
+      ),
       MainTab.character => CharacterPage(
-          scrollController: _characterScrollController,
-          rankRepository: widget.characterRankRepository,
-          icoCharacterRepository: widget.icoCharacterRepository,
-        ),
+        scrollController: _characterScrollController,
+        rankRepository: widget.characterRankRepository,
+        icoCharacterRepository: widget.icoCharacterRepository,
+      ),
       MainTab.profile => UserDetailPage(
-          entryMode: UserDetailEntryMode.primary,
-          authRepository: widget.authRepository,
-          preferences: widget.preferences,
-          repository: widget.userRepository,
-          snapshotCoordinator: widget.userAssetSnapshotCoordinator,
-          characterDetailRepository: widget.characterDetailRepository,
-          templeRepository: widget.templeRepository,
-          templeAssetMagicRepository: widget.templeAssetMagicRepository,
-          oosRepository: widget.oosRepository,
-          scratchTicketRepository: widget.scratchTicketRepository,
-          scrollController: _profileScrollController,
-          reserveDockPadding: true,
-          onSignedOut: _switchToHomeAfterSignOut,
-          onLiquidGlassChanged: _handleLiquidGlassChanged,
-        ),
+        entryMode: UserDetailEntryMode.primary,
+        authRepository: widget.authRepository,
+        preferences: widget.preferences,
+        repository: widget.userRepository,
+        snapshotCoordinator: widget.userAssetSnapshotCoordinator,
+        characterDetailRepository: widget.characterDetailRepository,
+        templeRepository: widget.templeRepository,
+        templeAssetMagicRepository: widget.templeAssetMagicRepository,
+        oosRepository: widget.oosRepository,
+        scratchTicketRepository: widget.scratchTicketRepository,
+        scrollController: _profileScrollController,
+        reserveDockPadding: true,
+        onSignedOut: _switchToHomeAfterSignOut,
+        onLiquidGlassChanged: _handleLiquidGlassChanged,
+      ),
     };
   }
 
@@ -360,10 +361,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           if (!mounted) {
             return;
           }
-          AppToast.error(
-            context,
-            text: '登录已过期',
-          );
+          AppToast.error(context, text: '登录已过期');
           final isAuthorized = await _openAuthPage(
             onAuthenticated: _loadProfileAndSwitchAfterAuth,
           );
@@ -374,10 +372,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           if (!mounted) {
             return;
           }
-          AppToast.error(
-            context,
-            text: result.message ?? '用户资产加载失败',
-          );
+          AppToast.error(context, text: result.message ?? '用户资产加载失败');
       }
     } finally {
       _isOpeningProfile = false;
@@ -387,9 +382,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   /// 打开 Tinygrail 授权页面
   ///
   /// [onAuthenticated] 授权成功并写入 Cookie 后关闭授权页前执行的回调
-  Future<bool?> _openAuthPage({
-    Future<void> Function()? onAuthenticated,
-  }) {
+  Future<bool?> _openAuthPage({Future<void> Function()? onAuthenticated}) {
     return Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(
         builder: (context) {
@@ -421,15 +414,9 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           _currentTab = MainTab.profile;
         });
       case UserAssetsFetchStatus.authExpired:
-        AppToast.error(
-          context,
-          text: '登录已过期',
-        );
+        AppToast.error(context, text: '登录已过期');
       case UserAssetsFetchStatus.failure:
-        AppToast.error(
-          context,
-          text: result.message ?? '用户资产加载失败',
-        );
+        AppToast.error(context, text: result.message ?? '用户资产加载失败');
     }
   }
 

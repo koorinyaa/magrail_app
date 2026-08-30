@@ -5,9 +5,7 @@ class _BotLogPage extends StatefulWidget {
   /// 创建 bot 操作日志二级页面
   ///
   /// [controller] bot 配置页控制器
-  const _BotLogPage({
-    required this.controller,
-  });
+  const _BotLogPage({required this.controller});
 
   /// bot 配置页控制器
   final BotConfigController controller;
@@ -65,10 +63,7 @@ class _BotLogPageState extends State<_BotLogPage> {
       return [
         SliverFillRemaining(
           hasScrollBody: false,
-          child: _BotLogSliverState(
-            icon: Icons.wifi_off_rounded,
-            text: error,
-          ),
+          child: _BotLogSliverState(icon: Icons.wifi_off_rounded, text: error),
         ),
       ];
     }
@@ -103,9 +98,6 @@ class _BotLogPageState extends State<_BotLogPage> {
   ///
   /// [characterId] 角色 ID
   void _handleCharacterTap(int characterId) {
-    openCharacterDetail(
-      context,
-      characterId: characterId,
-    );
+    openCharacterDetail(context, characterId: characterId);
   }
 }

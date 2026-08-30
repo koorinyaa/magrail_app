@@ -42,9 +42,7 @@ class _CharacterTradeHistoryBody extends StatelessWidget {
   /// 创建角色交易记录主体内容
   ///
   /// [controller] 角色交易记录控制器
-  const _CharacterTradeHistoryBody({
-    required this.controller,
-  });
+  const _CharacterTradeHistoryBody({required this.controller});
 
   /// 角色交易记录控制器
   final CharacterTradeHistorySheetController controller;
@@ -89,9 +87,7 @@ class _CharacterTradeHistoryRow extends StatelessWidget {
   /// 创建角色交易记录条目
   ///
   /// [item] 角色交易记录图表接口条目
-  const _CharacterTradeHistoryRow({
-    required this.item,
-  });
+  const _CharacterTradeHistoryRow({required this.item});
 
   /// 角色交易记录图表接口条目
   final CharacterTradeHistoryItem item;
@@ -140,8 +136,9 @@ class _CharacterTradeHistoryRow extends StatelessWidget {
                     Icon(
                       LucideIcons.clock3,
                       size: 12,
-                      color:
-                          colorScheme.onSurfaceVariant.withValues(alpha: 0.58),
+                      color: colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.58,
+                      ),
                     ),
                     const SizedBox(width: 4),
                     Flexible(
@@ -205,9 +202,7 @@ class _CharacterTradeHistoryListDivider extends StatelessWidget {
     return Divider(
       height: 1,
       thickness: 0.6,
-      color: colorScheme.outlineVariant.withValues(
-        alpha: isDark ? 0.32 : 0.56,
-      ),
+      color: colorScheme.outlineVariant.withValues(alpha: isDark ? 0.32 : 0.56),
     );
   }
 }

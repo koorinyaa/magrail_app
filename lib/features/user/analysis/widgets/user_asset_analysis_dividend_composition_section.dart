@@ -42,15 +42,9 @@ class UserAssetAnalysisDividendCompositionSection extends StatelessWidget {
         if (!hasDividend)
           const _EmptyDividendComposition()
         else ...[
-          _DividendShareLabels(
-            character: character,
-            temple: temple,
-          ),
+          _DividendShareLabels(character: character, temple: temple),
           const SizedBox(height: 9),
-          _DividendShareTrack(
-            character: character,
-            temple: temple,
-          ),
+          _DividendShareTrack(character: character, temple: temple),
           const SizedBox(height: 18),
           SizedBox(
             height: 100,
@@ -91,10 +85,7 @@ class _DividendShareLabels extends StatelessWidget {
   ///
   /// [character] 持股股息分段
   /// [temple] 圣殿股息分段
-  const _DividendShareLabels({
-    required this.character,
-    required this.temple,
-  });
+  const _DividendShareLabels({required this.character, required this.temple});
 
   /// 持股股息分段
   final UserAssetAnalysisDividendSegment character;
@@ -150,10 +141,7 @@ class _DividendShareTrack extends StatelessWidget {
   ///
   /// [character] 持股股息分段
   /// [temple] 圣殿股息分段
-  const _DividendShareTrack({
-    required this.character,
-    required this.temple,
-  });
+  const _DividendShareTrack({required this.character, required this.temple});
 
   /// 持股股息分段
   final UserAssetAnalysisDividendSegment character;
@@ -167,14 +155,16 @@ class _DividendShareTrack extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final total = character.value + temple.value;
-    final characterShare =
-        total <= 0 ? 0.5 : (character.value / total).clamp(0, 1).toDouble();
+    final characterShare = total <= 0
+        ? 0.5
+        : (character.value / total).clamp(0, 1).toDouble();
     final disableAnimations = MediaQuery.disableAnimationsOf(context);
 
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0, end: characterShare),
-      duration:
-          disableAnimations ? Duration.zero : const Duration(milliseconds: 680),
+      duration: disableAnimations
+          ? Duration.zero
+          : const Duration(milliseconds: 680),
       curve: Curves.easeOutCubic,
       builder: (context, animatedShare, child) {
         return LayoutBuilder(
@@ -190,11 +180,7 @@ class _DividendShareTrack extends StatelessWidget {
                       width: constraints.maxWidth * animatedShare,
                       child: const ColoredBox(color: _characterColor),
                     ),
-                    const Expanded(
-                      child: ColoredBox(
-                        color: _templeColor,
-                      ),
-                    ),
+                    const Expanded(child: ColoredBox(color: _templeColor)),
                   ],
                 ),
               ),
@@ -267,10 +253,7 @@ class _DividendSourceCard extends StatelessWidget {
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
               child: Text(
-                Formatters.tinygrailCompactValue(
-                  segment.value,
-                  prefix: '₵',
-                ),
+                Formatters.tinygrailCompactValue(segment.value, prefix: '₵'),
                 maxLines: 1,
                 style: TextStyle(
                   color: colorScheme.onSurface,
@@ -312,11 +295,7 @@ class _StarlightDividendRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
           children: [
-            const Icon(
-              LucideIcons.sparkles,
-              size: 17,
-              color: _starlightColor,
-            ),
+            const Icon(LucideIcons.sparkles, size: 17, color: _starlightColor),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -357,10 +336,7 @@ class _AcrylicDividendCard extends StatelessWidget {
   ///
   /// [color] 卡片语义色
   /// [child] 卡片内容
-  const _AcrylicDividendCard({
-    required this.color,
-    required this.child,
-  });
+  const _AcrylicDividendCard({required this.color, required this.child});
 
   final Color color;
   final Widget child;
@@ -473,11 +449,7 @@ UserAssetAnalysisDividendSegment _segmentByLabel(
       return segment;
     }
   }
-  return UserAssetAnalysisDividendSegment(
-    label: label,
-    value: 0,
-    share: 0,
-  );
+  return UserAssetAnalysisDividendSegment(label: label, value: 0, share: 0);
 }
 
 /// 格式化股息占比

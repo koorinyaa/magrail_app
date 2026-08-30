@@ -17,11 +17,7 @@ class UserAssetAnalysisDatabase {
     final database = await _openDatabase();
     final rows = await database.query(
       _analysisTableName,
-      columns: const [
-        'username',
-        'updated_at_milliseconds',
-        'payload_json',
-      ],
+      columns: const ['username', 'updated_at_milliseconds', 'payload_json'],
       where: 'username = ?',
       whereArgs: [username],
       limit: 1,
@@ -37,15 +33,11 @@ class UserAssetAnalysisDatabase {
   /// [entry] 用户资产分析缓存行
   Future<void> upsertEntry(UserAssetAnalysisCacheEntry entry) async {
     final database = await _openDatabase();
-    await database.insert(
-      _analysisTableName,
-      {
-        'username': entry.username,
-        'updated_at_milliseconds': entry.updatedAtMilliseconds,
-        'payload_json': entry.payloadJson,
-      },
-      conflictAlgorithm: sqflite.ConflictAlgorithm.replace,
-    );
+    await database.insert(_analysisTableName, {
+      'username': entry.username,
+      'updated_at_milliseconds': entry.updatedAtMilliseconds,
+      'payload_json': entry.payloadJson,
+    }, conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
   }
 
   /// 删除用户资产分析缓存行
@@ -96,16 +88,16 @@ class UserAssetAnalysisDatabase {
 
     final nextOpeningDatabase = sqflite
         .openDatabase(
-      'user_asset_analysis.sqlite',
-      version: 1,
-      // 页面实例使用独立连接，避免旧页面关闭新页面复用的同路径连接
-      singleInstance: false,
-      onCreate: (database, _) => _createSchema(database),
-    )
+          'user_asset_analysis.sqlite',
+          version: 1,
+          // 页面实例使用独立连接，避免旧页面关闭新页面复用的同路径连接
+          singleInstance: false,
+          onCreate: (database, _) => _createSchema(database),
+        )
         .then((database) {
-      _database = database;
-      return database;
-    });
+          _database = database;
+          return database;
+        });
     _openingDatabase = nextOpeningDatabase;
     return nextOpeningDatabase.whenComplete(() {
       _openingDatabase = null;

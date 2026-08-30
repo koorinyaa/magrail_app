@@ -18,6 +18,7 @@ class LatestLinkCard extends StatelessWidget {
   /// [onCharacterTap] 角色名称点击回调
   /// [onUserTap] 用户名称点击回调
   /// [onAssetTap] 圣殿资产入口点击回调
+  /// [key] Flutter 组件标识
   const LatestLinkCard({
     super.key,
     required this.pair,
@@ -88,9 +89,7 @@ class LatestLinkCard extends StatelessWidget {
           TempleLinkCard(
             width: width,
             leftCoverUrl: TinygrailAssetUrls.getSmallCover(pair.left.cover),
-            leftAvatarUrl: TinygrailAssetUrls.normalizeAvatar(
-              pair.left.avatar,
-            ),
+            leftAvatarUrl: TinygrailAssetUrls.normalizeAvatar(pair.left.avatar),
             leftCharacterName: TinygrailFormatters.decodeHtmlEntities(
               pair.left.characterName,
             ),
@@ -99,8 +98,9 @@ class LatestLinkCard extends StatelessWidget {
             onLeftCharacterTap: onCharacterTap == null
                 ? null
                 : () => onCharacterTap!(pair.left),
-            onLeftAssetTap:
-                onAssetTap == null ? null : () => onAssetTap!(pair, pair.left),
+            onLeftAssetTap: onAssetTap == null
+                ? null
+                : () => onAssetTap!(pair, pair.left),
             rightCoverUrl: TinygrailAssetUrls.getSmallCover(pair.right.cover),
             rightAvatarUrl: TinygrailAssetUrls.normalizeAvatar(
               pair.right.avatar,
@@ -113,8 +113,9 @@ class LatestLinkCard extends StatelessWidget {
             onRightCharacterTap: onCharacterTap == null
                 ? null
                 : () => onCharacterTap!(pair.right),
-            onRightAssetTap:
-                onAssetTap == null ? null : () => onAssetTap!(pair, pair.right),
+            onRightAssetTap: onAssetTap == null
+                ? null
+                : () => onAssetTap!(pair, pair.right),
           ),
           const SizedBox(height: 8),
           Padding(
@@ -193,9 +194,7 @@ class LatestLinkCard extends StatelessWidget {
   ///
   /// [pair] 最新连接展示组
   String _resolveOwnerLabel(LatestLinkPair pair) {
-    final nickname = TinygrailFormatters.decodeHtmlEntities(
-      pair.ownerNickname,
-    );
+    final nickname = TinygrailFormatters.decodeHtmlEntities(pair.ownerNickname);
     if (nickname.isNotEmpty) {
       return '@$nickname';
     }

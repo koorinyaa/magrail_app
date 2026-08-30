@@ -13,22 +13,20 @@ class TopWeekRepository {
   /// 创建每周萌王仓库
   ///
   /// [apiClient] Tinygrail API 客户端
-  const TopWeekRepository({
-    required ApiClient apiClient,
-  }) : _apiClient = apiClient;
+  const TopWeekRepository({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   final ApiClient _apiClient;
 
   /// 获取每周萌王条目
   Future<List<TopWeekEntry>> fetchTopWeekEntries() async {
-    final json =
-        await _apiClient.getJson<Map<String, Object?>>('chara/topweek');
+    final json = await _apiClient.getJson<Map<String, Object?>>(
+      'chara/topweek',
+    );
     final response = TinygrailResponse<List<TopWeekApiItem>>.fromJson(
       json,
-      (value) => TinygrailResponseParser.asObjectList(
-        value,
-        TopWeekApiItem.fromJson,
-      ),
+      (value) =>
+          TinygrailResponseParser.asObjectList(value, TopWeekApiItem.fromJson),
     );
 
     if (!response.isSuccess) {
@@ -42,10 +40,14 @@ class TopWeekRepository {
 
     final scoreBase = _resolveScoreBase(items);
 
-    return items.asMap().entries.map((entry) {
-      final rank = entry.key + 1;
-      return _mapItemToEntry(entry.value, rank, scoreBase);
-    }).toList(growable: false);
+    return items
+        .asMap()
+        .entries
+        .map((entry) {
+          final rank = entry.key + 1;
+          return _mapItemToEntry(entry.value, rank, scoreBase);
+        })
+        .toList(growable: false);
   }
 
   /// 获取往期萌王分页数据
@@ -60,17 +62,18 @@ class TopWeekRepository {
       'chara/topweek/history/$page/$pageSize',
     );
     final response =
-        TinygrailResponse<TinygrailPage<TopWeekHistoryApiItem>>.fromJson(
-      json,
-      (value) {
-        final valueJson = TinygrailResponseParser.asObjectMap(value);
-        if (valueJson == null) {
-          return null;
-        }
-        return TinygrailPage.fromJson(
-            valueJson, TopWeekHistoryApiItem.fromJson);
-      },
-    );
+        TinygrailResponse<TinygrailPage<TopWeekHistoryApiItem>>.fromJson(json, (
+          value,
+        ) {
+          final valueJson = TinygrailResponseParser.asObjectMap(value);
+          if (valueJson == null) {
+            return null;
+          }
+          return TinygrailPage.fromJson(
+            valueJson,
+            TopWeekHistoryApiItem.fromJson,
+          );
+        });
 
     if (!response.isSuccess || response.value == null) {
       throw StateError(response.message ?? '获取往期萌王失败');

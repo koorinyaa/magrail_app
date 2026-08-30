@@ -26,9 +26,7 @@ Future<void> updateTempleAssetCover(
   late final XFile? pickedFile;
   late final Uint8List bytes;
   try {
-    pickedFile = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
-    );
+    pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile == null) {
       return;
     }
@@ -129,10 +127,7 @@ String? _resolveImageContentType(XFile pickedFile, List<int> bytes) {
     return pathMimeType;
   }
 
-  return lookupMimeType(
-    pickedFile.name,
-    headerBytes: bytes,
-  )?.trim();
+  return lookupMimeType(pickedFile.name, headerBytes: bytes)?.trim();
 }
 
 /// 转换封面更新错误文案

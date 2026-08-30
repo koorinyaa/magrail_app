@@ -5,9 +5,7 @@ class _TowerLogFooter extends StatelessWidget {
   /// 创建通天塔日志底部状态
   ///
   /// [controller] 通天塔日志控制器
-  const _TowerLogFooter({
-    required this.controller,
-  });
+  const _TowerLogFooter({required this.controller});
 
   final TowerLogController controller;
 
@@ -17,9 +15,7 @@ class _TowerLogFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (controller.hasLargeRealtimeUpdate) {
-      return _TowerLogExpiredFooter(
-        onRefresh: controller.refreshLatest,
-      );
+      return _TowerLogExpiredFooter(onRefresh: controller.refreshLatest);
     }
 
     return PaginationFooter(
@@ -37,9 +33,7 @@ class _TowerLogExpiredFooter extends StatelessWidget {
   /// 创建通天塔日志分页过期底部提示
   ///
   /// [onRefresh] 刷新最新日志回调
-  const _TowerLogExpiredFooter({
-    required this.onRefresh,
-  });
+  const _TowerLogExpiredFooter({required this.onRefresh});
 
   final VoidCallback onRefresh;
 
@@ -182,9 +176,7 @@ class _TowerLogRealtimeDivider extends StatelessWidget {
   /// 创建通天塔日志实时分隔线
   ///
   /// [count] 已显示的实时日志数量
-  const _TowerLogRealtimeDivider({
-    required this.count,
-  });
+  const _TowerLogRealtimeDivider({required this.count});
 
   final int count;
 
@@ -200,13 +192,7 @@ class _TowerLogRealtimeDivider extends StatelessWidget {
       height: 32,
       child: Row(
         children: [
-          Expanded(
-            child: Divider(
-              height: 1,
-              thickness: 1,
-              color: lineColor,
-            ),
-          ),
+          Expanded(child: Divider(height: 1, thickness: 1, color: lineColor)),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
@@ -221,13 +207,7 @@ class _TowerLogRealtimeDivider extends StatelessWidget {
               ),
             ),
           ),
-          Expanded(
-            child: Divider(
-              height: 1,
-              thickness: 1,
-              color: lineColor,
-            ),
-          ),
+          Expanded(child: Divider(height: 1, thickness: 1, color: lineColor)),
         ],
       ),
     );
@@ -347,9 +327,7 @@ class _TowerLogErrorState extends StatelessWidget {
   /// 创建通天塔日志加载错误状态
   ///
   /// [onRetry] 重试回调
-  const _TowerLogErrorState({
-    required this.onRetry,
-  });
+  const _TowerLogErrorState({required this.onRetry});
 
   final VoidCallback onRetry;
 

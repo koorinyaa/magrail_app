@@ -25,8 +25,9 @@ class CharacterDetailLinksPageController extends ChangeNotifier {
   List<CharacterDetailLinkGroup> get groups {
     final grouped = <int, List<CharacterDetailTempleItem>>{};
     for (final item in items) {
-      final groupKey =
-          item.linkId == 0 ? item.link?.characterId ?? 0 : item.linkId;
+      final groupKey = item.linkId == 0
+          ? item.link?.characterId ?? 0
+          : item.linkId;
       grouped
           .putIfAbsent(groupKey, () => <CharacterDetailTempleItem>[])
           .add(item);
@@ -59,10 +60,7 @@ class CharacterDetailLinkGroup {
   ///
   /// [linkId] LINK 目标角色 ID
   /// [items] 分组内 LINK 条目
-  const CharacterDetailLinkGroup({
-    required this.linkId,
-    required this.items,
-  });
+  const CharacterDetailLinkGroup({required this.linkId, required this.items});
 
   /// LINK 目标角色 ID
   final int linkId;
@@ -74,6 +72,8 @@ class CharacterDetailLinkGroup {
   int get count => items.length;
 
   /// LINK 目标角色名称
+  ///
+  /// [fallback] 角色名称为空时的回退文案
   String linkedCharacterName(String fallback) {
     for (final item in items) {
       final linked = item.link;

@@ -10,18 +10,11 @@ class UserItemPageController extends ChangeNotifier {
   /// 创建用户道具二级页面控制器
   ///
   /// [repository] 用户仓库
-  UserItemPageController({
-    required UserRepository repository,
-  }) : _repository = repository;
+  UserItemPageController({required UserRepository repository})
+    : _repository = repository;
 
   // 已接入使用流程的道具固定置顶展示
-  static const Map<int, int> _pinnedItemOrder = {
-    6: 0,
-    5: 1,
-    1: 2,
-    9: 3,
-    2: 4,
-  };
+  static const Map<int, int> _pinnedItemOrder = {6: 0, 5: 1, 1: 2, 9: 3, 2: 4};
 
   final UserRepository _repository;
   List<UserItemApiItem> _items = const <UserItemApiItem>[];

@@ -5,9 +5,7 @@ class _IcoHeaderShell extends StatelessWidget {
   /// 创建 ICO 头部卡片外壳
   ///
   /// [child] 卡片主体内容
-  const _IcoHeaderShell({
-    required this.child,
-  });
+  const _IcoHeaderShell({required this.child});
 
   /// 卡片主体内容
   final Widget child;
@@ -19,8 +17,9 @@ class _IcoHeaderShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
-    final cardColor =
-        isDark ? colorScheme.surfaceContainerLow : colorScheme.surface;
+    final cardColor = isDark
+        ? colorScheme.surfaceContainerLow
+        : colorScheme.surface;
 
     return Container(
       width: double.infinity,
@@ -47,10 +46,7 @@ class _IcoHeaderTitle extends StatelessWidget {
   ///
   /// [info] ICO 头部资料
   /// [prediction] ICO 预测数据
-  const _IcoHeaderTitle({
-    required this.info,
-    required this.prediction,
-  });
+  const _IcoHeaderTitle({required this.info, required this.prediction});
 
   /// ICO 头部资料
   final CharacterDetailIcoInfo info;
@@ -120,9 +116,7 @@ class _IcoHeaderCharacterIdRow extends StatelessWidget {
   /// 创建 ICO 头部角色 ID 行
   ///
   /// [characterId] 角色 ID
-  const _IcoHeaderCharacterIdRow({
-    required this.characterId,
-  });
+  const _IcoHeaderCharacterIdRow({required this.characterId});
 
   /// 角色 ID
   final int characterId;
@@ -176,17 +170,12 @@ class _IcoHeaderCharacterIdRow extends StatelessWidget {
   ///
   /// [context] 当前组件树上下文
   Future<void> _copyCharacterId(BuildContext context) async {
-    await Clipboard.setData(
-      ClipboardData(text: '#$characterId'),
-    );
+    await Clipboard.setData(ClipboardData(text: '#$characterId'));
     if (!context.mounted) {
       return;
     }
 
-    AppToast.info(
-      context,
-      text: '已复制角色ID',
-    );
+    AppToast.info(context, text: '已复制角色ID');
   }
 }
 
@@ -196,10 +185,7 @@ class _IcoHeaderChips extends StatelessWidget {
   ///
   /// [info] ICO 头部资料
   /// [prediction] ICO 预测数据
-  const _IcoHeaderChips({
-    required this.info,
-    required this.prediction,
-  });
+  const _IcoHeaderChips({required this.info, required this.prediction});
 
   /// ICO 头部资料
   final CharacterDetailIcoInfo info;
@@ -237,10 +223,7 @@ class _IcoHeaderProgress extends StatelessWidget {
   ///
   /// [info] ICO 头部资料
   /// [prediction] ICO 预测数据
-  const _IcoHeaderProgress({
-    required this.info,
-    required this.prediction,
-  });
+  const _IcoHeaderProgress({required this.info, required this.prediction});
 
   /// ICO 头部资料
   final CharacterDetailIcoInfo info;
@@ -263,9 +246,7 @@ class _IcoHeaderProgress extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Expanded(
-              child: _IcoHeaderProgressMessage(prediction: prediction),
-            ),
+            Expanded(child: _IcoHeaderProgressMessage(prediction: prediction)),
             const SizedBox(width: 12),
             Text(
               '$percent%',
@@ -288,9 +269,7 @@ class _IcoHeaderProgress extends StatelessWidget {
             value: prediction.progress,
             minHeight: 4,
             backgroundColor: colorScheme.surfaceContainerHighest,
-            valueColor: AlwaysStoppedAnimation<Color>(
-              progressColor,
-            ),
+            valueColor: AlwaysStoppedAnimation<Color>(progressColor),
           ),
         ),
       ],
@@ -325,9 +304,7 @@ class _IcoHeaderProgressMessage extends StatelessWidget {
   /// 创建 ICO 头部进度目标文案
   ///
   /// [prediction] ICO 预测数据
-  const _IcoHeaderProgressMessage({
-    required this.prediction,
-  });
+  const _IcoHeaderProgressMessage({required this.prediction});
 
   /// ICO 预测数据
   final CharacterDetailIcoPrediction prediction;
@@ -361,17 +338,12 @@ class _IcoHeaderProgressMessage extends StatelessWidget {
   ///
   /// [accentStyle] 数字强调样式
   /// [moneyNeeded] 还需金额
-  List<InlineSpan> _buildSpans(
-    TextStyle accentStyle,
-    double moneyNeeded,
-  ) {
+  List<InlineSpan> _buildSpans(TextStyle accentStyle, double moneyNeeded) {
     final needsUsers = prediction.users > 0;
     final needsMoney = moneyNeeded > 0;
     if (!needsUsers && !needsMoney) {
       return <InlineSpan>[
-        TextSpan(
-          text: prediction.level > 0 ? '已达到下一等级条件' : '已满足上市条件',
-        ),
+        TextSpan(text: prediction.level > 0 ? '已达到下一等级条件' : '已满足上市条件'),
       ];
     }
 
@@ -389,10 +361,7 @@ class _IcoHeaderProgressMessage extends StatelessWidget {
   ///
   /// [accentStyle] 数字强调样式
   /// [moneyNeeded] 还需金额
-  List<InlineSpan> _buildMoneySpans(
-    TextStyle accentStyle,
-    double moneyNeeded,
-  ) {
+  List<InlineSpan> _buildMoneySpans(TextStyle accentStyle, double moneyNeeded) {
     final moneyText = Formatters.tinygrailCurrency(moneyNeeded);
     if (!moneyText.startsWith('₵')) {
       return <InlineSpan>[
@@ -413,9 +382,7 @@ class _IcoHeaderCountdown extends StatelessWidget {
   /// 创建 ICO 头部倒计时区
   ///
   /// [countdown] ICO 倒计时数据
-  const _IcoHeaderCountdown({
-    required this.countdown,
-  });
+  const _IcoHeaderCountdown({required this.countdown});
 
   /// ICO 倒计时数据
   final _CharacterDetailIcoCountdown countdown;
@@ -430,8 +397,8 @@ class _IcoHeaderCountdown extends StatelessWidget {
     const warningColor = Color(0xFFF5A524);
     final countdownColor = countdown.isEndingSoon
         ? isDark
-            ? const Color(0xFFFFD58A)
-            : warningColor
+              ? const Color(0xFFFFD58A)
+              : warningColor
         : colorScheme.onSurfaceVariant;
 
     return Row(
@@ -476,9 +443,7 @@ class _IcoHeaderInfoChip extends StatelessWidget {
   /// 创建 ICO 头部通用信息胶囊
   ///
   /// [text] 胶囊文本
-  const _IcoHeaderInfoChip({
-    required this.text,
-  });
+  const _IcoHeaderInfoChip({required this.text});
 
   /// 胶囊文本
   final String text;
@@ -496,8 +461,9 @@ class _IcoHeaderInfoChip extends StatelessWidget {
     final backgroundColor = isHighlighted
         ? highlightColor.withValues(alpha: isDark ? 0.22 : 0.14)
         : colors.backgroundColor;
-    final foregroundColor =
-        isHighlighted ? highlightColor : colors.foregroundColor;
+    final foregroundColor = isHighlighted
+        ? highlightColor
+        : colors.foregroundColor;
 
     return DecoratedBox(
       decoration: BoxDecoration(

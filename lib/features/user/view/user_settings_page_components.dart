@@ -108,11 +108,7 @@ class _SettingsActionTile extends StatelessWidget {
                 const _SettingsNewBadge(),
                 const SizedBox(width: 10),
               ],
-              Icon(
-                trailingIcon,
-                size: 20,
-                color: colorScheme.onSurfaceVariant,
-              ),
+              Icon(trailingIcon, size: 20, color: colorScheme.onSurfaceVariant),
             ],
           ),
         ),
@@ -430,10 +426,7 @@ class _SignOutButton extends StatelessWidget {
   ///
   /// [isDisabled] 是否禁用点击
   /// [onPressed] 退出按钮点击回调
-  const _SignOutButton({
-    required this.isDisabled,
-    required this.onPressed,
-  });
+  const _SignOutButton({required this.isDisabled, required this.onPressed});
 
   /// 是否禁用点击
   final bool isDisabled;
@@ -458,11 +451,7 @@ class _SignOutButton extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
           child: Row(
             children: [
-              Icon(
-                Icons.logout_rounded,
-                size: 22,
-                color: colorScheme.error,
-              ),
+              Icon(Icons.logout_rounded, size: 22, color: colorScheme.error),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(

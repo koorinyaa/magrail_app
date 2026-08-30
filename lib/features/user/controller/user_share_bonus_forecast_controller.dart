@@ -12,8 +12,8 @@ class UserShareBonusForecastController extends ChangeNotifier {
   UserShareBonusForecastController({
     required UserRepository repository,
     required String username,
-  })  : _repository = repository,
-        _username = username;
+  }) : _repository = repository,
+       _username = username;
 
   final UserRepository _repository;
   final String _username;

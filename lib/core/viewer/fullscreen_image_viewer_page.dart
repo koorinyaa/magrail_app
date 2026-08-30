@@ -8,6 +8,7 @@ import 'package:magrail_app/core/utils/image_saver.dart';
 class FullscreenImageViewerPage extends StatefulWidget {
   /// 创建全屏图片查看页面
   ///
+  /// [key] Flutter 组件标识
   /// [imageUrl] 图片地址
   /// [heroTag] Hero 动画标识
   const FullscreenImageViewerPage({
@@ -18,6 +19,7 @@ class FullscreenImageViewerPage extends StatefulWidget {
 
   /// 创建全屏资源图片查看页面
   ///
+  /// [key] Flutter 组件标识
   /// [assetName] 资源图片路径
   /// [heroTag] Hero 动画标识
   const FullscreenImageViewerPage.asset({
@@ -74,10 +76,7 @@ class _FullscreenImageViewerPageState extends State<FullscreenImageViewerPage> {
                     ),
                   ),
                   Positioned.fill(
-                    child: Hero(
-                      tag: widget.heroTag,
-                      child: _buildImage(),
-                    ),
+                    child: Hero(tag: widget.heroTag, child: _buildImage()),
                   ),
                 ],
               ),
@@ -174,8 +173,9 @@ class _FullscreenImageViewerPageState extends State<FullscreenImageViewerPage> {
   /// [offset] 页面滑动位移
   /// [pageSize] 页面尺寸
   Color _resolveSlideBackgroundColor(Offset offset, Size pageSize) {
-    final progress =
-        (offset.dy.abs() / (pageSize.height * 0.45)).clamp(0.0, 1.0).toDouble();
+    final progress = (offset.dy.abs() / (pageSize.height * 0.45))
+        .clamp(0.0, 1.0)
+        .toDouble();
     return const Color(0xFF09090B).withValues(alpha: 1 - progress);
   }
 
@@ -207,10 +207,6 @@ class _FullscreenImageViewerPageState extends State<FullscreenImageViewerPage> {
       ImageSaveStatus.saveFailed => AppToastVariant.error,
     };
 
-    AppToast.show(
-      context,
-      text: result.message,
-      variant: variant,
-    );
+    AppToast.show(context, text: result.message, variant: variant);
   }
 }

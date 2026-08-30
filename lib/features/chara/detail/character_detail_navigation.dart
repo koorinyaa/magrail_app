@@ -19,8 +19,9 @@ void openCharacterDetail(
   String? avatarUrl,
   String? avatarHeroTag,
 }) {
-  final resolvedName =
-      TinygrailFormatters.decodeHtmlEntities(name ?? '').trim();
+  final resolvedName = TinygrailFormatters.decodeHtmlEntities(
+    name ?? '',
+  ).trim();
   final trimmedAvatarUrl = avatarUrl?.trim();
   final resolvedAvatarUrl = trimmedAvatarUrl == null || trimmedAvatarUrl.isEmpty
       ? ''

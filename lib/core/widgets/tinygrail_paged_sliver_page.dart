@@ -10,11 +10,12 @@ import 'package:magrail_app/core/widgets/secondary_page_refresh_view.dart';
 /// [context] 当前组件树上下文
 /// [items] 当前已加载的展示条目
 /// [onItemBuilt] 展示条目构建回调
-typedef TinygrailPagedContentSliversBuilder<T> = List<Widget> Function(
-  BuildContext context,
-  List<T> items,
-  ValueChanged<int> onItemBuilt,
-);
+typedef TinygrailPagedContentSliversBuilder<T> =
+    List<Widget> Function(
+      BuildContext context,
+      List<T> items,
+      ValueChanged<int> onItemBuilt,
+    );
 
 /// Tinygrail 分页二级页面通用壳层
 class TinygrailPagedSliverPage<T, R> extends StatefulWidget {
@@ -69,7 +70,8 @@ class TinygrailPagedSliverPage<T, R> extends StatefulWidget {
   final Widget Function(
     BuildContext context,
     TinygrailPagedListController<T, R> controller,
-  ) emptySliverBuilder;
+  )
+  emptySliverBuilder;
 
   /// 内容 sliver 构建器
   final TinygrailPagedContentSliversBuilder<T> contentSliversBuilder;
@@ -120,7 +122,8 @@ class _TinygrailPagedSliverPageState<T, R>
         listenable: widget.controller,
         builder: (context, child) {
           final items = widget.controller.items;
-          final isStateOnlyContent = !widget.controller.isInitialLoading &&
+          final isStateOnlyContent =
+              !widget.controller.isInitialLoading &&
               (widget.controller.initialError != null || items.isEmpty);
 
           return SecondaryPageRefreshView(
@@ -158,7 +161,8 @@ class _TinygrailPagedSliverPageState<T, R>
               if (!isStateOnlyContent)
                 SliverToBoxAdapter(
                   child: SizedBox(
-                    height: widget.bottomContentPadding +
+                    height:
+                        widget.bottomContentPadding +
                         MediaQuery.paddingOf(context).bottom,
                   ),
                 ),
@@ -190,9 +194,6 @@ class _TinygrailPagedSliverPageState<T, R>
       return;
     }
 
-    AppToast.error(
-      context,
-      text: widget.refreshErrorText,
-    );
+    AppToast.error(context, text: widget.refreshErrorText);
   }
 }

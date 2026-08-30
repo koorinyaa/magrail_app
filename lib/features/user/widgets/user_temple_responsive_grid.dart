@@ -140,23 +140,20 @@ class UserTempleResponsiveGrid extends StatelessWidget {
         crossAxisSpacing: crossAxisSpacing,
         childAspectRatio: metrics.childAspectRatio,
       ),
-      delegate: SliverChildBuilderDelegate(
-        (context, localIndex) {
-          final index = start + localIndex;
-          final item = items[index];
-          onItemBuilt?.call(index);
-          return UserTempleCard(
-            item: item,
-            ownerLabel: ownerLabel,
-            width: metrics.cardWidth,
-            heroTagPrefix: 'user-temple-page-cover-$index',
-            sortValue: sortValues[item.id],
-            onCharacterTap: onCharacterTap,
-            onAssetTap: onAssetTap,
-          );
-        },
-        childCount: end - start,
-      ),
+      delegate: SliverChildBuilderDelegate((context, localIndex) {
+        final index = start + localIndex;
+        final item = items[index];
+        onItemBuilt?.call(index);
+        return UserTempleCard(
+          item: item,
+          ownerLabel: ownerLabel,
+          width: metrics.cardWidth,
+          heroTagPrefix: 'user-temple-page-cover-$index',
+          sortValue: sortValues[item.id],
+          onCharacterTap: onCharacterTap,
+          onAssetTap: onAssetTap,
+        );
+      }, childCount: end - start),
     );
   }
 
@@ -374,9 +371,7 @@ class _UserTempleLevelGroup {
 /// 按连续角色等级拆分圣殿网格
 ///
 /// [items] 已按角色等级排序的圣殿条目
-List<_UserTempleLevelGroup> _resolveLevelGroups(
-  List<UserTempleApiItem> items,
-) {
+List<_UserTempleLevelGroup> _resolveLevelGroups(List<UserTempleApiItem> items) {
   if (items.isEmpty) {
     return const [];
   }
@@ -444,10 +439,7 @@ class UserTempleSkeletonGrid extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [itemCount] 骨架卡片数量
-  const UserTempleSkeletonGrid({
-    super.key,
-    this.itemCount = 12,
-  });
+  const UserTempleSkeletonGrid({super.key, this.itemCount = 12});
 
   /// 骨架卡片数量
   final int itemCount;

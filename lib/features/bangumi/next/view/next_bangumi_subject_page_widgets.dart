@@ -44,7 +44,8 @@ class _NextBangumiSubjectFloatingToolbar extends StatelessWidget {
     final safePadding = MediaQuery.paddingOf(context);
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
-    final backgroundAlpha = progress *
+    final backgroundAlpha =
+        progress *
         (isDark
             ? AppBlurStyle.darkSurfaceAlpha
             : AppBlurStyle.lightSurfaceAlpha);
@@ -117,10 +118,10 @@ class _NextBangumiSubjectTopActions extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final iconButtonStyle =
         (IconButtonTheme.of(context).style ?? const ButtonStyle()).copyWith(
-      foregroundColor: WidgetStatePropertyAll(colorScheme.onSurface),
-      fixedSize: WidgetStatePropertyAll(Size.square(toolbarHeight)),
-      padding: const WidgetStatePropertyAll(EdgeInsets.zero),
-    );
+          foregroundColor: WidgetStatePropertyAll(colorScheme.onSurface),
+          fixedSize: WidgetStatePropertyAll(Size.square(toolbarHeight)),
+          padding: const WidgetStatePropertyAll(EdgeInsets.zero),
+        );
 
     return IconButtonTheme(
       data: IconButtonThemeData(style: iconButtonStyle),
@@ -139,10 +140,7 @@ class _NextBangumiSubjectTopActions extends StatelessWidget {
                   child: Center(
                     child: IconButton(
                       onPressed: () => Navigator.of(context).maybePop(),
-                      icon: const Icon(
-                        Icons.chevron_left_rounded,
-                        size: 30,
-                      ),
+                      icon: const Icon(Icons.chevron_left_rounded, size: 30),
                     ),
                   ),
                 ),
@@ -154,10 +152,7 @@ class _NextBangumiSubjectTopActions extends StatelessWidget {
                   child: Center(
                     child: IconButton(
                       onPressed: onSearchPressed,
-                      icon: const Icon(
-                        Icons.search_rounded,
-                        size: 22,
-                      ),
+                      icon: const Icon(Icons.search_rounded, size: 22),
                     ),
                   ),
                 ),
@@ -234,9 +229,7 @@ class _NextBangumiSubjectDetailSliver extends StatelessWidget {
   /// 创建 Next Bangumi 条目详情 Sliver
   ///
   /// [subject] 条目详情
-  const _NextBangumiSubjectDetailSliver({
-    required this.subject,
-  });
+  const _NextBangumiSubjectDetailSliver({required this.subject});
 
   /// 条目详情
   final NextBangumiSubject subject;
@@ -253,8 +246,9 @@ class _NextBangumiSubjectDetailSliver extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
           child: Center(
             child: ConstrainedBox(
-              constraints:
-                  const BoxConstraints(maxWidth: _subjectContentMaxWidth),
+              constraints: const BoxConstraints(
+                maxWidth: _subjectContentMaxWidth,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -296,9 +290,7 @@ class _NextBangumiSubjectCover extends StatelessWidget {
   /// 创建 Next Bangumi 条目详情封面
   ///
   /// [coverUrl] 封面地址
-  const _NextBangumiSubjectCover({
-    required this.coverUrl,
-  });
+  const _NextBangumiSubjectCover({required this.coverUrl});
 
   /// 封面地址
   final String coverUrl;
@@ -431,9 +423,7 @@ class _NextBangumiSubjectTitle extends StatelessWidget {
   /// 创建 Next Bangumi 条目详情标题
   ///
   /// [subject] 条目详情
-  const _NextBangumiSubjectTitle({
-    required this.subject,
-  });
+  const _NextBangumiSubjectTitle({required this.subject});
 
   /// 条目详情
   final NextBangumiSubject subject;
@@ -509,9 +499,7 @@ class _NextBangumiSubjectTagWrap extends StatelessWidget {
   /// 创建 Next Bangumi 条目详情标签组
   ///
   /// [tags] 标签文本
-  const _NextBangumiSubjectTagWrap({
-    required this.tags,
-  });
+  const _NextBangumiSubjectTagWrap({required this.tags});
 
   /// 标签文本
   final List<String> tags;
@@ -525,9 +513,7 @@ class _NextBangumiSubjectTagWrap extends StatelessWidget {
       alignment: WrapAlignment.center,
       spacing: 6,
       runSpacing: 7,
-      children: [
-        for (final tag in tags) _NextBangumiSubjectTag(text: tag),
-      ],
+      children: [for (final tag in tags) _NextBangumiSubjectTag(text: tag)],
     );
   }
 }
@@ -537,9 +523,7 @@ class _NextBangumiSubjectTag extends StatelessWidget {
   /// 创建 Next Bangumi 条目详情标签胶囊
   ///
   /// [text] 标签文本
-  const _NextBangumiSubjectTag({
-    required this.text,
-  });
+  const _NextBangumiSubjectTag({required this.text});
 
   /// 标签文本
   final String text;
@@ -585,9 +569,7 @@ class _NextBangumiSubjectScore extends StatelessWidget {
   /// 创建 Next Bangumi 条目详情评分
   ///
   /// [score] 评分
-  const _NextBangumiSubjectScore({
-    required this.score,
-  });
+  const _NextBangumiSubjectScore({required this.score});
 
   /// 评分
   final double score;

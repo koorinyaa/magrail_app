@@ -10,6 +10,7 @@ class TowerRankingRangeHeader extends StatelessWidget
   /// [selectedIndex] 当前选中的分段索引
   /// [segmentCount] 分段数量
   /// [onSelected] 分段选择回调
+  /// [key] Flutter 组件标识
   const TowerRankingRangeHeader({
     super.key,
     required this.selectedIndex,
@@ -45,9 +46,7 @@ class TowerRankingRangeHeader extends StatelessWidget
       height: preferredSize.height,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: dividerColor),
-          ),
+          border: Border(bottom: BorderSide(color: dividerColor)),
         ),
         child: _TowerRankingRangeSelector(
           selectedIndex: selectedIndex,
@@ -140,13 +139,13 @@ class _TowerRankingRangeChip extends StatelessWidget {
             isDark ? colorScheme.surfaceContainerLow : colorScheme.surface,
           )
         : isDark
-            ? colorScheme.surfaceContainerLow
-            : colorScheme.surfaceContainerHighest;
+        ? colorScheme.surfaceContainerLow
+        : colorScheme.surfaceContainerHighest;
     final textColor = isSelected
         ? colorScheme.primary
         : isDark
-            ? colorScheme.onSurfaceVariant
-            : colorScheme.onSurface;
+        ? colorScheme.onSurfaceVariant
+        : colorScheme.onSurface;
 
     return Material(
       color: Colors.transparent,

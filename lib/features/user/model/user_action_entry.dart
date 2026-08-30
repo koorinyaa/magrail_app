@@ -52,10 +52,7 @@ final class UserActionEntry {
   ///
   /// [type] 入口类型
   /// [label] 入口文案
-  const UserActionEntry({
-    required this.type,
-    required this.label,
-  });
+  const UserActionEntry({required this.type, required this.label});
 
   /// 入口类型
   final UserActionType type;

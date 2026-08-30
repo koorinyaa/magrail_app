@@ -20,9 +20,9 @@ class AppActivityReporter {
     required Dio dio,
     required SecureStorage secureStorage,
     required AppPreferences preferences,
-  })  : _dio = dio,
-        _secureStorage = secureStorage,
-        _preferences = preferences;
+  }) : _dio = dio,
+       _secureStorage = secureStorage,
+       _preferences = preferences;
 
   final Dio _dio;
   final SecureStorage _secureStorage;
@@ -137,7 +137,8 @@ class AppActivityReporter {
     required String appVersion,
   }) {
     final utc8Now = DateTime.now().toUtc().add(const Duration(hours: 8));
-    final day = '${utc8Now.year.toString().padLeft(4, '0')}-'
+    final day =
+        '${utc8Now.year.toString().padLeft(4, '0')}-'
         '${utc8Now.month.toString().padLeft(2, '0')}-'
         '${utc8Now.day.toString().padLeft(2, '0')}';
     final account = userId == null ? 'guest' : '$userId:$username';

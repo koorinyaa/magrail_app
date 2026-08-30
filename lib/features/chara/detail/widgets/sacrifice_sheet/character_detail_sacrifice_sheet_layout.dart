@@ -1,14 +1,12 @@
 part of '../character_detail_sacrifice_sheet.dart';
 
+/// 角色资产重组抽屉布局
 class _SacrificeMainPanel extends StatelessWidget {
   /// 创建资产重组抽屉主体面板
   ///
   /// [controller] 资产重组抽屉控制器
   /// [onSubmit] 提交回调
-  const _SacrificeMainPanel({
-    required this.controller,
-    required this.onSubmit,
-  });
+  const _SacrificeMainPanel({required this.controller, required this.onSubmit});
 
   /// 资产重组抽屉控制器
   final CharacterDetailSacrificeSheetController controller;
@@ -32,10 +30,7 @@ class _SacrificeMainPanel extends StatelessWidget {
         const SizedBox(height: 10),
         _SacrificeQuickButtons(controller: controller),
         const SizedBox(height: 16),
-        _SacrificeSubmitButton(
-          controller: controller,
-          onSubmit: onSubmit,
-        ),
+        _SacrificeSubmitButton(controller: controller, onSubmit: onSubmit),
       ],
     );
   }
@@ -58,9 +53,7 @@ BoxDecoration _sacrificeInsetDecoration(
     ),
     borderRadius: BorderRadius.circular(radius),
     border: Border.all(
-      color: colorScheme.outlineVariant.withValues(
-        alpha: isDark ? 0.20 : 0.36,
-      ),
+      color: colorScheme.outlineVariant.withValues(alpha: isDark ? 0.20 : 0.36),
     ),
   );
 }
@@ -71,10 +64,7 @@ class _SacrificeSheetHeader extends StatelessWidget {
   ///
   /// [controller] 资产重组抽屉控制器
   /// [mode] 标题展示的提交类型
-  const _SacrificeSheetHeader({
-    required this.controller,
-    this.mode,
-  });
+  const _SacrificeSheetHeader({required this.controller, this.mode});
 
   /// 资产重组抽屉控制器
   final CharacterDetailSacrificeSheetController controller;
@@ -91,13 +81,15 @@ class _SacrificeSheetHeader extends StatelessWidget {
     final characterName = TinygrailFormatters.decodeHtmlEntities(
       header?.name ?? '',
     ).trim();
-    final resolvedCharacterName =
-        characterName.isEmpty ? '角色名称' : characterName;
+    final resolvedCharacterName = characterName.isEmpty
+        ? '角色名称'
+        : characterName;
     final characterSubtitle =
         '#${header?.characterId ?? 0} 「$resolvedCharacterName」';
     final titleMode = mode ?? controller.mode;
-    final title =
-        titleMode == CharacterDetailSacrificeMode.financing ? '股权融资' : '资产重组';
+    final title = titleMode == CharacterDetailSacrificeMode.financing
+        ? '股权融资'
+        : '资产重组';
 
     return AppBottomSheetHeader(
       icon: LucideIcons.repeat2,
@@ -112,9 +104,7 @@ class _SacrificeStats extends StatelessWidget {
   /// 创建资产重组数据概览
   ///
   /// [controller] 资产重组抽屉控制器
-  const _SacrificeStats({
-    required this.controller,
-  });
+  const _SacrificeStats({required this.controller});
 
   /// 资产重组抽屉控制器
   final CharacterDetailSacrificeSheetController controller;
@@ -140,7 +130,8 @@ class _SacrificeStats extends StatelessWidget {
             Expanded(
               child: _SacrificeStatItem(
                 label: '圣殿',
-                value: '${Formatters.groupedNumber(controller.templeAssets)} / '
+                value:
+                    '${Formatters.groupedNumber(controller.templeAssets)} / '
                     '${Formatters.groupedNumber(controller.templeSacrifices)}',
                 level: controller.templeLevel,
               ),

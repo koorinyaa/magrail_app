@@ -5,9 +5,7 @@ class _ShareBonusForecastHeader extends StatelessWidget {
   /// 创建股息预测标题区
   ///
   /// [displayName] 目标用户展示名称
-  const _ShareBonusForecastHeader({
-    required this.displayName,
-  });
+  const _ShareBonusForecastHeader({required this.displayName});
 
   /// 目标用户展示名称
   final String displayName;
@@ -55,9 +53,7 @@ class _ShareBonusForecastContent extends StatefulWidget {
   /// 创建股息预测内容
   ///
   /// [forecast] 股息预测数据
-  const _ShareBonusForecastContent({
-    required this.forecast,
-  });
+  const _ShareBonusForecastContent({required this.forecast});
 
   /// 股息预测数据
   final UserShareBonusForecast forecast;
@@ -144,9 +140,7 @@ class _ShareBonusForecastSummary extends StatelessWidget {
           alpha: colorScheme.brightness == Brightness.dark ? 0.24 : 0.42,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colorScheme.primary.withValues(alpha: 0.18),
-        ),
+        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.18)),
       ),
       child: Stack(
         children: [
@@ -185,10 +179,7 @@ class _ShareBonusForecastSummary extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '预期股息 ${_formatShareBonusCurrency(
-                    forecast.share,
-                    showFullNumbers: showFullNumbers,
-                  )}',
+                  '预期股息 ${_formatShareBonusCurrency(forecast.share, showFullNumbers: showFullNumbers)}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -311,10 +302,7 @@ class _ShareBonusForecastStats extends StatelessWidget {
 ///
 /// [value] 金额数值
 /// [showFullNumbers] 是否显示完整数字
-String _formatShareBonusCurrency(
-  num value, {
-  required bool showFullNumbers,
-}) {
+String _formatShareBonusCurrency(num value, {required bool showFullNumbers}) {
   if (showFullNumbers) {
     return Formatters.tinygrailCurrency(value);
   }
@@ -326,10 +314,7 @@ String _formatShareBonusCurrency(
 ///
 /// [value] 数量数值
 /// [showFullNumbers] 是否显示完整数字
-String _formatShareBonusNumber(
-  num value, {
-  required bool showFullNumbers,
-}) {
+String _formatShareBonusNumber(num value, {required bool showFullNumbers}) {
   if (showFullNumbers) {
     return Formatters.groupedNumber(value);
   }
@@ -343,10 +328,7 @@ class _ShareBonusStatEntry {
   ///
   /// [label] 条目标题
   /// [value] 条目数值
-  const _ShareBonusStatEntry({
-    required this.label,
-    required this.value,
-  });
+  const _ShareBonusStatEntry({required this.label, required this.value});
 
   /// 条目标题
   final String label;
@@ -360,9 +342,7 @@ class _ShareBonusStatTile extends StatelessWidget {
   /// 创建股息预测明细卡片
   ///
   /// [entry] 明细条目数据
-  const _ShareBonusStatTile({
-    required this.entry,
-  });
+  const _ShareBonusStatTile({required this.entry});
 
   /// 明细条目数据
   final _ShareBonusStatEntry entry;

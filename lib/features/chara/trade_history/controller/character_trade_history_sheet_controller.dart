@@ -12,8 +12,8 @@ class CharacterTradeHistorySheetController extends ChangeNotifier {
   CharacterTradeHistorySheetController({
     required CharacterTradeHistoryRepository repository,
     required int characterId,
-  })  : _repository = repository,
-        _characterId = characterId;
+  }) : _repository = repository,
+       _characterId = characterId;
 
   final CharacterTradeHistoryRepository _repository;
   final int _characterId;

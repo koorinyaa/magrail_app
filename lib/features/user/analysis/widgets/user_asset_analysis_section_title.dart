@@ -40,11 +40,7 @@ class UserAssetAnalysisSectionTitle extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(
-          leadingIcon,
-          size: 18,
-          color: accentColor,
-        ),
+        Icon(leadingIcon, size: 18, color: accentColor),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
@@ -60,10 +56,7 @@ class UserAssetAnalysisSectionTitle extends StatelessWidget {
             ),
           ),
         ),
-        if (trailing != null) ...[
-          const SizedBox(width: 12),
-          trailing,
-        ],
+        if (trailing != null) ...[const SizedBox(width: 12), trailing],
       ],
     );
   }

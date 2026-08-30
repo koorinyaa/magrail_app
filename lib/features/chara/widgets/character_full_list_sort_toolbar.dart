@@ -116,8 +116,9 @@ class _CharacterFullListSortChip extends StatelessWidget {
     final backgroundColor = isSelected
         ? colorScheme.primary.withValues(alpha: 0.1)
         : Colors.transparent;
-    final foregroundColor =
-        isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant;
+    final foregroundColor = isSelected
+        ? colorScheme.primary
+        : colorScheme.onSurfaceVariant;
     return Material(
       color: Colors.transparent,
       child: InkWell(

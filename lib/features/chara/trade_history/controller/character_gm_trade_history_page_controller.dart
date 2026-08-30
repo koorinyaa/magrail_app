@@ -5,8 +5,11 @@ import 'package:magrail_app/features/chara/trade_history/repository/character_tr
 
 /// 角色 GM 交易记录二级页面控制器
 class CharacterGmTradeHistoryPageController
-    extends TinygrailPagedListController<CharacterGmTradeHistoryItem,
-        CharacterGmTradeHistoryItem> {
+    extends
+        TinygrailPagedListController<
+          CharacterGmTradeHistoryItem,
+          CharacterGmTradeHistoryItem
+        > {
   /// 创建角色 GM 交易记录二级页面控制器
   ///
   /// [repository] 角色交易记录仓库
@@ -16,8 +19,8 @@ class CharacterGmTradeHistoryPageController
     required CharacterTradeHistoryRepository repository,
     required int characterId,
     super.pageSize = defaultPageSize,
-  })  : _repository = repository,
-        _characterId = characterId;
+  }) : _repository = repository,
+       _characterId = characterId;
 
   /// GM 交易记录默认分页数量
   static const int defaultPageSize = 50;

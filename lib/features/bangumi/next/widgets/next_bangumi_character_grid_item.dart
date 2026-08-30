@@ -132,9 +132,7 @@ class _NextBangumiCharacterStatusBadge extends StatelessWidget {
   /// 创建 Next Bangumi 角色状态胶囊
   ///
   /// [status] 小圣杯角色状态
-  const _NextBangumiCharacterStatusBadge({
-    required this.status,
-  });
+  const _NextBangumiCharacterStatusBadge({required this.status});
 
   /// 小圣杯角色状态
   final CharacterDetailBasicInfo? status;

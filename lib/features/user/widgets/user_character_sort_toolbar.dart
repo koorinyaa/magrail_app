@@ -80,10 +80,12 @@ class UserCharacterSortToolbar extends StatelessWidget
                         label: option.label,
                         isSelected: sort == option,
                         direction: controller.direction,
-                        showDirection: sort == option &&
+                        showDirection:
+                            sort == option &&
                             (isCurrentUser ||
                                 option != UserCharacterSnapshotSort.holdings),
-                        onPressed: !isCurrentUser &&
+                        onPressed:
+                            !isCurrentUser &&
                                 sort == UserCharacterSnapshotSort.holdings &&
                                 option == UserCharacterSnapshotSort.holdings
                             ? null
@@ -133,8 +135,9 @@ class _UserCharacterSortChip extends StatelessWidget {
     final backgroundColor = isSelected
         ? colorScheme.primary.withValues(alpha: 0.1)
         : Colors.transparent;
-    final foregroundColor =
-        isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant;
+    final foregroundColor = isSelected
+        ? colorScheme.primary
+        : colorScheme.onSurfaceVariant;
     return Material(
       color: Colors.transparent,
       child: InkWell(

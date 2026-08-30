@@ -19,10 +19,7 @@ extension _UserCharacterPageActions on _UserCharacterPageState {
   ///
   /// [item] 用户角色条目
   /// [avatarHeroTag] 入口头像转场标识
-  void _openCharacterDetail(
-    UserCharacterApiItem item,
-    String? avatarHeroTag,
-  ) {
+  void _openCharacterDetail(UserCharacterApiItem item, String? avatarHeroTag) {
     openCharacterDetail(
       context,
       characterId: item.characterId,
@@ -37,10 +34,7 @@ extension _UserCharacterPageActions on _UserCharacterPageState {
     if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) {
       return;
     }
-    AppToast.error(
-      context,
-      text: '数据刷新失败',
-    );
+    AppToast.error(context, text: '数据刷新失败');
   }
 
   /// 是否展示当前登录用户的本地角色快照

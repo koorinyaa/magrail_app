@@ -52,9 +52,7 @@ class _TempleAssetSoftTagsScrollView extends StatelessWidget {
   /// 创建圣殿资产胶囊滚动区
   ///
   /// [child] 胶囊内容
-  const _TempleAssetSoftTagsScrollView({
-    required this.child,
-  });
+  const _TempleAssetSoftTagsScrollView({required this.child});
 
   /// 胶囊内容
   final Widget child;
@@ -174,10 +172,7 @@ class _TempleAssetPrimaryLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!showLevelBadge) {
-      return _TempleAssetScalingText(
-        text: text,
-        style: style,
-      );
+      return _TempleAssetScalingText(text: text, style: style);
     }
 
     return Row(
@@ -195,11 +190,7 @@ class _TempleAssetPrimaryLine extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 6),
-        LevelBadge(
-          level: level,
-          zeroCount: zeroCount,
-          isCompact: true,
-        ),
+        LevelBadge(level: level, zeroCount: zeroCount, isCompact: true),
       ],
     );
   }
@@ -211,10 +202,7 @@ class _TempleAssetScalingText extends StatelessWidget {
   ///
   /// [text] 显示文本
   /// [style] 文本样式
-  const _TempleAssetScalingText({
-    required this.text,
-    required this.style,
-  });
+  const _TempleAssetScalingText({required this.text, required this.style});
 
   /// 显示文本
   final String text;
@@ -232,12 +220,7 @@ class _TempleAssetScalingText extends StatelessWidget {
       child: FittedBox(
         fit: BoxFit.scaleDown,
         alignment: Alignment.centerLeft,
-        child: Text(
-          text,
-          maxLines: 1,
-          softWrap: false,
-          style: style,
-        ),
+        child: Text(text, maxLines: 1, softWrap: false, style: style),
       ),
     );
   }
@@ -248,9 +231,7 @@ class _TempleAssetSoftTags extends StatelessWidget {
   /// 创建圣殿资产浅色标签组
   ///
   /// [items] 指标条目
-  const _TempleAssetSoftTags({
-    required this.items,
-  });
+  const _TempleAssetSoftTags({required this.items});
 
   /// 指标条目
   final List<TempleAssetCardTagData> items;
@@ -264,9 +245,7 @@ class _TempleAssetSoftTags extends StatelessWidget {
       alignment: WrapAlignment.start,
       spacing: 5,
       runSpacing: 3,
-      children: [
-        for (final item in items) _TempleAssetSoftTag(data: item),
-      ],
+      children: [for (final item in items) _TempleAssetSoftTag(data: item)],
     );
   }
 }
@@ -276,9 +255,7 @@ class _TempleAssetSoftTag extends StatelessWidget {
   /// 创建圣殿资产浅色标签
   ///
   /// [data] 指标数据
-  const _TempleAssetSoftTag({
-    required this.data,
-  });
+  const _TempleAssetSoftTag({required this.data});
 
   /// 指标数据
   final TempleAssetCardTagData data;
@@ -342,9 +319,7 @@ class _TempleAssetProgress extends StatelessWidget {
   /// 创建圣殿资产进度条
   ///
   /// [data] 圣殿资产卡片展示数据
-  const _TempleAssetProgress({
-    required this.data,
-  });
+  const _TempleAssetProgress({required this.data});
 
   /// 圣殿资产卡片展示数据
   final TempleAssetCardData data;

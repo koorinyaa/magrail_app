@@ -68,25 +68,23 @@ class UserLinkResponsiveGrid extends StatelessWidget {
               crossAxisCount: layout.crossAxisCount,
               mainAxisSpacing: _mainAxisSpacing,
               crossAxisSpacing: _crossAxisSpacing,
-              childAspectRatio: layout.cellWidth /
+              childAspectRatio:
+                  layout.cellWidth /
                   UserLinkCard.heightForWidth(layout.cardWidth),
             ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                onItemBuilt?.call(index);
-                return Align(
-                  alignment: Alignment.topCenter,
-                  child: UserLinkCard(
-                    item: items[index],
-                    width: layout.cardWidth,
-                    heroTagPrefix: 'user-link-page-cover-$index',
-                    onCharacterTap: onCharacterTap,
-                    onAssetTap: onAssetTap,
-                  ),
-                );
-              },
-              childCount: items.length,
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              onItemBuilt?.call(index);
+              return Align(
+                alignment: Alignment.topCenter,
+                child: UserLinkCard(
+                  item: items[index],
+                  width: layout.cardWidth,
+                  heroTagPrefix: 'user-link-page-cover-$index',
+                  onCharacterTap: onCharacterTap,
+                  onAssetTap: onAssetTap,
+                ),
+              );
+            }, childCount: items.length),
           ),
         );
       },
@@ -113,9 +111,10 @@ class UserLinkResponsiveGrid extends StatelessWidget {
       );
     }
 
-    final rawCount = ((contentWidth + _crossAxisSpacing) /
-            (_minCardWidth + _crossAxisSpacing))
-        .floor();
+    final rawCount =
+        ((contentWidth + _crossAxisSpacing) /
+                (_minCardWidth + _crossAxisSpacing))
+            .floor();
     final crossAxisCount = rawCount.clamp(1, _maxColumnCount).toInt();
     final cellWidth = math.max(
       0.0,
@@ -138,10 +137,7 @@ class UserLinkSkeletonGrid extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [itemCount] 骨架卡片数量
-  const UserLinkSkeletonGrid({
-    super.key,
-    this.itemCount = 8,
-  });
+  const UserLinkSkeletonGrid({super.key, this.itemCount = 8});
 
   /// 骨架卡片数量
   final int itemCount;
@@ -171,18 +167,16 @@ class UserLinkSkeletonGrid extends StatelessWidget {
               crossAxisCount: layout.crossAxisCount,
               mainAxisSpacing: UserLinkResponsiveGrid._mainAxisSpacing,
               crossAxisSpacing: UserLinkResponsiveGrid._crossAxisSpacing,
-              childAspectRatio: layout.cellWidth /
+              childAspectRatio:
+                  layout.cellWidth /
                   UserLinkCard.heightForWidth(layout.cardWidth),
             ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return Align(
-                  alignment: Alignment.topCenter,
-                  child: _UserLinkSkeletonCard(width: layout.cardWidth),
-                );
-              },
-              childCount: itemCount,
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              return Align(
+                alignment: Alignment.topCenter,
+                child: _UserLinkSkeletonCard(width: layout.cardWidth),
+              );
+            }, childCount: itemCount),
           ),
         );
       },
@@ -218,9 +212,7 @@ class _UserLinkSkeletonCard extends StatelessWidget {
   /// 创建用户连接骨架卡片
   ///
   /// [width] 卡片宽度
-  const _UserLinkSkeletonCard({
-    required this.width,
-  });
+  const _UserLinkSkeletonCard({required this.width});
 
   /// 卡片宽度
   final double width;
@@ -241,11 +233,7 @@ class _UserLinkSkeletonCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(24),
           ),
           const SizedBox(height: 8),
-          Bone(
-            width: 66,
-            height: 22,
-            borderRadius: BorderRadius.circular(999),
-          ),
+          Bone(width: 66, height: 22, borderRadius: BorderRadius.circular(999)),
         ],
       ),
     );

@@ -112,8 +112,9 @@ class CharacterGmTradeHistoryItem {
   /// [nickname] 用户昵称
   /// [username] 用户名
   String _displayName(String nickname, String username) {
-    final decodedNickname =
-        TinygrailFormatters.decodeHtmlEntities(nickname).trim();
+    final decodedNickname = TinygrailFormatters.decodeHtmlEntities(
+      nickname,
+    ).trim();
     if (decodedNickname.isNotEmpty) {
       return decodedNickname;
     }

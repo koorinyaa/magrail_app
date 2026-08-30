@@ -139,19 +139,20 @@ List<UserAssetAnalysisCharacterBubble> selectUserAssetAnalysisCharacterBubbles({
   required UserAssetAnalysis analysis,
   required UserAssetAnalysisAssetProportionMode mode,
 }) {
-  final visibleBubbles = analysis.characterBubbles
-      .where((bubble) => _characterBubbleValue(bubble, mode) > 0)
-      .toList()
-    ..sort((a, b) {
-      final valueCompare = _characterBubbleValue(
-        b,
-        mode,
-      ).compareTo(_characterBubbleValue(a, mode));
-      if (valueCompare != 0) {
-        return valueCompare;
-      }
-      return a.characterId.compareTo(b.characterId);
-    });
+  final visibleBubbles =
+      analysis.characterBubbles
+          .where((bubble) => _characterBubbleValue(bubble, mode) > 0)
+          .toList()
+        ..sort((a, b) {
+          final valueCompare = _characterBubbleValue(
+            b,
+            mode,
+          ).compareTo(_characterBubbleValue(a, mode));
+          if (valueCompare != 0) {
+            return valueCompare;
+          }
+          return a.characterId.compareTo(b.characterId);
+        });
 
   return visibleBubbles.take(_maxVisibleBubbles).toList(growable: false);
 }

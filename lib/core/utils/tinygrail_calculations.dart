@@ -21,10 +21,11 @@ final class TinygrailCalculations {
       return 0;
     }
 
-    final level = (math.log(circulation / _characterLevelBaseCirculation) /
-                math.log(_characterLevelLogBase) +
-            1)
-        .floor();
+    final level =
+        (math.log(circulation / _characterLevelBaseCirculation) /
+                    math.log(_characterLevelLogBase) +
+                1)
+            .floor();
     if (level < 0) {
       return 0;
     }
@@ -42,7 +43,8 @@ final class TinygrailCalculations {
       return 0;
     }
 
-    final circulation = _characterLevelBaseCirculation *
+    final circulation =
+        _characterLevelBaseCirculation *
         math.pow(_characterLevelLogBase, level - 1);
 
     return circulation.ceil();

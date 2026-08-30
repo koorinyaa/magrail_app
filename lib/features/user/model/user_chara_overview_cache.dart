@@ -67,22 +67,26 @@ class UserCharaOverviewCache {
   factory UserCharaOverviewCache.fromJson(Map<String, Object?> json) {
     return UserCharaOverviewCache(
       username: TinygrailResponseParser.asString(json['Username']),
-      links: TinygrailResponseParser.asObjectList(
+      links:
+          TinygrailResponseParser.asObjectList(
             json['Links'],
             UserLinkApiItem.fromJson,
           ) ??
           const <UserLinkApiItem>[],
-      temples: TinygrailResponseParser.asObjectList(
+      temples:
+          TinygrailResponseParser.asObjectList(
             json['Temples'],
             UserTempleApiItem.fromJson,
           ) ??
           const <UserTempleApiItem>[],
-      characters: TinygrailResponseParser.asObjectList(
+      characters:
+          TinygrailResponseParser.asObjectList(
             json['Characters'],
             UserCharacterApiItem.fromJson,
           ) ??
           const <UserCharacterApiItem>[],
-      icos: TinygrailResponseParser.asObjectList(
+      icos:
+          TinygrailResponseParser.asObjectList(
             json['Icos'],
             UserIcoApiItem.fromJson,
           ) ??
@@ -101,8 +105,9 @@ class UserCharaOverviewCache {
       'Username': username,
       'Links': links.map((item) => item.toJson()).toList(growable: false),
       'Temples': temples.map((item) => item.toJson()).toList(growable: false),
-      'Characters':
-          characters.map((item) => item.toJson()).toList(growable: false),
+      'Characters': characters
+          .map((item) => item.toJson())
+          .toList(growable: false),
       'Icos': icos.map((item) => item.toJson()).toList(growable: false),
       'LinkTotalItems': linkTotalItems,
       'TempleTotalItems': templeTotalItems,

@@ -29,7 +29,8 @@ class UserAssetLevelSliverController {
     if (previousLayout != null && previousLayout.hasSameMapping(layout)) {
       return;
     }
-    final anchorAbsoluteIndex = _pendingRestoreAbsoluteIndex ??
+    final anchorAbsoluteIndex =
+        _pendingRestoreAbsoluteIndex ??
         (listController.isAttached && previousLayout != null
             ? _visibleAbsoluteIndex(previousLayout)
             : null);
@@ -76,10 +77,7 @@ class UserAssetLevelSliverController {
   ///
   /// [level] 目标角色等级
   /// [scrollController] 页面滚动控制器
-  void jumpToLevel(
-    int level,
-    ScrollController scrollController,
-  ) {
+  void jumpToLevel(int level, ScrollController scrollController) {
     final virtualIndex = _layout?.virtualIndexForLevel(level);
     if (!listController.isAttached ||
         virtualIndex == null ||

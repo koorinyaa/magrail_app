@@ -58,9 +58,11 @@ class IcoCharacterSortToolbar extends StatelessWidget
             ),
             child: Row(
               children: [
-                for (var index = 0;
-                    index < IcoCharacterSort.values.length;
-                    index += 1) ...[
+                for (
+                  var index = 0;
+                  index < IcoCharacterSort.values.length;
+                  index += 1
+                ) ...[
                   if (index > 0) const SizedBox(width: 6),
                   _IcoCharacterSortChip(
                     sort: IcoCharacterSort.values[index],
@@ -103,8 +105,9 @@ class _IcoCharacterSortChip extends StatelessWidget {
     final backgroundColor = isSelected
         ? colorScheme.primary.withValues(alpha: 0.1)
         : Colors.transparent;
-    final foregroundColor =
-        isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant;
+    final foregroundColor = isSelected
+        ? colorScheme.primary
+        : colorScheme.onSurfaceVariant;
     return Material(
       color: Colors.transparent,
       child: InkWell(

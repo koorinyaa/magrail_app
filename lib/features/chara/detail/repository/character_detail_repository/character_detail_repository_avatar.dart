@@ -1,5 +1,6 @@
 part of '../character_detail_repository.dart';
 
+/// 角色详情头像操作
 extension CharacterDetailRepositoryAvatarActions on CharacterDetailRepository {
   /// 更换角色头像
   ///

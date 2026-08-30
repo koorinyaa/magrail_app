@@ -63,8 +63,9 @@ class CharacterDetailBasicInfo {
   factory CharacterDetailBasicInfo.fromJson(Map<String, Object?> json) {
     final characterId = TinygrailResponseParser.asInt(json['CharacterId']);
     final isTrade = json.containsKey('Current');
-    final pageType =
-        isTrade ? CharacterDetailPageType.trade : CharacterDetailPageType.ico;
+    final pageType = isTrade
+        ? CharacterDetailPageType.trade
+        : CharacterDetailPageType.ico;
 
     return CharacterDetailBasicInfo(
       characterId: characterId > 0

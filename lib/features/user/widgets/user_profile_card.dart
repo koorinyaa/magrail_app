@@ -70,8 +70,9 @@ class _UserProfileCardState extends State<UserProfileCard> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
-    final cardColor =
-        isDark ? colorScheme.surfaceContainerLow : colorScheme.surface;
+    final cardColor = isDark
+        ? colorScheme.surfaceContainerLow
+        : colorScheme.surface;
     final nickname = widget.profile.nickname.trim();
     final displayName = nickname.isEmpty ? widget.profile.name : nickname;
     final balanceText = widget.hideBalanceAndAssets
@@ -233,9 +234,7 @@ class _BalanceAndAssetsToggleButton extends StatelessWidget {
   /// 创建余额和资产显示模式切换按钮
   ///
   /// [onPressed] 按钮点击回调
-  const _BalanceAndAssetsToggleButton({
-    required this.onPressed,
-  });
+  const _BalanceAndAssetsToggleButton({required this.onPressed});
 
   /// 按钮点击回调
   final VoidCallback onPressed;

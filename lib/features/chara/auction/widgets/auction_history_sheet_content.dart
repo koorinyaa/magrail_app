@@ -42,9 +42,7 @@ class _AuctionHistorySummary extends StatelessWidget {
   /// 创建往期拍卖当前页统计
   ///
   /// [controller] 往期拍卖控制器
-  const _AuctionHistorySummary({
-    required this.controller,
-  });
+  const _AuctionHistorySummary({required this.controller});
 
   /// 往期拍卖控制器
   final AuctionHistorySheetController controller;
@@ -285,10 +283,7 @@ class _AuctionHistoryRow extends StatelessWidget {
   ///
   /// [item] 往期拍卖接口条目
   /// [currentUserId] 当前登录用户 ID
-  const _AuctionHistoryRow({
-    required this.item,
-    required this.currentUserId,
-  });
+  const _AuctionHistoryRow({required this.item, required this.currentUserId});
 
   /// 往期拍卖接口条目
   final AuctionHistoryApiItem item;
@@ -308,11 +303,9 @@ class _AuctionHistoryRow extends StatelessWidget {
     final displayName = bidderName.isEmpty ? item.username : bidderName;
     final currentUserId = this.currentUserId;
     final isCurrentUser = currentUserId != null && item.userId == currentUserId;
-    final resultColor = _auctionHistoryResultColor(
-      colorScheme,
-      item.isSuccess,
-    );
-    final auctionValueText = '${Formatters.tinygrailCurrency(item.price)} / '
+    final resultColor = _auctionHistoryResultColor(colorScheme, item.isSuccess);
+    final auctionValueText =
+        '${Formatters.tinygrailCurrency(item.price)} / '
         '${Formatters.groupedNumber(item.amount)}';
 
     return Padding(
@@ -353,8 +346,9 @@ class _AuctionHistoryRow extends StatelessWidget {
                         ? colorScheme.primary
                         : colorScheme.onSurfaceVariant.withValues(alpha: 0.62),
                     fontSize: 11,
-                    fontWeight:
-                        isCurrentUser ? FontWeight.w900 : FontWeight.w600,
+                    fontWeight: isCurrentUser
+                        ? FontWeight.w900
+                        : FontWeight.w600,
                     height: 1,
                   ),
                 ),
@@ -392,9 +386,7 @@ class _AuctionHistoryStateChip extends StatelessWidget {
   /// 创建往期拍卖结果标签
   ///
   /// [isSuccess] 是否拍卖成功
-  const _AuctionHistoryStateChip({
-    required this.isSuccess,
-  });
+  const _AuctionHistoryStateChip({required this.isSuccess});
 
   /// 是否拍卖成功
   final bool isSuccess;
@@ -405,12 +397,10 @@ class _AuctionHistoryStateChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final foregroundColor = _auctionHistoryResultColor(
-      colorScheme,
-      isSuccess,
-    );
-    final backgroundAlpha =
-        colorScheme.brightness == Brightness.dark ? 0.18 : 0.11;
+    final foregroundColor = _auctionHistoryResultColor(colorScheme, isSuccess);
+    final backgroundAlpha = colorScheme.brightness == Brightness.dark
+        ? 0.18
+        : 0.11;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -441,10 +431,7 @@ class _AuctionHistoryStateChip extends StatelessWidget {
 ///
 /// [colorScheme] 当前主题色板
 /// [isSuccess] 是否拍卖成功
-Color _auctionHistoryResultColor(
-  ColorScheme colorScheme,
-  bool isSuccess,
-) {
+Color _auctionHistoryResultColor(ColorScheme colorScheme, bool isSuccess) {
   return isSuccess ? const Color(0xFF17C964) : colorScheme.onSurfaceVariant;
 }
 
@@ -464,9 +451,7 @@ class _AuctionHistoryListDivider extends StatelessWidget {
     return Divider(
       height: 1,
       thickness: 0.6,
-      color: colorScheme.outlineVariant.withValues(
-        alpha: isDark ? 0.32 : 0.56,
-      ),
+      color: colorScheme.outlineVariant.withValues(alpha: isDark ? 0.32 : 0.56),
     );
   }
 }

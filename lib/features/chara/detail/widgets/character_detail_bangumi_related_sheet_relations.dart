@@ -113,18 +113,15 @@ class _CharacterBangumiRelationsSheetState
       slivers: [
         SliverGrid(
           gridDelegate: _CharacterBangumiRelationGridMetrics.delegate,
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final item = _items[index];
-              _handleItemBuilt(index);
-              return NextBangumiCharacterGridItem(
-                item: item,
-                status: _statuses[item.characterId],
-                onTap: () => _openCharacter(item),
-              );
-            },
-            childCount: _items.length,
-          ),
+          delegate: SliverChildBuilderDelegate((context, index) {
+            final item = _items[index];
+            _handleItemBuilt(index);
+            return NextBangumiCharacterGridItem(
+              item: item,
+              status: _statuses[item.characterId],
+              onTap: () => _openCharacter(item),
+            );
+          }, childCount: _items.length),
         ),
         SliverToBoxAdapter(
           child: PaginationFooter(
@@ -177,10 +174,10 @@ class _CharacterBangumiRelationsSheetState
         offset: requestedOffset,
       );
       final newItems = _dedupeNewItems(page.items);
-      final statuses =
-          await widget.characterRepository.fetchCharacterBasicInfoList(
-        newItems.map((item) => item.characterId).toList(growable: false),
-      );
+      final statuses = await widget.characterRepository
+          .fetchCharacterBasicInfoList(
+            newItems.map((item) => item.characterId).toList(growable: false),
+          );
       if (!mounted || requestId != _requestId) {
         return;
       }
@@ -215,10 +212,7 @@ class _CharacterBangumiRelationsSheetState
       }
 
       setState(() {
-        final message = resolveUserErrorMessage(
-          error,
-          fallback: '获取关联角色失败',
-        );
+        final message = resolveUserErrorMessage(error, fallback: '获取关联角色失败');
         if (reset) {
           _isInitialLoading = false;
           _initialError = message;
@@ -295,8 +289,10 @@ class _CharacterBangumiRelationsSheetState
 
     final maxIndex = itemCount - 1;
     final triggerIndex =
-        (maxIndex - (_characterBangumiRelatedPageSize / 2).ceil())
-            .clamp(0, maxIndex);
+        (maxIndex - (_characterBangumiRelatedPageSize / 2).ceil()).clamp(
+          0,
+          maxIndex,
+        );
     if (index < triggerIndex || !_canLoadNextPage) {
       return;
     }
@@ -425,9 +421,9 @@ final class _CharacterBangumiRelationGridMetrics {
   /// 关联角色网格代理
   static const SliverGridDelegateWithMaxCrossAxisExtent delegate =
       SliverGridDelegateWithMaxCrossAxisExtent(
-    maxCrossAxisExtent: 118,
-    mainAxisExtent: 136,
-    mainAxisSpacing: 14,
-    crossAxisSpacing: 10,
-  );
+        maxCrossAxisExtent: 118,
+        mainAxisExtent: 136,
+        mainAxisSpacing: 14,
+        crossAxisSpacing: 10,
+      );
 }

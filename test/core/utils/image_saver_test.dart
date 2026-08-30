@@ -10,15 +10,12 @@ void main() {
     const channel = MethodChannel('gal');
     final messenger =
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
-    messenger.setMockMethodCallHandler(
-      channel,
-      (_) async {
-        throw PlatformException(
-          code: 'TEST_GALLERY_FAILURE',
-          message: 'test gallery failure',
-        );
-      },
-    );
+    messenger.setMockMethodCallHandler(channel, (_) async {
+      throw PlatformException(
+        code: 'TEST_GALLERY_FAILURE',
+        message: 'test gallery failure',
+      );
+    });
     addTearDown(() {
       messenger.setMockMethodCallHandler(channel, null);
     });

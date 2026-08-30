@@ -50,10 +50,7 @@ class CharacterDetailTradeHeaderSection extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [header] 已上市角色头部资料
-  const CharacterDetailTradeHeaderSection({
-    super.key,
-    required this.header,
-  });
+  const CharacterDetailTradeHeaderSection({super.key, required this.header});
 
   /// 已上市角色头部资料
   final CharacterDetailTradeHeader header;
@@ -81,9 +78,7 @@ class _TradeHeaderShell extends StatelessWidget {
   /// 创建已上市头部卡片外壳
   ///
   /// [child] 头部主体内容
-  const _TradeHeaderShell({
-    required this.child,
-  });
+  const _TradeHeaderShell({required this.child});
 
   /// 头部主体内容
   final Widget child;
@@ -95,8 +90,9 @@ class _TradeHeaderShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
-    final cardColor =
-        isDark ? colorScheme.surfaceContainerLow : colorScheme.surface;
+    final cardColor = isDark
+        ? colorScheme.surfaceContainerLow
+        : colorScheme.surface;
 
     return Container(
       width: double.infinity,
@@ -122,9 +118,7 @@ class _TradeHeaderTitleRow extends StatelessWidget {
   /// 创建已上市头部标题行
   ///
   /// [header] 已上市角色头部资料
-  const _TradeHeaderTitleRow({
-    required this.header,
-  });
+  const _TradeHeaderTitleRow({required this.header});
 
   /// 已上市角色头部资料
   final CharacterDetailTradeHeader header;
@@ -155,16 +149,11 @@ class _TradeHeaderTitleRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 7),
-            LevelBadge(
-              level: header.level,
-              zeroCount: header.zeroCount,
-            ),
+            LevelBadge(level: header.level, zeroCount: header.zeroCount),
           ],
         ),
         const SizedBox(height: 5),
-        _TradeHeaderCharacterIdRow(
-          characterId: header.characterId,
-        ),
+        _TradeHeaderCharacterIdRow(characterId: header.characterId),
         if (header.hasKillVotes) ...[
           const SizedBox(height: 6),
           _TradeHeaderKillVoteStatus(header: header),
@@ -196,9 +185,7 @@ class _TradeHeaderCharacterIdRow extends StatelessWidget {
   /// 创建已上市头部角色 ID 行
   ///
   /// [characterId] 角色 ID
-  const _TradeHeaderCharacterIdRow({
-    required this.characterId,
-  });
+  const _TradeHeaderCharacterIdRow({required this.characterId});
 
   /// 角色 ID
   final int characterId;
@@ -252,17 +239,12 @@ class _TradeHeaderCharacterIdRow extends StatelessWidget {
   ///
   /// [context] 当前组件树上下文
   Future<void> _copyCharacterId(BuildContext context) async {
-    await Clipboard.setData(
-      ClipboardData(text: '#$characterId'),
-    );
+    await Clipboard.setData(ClipboardData(text: '#$characterId'));
     if (!context.mounted) {
       return;
     }
 
-    AppToast.info(
-      context,
-      text: '已复制角色ID',
-    );
+    AppToast.info(context, text: '已复制角色ID');
   }
 }
 
@@ -271,9 +253,7 @@ class _TradeHeaderKillVoteStatus extends StatelessWidget {
   /// 创建已上市头部删除投票状态
   ///
   /// [header] 已上市角色头部资料
-  const _TradeHeaderKillVoteStatus({
-    required this.header,
-  });
+  const _TradeHeaderKillVoteStatus({required this.header});
 
   /// 已上市角色头部资料
   final CharacterDetailTradeHeader header;
@@ -299,11 +279,7 @@ class _TradeHeaderKillVoteStatus extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.max,
           children: [
-            Icon(
-              LucideIcons.triangleAlert,
-              size: 13,
-              color: foregroundColor,
-            ),
+            Icon(LucideIcons.triangleAlert, size: 13, color: foregroundColor),
             const SizedBox(width: 6),
             Expanded(
               child: Text(

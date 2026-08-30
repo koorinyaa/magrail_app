@@ -15,8 +15,8 @@ class TopWeekController extends ChangeNotifier {
   TopWeekController({
     required TopWeekRepository repository,
     required AuctionRepository auctionRepository,
-  })  : _repository = repository,
-        _auctionRepository = auctionRepository;
+  }) : _repository = repository,
+       _auctionRepository = auctionRepository;
 
   static const Duration _statusRefreshInterval = Duration(seconds: 10);
   static const Duration _autoRefreshInterval = Duration(minutes: 10);
@@ -87,9 +87,7 @@ class TopWeekController extends ChangeNotifier {
   /// 加载每周萌王条目
   ///
   /// [showSkeleton] 是否显示首次加载骨架
-  Future<void> load({
-    required bool showSkeleton,
-  }) async {
+  Future<void> load({required bool showSkeleton}) async {
     if (_isDisposed || _isLoading || _isRefreshing) {
       return;
     }
@@ -175,9 +173,7 @@ class TopWeekController extends ChangeNotifier {
   /// 安排自动刷新
   ///
   /// [success] 上次刷新是否成功
-  void _scheduleAutoRefresh({
-    required bool success,
-  }) {
+  void _scheduleAutoRefresh({required bool success}) {
     _autoRefreshTimer?.cancel();
     _autoRefreshTimer = Timer(
       success ? _autoRefreshInterval : _retryRefreshInterval,
@@ -199,9 +195,7 @@ class TopWeekController extends ChangeNotifier {
           .map((entry) => entry.characterId)
           .toSet()
           .toList(growable: false);
-      final auctionMap = await _auctionRepository.fetchAuctionMap(
-        characterIds,
-      );
+      final auctionMap = await _auctionRepository.fetchAuctionMap(characterIds);
       if (_isDisposed ||
           syncSerial != _auctionSyncSerial ||
           !identical(_entries, entries)) {

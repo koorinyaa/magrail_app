@@ -52,8 +52,9 @@ Future<CharacterDetailSacrificeMode?> showCharacterDetailSacrificeSheet(
       const topGap = 32.0;
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
-      final maxHeight =
-          availableHeight.clamp(0.0, mediaQuery.size.height).toDouble();
+      final maxHeight = availableHeight
+          .clamp(0.0, mediaQuery.size.height)
+          .toDouble();
 
       return ConstrainedBox(
         constraints: BoxConstraints(maxHeight: maxHeight),
@@ -166,9 +167,7 @@ class _CharacterDetailSacrificeSheetState
       child: Padding(
         padding: EdgeInsets.only(bottom: mediaQuery.viewInsets.bottom),
         child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(28),
-          ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: backgroundColor,
@@ -254,10 +253,7 @@ class _CharacterDetailSacrificeSheetState
       children: [
         _SacrificeSheetHeader(controller: _controller),
         const SizedBox(height: 16),
-        _SacrificeMainPanel(
-          controller: _controller,
-          onSubmit: _handleSubmit,
-        ),
+        _SacrificeMainPanel(controller: _controller, onSubmit: _handleSubmit),
       ],
     );
   }
@@ -301,10 +297,7 @@ class _CharacterDetailSacrificeSheetState
         return;
       }
 
-      AppToast.error(
-        context,
-        text: _errorText(error, mode),
-      );
+      AppToast.error(context, text: _errorText(error, mode));
     }
   }
 
@@ -313,8 +306,9 @@ class _CharacterDetailSacrificeSheetState
   /// [error] 捕获到的异常
   /// [mode] 本次提交类型
   String _errorText(Object error, CharacterDetailSacrificeMode mode) {
-    final fallback =
-        mode == CharacterDetailSacrificeMode.financing ? '股权融资失败' : '资产重组失败';
+    final fallback = mode == CharacterDetailSacrificeMode.financing
+        ? '股权融资失败'
+        : '资产重组失败';
     return resolveUserErrorMessage(error, fallback: fallback);
   }
 

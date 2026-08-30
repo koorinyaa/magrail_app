@@ -4,8 +4,12 @@ import 'package:magrail_app/features/user/model/user_market_order_api_item.dart'
 import 'package:magrail_app/features/user/repository/user_repository.dart';
 
 /// 用户委托订单二级页面控制器
-class UserMarketOrderPageController extends TinygrailPagedListController<
-    UserMarketOrderApiItem, UserMarketOrderApiItem> {
+class UserMarketOrderPageController
+    extends
+        TinygrailPagedListController<
+          UserMarketOrderApiItem,
+          UserMarketOrderApiItem
+        > {
   /// 创建用户委托订单二级页面控制器
   ///
   /// [repository] 用户仓库
@@ -15,8 +19,8 @@ class UserMarketOrderPageController extends TinygrailPagedListController<
     required UserRepository repository,
     required UserMarketOrderSide side,
     super.pageSize = defaultPageSize,
-  })  : _repository = repository,
-        _side = side;
+  }) : _repository = repository,
+       _side = side;
 
   /// 用户委托订单默认分页数量
   static const int defaultPageSize = 50;
@@ -35,13 +39,13 @@ class UserMarketOrderPageController extends TinygrailPagedListController<
   }) {
     return switch (_side) {
       UserMarketOrderSide.bid => _repository.fetchUserBidPage(
-          page: page,
-          pageSize: pageSize,
-        ),
+        page: page,
+        pageSize: pageSize,
+      ),
       UserMarketOrderSide.ask => _repository.fetchUserAskPage(
-          page: page,
-          pageSize: pageSize,
-        ),
+        page: page,
+        pageSize: pageSize,
+      ),
     };
   }
 

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// 本地偏好设置
@@ -158,10 +158,7 @@ class AppPreferences {
   ///
   /// [value] 是否允许点击未公开用户持股
   Future<void> setRevealPrivateUserHoldingsEnabled(bool value) {
-    return _preferences.setBool(
-      _revealPrivateUserHoldingsEnabledKey,
-      value,
-    );
+    return _preferences.setBool(_revealPrivateUserHoldingsEnabledKey, value);
   }
 
   /// 读取液态玻璃开关状态

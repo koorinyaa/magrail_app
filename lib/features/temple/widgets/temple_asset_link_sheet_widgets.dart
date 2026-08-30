@@ -5,9 +5,7 @@ class _TempleAssetLinkSheetHeader extends StatelessWidget {
   /// 创建圣殿 LINK 抽屉标题区
   ///
   /// [data] 圣殿资产卡片展示数据
-  const _TempleAssetLinkSheetHeader({
-    required this.data,
-  });
+  const _TempleAssetLinkSheetHeader({required this.data});
 
   /// 圣殿资产卡片展示数据
   final TempleAssetCardData data;
@@ -33,9 +31,7 @@ class _TempleAssetLinkInlineWarning extends StatelessWidget {
   /// 创建圣殿 LINK 行内警告
   ///
   /// [text] 警告文本
-  const _TempleAssetLinkInlineWarning({
-    required this.text,
-  });
+  const _TempleAssetLinkInlineWarning({required this.text});
 
   /// 警告文本
   final String text;
@@ -72,9 +68,7 @@ class _TempleAssetLinkEmptyText extends StatelessWidget {
   /// 创建圣殿 LINK 空文本
   ///
   /// [text] 展示文本
-  const _TempleAssetLinkEmptyText({
-    required this.text,
-  });
+  const _TempleAssetLinkEmptyText({required this.text});
 
   /// 展示文本
   final String text;
@@ -111,9 +105,7 @@ class _TempleAssetLinkSkeletonGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final layout = _TempleAssetLinkGridLayout.resolve(
-          constraints.maxWidth,
-        );
+        final layout = _TempleAssetLinkGridLayout.resolve(constraints.maxWidth);
 
         return Skeletonizer.zone(
           child: GridView.builder(

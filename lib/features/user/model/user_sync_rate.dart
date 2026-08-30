@@ -23,7 +23,8 @@ final class UserSyncRate {
   }) {
     final hasNoCharacters =
         currentUser.characterIds.isEmpty && otherUser.characterIds.isEmpty;
-    final hasNoTemples = currentUser.templeCharacterIds.isEmpty &&
+    final hasNoTemples =
+        currentUser.templeCharacterIds.isEmpty &&
         otherUser.templeCharacterIds.isEmpty;
     if (hasNoCharacters && hasNoTemples) {
       return null;

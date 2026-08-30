@@ -1,5 +1,6 @@
 part of '../character_detail_repository.dart';
 
+/// 角色详情圣殿查询
 extension CharacterDetailRepositoryTempleQueries on CharacterDetailRepository {
   /// 获取角色 LINK 圣殿列表
   ///
@@ -11,15 +12,14 @@ extension CharacterDetailRepositoryTempleQueries on CharacterDetailRepository {
       'chara/links/$characterId',
     );
     final response =
-        TinygrailResponse<List<CharacterDetailTempleItem>>.fromJson(
-      json,
-      (value) {
-        return TinygrailResponseParser.asObjectList(
+        TinygrailResponse<List<CharacterDetailTempleItem>>.fromJson(json, (
           value,
-          CharacterDetailTempleItem.fromJson,
-        );
-      },
-    );
+        ) {
+          return TinygrailResponseParser.asObjectList(
+            value,
+            CharacterDetailTempleItem.fromJson,
+          );
+        });
 
     if (!response.isSuccess) {
       throw StateError(response.message ?? '获取连接失败');
@@ -38,15 +38,14 @@ extension CharacterDetailRepositoryTempleQueries on CharacterDetailRepository {
       'chara/temple/$characterId',
     );
     final response =
-        TinygrailResponse<List<CharacterDetailTempleItem>>.fromJson(
-      json,
-      (value) {
-        return TinygrailResponseParser.asObjectList(
+        TinygrailResponse<List<CharacterDetailTempleItem>>.fromJson(json, (
           value,
-          CharacterDetailTempleItem.fromJson,
-        );
-      },
-    );
+        ) {
+          return TinygrailResponseParser.asObjectList(
+            value,
+            CharacterDetailTempleItem.fromJson,
+          );
+        });
 
     if (!response.isSuccess) {
       throw StateError(response.message ?? '获取圣殿失败');

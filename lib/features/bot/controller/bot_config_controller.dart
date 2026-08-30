@@ -21,10 +21,10 @@ class BotConfigController extends ChangeNotifier {
     required BotRepository repository,
     required CharacterDetailRepository characterRepository,
     required UserRepository userRepository,
-  })  : _authRepository = authRepository,
-        _repository = repository,
-        _characterRepository = characterRepository,
-        _userRepository = userRepository;
+  }) : _authRepository = authRepository,
+       _repository = repository,
+       _characterRepository = characterRepository,
+       _userRepository = userRepository;
 
   final TinygrailAuthRepository _authRepository;
   final BotRepository _repository;
@@ -190,9 +190,9 @@ class BotConfigController extends ChangeNotifier {
       pageSize: pageSize,
       keyword: keyword,
     );
-    final items = templePage.items.map(_templeOptionFromUserTemple).toList(
-          growable: false,
-        );
+    final items = templePage.items
+        .map(_templeOptionFromUserTemple)
+        .toList(growable: false);
     for (final item in items) {
       _templeOptions[item.characterId] = item;
     }
@@ -224,8 +224,9 @@ class BotConfigController extends ChangeNotifier {
       pageSize: ids.length,
       characterIds: ids,
     );
-    final items =
-        page.items.map(_templeOptionFromUserTemple).toList(growable: false);
+    final items = page.items
+        .map(_templeOptionFromUserTemple)
+        .toList(growable: false);
     for (final item in items) {
       _templeOptions[item.characterId] = item;
     }
@@ -266,10 +267,7 @@ class BotConfigController extends ChangeNotifier {
     _notifyIfActive();
 
     try {
-      await _repository.saveConfig(
-        token: await _ensureToken(),
-        config: config,
-      );
+      await _repository.saveConfig(token: await _ensureToken(), config: config);
     } finally {
       _isSaving = false;
       _notifyIfActive();

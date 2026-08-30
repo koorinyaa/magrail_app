@@ -168,10 +168,7 @@ class _UserAssetAnalysisShareOverlayState
                   ),
                   const SizedBox(height: 16),
                   Expanded(
-                    child: _buildPreview(
-                      context,
-                      imageBytes: imageBytes,
-                    ),
+                    child: _buildPreview(context, imageBytes: imageBytes),
                   ),
                   const SizedBox(height: 20),
                   Center(
@@ -233,10 +230,7 @@ class _UserAssetAnalysisShareOverlayState
                                           strokeWidth: 2,
                                         ),
                                       )
-                                    : const Icon(
-                                        LucideIcons.share2,
-                                        size: 18,
-                                      ),
+                                    : const Icon(LucideIcons.share2, size: 18),
                                 label: const Text('分享给'),
                               ),
                             ),
@@ -468,9 +462,10 @@ class _UserAssetAnalysisShareOverlayState
 
   /// 分享图片基础名称
   String get _shareImageBaseName {
-    final safeUsername = widget.analysis.username
-        .trim()
-        .replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
+    final safeUsername = widget.analysis.username.trim().replaceAll(
+      RegExp(r'[^A-Za-z0-9_-]'),
+      '_',
+    );
     final username = safeUsername.isEmpty ? 'user' : safeUsername;
     return 'magrail_asset_analysis_${username}_'
         '${_generatedAt.millisecondsSinceEpoch}';

@@ -43,11 +43,11 @@ class UserRepository with _UserRepositoryPageQueries {
     required AppPreferences preferences,
     required AuctionRepository auctionRepository,
     required AppActivityReporter activityReporter,
-  })  : _apiClient = apiClient,
-        _authRepository = authRepository,
-        _preferences = preferences,
-        _auctionRepository = auctionRepository,
-        _activityReporter = activityReporter;
+  }) : _apiClient = apiClient,
+       _authRepository = authRepository,
+       _preferences = preferences,
+       _auctionRepository = auctionRepository,
+       _activityReporter = activityReporter;
 
   @override
   final ApiClient _apiClient;
@@ -178,17 +178,16 @@ class UserRepository with _UserRepositoryPageQueries {
 
     try {
       final json = await _apiClient.getJson<Map<String, Object?>>(path);
-      final response = TinygrailResponse<UserDetailProfile>.fromJson(
-        json,
-        (value) {
-          final valueJson = TinygrailResponseParser.asObjectMap(value);
-          if (valueJson == null) {
-            return null;
-          }
+      final response = TinygrailResponse<UserDetailProfile>.fromJson(json, (
+        value,
+      ) {
+        final valueJson = TinygrailResponseParser.asObjectMap(value);
+        if (valueJson == null) {
+          return null;
+        }
 
-          return UserDetailProfile.fromJson(valueJson);
-        },
-      );
+        return UserDetailProfile.fromJson(valueJson);
+      });
 
       final profile = response.value;
       if (!response.isSuccess || profile == null) {
@@ -350,17 +349,16 @@ class UserRepository with _UserRepositoryPageQueries {
         ? 'event/share/bonus/test'
         : 'event/share/bonus/test/${_encodeUsername(resolvedUsername)}';
     final json = await _apiClient.getJson<Map<String, Object?>>(path);
-    final response = TinygrailResponse<UserShareBonusForecast>.fromJson(
-      json,
-      (value) {
-        final valueJson = TinygrailResponseParser.asObjectMap(value);
-        if (valueJson == null) {
-          return null;
-        }
+    final response = TinygrailResponse<UserShareBonusForecast>.fromJson(json, (
+      value,
+    ) {
+      final valueJson = TinygrailResponseParser.asObjectMap(value);
+      if (valueJson == null) {
+        return null;
+      }
 
-        return UserShareBonusForecast.fromJson(valueJson);
-      },
-    );
+      return UserShareBonusForecast.fromJson(valueJson);
+    });
 
     final forecast = response.value;
     if (!response.isSuccess || forecast == null) {
@@ -440,14 +438,10 @@ class UserRepository with _UserRepositoryPageQueries {
   /// 缓存当前登录用户角色资产预览
   ///
   /// [cache] 用户角色资产预览缓存
-  Future<void> cacheCurrentUserCharaOverview(
-    UserCharaOverviewCache cache,
-  ) {
+  Future<void> cacheCurrentUserCharaOverview(UserCharaOverviewCache cache) {
     final cacheJson = cache.toJson()
       ..['UpdatedAt'] = _cacheUpdatedAtMilliseconds();
-    return _preferences.setCurrentUserCharaOverviewCache(
-      jsonEncode(cacheJson),
-    );
+    return _preferences.setCurrentUserCharaOverviewCache(jsonEncode(cacheJson));
   }
 
   /// 清除当前登录用户资料和角色资产预览缓存
@@ -552,17 +546,16 @@ class UserRepository with _UserRepositoryPageQueries {
     required T Function(Map<String, Object?> json) itemFromJson,
     required String fallbackMessage,
   }) {
-    final response = TinygrailResponse<TinygrailPage<T>>.fromJson(
-      json,
-      (value) {
-        final valueJson = TinygrailResponseParser.asObjectMap(value);
-        if (valueJson == null) {
-          return null;
-        }
+    final response = TinygrailResponse<TinygrailPage<T>>.fromJson(json, (
+      value,
+    ) {
+      final valueJson = TinygrailResponseParser.asObjectMap(value);
+      if (valueJson == null) {
+        return null;
+      }
 
-        return TinygrailPage.fromJson(valueJson, itemFromJson);
-      },
-    );
+      return TinygrailPage.fromJson(valueJson, itemFromJson);
+    });
 
     final page = response.value;
     if (!response.isSuccess || page == null) {

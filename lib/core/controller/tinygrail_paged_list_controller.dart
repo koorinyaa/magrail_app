@@ -15,8 +15,8 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
   TinygrailPagedListController({
     required this.pageSize,
     this.emptyPageScanLimit = 1,
-  })  : assert(pageSize > 0),
-        assert(emptyPageScanLimit > 0) {
+  }) : assert(pageSize > 0),
+       assert(emptyPageScanLimit > 0) {
     _pagingController = PagingController<int, ItemType>(
       getNextPageKey: _resolveNextPageKey,
       fetchPage: _fetchPageForPagingController,
@@ -133,9 +133,7 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
 
     _isRefreshing = !shouldShowInitialLoading;
     if (shouldShowInitialLoading) {
-      _pagingController.value = PagingState<int, ItemType>(
-        isLoading: true,
-      );
+      _pagingController.value = PagingState<int, ItemType>(isLoading: true);
     } else {
       _pagingController.value = previousState.copyWith(error: null);
     }
@@ -230,7 +228,8 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
     Future<TinygrailPage<RawItemType>> Function({
       required int page,
       required int pageSize,
-    })? pageLoader,
+    })?
+    pageLoader,
   }) async {
     if (_isDisposed || page <= 0 || followingPageCount < 0) {
       return false;
@@ -352,8 +351,9 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
     }
 
     final maxIndex = itemCount - 1;
-    final triggerIndex =
-        (maxIndex - itemPreloadThreshold).clamp(0, maxIndex).toInt();
+    final triggerIndex = (maxIndex - itemPreloadThreshold)
+        .clamp(0, maxIndex)
+        .toInt();
     if (index < triggerIndex) {
       return;
     }
@@ -465,7 +465,8 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
     Future<TinygrailPage<RawItemType>> Function({
       required int page,
       required int pageSize,
-    })? pageLoader,
+    })?
+    pageLoader,
   }) async {
     final previousNextPage = _nextPage;
     final previousCanLoadMore = _canLoadMore;
@@ -558,8 +559,9 @@ abstract class TinygrailPagedListController<ItemType, RawItemType>
     required int rawItemCount,
   }) {
     // 接口页码异常回退时至少按请求页推进，避免空展示页扫描卡住
-    final resolvedPage =
-        currentPage > requestedPage ? currentPage : requestedPage;
+    final resolvedPage = currentPage > requestedPage
+        ? currentPage
+        : requestedPage;
     _nextPage = resolvedPage + 1;
     _canLoadMore = rawItemCount > 0 && resolvedPage < totalPages;
   }

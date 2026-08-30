@@ -1,5 +1,6 @@
 part of '../character_detail_repository.dart';
 
+/// 角色详情交易头部查询
 extension CharacterDetailRepositoryTradeHeaderQueries
     on CharacterDetailRepository {
   /// 获取英灵殿角色持股数据

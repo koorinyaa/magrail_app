@@ -113,6 +113,7 @@ class TopWeekHistoryPageIndicator extends StatelessWidget
     implements PreferredSizeWidget {
   /// 创建往期萌王分页指示器
   ///
+  /// [key] Flutter 组件标识
   /// [currentPage] 当前页码
   /// [totalPages] 总页数
   const TopWeekHistoryPageIndicator({
@@ -159,9 +160,7 @@ class TopWeekHistoryPageIndicator extends StatelessWidget
             final isActive = index == activeIndex;
             return AnimatedContainer(
               duration: const Duration(milliseconds: 180),
-              margin: EdgeInsets.only(
-                right: index == _dotCount - 1 ? 0 : 6,
-              ),
+              margin: EdgeInsets.only(right: index == _dotCount - 1 ? 0 : 6),
               width: isActive ? 8 : 6,
               height: isActive ? 8 : 6,
               decoration: BoxDecoration(
@@ -255,10 +254,7 @@ class _TopWeekHistoryPageContentState
     final error = widget.controller.pageErrorAt(widget.page);
 
     if (pageData != null) {
-      return TopWeekHistoryList(
-        page: pageData,
-        padding: widget.contentPadding,
-      );
+      return TopWeekHistoryList(page: pageData, padding: widget.contentPadding);
     }
 
     if (error != null) {
@@ -270,15 +266,11 @@ class _TopWeekHistoryPageContentState
     }
 
     if (isLoading || widget.controller.isInitialLoading) {
-      return _TopWeekHistorySkeletonPage(
-        padding: widget.contentPadding,
-      );
+      return _TopWeekHistorySkeletonPage(padding: widget.contentPadding);
     }
 
     _requestMissingPage();
-    return _TopWeekHistorySkeletonPage(
-      padding: widget.contentPadding,
-    );
+    return _TopWeekHistorySkeletonPage(padding: widget.contentPadding);
   }
 
   /// 触发当前页数据加载
@@ -314,9 +306,7 @@ class _TopWeekHistorySkeletonPage extends StatelessWidget {
   /// 创建往期萌王骨架页
   ///
   /// [padding] 骨架列表滚动内边距
-  const _TopWeekHistorySkeletonPage({
-    required this.padding,
-  });
+  const _TopWeekHistorySkeletonPage({required this.padding});
 
   final EdgeInsetsGeometry padding;
 
@@ -462,9 +452,7 @@ class _TopWeekHistoryErrorState extends StatelessWidget {
   /// 创建往期萌王错误页
   ///
   /// [onRetry] 重试回调
-  const _TopWeekHistoryErrorState({
-    required this.onRetry,
-  });
+  const _TopWeekHistoryErrorState({required this.onRetry});
 
   final VoidCallback onRetry;
 

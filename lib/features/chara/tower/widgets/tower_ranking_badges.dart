@@ -61,12 +61,7 @@ class TowerStarsRow extends StatelessWidget {
           ),
         if (hasLevelIcons)
           for (final icon in icons)
-            Icon(
-              icon,
-              size: iconSize,
-              fill: 1,
-              color: const Color(0xFFF2B72F),
-            ),
+            Icon(icon, size: iconSize, fill: 1, color: const Color(0xFFF2B72F)),
       ],
     );
   }
@@ -76,11 +71,9 @@ class TowerStarsRow extends StatelessWidget {
 class TowerStarForcesBadge extends StatelessWidget {
   /// 创建通天塔星之力徽标
   ///
+  /// [key] Flutter 组件标识
   /// [value] 星之力数值
-  const TowerStarForcesBadge({
-    super.key,
-    required this.value,
-  });
+  const TowerStarForcesBadge({super.key, required this.value});
 
   /// 星之力显示文本
   final String value;
@@ -98,10 +91,12 @@ class TowerStarForcesBadge extends StatelessWidget {
     final borderColor = isDark
         ? const Color(0xFFEAB308).withValues(alpha: 0.18)
         : const Color(0x40F5A524);
-    final iconColor =
-        isDark ? const Color(0xFFFACC15) : const Color(0xFFB76E00);
-    final textColor =
-        isDark ? const Color(0xFFFDE68A) : const Color(0xFF9A5B00);
+    final iconColor = isDark
+        ? const Color(0xFFFACC15)
+        : const Color(0xFFB76E00);
+    final textColor = isDark
+        ? const Color(0xFFFDE68A)
+        : const Color(0xFF9A5B00);
 
     return Container(
       width: 72,
@@ -114,11 +109,7 @@ class TowerStarForcesBadge extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.auto_awesome_rounded,
-            color: iconColor,
-            size: 11,
-          ),
+          Icon(Icons.auto_awesome_rounded, color: iconColor, size: 11),
           const SizedBox(width: 3),
           Flexible(
             child: Text(

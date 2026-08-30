@@ -64,10 +64,7 @@ class UserRedPacketLogSkeletonSliverList extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [itemCount] 骨架条目数量
-  const UserRedPacketLogSkeletonSliverList({
-    super.key,
-    this.itemCount = 12,
-  });
+  const UserRedPacketLogSkeletonSliverList({super.key, this.itemCount = 12});
 
   /// 骨架条目数量
   final int itemCount;
@@ -79,9 +76,7 @@ class UserRedPacketLogSkeletonSliverList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverList.separated(
       itemBuilder: (context, index) {
-        return const UserAssetRecordListItem(
-          child: _RedPacketLogSkeletonRow(),
-        );
+        return const UserAssetRecordListItem(child: _RedPacketLogSkeletonRow());
       },
       separatorBuilder: (context, index) => const _RedPacketLogDivider(),
       itemCount: itemCount,
@@ -136,9 +131,7 @@ class _RedPacketLogSkeletonRow extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Flexible(
-                        child: Bone.text(width: 92, fontSize: 14),
-                      ),
+                      Flexible(child: Bone.text(width: 92, fontSize: 14)),
                       SizedBox(width: 6),
                       Bone(
                         width: 54,

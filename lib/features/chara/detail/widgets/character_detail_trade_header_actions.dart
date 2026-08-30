@@ -61,7 +61,7 @@ class CharacterDetailTradeHeaderActions extends StatefulWidget {
 
   /// 资产重组或股权融资成功回调
   final Future<void> Function(CharacterDetailSacrificeMode mode)
-      onSacrificeChanged;
+  onSacrificeChanged;
 
   /// 拍卖变更回调
   final Future<void> Function() onAuctionChanged;
@@ -262,7 +262,8 @@ class _CharacterDetailTradeHeaderActionsState
         return;
       }
 
-      final hasUserBid = auction != null &&
+      final hasUserBid =
+          auction != null &&
           auction.id > 0 &&
           auction.price > 0 &&
           auction.amount > 0;
@@ -468,11 +469,7 @@ class _CharacterDetailTradeHeaderActionsState
       return;
     }
 
-    await _runAction(
-      context,
-      action,
-      () => widget.onVoteKill(reason: reason),
-    );
+    await _runAction(context, action, () => widget.onVoteKill(reason: reason));
   }
 
   /// 处理撤回投票点击

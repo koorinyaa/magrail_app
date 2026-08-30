@@ -15,10 +15,7 @@ class BangumiAuthConfig {
   ///
   /// [useMirror] 是否使用 Bangumi 镜像域名
   /// [mirrorHost] Bangumi 镜像域名
-  static Uri authorizeUri({
-    required bool useMirror,
-    String? mirrorHost,
-  }) {
+  static Uri authorizeUri({required bool useMirror, String? mirrorHost}) {
     return Uri.https(
       useMirror
           ? BangumiMirrorConfig.resolveHost(mirrorHost)

@@ -36,7 +36,7 @@ class CharacterDetailBoardSliverList extends StatelessWidget {
 
   /// 成员圣殿查询回调
   final CharacterDetailTempleItem? Function(CharacterDetailBoardMember member)
-      templeFor;
+  templeFor;
 
   /// 条目构建回调
   final ValueChanged<int>? onItemBuilt;
@@ -57,28 +57,25 @@ class CharacterDetailBoardSliverList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverFixedExtentList(
       itemExtent: _BoardSliverListMetrics.itemExtent,
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final item = items[index];
-          final temple = templeFor(item);
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final item = items[index];
+        final temple = templeFor(item);
 
-          onItemBuilt?.call(index);
-          return _BoardSliverListItem(
-            child: CharacterDetailBoardMemberRow(
-              member: item,
-              serialNumber: index + 1,
-              totalShares: totalShares,
-              temple: temple,
-              onTap: onMemberTap == null ? null : () => onMemberTap!(item),
-              onTempleTap: temple == null || onTempleTap == null
-                  ? null
-                  : () => onTempleTap!(temple),
-              onRevealStock: onRevealStock,
-            ),
-          );
-        },
-        childCount: items.length,
-      ),
+        onItemBuilt?.call(index);
+        return _BoardSliverListItem(
+          child: CharacterDetailBoardMemberRow(
+            member: item,
+            serialNumber: index + 1,
+            totalShares: totalShares,
+            temple: temple,
+            onTap: onMemberTap == null ? null : () => onMemberTap!(item),
+            onTempleTap: temple == null || onTempleTap == null
+                ? null
+                : () => onTempleTap!(temple),
+            onRevealStock: onRevealStock,
+          ),
+        );
+      }, childCount: items.length),
     );
   }
 }
@@ -104,14 +101,9 @@ class CharacterDetailBoardSkeletonSliverList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverFixedExtentList(
       itemExtent: _BoardSliverListMetrics.itemExtent,
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          return const _BoardSliverListItem(
-            child: _BoardMemberRowSkeleton(),
-          );
-        },
-        childCount: itemCount,
-      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        return const _BoardSliverListItem(child: _BoardMemberRowSkeleton());
+      }, childCount: itemCount),
     );
   }
 }
@@ -201,9 +193,7 @@ class _BoardSliverListItem extends StatelessWidget {
   /// 创建董事会列表条目外层
   ///
   /// [child] 条目主体
-  const _BoardSliverListItem({
-    required this.child,
-  });
+  const _BoardSliverListItem({required this.child});
 
   /// 条目主体
   final Widget child;

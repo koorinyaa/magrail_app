@@ -142,10 +142,7 @@ class _CharacterDetailBangumiActionsCardState
       if (mounted) {
         AppToast.error(
           context,
-          text: resolveUserErrorMessage(
-            error,
-            fallback: '同步资料失败',
-          ),
+          text: resolveUserErrorMessage(error, fallback: '同步资料失败'),
         );
       }
     } finally {
@@ -197,9 +194,7 @@ class _BangumiActionButton extends StatelessWidget {
   /// 创建角色 Bangumi 关联操作按钮
   ///
   /// [action] 操作入口
-  const _BangumiActionButton({
-    required this.action,
-  });
+  const _BangumiActionButton({required this.action});
 
   /// 操作入口
   final _BangumiActionEntry action;
@@ -228,11 +223,7 @@ class _BangumiActionButton extends StatelessWidget {
                 ),
               )
             else
-              Icon(
-                action.icon,
-                size: 22,
-                color: colorScheme.onSurface,
-              ),
+              Icon(action.icon, size: 22, color: colorScheme.onSurface),
             const SizedBox(height: 6),
             Text(
               action.label,

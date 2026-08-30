@@ -6,10 +6,7 @@ class _LockTotalSwitch extends StatelessWidget {
   ///
   /// [value] 是否锁定总额
   /// [onChanged] 状态变化回调
-  const _LockTotalSwitch({
-    required this.value,
-    required this.onChanged,
-  });
+  const _LockTotalSwitch({required this.value, required this.onChanged});
 
   /// 是否锁定总额
   final bool value;
@@ -237,18 +234,9 @@ class _AuctionQuickInputButtons extends StatelessWidget {
         spacing: 8,
         runSpacing: 8,
         children: [
-          _AuctionQuickInputButton(
-            text: '拍满',
-            onPressed: onFillRemaining,
-          ),
-          _AuctionQuickInputButton(
-            text: '英灵殿',
-            onPressed: onFillMaxAmount,
-          ),
-          _AuctionQuickInputButton(
-            text: '底价',
-            onPressed: onFillBasePrice,
-          ),
+          _AuctionQuickInputButton(text: '拍满', onPressed: onFillRemaining),
+          _AuctionQuickInputButton(text: '英灵殿', onPressed: onFillMaxAmount),
+          _AuctionQuickInputButton(text: '底价', onPressed: onFillBasePrice),
         ],
       ),
     );
@@ -261,10 +249,7 @@ class _AuctionQuickInputButton extends StatelessWidget {
   ///
   /// [text] 按钮文本
   /// [onPressed] 点击回调
-  const _AuctionQuickInputButton({
-    required this.text,
-    required this.onPressed,
-  });
+  const _AuctionQuickInputButton({required this.text, required this.onPressed});
 
   /// 按钮文本
   final String text;
@@ -321,9 +306,7 @@ class _AuctionTotalText extends StatelessWidget {
   /// 创建拍卖合计文本
   ///
   /// [total] 合计金额
-  const _AuctionTotalText({
-    required this.total,
-  });
+  const _AuctionTotalText({required this.total});
 
   /// 合计金额
   final double total;
@@ -339,9 +322,7 @@ class _AuctionTotalText extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.primary.withValues(alpha: 0.09),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colorScheme.primary.withValues(alpha: 0.16),
-        ),
+        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.16)),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),

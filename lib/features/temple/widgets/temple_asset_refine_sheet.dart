@@ -34,8 +34,9 @@ Future<void> showTempleAssetRefineSheet(
       const topGap = 32.0;
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
-      final maxHeight =
-          availableHeight.clamp(0.0, mediaQuery.size.height).toDouble();
+      final maxHeight = availableHeight
+          .clamp(0.0, mediaQuery.size.height)
+          .toDouble();
 
       return ConstrainedBox(
         constraints: BoxConstraints(maxHeight: maxHeight),
@@ -51,10 +52,7 @@ class TempleAssetRefineSheet extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [data] 圣殿资产卡片展示数据
-  const TempleAssetRefineSheet({
-    super.key,
-    required this.data,
-  });
+  const TempleAssetRefineSheet({super.key, required this.data});
 
   /// 圣殿资产卡片展示数据
   final TempleAssetCardData data;
@@ -196,10 +194,7 @@ class _TempleAssetRefineSheetState extends State<TempleAssetRefineSheet> {
         return;
       }
 
-      AppToast.error(
-        context,
-        text: _messageForError(error),
-      );
+      AppToast.error(context, text: _messageForError(error));
     } finally {
       try {
         await actionContext.onActionCompleted?.call();

@@ -10,9 +10,8 @@ class TowerController extends ChangeNotifier {
   /// 创建通天塔控制器
   ///
   /// [repository] 通天塔仓库
-  TowerController({
-    required TowerRepository repository,
-  }) : _repository = repository;
+  TowerController({required TowerRepository repository})
+    : _repository = repository;
 
   static const Duration _autoRefreshInterval = Duration(minutes: 10);
   static const Duration _retryRefreshInterval = Duration(minutes: 1);
@@ -46,9 +45,7 @@ class TowerController extends ChangeNotifier {
   /// 加载通天塔条目
   ///
   /// [showSkeleton] 是否显示首次加载骨架
-  Future<void> load({
-    required bool showSkeleton,
-  }) async {
+  Future<void> load({required bool showSkeleton}) async {
     if (_isDisposed || _isLoading || _isRefreshing) {
       return;
     }
@@ -62,21 +59,22 @@ class TowerController extends ChangeNotifier {
 
     try {
       final items = await _repository.fetchTowerItems();
-      final entries = items
-          .map(
-            (item) => TowerEntry(
-              characterId: item.characterId,
-              rank: item.rank,
-              name: item.name,
-              level: item.level,
-              zeroCount: item.zeroCount,
-              stars: item.stars,
-              starForces: item.starForces,
-              avatarUrl: TinygrailAssetUrls.normalizeAvatar(item.icon),
-            ),
-          )
-          .toList(growable: false)
-        ..sort((a, b) => a.rank.compareTo(b.rank));
+      final entries =
+          items
+              .map(
+                (item) => TowerEntry(
+                  characterId: item.characterId,
+                  rank: item.rank,
+                  name: item.name,
+                  level: item.level,
+                  zeroCount: item.zeroCount,
+                  stars: item.stars,
+                  starForces: item.starForces,
+                  avatarUrl: TinygrailAssetUrls.normalizeAvatar(item.icon),
+                ),
+              )
+              .toList(growable: false)
+            ..sort((a, b) => a.rank.compareTo(b.rank));
 
       if (_isDisposed) {
         return;
@@ -122,9 +120,7 @@ class TowerController extends ChangeNotifier {
   /// 安排自动刷新
   ///
   /// [success] 上次刷新是否成功
-  void _scheduleAutoRefresh({
-    required bool success,
-  }) {
+  void _scheduleAutoRefresh({required bool success}) {
     _autoRefreshTimer?.cancel();
     _autoRefreshTimer = Timer(
       success ? _autoRefreshInterval : _retryRefreshInterval,

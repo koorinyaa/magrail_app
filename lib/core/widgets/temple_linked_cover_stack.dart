@@ -9,6 +9,7 @@ class TempleLinkedCoverStack extends StatelessWidget {
 
   /// 创建圣殿 LINK 静态封面堆叠
   ///
+  /// [key] Flutter 组件标识
   /// [width] 堆叠区域宽度
   /// [frontCover] 前层圣殿封面
   /// [linkedCover] 后层 LINK 封面
@@ -50,16 +51,8 @@ class TempleLinkedCoverStack extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.hardEdge,
         children: [
-          Positioned(
-            left: horizontalOffset,
-            top: 0,
-            child: linkedCover,
-          ),
-          Positioned(
-            left: 0,
-            top: verticalOffset,
-            child: frontCover,
-          ),
+          Positioned(left: horizontalOffset, top: 0, child: linkedCover),
+          Positioned(left: 0, top: verticalOffset, child: frontCover),
         ],
       ),
     );
@@ -70,6 +63,7 @@ class TempleLinkedCoverStack extends StatelessWidget {
 class TempleLinkedCover extends StatelessWidget {
   /// 创建圣殿 LINK 后层封面
   ///
+  /// [key] Flutter 组件标识
   /// [width] 封面宽度
   /// [coverUrl] 圣殿封面地址
   /// [avatarUrl] 封面缺失时使用的头像地址
@@ -100,10 +94,7 @@ class TempleLinkedCover extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(24);
-    final image = TempleCoverImage(
-      coverUrl: coverUrl,
-      avatarUrl: avatarUrl,
-    );
+    final image = TempleCoverImage(coverUrl: coverUrl, avatarUrl: avatarUrl);
     final tag = heroTag;
 
     return SizedBox(

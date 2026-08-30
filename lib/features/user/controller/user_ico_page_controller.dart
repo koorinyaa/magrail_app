@@ -15,8 +15,8 @@ class UserIcoPageController
     required UserRepository repository,
     required String username,
     super.pageSize = defaultPageSize,
-  })  : _repository = repository,
-        _username = username;
+  }) : _repository = repository,
+       _username = username;
 
   /// 用户 ICO 二级页面默认分页数量
   static const int defaultPageSize = 24;

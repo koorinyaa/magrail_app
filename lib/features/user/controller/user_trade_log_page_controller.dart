@@ -4,8 +4,9 @@ import 'package:magrail_app/features/user/model/user_trade_log_api_item.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
 
 /// 用户交易记录二级页面控制器
-class UserTradeLogPageController extends TinygrailPagedListController<
-    UserTradeLogApiItem, UserTradeLogApiItem> {
+class UserTradeLogPageController
+    extends
+        TinygrailPagedListController<UserTradeLogApiItem, UserTradeLogApiItem> {
   /// 创建用户交易记录二级页面控制器
   ///
   /// [repository] 用户仓库
@@ -15,8 +16,8 @@ class UserTradeLogPageController extends TinygrailPagedListController<
     required UserRepository repository,
     required int userId,
     super.pageSize = defaultPageSize,
-  })  : _repository = repository,
-        _userId = userId;
+  }) : _repository = repository,
+       _userId = userId;
 
   /// 用户交易记录默认分页数量
   static const int defaultPageSize = 48;
@@ -54,9 +55,7 @@ class UserTradeLogPageController extends TinygrailPagedListController<
   ///
   /// [items] 接口返回记录条目
   @override
-  List<UserTradeLogApiItem> convertPageItems(
-    List<UserTradeLogApiItem> items,
-  ) {
+  List<UserTradeLogApiItem> convertPageItems(List<UserTradeLogApiItem> items) {
     return items;
   }
 }

@@ -20,8 +20,9 @@ extension _TempleAssetMagicChaosFlow on _TempleAssetMagicActionSheetState {
     });
 
     try {
-      final result =
-          await _TempleAssetMagicSubmitLogic(this)._submitChaosCubeDraw();
+      final result = await _TempleAssetMagicSubmitLogic(
+        this,
+      )._submitChaosCubeDraw();
       if (!mounted) {
         return null;
       }
@@ -64,11 +65,12 @@ extension _TempleAssetMagicChaosFlow on _TempleAssetMagicActionSheetState {
     }
 
     try {
-      final result =
-          await _TempleAssetMagicSubmitLogic(this)._submitChaosCubeDraw();
-      await _TempleAssetMagicDialogFlow(this)._refreshAfterMagicAction(
-        dialogContext.mounted ? dialogContext : null,
-      );
+      final result = await _TempleAssetMagicSubmitLogic(
+        this,
+      )._submitChaosCubeDraw();
+      await _TempleAssetMagicDialogFlow(
+        this,
+      )._refreshAfterMagicAction(dialogContext.mounted ? dialogContext : null);
       return result;
     } catch (error) {
       if (!dialogContext.mounted) {

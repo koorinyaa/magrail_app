@@ -67,7 +67,8 @@ class UserDetailFloatingTopActions extends StatelessWidget {
     final safePadding = MediaQuery.paddingOf(context);
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
-    final backgroundAlpha = progress *
+    final backgroundAlpha =
+        progress *
         (isDark
             ? AppBlurStyle.darkSurfaceAlpha
             : AppBlurStyle.lightSurfaceAlpha);
@@ -116,10 +117,7 @@ class _UserDetailTopIdentity extends StatelessWidget {
   ///
   /// [profile] 用户资料
   /// [progress] 顶部紧凑用户标识显示进度
-  const _UserDetailTopIdentity({
-    required this.profile,
-    required this.progress,
-  });
+  const _UserDetailTopIdentity({required this.profile, required this.progress});
 
   /// 用户资料
   final UserDetailProfile? profile;
@@ -241,12 +239,10 @@ class _UserDetailTopActions extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final iconButtonStyle =
         (IconButtonTheme.of(context).style ?? const ButtonStyle()).copyWith(
-      foregroundColor: WidgetStatePropertyAll(colorScheme.onSurface),
-      fixedSize: WidgetStatePropertyAll(
-        Size.square(toolbarHeight),
-      ),
-      padding: const WidgetStatePropertyAll(EdgeInsets.zero),
-    );
+          foregroundColor: WidgetStatePropertyAll(colorScheme.onSurface),
+          fixedSize: WidgetStatePropertyAll(Size.square(toolbarHeight)),
+          padding: const WidgetStatePropertyAll(EdgeInsets.zero),
+        );
     final trailingIconButtonStyle = iconButtonStyle.copyWith(
       fixedSize: const WidgetStatePropertyAll(
         Size.square(_trailingButtonExtent),
@@ -254,9 +250,7 @@ class _UserDetailTopActions extends StatelessWidget {
     );
 
     return IconButtonTheme(
-      data: IconButtonThemeData(
-        style: iconButtonStyle,
-      ),
+      data: IconButtonThemeData(style: iconButtonStyle),
       child: IconTheme(
         data: IconThemeData(color: colorScheme.onSurface),
         child: SizedBox(
@@ -273,10 +267,7 @@ class _UserDetailTopActions extends StatelessWidget {
                     child: Center(
                       child: IconButton(
                         onPressed: () => Navigator.of(context).maybePop(),
-                        icon: const Icon(
-                          Icons.chevron_left_rounded,
-                          size: 30,
-                        ),
+                        icon: const Icon(Icons.chevron_left_rounded, size: 30),
                       ),
                     ),
                   ),

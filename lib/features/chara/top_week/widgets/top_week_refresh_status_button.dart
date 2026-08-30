@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class TopWeekRefreshStatusButton extends StatelessWidget {
   /// 创建每周萌王刷新状态按钮
   ///
+  /// [key] Flutter 组件标识
   /// [label] 刷新状态文案
   /// [onPressed] 刷新按钮点击回调
   const TopWeekRefreshStatusButton({

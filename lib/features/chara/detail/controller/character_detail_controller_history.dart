@@ -1,5 +1,6 @@
 part of 'character_detail_controller.dart';
 
+/// 角色详情历史数据操作
 extension _CharacterDetailControllerHistory on CharacterDetailController {
   /// 使用请求结果更新角色历史数据
   ///

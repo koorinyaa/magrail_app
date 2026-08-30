@@ -1,5 +1,6 @@
 part of '../character_detail_repository.dart';
 
+/// 角色详情基础资料查询
 extension CharacterDetailRepositoryBasicQueries on CharacterDetailRepository {
   /// 获取角色详情基础资料
   ///
@@ -174,15 +175,14 @@ extension CharacterDetailRepositoryBasicQueries on CharacterDetailRepository {
       queryParameters: {'keyword': resolvedKeyword},
     );
     final response =
-        TinygrailResponse<List<CharacterDetailSearchItem>>.fromJson(
-      json,
-      (value) {
-        return TinygrailResponseParser.asObjectList(
+        TinygrailResponse<List<CharacterDetailSearchItem>>.fromJson(json, (
           value,
-          CharacterDetailSearchItem.fromJson,
-        );
-      },
-    );
+        ) {
+          return TinygrailResponseParser.asObjectList(
+            value,
+            CharacterDetailSearchItem.fromJson,
+          );
+        });
 
     if (!response.isSuccess) {
       throw StateError(response.message ?? '搜索角色失败');

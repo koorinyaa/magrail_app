@@ -5,9 +5,7 @@ class _PortalBackdropPainter extends CustomPainter {
   /// 创建角色入口背景绘制器
   ///
   /// [lineColor] 网格线颜色
-  const _PortalBackdropPainter({
-    required this.lineColor,
-  });
+  const _PortalBackdropPainter({required this.lineColor});
 
   final Color lineColor;
 
@@ -42,10 +40,7 @@ class _PortalCardPainter extends CustomPainter {
   ///
   /// [accent] 入口强调色
   /// [prominent] 是否为主入口
-  const _PortalCardPainter({
-    required this.accent,
-    required this.prominent,
-  });
+  const _PortalCardPainter({required this.accent, required this.prominent});
 
   final Color accent;
   final bool prominent;
@@ -64,9 +59,7 @@ class _PortalCardPainter extends CustomPainter {
           accent.withValues(alpha: prominent ? 0.22 : 0.18),
           accent.withValues(alpha: 0),
         ],
-      ).createShader(
-        Rect.fromCircle(center: glowCenter, radius: glowRadius),
-      );
+      ).createShader(Rect.fromCircle(center: glowCenter, radius: glowRadius));
     canvas.drawCircle(glowCenter, glowRadius, glowPaint);
   }
 

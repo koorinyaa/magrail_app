@@ -17,8 +17,9 @@ class UserDetailSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
-    final cardColor =
-        isDark ? colorScheme.surfaceContainerLow : colorScheme.surface;
+    final cardColor = isDark
+        ? colorScheme.surfaceContainerLow
+        : colorScheme.surface;
 
     return Skeletonizer.zone(
       child: Column(
@@ -160,11 +161,7 @@ class _UserMetricSkeleton extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Bone(
-          width: 30,
-          height: 10,
-          borderRadius: BorderRadius.circular(4),
-        ),
+        Bone(width: 30, height: 10, borderRadius: BorderRadius.circular(4)),
         const SizedBox(width: 6),
         Expanded(
           child: Bone(
@@ -191,17 +188,9 @@ class _UserActionItemSkeleton extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Bone(
-          width: 22,
-          height: 22,
-          borderRadius: BorderRadius.circular(11),
-        ),
+        Bone(width: 22, height: 22, borderRadius: BorderRadius.circular(11)),
         const SizedBox(height: 6),
-        Bone(
-          width: 48,
-          height: 12,
-          borderRadius: BorderRadius.circular(5),
-        ),
+        Bone(width: 48, height: 12, borderRadius: BorderRadius.circular(5)),
       ],
     );
   }

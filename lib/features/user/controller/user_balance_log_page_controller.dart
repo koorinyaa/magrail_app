@@ -4,8 +4,12 @@ import 'package:magrail_app/features/user/model/user_balance_log_api_item.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
 
 /// 用户资金日志二级页面控制器
-class UserBalanceLogPageController extends TinygrailPagedListController<
-    UserBalanceLogApiItem, UserBalanceLogApiItem> {
+class UserBalanceLogPageController
+    extends
+        TinygrailPagedListController<
+          UserBalanceLogApiItem,
+          UserBalanceLogApiItem
+        > {
   /// 创建用户资金日志二级页面控制器
   ///
   /// [repository] 用户仓库
@@ -29,10 +33,7 @@ class UserBalanceLogPageController extends TinygrailPagedListController<
     required int page,
     required int pageSize,
   }) {
-    return _repository.fetchUserBalanceLogPage(
-      page: page,
-      pageSize: pageSize,
-    );
+    return _repository.fetchUserBalanceLogPage(page: page, pageSize: pageSize);
   }
 
   /// 转换用户资金日志展示条目

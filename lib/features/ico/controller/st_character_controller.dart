@@ -18,23 +18,23 @@ class StCharacterPageController
     required super.waitForScrollIdle,
     super.onBeforeFullItemsReplaced,
     super.onDataRefreshFailed,
-  })  : _repository = repository,
-        super(
-          pageSize: StCharacterRepository.pageSize,
-          availableSorts: const <CharacterFullListSort>[
-            CharacterFullListSort.st,
-            CharacterFullListSort.circulation,
-            CharacterFullListSort.bids,
-            CharacterFullListSort.asks,
-            CharacterFullListSort.dividend,
-            CharacterFullListSort.towerRank,
-            CharacterFullListSort.stars,
-            CharacterFullListSort.currentPrice,
-            CharacterFullListSort.fluctuation,
-            CharacterFullListSort.marketValue,
-            CharacterFullListSort.listedDate,
-          ],
-        );
+  }) : _repository = repository,
+       super(
+         pageSize: StCharacterRepository.pageSize,
+         availableSorts: const <CharacterFullListSort>[
+           CharacterFullListSort.st,
+           CharacterFullListSort.circulation,
+           CharacterFullListSort.bids,
+           CharacterFullListSort.asks,
+           CharacterFullListSort.dividend,
+           CharacterFullListSort.towerRank,
+           CharacterFullListSort.stars,
+           CharacterFullListSort.currentPrice,
+           CharacterFullListSort.fluctuation,
+           CharacterFullListSort.marketValue,
+           CharacterFullListSort.listedDate,
+         ],
+       );
 
   final StCharacterRepository _repository;
 
@@ -47,10 +47,7 @@ class StCharacterPageController
     required int page,
     required int pageSize,
   }) {
-    return _repository.fetchStCharacters(
-      page: page,
-      pageSize: pageSize,
-    );
+    return _repository.fetchStCharacters(page: page, pageSize: pageSize);
   }
 
   /// 请求 ST 完整角色数据

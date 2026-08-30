@@ -60,8 +60,8 @@ class CharacterQuickEntryBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final horizontalPadding =
         MediaQuery.sizeOf(context).width >= _tabletBreakpoint
-            ? _tabletHorizontalPadding
-            : 16.0;
+        ? _tabletHorizontalPadding
+        : 16.0;
     return Padding(
       padding: AppSafeAreaInsets.fromLTRB(
         context,
@@ -78,8 +78,9 @@ class CharacterQuickEntryBar extends StatelessWidget {
                 math.min(_maximumContentWidth, constraints.maxWidth),
               )
               .toDouble();
-          final viewportWidth =
-              math.min(contentWidth, constraints.maxWidth).toDouble();
+          final viewportWidth = math
+              .min(contentWidth, constraints.maxWidth)
+              .toDouble();
           final canFit = contentWidth <= viewportWidth;
           return SizedBox(
             height: _contentHeight,

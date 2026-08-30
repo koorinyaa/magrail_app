@@ -6,10 +6,7 @@ class _BotLogSliverList extends StatelessWidget {
   ///
   /// [logs] 操作日志列表
   /// [onCharacterTap] 角色 ID 点击回调
-  const _BotLogSliverList({
-    required this.logs,
-    required this.onCharacterTap,
-  });
+  const _BotLogSliverList({required this.logs, required this.onCharacterTap});
 
   /// 操作日志列表
   final List<BotLogEntry> logs;
@@ -25,10 +22,7 @@ class _BotLogSliverList extends StatelessWidget {
     return SliverList.separated(
       itemBuilder: (context, index) {
         return UserAssetRecordListItem(
-          child: _BotLogRow(
-            log: logs[index],
-            onCharacterTap: onCharacterTap,
-          ),
+          child: _BotLogRow(log: logs[index], onCharacterTap: onCharacterTap),
         );
       },
       separatorBuilder: (context, index) {
@@ -64,9 +58,7 @@ class _BotLogSkeletonSliverList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverList.separated(
       itemBuilder: (context, index) {
-        return const UserAssetRecordListItem(
-          child: _BotLogSkeletonRow(),
-        );
+        return const UserAssetRecordListItem(child: _BotLogSkeletonRow());
       },
       separatorBuilder: (context, index) {
         final colorScheme = Theme.of(context).colorScheme;
@@ -131,10 +123,7 @@ class _BotLogSliverState extends StatelessWidget {
   ///
   /// [icon] 状态图标
   /// [text] 状态文案
-  const _BotLogSliverState({
-    required this.icon,
-    required this.text,
-  });
+  const _BotLogSliverState({required this.icon, required this.text});
 
   /// 状态图标
   final IconData icon;
@@ -180,10 +169,7 @@ class _BotLogRow extends StatelessWidget {
   ///
   /// [log] 操作日志条目
   /// [onCharacterTap] 角色 ID 点击回调
-  const _BotLogRow({
-    required this.log,
-    required this.onCharacterTap,
-  });
+  const _BotLogRow({required this.log, required this.onCharacterTap});
 
   /// 操作日志条目
   final BotLogEntry log;
@@ -267,10 +253,7 @@ class _BotLogDescription extends StatelessWidget {
   ///
   /// [text] 正文文本
   /// [onCharacterTap] 角色 ID 点击回调
-  const _BotLogDescription({
-    required this.text,
-    required this.onCharacterTap,
-  });
+  const _BotLogDescription({required this.text, required this.onCharacterTap});
 
   /// 正文文本
   final String text;
@@ -333,9 +316,7 @@ class _BotLogDescription extends StatelessWidget {
     for (final match in regex.allMatches(text)) {
       if (match.start > lastIndex) {
         parts.add(
-          _BotLogDescriptionPart(
-            text: text.substring(lastIndex, match.start),
-          ),
+          _BotLogDescriptionPart(text: text.substring(lastIndex, match.start)),
         );
       }
 
@@ -349,11 +330,7 @@ class _BotLogDescription extends StatelessWidget {
     }
 
     if (lastIndex < text.length) {
-      parts.add(
-        _BotLogDescriptionPart(
-          text: text.substring(lastIndex),
-        ),
-      );
+      parts.add(_BotLogDescriptionPart(text: text.substring(lastIndex)));
     }
 
     return parts;
@@ -366,10 +343,7 @@ final class _BotLogDescriptionPart {
   ///
   /// [text] 片段文本
   /// [characterId] 角色 ID
-  const _BotLogDescriptionPart({
-    required this.text,
-    this.characterId,
-  });
+  const _BotLogDescriptionPart({required this.text, this.characterId});
 
   /// 片段文本
   final String text;

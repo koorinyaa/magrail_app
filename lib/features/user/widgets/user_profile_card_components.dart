@@ -313,11 +313,7 @@ class UserProfileMetric extends StatelessWidget {
             child: FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
-              child: Text(
-                value,
-                maxLines: 1,
-                style: valueStyle,
-              ),
+              child: Text(value, maxLines: 1, style: valueStyle),
             ),
           ),
         ),

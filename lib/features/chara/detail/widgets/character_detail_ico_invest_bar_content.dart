@@ -5,9 +5,7 @@ class _IcoInvestSurface extends StatelessWidget {
   /// 创建 ICO 注资栏浮层外壳
   ///
   /// [child] 注资栏内容
-  const _IcoInvestSurface({
-    required this.child,
-  });
+  const _IcoInvestSurface({required this.child});
 
   /// 注资栏内容
   final Widget child;
@@ -20,9 +18,7 @@ class _IcoInvestSurface extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
 
-    const borderRadius = BorderRadius.vertical(
-      top: Radius.circular(22),
-    );
+    const borderRadius = BorderRadius.vertical(top: Radius.circular(22));
 
     return ClipRRect(
       borderRadius: borderRadius,
@@ -115,7 +111,7 @@ class _IcoInvestForm extends StatelessWidget {
     final expectedShares = prediction.expectedShares(userInfo.amount);
     final promptText = userInfo.hasInvested
         ? '已注资 ${Formatters.tinygrailCurrency(userInfo.amount)}，预计可得 '
-            '${Formatters.groupedNumber(expectedShares)} 股'
+              '${Formatters.groupedNumber(expectedShares)} 股'
         : '追加注资请在下方输入金额';
     final balanceText = balance == null
         ? '账户余额：未知'
@@ -195,9 +191,7 @@ class _IcoInvestAmountField extends StatelessWidget {
   /// 创建 ICO 注资金额输入框
   ///
   /// [controller] 注资金额输入控制器
-  const _IcoInvestAmountField({
-    required this.controller,
-  });
+  const _IcoInvestAmountField({required this.controller});
 
   /// 注资金额输入控制器
   final TextEditingController controller;
@@ -219,9 +213,7 @@ class _IcoInvestAmountField extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-      ],
+      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
       style: TextStyle(
         color: colorScheme.onSurface,
         fontSize: 16,
@@ -269,10 +261,7 @@ class _IcoInvestQuickButton extends StatelessWidget {
   ///
   /// [text] 按钮文案
   /// [onPressed] 点击回调，为空时禁用
-  const _IcoInvestQuickButton({
-    required this.text,
-    required this.onPressed,
-  });
+  const _IcoInvestQuickButton({required this.text, required this.onPressed});
 
   /// 按钮文案
   final String text;
@@ -386,9 +375,7 @@ class _IcoInvestStatusText extends StatelessWidget {
   /// 创建 ICO 注资状态文本
   ///
   /// [text] 状态文案
-  const _IcoInvestStatusText({
-    required this.text,
-  });
+  const _IcoInvestStatusText({required this.text});
 
   /// 状态文案
   final String text;

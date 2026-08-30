@@ -31,6 +31,7 @@ class LatestLinkCarousel extends StatelessWidget {
   /// [magicRepository] 圣殿资产魔法道具仓库
   /// [oosRepository] Tinygrail OOS 仓库
   /// [userRepository] 用户仓库
+  /// [key] Flutter 组件标识
   const LatestLinkCarousel({
     super.key,
     required this.pairs,
@@ -80,20 +81,14 @@ class LatestLinkCarousel extends StatelessWidget {
 
     if (isLoadFailed && !showSkeleton && (pairs == null || pairs!.isEmpty)) {
       return Padding(
-        padding: AppSafeAreaInsets.symmetricHorizontal(
-          context,
-          horizontal: 24,
-        ),
+        padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 24),
         child: _LatestLinkErrorState(onRetry: onRetry),
       );
     }
 
     if (!showSkeleton && pairs != null && pairs!.isEmpty) {
       return Padding(
-        padding: AppSafeAreaInsets.symmetricHorizontal(
-          context,
-          horizontal: 24,
-        ),
+        padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 24),
         child: const _LatestLinkEmptyState(),
       );
     }
@@ -192,9 +187,7 @@ class _LatestLinkErrorState extends StatelessWidget {
   /// 创建首页最新连接加载失败状态
   ///
   /// [onRetry] 重试回调
-  const _LatestLinkErrorState({
-    required this.onRetry,
-  });
+  const _LatestLinkErrorState({required this.onRetry});
 
   /// 重试回调
   final Future<void> Function() onRetry;

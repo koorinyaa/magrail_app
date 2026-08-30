@@ -39,8 +39,9 @@ extension _TempleAssetMagicStardustFlow on _TempleAssetMagicActionSheetState {
     if (_selectedCharacter?.characterId == item.characterId) {
       _setSheetState(() {
         _selectedCharacter = null;
-        _amountController.text =
-            _TempleAssetMagicStateQueries(this)._defaultAmountText;
+        _amountController.text = _TempleAssetMagicStateQueries(
+          this,
+        )._defaultAmountText;
       });
       _stardustDownSacrificesNotifier.value = false;
     }
@@ -64,15 +65,16 @@ extension _TempleAssetMagicStardustFlow on _TempleAssetMagicActionSheetState {
     });
 
     try {
-      final message =
-          await _TempleAssetMagicSubmitLogic(this)._submitStardust();
+      final message = await _TempleAssetMagicSubmitLogic(
+        this,
+      )._submitStardust();
       if (!mounted) {
         return null;
       }
 
-      await _TempleAssetMagicDialogFlow(this)._recordRecentMagicCharacterId(
-        _selectedCharacter?.characterId ?? 0,
-      );
+      await _TempleAssetMagicDialogFlow(
+        this,
+      )._recordRecentMagicCharacterId(_selectedCharacter?.characterId ?? 0);
       if (!mounted) {
         return null;
       }

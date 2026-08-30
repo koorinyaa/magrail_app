@@ -192,10 +192,7 @@ class _CharacterDetailTradeSectionState
   /// 处理成交记录入口
   void _handleTradeRecordsButtonPressed() {
     unawaited(
-      showCharacterDetailTradeRecordsSheet(
-        context,
-        controller: _controller,
-      ),
+      showCharacterDetailTradeRecordsSheet(context, controller: _controller),
     );
   }
 
@@ -299,9 +296,7 @@ class _TradeSurface extends StatelessWidget {
   /// 创建角色详情交易区表面
   ///
   /// [child] 表面内容
-  const _TradeSurface({
-    required this.child,
-  });
+  const _TradeSurface({required this.child});
 
   /// 表面内容
   final Widget child;
@@ -326,10 +321,7 @@ class _TradeSurface extends StatelessWidget {
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: child,
-      ),
+      child: Padding(padding: const EdgeInsets.all(12), child: child),
     );
   }
 }
@@ -339,9 +331,7 @@ class _TradeSectionHeader extends StatelessWidget {
   /// 创建角色详情交易区标题行
   ///
   /// [onTradeRecordsButtonPressed] 成交记录入口回调
-  const _TradeSectionHeader({
-    required this.onTradeRecordsButtonPressed,
-  });
+  const _TradeSectionHeader({required this.onTradeRecordsButtonPressed});
 
   /// 成交记录入口回调
   final VoidCallback onTradeRecordsButtonPressed;
@@ -409,8 +399,9 @@ class _TradeFormToggleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final foregroundColor =
-        colorScheme.onSurfaceVariant.withValues(alpha: 0.72);
+    final foregroundColor = colorScheme.onSurfaceVariant.withValues(
+      alpha: 0.72,
+    );
 
     return TextButton(
       onPressed: onPressed,
@@ -419,10 +410,7 @@ class _TradeFormToggleButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
         minimumSize: const Size.fromHeight(26),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        textStyle: const TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-        ),
+        textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

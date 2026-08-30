@@ -58,10 +58,7 @@ class UserTempleCard extends StatelessWidget {
   ///
   /// [width] 卡片宽度
   /// [showSortValue] 是否预留排序字段补充行高度
-  static double heightForWidth(
-    double width, {
-    bool showSortValue = false,
-  }) {
+  static double heightForWidth(double width, {bool showSortValue = false}) {
     return width / 3 * 4 +
         _TempleAssetProgress.height +
         10 +
@@ -88,8 +85,9 @@ class UserTempleCard extends StatelessWidget {
       starForces: item.starForces,
       heroTag: _coverHeroTag(item),
       onTap: () => _openImageViewer(context, item),
-      onCharacterTap:
-          onCharacterTap == null ? null : () => onCharacterTap!(item),
+      onCharacterTap: onCharacterTap == null
+          ? null
+          : () => onCharacterTap!(item),
       onAssetTap: onAssetTap == null ? null : () => onAssetTap!(item),
       onLinkTap: linkedTemple == null ? null : () => _openLinkDialog(context),
     );
@@ -199,11 +197,7 @@ class UserTempleSortValue {
   /// [label] 排序字段文案
   /// [icon] 排序字段图标
   /// [value] 排序字段格式化数值
-  const UserTempleSortValue({
-    this.label = '',
-    this.icon,
-    required this.value,
-  });
+  const UserTempleSortValue({this.label = '', this.icon, required this.value});
 
   /// 排序字段文案
   final String label;
@@ -248,11 +242,7 @@ class _TempleSortValueLine extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             if (value.icon case final icon?) ...[
-              Icon(
-                icon,
-                size: 12,
-                color: colorScheme.onSurfaceVariant,
-              ),
+              Icon(icon, size: 12, color: colorScheme.onSurfaceVariant),
               const SizedBox(width: 3),
             ],
             Expanded(
@@ -277,9 +267,7 @@ class _TempleAssetProgress extends StatelessWidget {
   /// 创建用户圣殿资产进度条
   ///
   /// [item] 用户圣殿接口条目
-  const _TempleAssetProgress({
-    required this.item,
-  });
+  const _TempleAssetProgress({required this.item});
 
   /// 进度条区域高度
   static const double height = 26;

@@ -6,8 +6,12 @@ import 'package:magrail_app/features/chara/detail/model/character_detail_temple_
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
 
 /// 角色董事会二级页面控制器
-class CharacterDetailBoardPageController extends TinygrailPagedListController<
-    CharacterDetailBoardMember, CharacterDetailBoardMember> {
+class CharacterDetailBoardPageController
+    extends
+        TinygrailPagedListController<
+          CharacterDetailBoardMember,
+          CharacterDetailBoardMember
+        > {
   /// 创建角色董事会二级页面控制器
   ///
   /// [repository] 角色详情仓库
@@ -19,9 +23,9 @@ class CharacterDetailBoardPageController extends TinygrailPagedListController<
     required int characterId,
     CharacterDetailCollectionsController? collectionsController,
     super.pageSize = defaultPageSize,
-  })  : _repository = repository,
-        _characterId = characterId,
-        _collectionsController = collectionsController {
+  }) : _repository = repository,
+       _characterId = characterId,
+       _collectionsController = collectionsController {
     _collectionsController?.addListener(notifyListeners);
   }
 

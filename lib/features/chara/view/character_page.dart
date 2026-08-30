@@ -112,9 +112,7 @@ class _CharacterPageState extends State<CharacterPage> {
                 onHeaderTap: _openAllCharactersPage,
                 child: _buildRankPreview(context),
               ),
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 120),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 120)),
             ],
           ),
         );
@@ -233,10 +231,7 @@ class _CharacterPageState extends State<CharacterPage> {
   ///
   /// [item] ICO 角色条目
   /// [avatarHeroTag] 头像转场标识
-  void _openIcoCharacterDetail(
-    IcoCharacterEntry item,
-    String? avatarHeroTag,
-  ) {
+  void _openIcoCharacterDetail(IcoCharacterEntry item, String? avatarHeroTag) {
     openCharacterDetail(
       context,
       characterId: item.characterId,

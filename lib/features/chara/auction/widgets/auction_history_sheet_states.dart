@@ -5,9 +5,7 @@ class _AuctionHistoryPager extends StatelessWidget {
   /// 创建往期拍卖分页指示器
   ///
   /// [controller] 往期拍卖控制器
-  const _AuctionHistoryPager({
-    required this.controller,
-  });
+  const _AuctionHistoryPager({required this.controller});
 
   static const int _dotCount = 5;
 
@@ -37,9 +35,7 @@ class _AuctionHistoryPager extends StatelessWidget {
             final isActive = index == activeIndex;
             return AnimatedContainer(
               duration: const Duration(milliseconds: 180),
-              margin: EdgeInsets.only(
-                right: index == _dotCount - 1 ? 0 : 6,
-              ),
+              margin: EdgeInsets.only(right: index == _dotCount - 1 ? 0 : 6),
               width: isActive ? 8 : 6,
               height: isActive ? 8 : 6,
               decoration: BoxDecoration(
@@ -176,10 +172,7 @@ class _AuctionHistorySkeletonBlock extends StatelessWidget {
         color: color,
         borderRadius: BorderRadius.circular(radius),
       ),
-      child: SizedBox(
-        width: width,
-        height: height,
-      ),
+      child: SizedBox(width: width, height: height),
     );
   }
 }

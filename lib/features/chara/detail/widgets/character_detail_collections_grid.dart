@@ -52,7 +52,8 @@ class CharacterDetailTempleGrid extends StatelessWidget {
   final void Function(
     CharacterDetailTempleItem ownerItem,
     CharacterDetailTempleItem linkedItem,
-  )? onLinkedAssetTap;
+  )?
+  onLinkedAssetTap;
 
   /// 构建角色详情固定资产自适应网格
   ///
@@ -81,21 +82,18 @@ class CharacterDetailTempleGrid extends StatelessWidget {
               crossAxisSpacing: _crossAxisSpacing,
               childAspectRatio: layout.childAspectRatio,
             ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return CharacterDetailTempleCard(
-                  item: items[index],
-                  fallbackCharacterName: fallbackCharacterName,
-                  width: layout.cardWidth,
-                  heroTagPrefix: 'character-temple-page-cover-$index',
-                  onCharacterTap: onCharacterTap,
-                  onOwnerTap: onOwnerTap,
-                  onAssetTap: onAssetTap,
-                  onLinkedAssetTap: onLinkedAssetTap,
-                );
-              },
-              childCount: items.length,
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              return CharacterDetailTempleCard(
+                item: items[index],
+                fallbackCharacterName: fallbackCharacterName,
+                width: layout.cardWidth,
+                heroTagPrefix: 'character-temple-page-cover-$index',
+                onCharacterTap: onCharacterTap,
+                onOwnerTap: onOwnerTap,
+                onAssetTap: onAssetTap,
+                onLinkedAssetTap: onLinkedAssetTap,
+              );
+            }, childCount: items.length),
           ),
         );
       },
@@ -150,7 +148,8 @@ class CharacterDetailLinkGrid extends StatelessWidget {
   final void Function(
     CharacterDetailTempleItem ownerItem,
     CharacterDetailTempleItem linkedItem,
-  )? onLinkedAssetTap;
+  )?
+  onLinkedAssetTap;
 
   /// 构建角色详情 LINK 自适应网格
   ///
@@ -177,27 +176,25 @@ class CharacterDetailLinkGrid extends StatelessWidget {
               crossAxisCount: layout.crossAxisCount,
               mainAxisSpacing: _mainAxisSpacing,
               crossAxisSpacing: _crossAxisSpacing,
-              childAspectRatio: layout.cellWidth /
+              childAspectRatio:
+                  layout.cellWidth /
                   CharacterDetailLinkCard.heightForWidth(layout.cardWidth),
             ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return Align(
-                  alignment: Alignment.topCenter,
-                  child: CharacterDetailLinkCard(
-                    item: items[index],
-                    fallbackCharacterName: fallbackCharacterName,
-                    width: layout.cardWidth,
-                    heroTagPrefix: 'character-link-page-cover-$index',
-                    onCharacterTap: onCharacterTap,
-                    onOwnerTap: onOwnerTap,
-                    onTempleAssetTap: onTempleAssetTap,
-                    onLinkedAssetTap: onLinkedAssetTap,
-                  ),
-                );
-              },
-              childCount: items.length,
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              return Align(
+                alignment: Alignment.topCenter,
+                child: CharacterDetailLinkCard(
+                  item: items[index],
+                  fallbackCharacterName: fallbackCharacterName,
+                  width: layout.cardWidth,
+                  heroTagPrefix: 'character-link-page-cover-$index',
+                  onCharacterTap: onCharacterTap,
+                  onOwnerTap: onOwnerTap,
+                  onTempleAssetTap: onTempleAssetTap,
+                  onLinkedAssetTap: onLinkedAssetTap,
+                ),
+              );
+            }, childCount: items.length),
           ),
         );
       },
@@ -211,10 +208,7 @@ class CharacterDetailTempleSkeletonGrid extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [itemCount] 骨架卡片数量
-  const CharacterDetailTempleSkeletonGrid({
-    super.key,
-    this.itemCount = 12,
-  });
+  const CharacterDetailTempleSkeletonGrid({super.key, this.itemCount = 12});
 
   /// 骨架卡片数量
   final int itemCount;
@@ -246,12 +240,9 @@ class CharacterDetailTempleSkeletonGrid extends StatelessWidget {
               crossAxisSpacing: CharacterDetailTempleGrid._crossAxisSpacing,
               childAspectRatio: layout.childAspectRatio,
             ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return const _TempleSkeletonCard();
-              },
-              childCount: itemCount,
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              return const _TempleSkeletonCard();
+            }, childCount: itemCount),
           ),
         );
       },
@@ -265,10 +256,7 @@ class CharacterDetailLinkSkeletonGrid extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [itemCount] 骨架卡片数量
-  const CharacterDetailLinkSkeletonGrid({
-    super.key,
-    this.itemCount = 8,
-  });
+  const CharacterDetailLinkSkeletonGrid({super.key, this.itemCount = 8});
 
   /// 骨架卡片数量
   final int itemCount;
@@ -298,18 +286,16 @@ class CharacterDetailLinkSkeletonGrid extends StatelessWidget {
               crossAxisCount: layout.crossAxisCount,
               mainAxisSpacing: CharacterDetailLinkGrid._mainAxisSpacing,
               crossAxisSpacing: CharacterDetailLinkGrid._crossAxisSpacing,
-              childAspectRatio: layout.cellWidth /
+              childAspectRatio:
+                  layout.cellWidth /
                   CharacterDetailLinkCard.heightForWidth(layout.cardWidth),
             ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return Align(
-                  alignment: Alignment.topCenter,
-                  child: _LinkSkeletonCard(width: layout.cardWidth),
-                );
-              },
-              childCount: itemCount,
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              return Align(
+                alignment: Alignment.topCenter,
+                child: _LinkSkeletonCard(width: layout.cardWidth),
+              );
+            }, childCount: itemCount),
           ),
         );
       },
@@ -432,12 +418,14 @@ _LinkGridLayout _resolveLinkLayout(
     );
   }
 
-  final rawCount = ((contentWidth + CharacterDetailLinkGrid._crossAxisSpacing) /
-          (CharacterDetailLinkGrid._minCardWidth +
-              CharacterDetailLinkGrid._crossAxisSpacing))
-      .floor();
-  final crossAxisCount =
-      rawCount.clamp(1, CharacterDetailLinkGrid._maxColumnCount).toInt();
+  final rawCount =
+      ((contentWidth + CharacterDetailLinkGrid._crossAxisSpacing) /
+              (CharacterDetailLinkGrid._minCardWidth +
+                  CharacterDetailLinkGrid._crossAxisSpacing))
+          .floor();
+  final crossAxisCount = rawCount
+      .clamp(1, CharacterDetailLinkGrid._maxColumnCount)
+      .toInt();
   final cellWidth = math.max(
     0.0,
     (contentWidth -
@@ -510,9 +498,7 @@ class _LinkSkeletonCard extends StatelessWidget {
   /// 创建 LINK 骨架卡片
   ///
   /// [width] 卡片宽度
-  const _LinkSkeletonCard({
-    required this.width,
-  });
+  const _LinkSkeletonCard({required this.width});
 
   /// 卡片宽度
   final double width;
@@ -528,17 +514,14 @@ class _LinkSkeletonCard extends StatelessWidget {
         children: [
           Bone(
             width: width,
-            height: CharacterDetailLinkCard.imageHeight *
+            height:
+                CharacterDetailLinkCard.imageHeight *
                 width /
                 CharacterDetailLinkCard.defaultWidth,
             borderRadius: BorderRadius.circular(24),
           ),
           const SizedBox(height: 8),
-          Bone(
-            width: 96,
-            height: 22,
-            borderRadius: BorderRadius.circular(999),
-          ),
+          Bone(width: 96, height: 22, borderRadius: BorderRadius.circular(999)),
         ],
       ),
     );

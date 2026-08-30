@@ -12,10 +12,8 @@ class TowerLogController extends ChangeNotifier {
   ///
   /// [repository] 通天塔仓库
   /// [pageSize] 每页日志数量
-  TowerLogController({
-    required TowerRepository repository,
-    this.pageSize = 30,
-  }) : _repository = repository {
+  TowerLogController({required TowerRepository repository, this.pageSize = 30})
+    : _repository = repository {
     _realtimeClient = TowerLogRealtimeClient(onLog: receiveRealtimeLog);
   }
 
@@ -197,19 +195,12 @@ class TowerLogController extends ChangeNotifier {
   ///
   /// [page] 目标页码
   /// [force] 是否忽略已缓存数据重新请求
-  Future<void> loadPage(
-    int page, {
-    bool force = false,
-  }) async {
+  Future<void> loadPage(int page, {bool force = false}) async {
     if (_disposed) {
       return;
     }
 
-    final response = await _loadPage(
-      page,
-      force: force,
-      reportError: true,
-    );
+    final response = await _loadPage(page, force: force, reportError: true);
 
     if (_disposed || response == null) {
       return;
@@ -309,11 +300,7 @@ class TowerLogController extends ChangeNotifier {
           scannedPages < _maxLoadMoreScanPages &&
           canLoadMore) {
         final page = _nextHistoryPage;
-        final response = await _loadPage(
-          page,
-          force: false,
-          reportError: true,
-        );
+        final response = await _loadPage(page, force: false, reportError: true);
 
         if (_disposed || response == null) {
           break;
@@ -357,8 +344,9 @@ class TowerLogController extends ChangeNotifier {
     }
 
     final maxIndex = itemCount - 1;
-    final triggerIndex =
-        (maxIndex - itemPreloadThreshold).clamp(0, maxIndex).toInt();
+    final triggerIndex = (maxIndex - itemPreloadThreshold)
+        .clamp(0, maxIndex)
+        .toInt();
     if (index < triggerIndex) {
       return;
     }

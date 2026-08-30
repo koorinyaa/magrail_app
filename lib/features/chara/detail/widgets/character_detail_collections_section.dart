@@ -100,16 +100,17 @@ class _CharacterDetailCollectionsSectionState
               topSpacing: 18,
               onHeaderTap:
                   _controller.isLoadingLinks || _controller.hasLinkError
-                      ? null
-                      : _openLinksPage,
+                  ? null
+                  : _openLinksPage,
               child: _buildLinksPreview(context),
             ),
           if (_shouldShowTemplesSection)
             PageSectionSliver(
               title: _templesTitle,
               topSpacing: 18,
-              onHeaderTap:
-                  _isTempleNavigationDisabled ? null : _openTemplesPage,
+              onHeaderTap: _isTempleNavigationDisabled
+                  ? null
+                  : _openTemplesPage,
               child: _buildTemplesPreview(context),
             ),
         ];
@@ -118,9 +119,7 @@ class _CharacterDetailCollectionsSectionState
           return const SliverToBoxAdapter(child: SizedBox.shrink());
         }
 
-        return SliverMainAxisGroup(
-          slivers: slivers,
-        );
+        return SliverMainAxisGroup(slivers: slivers);
       },
     );
   }
@@ -310,10 +309,7 @@ class _CharacterDetailCollectionsSectionState
       return;
     }
 
-    context.pushNamed(
-      'userDetail',
-      queryParameters: {'username': username},
-    );
+    context.pushNamed('userDetail', queryParameters: {'username': username});
   }
 
   /// 二级页面路由参数
@@ -349,7 +345,8 @@ class _CharacterDetailCollectionsSectionState
     CharacterDetailTempleItem item, {
     int? characterId,
   }) {
-    final resolvedCharacterId = characterId ??
+    final resolvedCharacterId =
+        characterId ??
         (item.characterId > 0 ? item.characterId : widget.header.characterId);
 
     return TempleAssetDialogSource(

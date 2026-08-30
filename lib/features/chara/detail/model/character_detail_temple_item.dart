@@ -105,8 +105,9 @@ class CharacterDetailTempleItem {
 
   /// 拥有者展示文案
   String get ownerLabel {
-    final nickname =
-        TinygrailFormatters.decodeHtmlEntities(ownerNickname).trim();
+    final nickname = TinygrailFormatters.decodeHtmlEntities(
+      ownerNickname,
+    ).trim();
     if (nickname.isNotEmpty) {
       return '@$nickname';
     }
@@ -154,8 +155,9 @@ class CharacterDetailTempleItem {
   }) {
     final linkJson = TinygrailResponseParser.asObjectMap(json['Link']);
     final rawName = TinygrailResponseParser.asString(json['Name']);
-    final rawCharacterName =
-        TinygrailResponseParser.asString(json['CharacterName']);
+    final rawCharacterName = TinygrailResponseParser.asString(
+      json['CharacterName'],
+    );
 
     return CharacterDetailTempleItem(
       id: TinygrailResponseParser.asInt(json['Id']),
@@ -181,10 +183,7 @@ class CharacterDetailTempleItem {
       create: TinygrailResponseParser.asString(json['Create']),
       link: linkJson == null
           ? null
-          : CharacterDetailTempleItem._fromJson(
-              linkJson,
-              isLinkedTemple: true,
-            ),
+          : CharacterDetailTempleItem._fromJson(linkJson, isLinkedTemple: true),
     );
   }
 }

@@ -201,10 +201,7 @@ class _CharacterBangumiCastsSheetState
       }
 
       setState(() {
-        final message = resolveUserErrorMessage(
-          error,
-          fallback: '获取出演作品失败',
-        );
+        final message = resolveUserErrorMessage(error, fallback: '获取出演作品失败');
         if (reset) {
           _isInitialLoading = false;
           _initialError = message;
@@ -262,8 +259,10 @@ class _CharacterBangumiCastsSheetState
 
     final maxIndex = itemCount - 1;
     final triggerIndex =
-        (maxIndex - (_characterBangumiRelatedPageSize / 2).ceil())
-            .clamp(0, maxIndex);
+        (maxIndex - (_characterBangumiRelatedPageSize / 2).ceil()).clamp(
+          0,
+          maxIndex,
+        );
     if (index < triggerIndex || !_canLoadNextPage) {
       return;
     }

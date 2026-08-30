@@ -5,9 +5,7 @@ class _TradeHeaderCirculationChip extends StatelessWidget {
   /// 创建已上市头部流通 Chip
   ///
   /// [header] 已上市角色头部资料
-  const _TradeHeaderCirculationChip({
-    required this.header,
-  });
+  const _TradeHeaderCirculationChip({required this.header});
 
   /// 已上市角色头部资料
   final CharacterDetailTradeHeader header;
@@ -96,9 +94,7 @@ final class _TradeHeaderCirculationProgressData {
     );
     final nextLevel = currentLevel + 1;
     final currentMinimum =
-        TinygrailCalculations.minimumCirculationForCharacterLevel(
-      currentLevel,
-    );
+        TinygrailCalculations.minimumCirculationForCharacterLevel(currentLevel);
     final nextMinimum =
         TinygrailCalculations.minimumCirculationForCharacterLevel(nextLevel);
     final remaining = (nextMinimum - safeTotal).clamp(0, nextMinimum);
@@ -120,9 +116,7 @@ class _TradeHeaderCirculationProgress extends StatelessWidget {
   /// 创建已上市头部流通等级进度
   ///
   /// [data] 流通等级进度数据
-  const _TradeHeaderCirculationProgress({
-    required this.data,
-  });
+  const _TradeHeaderCirculationProgress({required this.data});
 
   /// 流通等级进度数据
   final _TradeHeaderCirculationProgressData data;
@@ -183,9 +177,7 @@ class _TradeHeaderDividendChip extends StatelessWidget {
   /// 创建已上市头部股息 Chip
   ///
   /// [header] 已上市角色头部资料
-  const _TradeHeaderDividendChip({
-    required this.header,
-  });
+  const _TradeHeaderDividendChip({required this.header});
 
   /// 已上市角色头部资料
   final CharacterDetailTradeHeader header;
@@ -228,14 +220,16 @@ class _TradeHeaderDividendChip extends StatelessWidget {
   Future<void> _showDividendFormulaDialog(BuildContext context) async {
     final dividendText = Formatters.tinygrailCurrency(header.dividend);
     final perStarDividendText = Formatters.tinygrailCurrency(2);
-    final rankFormulaText = '${Formatters.tinygrailCurrency(header.rate)} × '
+    final rankFormulaText =
+        '${Formatters.tinygrailCurrency(header.rate)} × '
         '0.005 × (601 - ${header.rank})';
     final starFormulaText = '${header.stars} × $perStarDividendText';
     final usesTowerFormula = header.rank > 0 && header.rank <= 500;
     final appliedFormulaText = usesTowerFormula
         ? '$rankFormulaText = $dividendText'
         : '$starFormulaText = $dividendText';
-    final message = '在通天塔前 500 名时：\n'
+    final message =
+        '在通天塔前 500 名时：\n'
         '基础股息 × 0.005 × (601 - 排名)\n'
         '\n'
         '不在通天塔前 500 名时：\n'

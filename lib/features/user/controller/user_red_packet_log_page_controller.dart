@@ -4,8 +4,12 @@ import 'package:magrail_app/features/user/model/user_red_packet_log_api_item.dar
 import 'package:magrail_app/features/user/repository/user_repository.dart';
 
 /// 用户红包记录二级页面控制器
-class UserRedPacketLogPageController extends TinygrailPagedListController<
-    UserRedPacketLogApiItem, UserRedPacketLogApiItem> {
+class UserRedPacketLogPageController
+    extends
+        TinygrailPagedListController<
+          UserRedPacketLogApiItem,
+          UserRedPacketLogApiItem
+        > {
   /// 创建用户红包记录二级页面控制器
   ///
   /// [repository] 用户仓库
@@ -15,8 +19,8 @@ class UserRedPacketLogPageController extends TinygrailPagedListController<
     required UserRepository repository,
     required String username,
     super.pageSize = defaultPageSize,
-  })  : _repository = repository,
-        _username = username;
+  }) : _repository = repository,
+       _username = username;
 
   /// 用户红包记录默认分页数量
   static const int defaultPageSize = 20;

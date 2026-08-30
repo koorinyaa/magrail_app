@@ -12,10 +12,7 @@ class UserBalanceLogPage extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [repository] 用户仓库
-  const UserBalanceLogPage({
-    super.key,
-    required this.repository,
-  });
+  const UserBalanceLogPage({super.key, required this.repository});
 
   /// 用户仓库
   final UserRepository repository;
@@ -34,9 +31,8 @@ class _UserBalanceLogPageState extends State<UserBalanceLogPage> {
   @override
   void initState() {
     super.initState();
-    _controller = UserBalanceLogPageController(
-      repository: widget.repository,
-    )..initialize();
+    _controller = UserBalanceLogPageController(repository: widget.repository)
+      ..initialize();
   }
 
   /// 释放用户资金日志二级页面状态
@@ -60,10 +56,7 @@ class _UserBalanceLogPageState extends State<UserBalanceLogPage> {
           child: Center(
             child: IconButton(
               onPressed: _toggleBalanceDisplayMode,
-              icon: const Icon(
-                Icons.swap_horiz_rounded,
-                size: 22,
-              ),
+              icon: const Icon(Icons.swap_horiz_rounded, size: 22),
             ),
           ),
         ),
@@ -101,9 +94,6 @@ class _UserBalanceLogPageState extends State<UserBalanceLogPage> {
   ///
   /// [characterId] 角色 ID
   void _handleCharacterTap(int characterId) {
-    openCharacterDetail(
-      context,
-      characterId: characterId,
-    );
+    openCharacterDetail(context, characterId: characterId);
   }
 }

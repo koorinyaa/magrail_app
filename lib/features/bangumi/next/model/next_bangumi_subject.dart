@@ -88,9 +88,7 @@ List<String> _tagNamesFromJson(Object? value) {
 
   return value
       .whereType<Map<Object?, Object?>>()
-      .map(
-        (item) => TinygrailResponseParser.asString(item['name']).trim(),
-      )
+      .map((item) => TinygrailResponseParser.asString(item['name']).trim())
       .where((item) => item.isNotEmpty)
       .toList(growable: false);
 }

@@ -158,10 +158,7 @@ class _ResultActionButton extends StatelessWidget {
   ///
   /// [label] 按钮文案
   /// [onPressed] 点击回调
-  const _ResultActionButton({
-    required this.label,
-    required this.onPressed,
-  });
+  const _ResultActionButton({required this.label, required this.onPressed});
 
   /// 按钮文案
   final String label;

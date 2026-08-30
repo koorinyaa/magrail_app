@@ -6,10 +6,7 @@ class _TradeTotalPreview extends StatelessWidget {
   ///
   /// [total] 当前合计金额
   /// [isWarning] 是否使用警告色
-  const _TradeTotalPreview({
-    required this.total,
-    required this.isWarning,
-  });
+  const _TradeTotalPreview({required this.total, required this.isWarning});
 
   /// 当前合计金额
   final double total;
@@ -24,8 +21,9 @@ class _TradeTotalPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
-    final foregroundColor =
-        isWarning ? colorScheme.error : colorScheme.onSurface;
+    final foregroundColor = isWarning
+        ? colorScheme.error
+        : colorScheme.onSurface;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -240,8 +238,9 @@ class _TradeTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
-      inputFormatters:
-          inputFormatter == null ? null : <TextInputFormatter>[inputFormatter!],
+      inputFormatters: inputFormatter == null
+          ? null
+          : <TextInputFormatter>[inputFormatter!],
       style: TextStyle(
         color: colorScheme.onSurface,
         fontSize: 15,

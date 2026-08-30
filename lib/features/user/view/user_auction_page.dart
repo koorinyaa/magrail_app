@@ -21,10 +21,7 @@ class UserAuctionPage extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [repository] 用户仓库
-  const UserAuctionPage({
-    super.key,
-    required this.repository,
-  });
+  const UserAuctionPage({super.key, required this.repository});
 
   /// 用户仓库
   final UserRepository repository;
@@ -44,9 +41,8 @@ class _UserAuctionPageState extends State<UserAuctionPage> {
   @override
   void initState() {
     super.initState();
-    _controller = UserAuctionPageController(
-      repository: widget.repository,
-    )..initialize();
+    _controller = UserAuctionPageController(repository: widget.repository)
+      ..initialize();
   }
 
   /// 释放用户拍卖二级页面状态
@@ -126,10 +122,7 @@ class _UserAuctionPageState extends State<UserAuctionPage> {
   ///
   /// [item] 用户拍卖条目
   /// [avatarHeroTag] 头像转场标识
-  void _handleCharacterTap(
-    UserAuctionApiItem item,
-    String? avatarHeroTag,
-  ) {
+  void _handleCharacterTap(UserAuctionApiItem item, String? avatarHeroTag) {
     openCharacterDetail(
       context,
       characterId: item.characterId,
@@ -179,20 +172,14 @@ class _UserAuctionPageState extends State<UserAuctionPage> {
         return;
       }
 
-      AppToast.info(
-        context,
-        text: message,
-      );
+      AppToast.info(context, text: message);
 
       final refreshed = await _controller.refresh();
       if (!mounted || refreshed) {
         return;
       }
 
-      AppToast.error(
-        context,
-        text: '拍卖列表刷新失败，请下拉重试',
-      );
+      AppToast.error(context, text: '拍卖列表刷新失败，请下拉重试');
     } catch (error) {
       if (!mounted) {
         return;
@@ -215,10 +202,7 @@ class _UserAuctionPageState extends State<UserAuctionPage> {
   ///
   /// [error] 原始错误
   /// [fallback] 兜底文案
-  String _resolveErrorMessage(
-    Object error, {
-    required String fallback,
-  }) {
+  String _resolveErrorMessage(Object error, {required String fallback}) {
     return resolveUserErrorMessage(error, fallback: fallback);
   }
 }

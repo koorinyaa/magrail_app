@@ -126,7 +126,7 @@ class UserCharaOverviewSection extends StatelessWidget {
 
   /// 角色条目点击回调
   final void Function(UserCharacterApiItem item, String? avatarHeroTag)?
-      onCharacterTap;
+  onCharacterTap;
 
   /// ICO 条目点击回调
   final void Function(UserIcoApiItem item, String? avatarHeroTag)? onIcoTap;
@@ -140,39 +140,29 @@ class UserCharaOverviewSection extends StatelessWidget {
     final resolvedTemples = temples ?? const <UserTempleApiItem>[];
     final resolvedCharacters = characters ?? const <UserCharacterApiItem>[];
     final resolvedIcos = icos ?? const <UserIcoApiItem>[];
-    final hasAnyVisibleContent = resolvedLinks.isNotEmpty ||
+    final hasAnyVisibleContent =
+        resolvedLinks.isNotEmpty ||
         resolvedTemples.isNotEmpty ||
         resolvedCharacters.isNotEmpty ||
         resolvedIcos.isNotEmpty;
-    final showSkeleton = (isLoading && !hasAnyVisibleContent) ||
+    final showSkeleton =
+        (isLoading && !hasAnyVisibleContent) ||
         links == null ||
         temples == null ||
         characters == null ||
         icos == null;
     final linksTitle = showSkeleton
         ? '连接'
-        : '${_resolveSectionCount(
-            totalItems: linkTotalItems,
-            visibleCount: resolvedLinks.length,
-          )}组连接';
+        : '${_resolveSectionCount(totalItems: linkTotalItems, visibleCount: resolvedLinks.length)}组连接';
     final templesTitle = showSkeleton
         ? '圣殿'
-        : '${_resolveSectionCount(
-            totalItems: templeTotalItems,
-            visibleCount: resolvedTemples.length,
-          )}座圣殿';
+        : '${_resolveSectionCount(totalItems: templeTotalItems, visibleCount: resolvedTemples.length)}座圣殿';
     final charactersTitle = showSkeleton
         ? '角色'
-        : '${_resolveSectionCount(
-            totalItems: characterTotalItems,
-            visibleCount: resolvedCharacters.length,
-          )}个角色';
+        : '${_resolveSectionCount(totalItems: characterTotalItems, visibleCount: resolvedCharacters.length)}个角色';
     final icosTitle = showSkeleton
         ? 'ICO'
-        : '${_resolveSectionCount(
-            totalItems: icoTotalItems,
-            visibleCount: resolvedIcos.length,
-          )}个ICO';
+        : '${_resolveSectionCount(totalItems: icoTotalItems, visibleCount: resolvedIcos.length)}个ICO';
 
     if (isLoadFailed && !showSkeleton && _isEmpty) {
       return SliverToBoxAdapter(
@@ -184,10 +174,7 @@ class UserCharaOverviewSection extends StatelessWidget {
             right: 24,
             bottom: 0,
           ),
-          child: UserOverviewMessage(
-            message: '角色资产加载失败',
-            onRetry: onRetry,
-          ),
+          child: UserOverviewMessage(message: '角色资产加载失败', onRetry: onRetry),
         ),
       );
     }

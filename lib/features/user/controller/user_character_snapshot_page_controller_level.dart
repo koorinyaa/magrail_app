@@ -13,8 +13,9 @@ extension UserCharacterSnapshotPageControllerLevel
     await _waitForInitialLoadAndBlockingRefresh();
     final revision = _levelIndexRevision;
     final queryGeneration = _queryGeneration;
-    final position =
-        _levelPositions.where((item) => item.level == level).firstOrNull;
+    final position = _levelPositions
+        .where((item) => item.level == level)
+        .firstOrNull;
     if (revision == null || position == null) {
       return null;
     }

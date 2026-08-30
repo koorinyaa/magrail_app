@@ -7,9 +7,8 @@ class IcoCharacterRepository {
   /// 创建 ICO 角色仓库
   ///
   /// [apiClient] Tinygrail API 客户端
-  const IcoCharacterRepository({
-    required ApiClient apiClient,
-  }) : _apiClient = apiClient;
+  const IcoCharacterRepository({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   /// ICO 即将结束接口一次性获取完整列表时使用的请求上限
   static const int fetchLimit = 999999;

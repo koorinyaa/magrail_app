@@ -20,6 +20,7 @@ class LatestTempleCard extends StatelessWidget {
   /// [onUserTap] 用户区域点击回调
   /// [onAssetTap] 圣殿资产入口点击回调
   /// [onLinkedAssetTap] LINK 圣殿资产入口点击回调
+  /// [key] Flutter 组件标识
   const LatestTempleCard({
     super.key,
     required this.item,
@@ -51,7 +52,7 @@ class LatestTempleCard extends StatelessWidget {
 
   /// LINK 圣殿资产入口点击回调
   final void Function(TempleApiItem ownerItem, TempleApiItem linkedItem)?
-      onLinkedAssetTap;
+  onLinkedAssetTap;
 
   /// 构建最新圣殿条目卡片
   ///
@@ -66,9 +67,7 @@ class LatestTempleCard extends StatelessWidget {
       width: coverWidth,
       coverUrl: TinygrailAssetUrls.getSmallCover(item.cover),
       avatarUrl: TinygrailAssetUrls.normalizeAvatar(item.avatar),
-      characterName: TinygrailFormatters.decodeHtmlEntities(
-        item.characterName,
-      ),
+      characterName: TinygrailFormatters.decodeHtmlEntities(item.characterName),
       characterLevel: item.characterLevel,
       zeroCount: item.zeroCount,
       ownerLabel: _resolveOwnerLabel(item),
@@ -120,23 +119,20 @@ class LatestTempleCard extends StatelessWidget {
         return TempleLinkCard(
           width: cardWidth,
           leftCoverUrl: TinygrailAssetUrls.getSmallCover(leftTemple.cover),
-          leftAvatarUrl: TinygrailAssetUrls.normalizeAvatar(
-            leftTemple.avatar,
-          ),
+          leftAvatarUrl: TinygrailAssetUrls.normalizeAvatar(leftTemple.avatar),
           leftCharacterName: TinygrailFormatters.decodeHtmlEntities(
             leftTemple.characterName,
           ),
           onLeftCoverTap: () => _openImageViewer(context, leftTemple),
-          onLeftCharacterTap:
-              onCharacterTap == null ? null : () => onCharacterTap!(leftTemple),
+          onLeftCharacterTap: onCharacterTap == null
+              ? null
+              : () => onCharacterTap!(leftTemple),
           onLeftAssetTap: currentOnLeft
               ? (onAssetTap == null ? null : () => onAssetTap!(item))
               : (onLinkedAssetTap == null
-                  ? null
-                  : () => onLinkedAssetTap!(item, linkedTemple)),
-          rightCoverUrl: TinygrailAssetUrls.getSmallCover(
-            rightTemple.cover,
-          ),
+                    ? null
+                    : () => onLinkedAssetTap!(item, linkedTemple)),
+          rightCoverUrl: TinygrailAssetUrls.getSmallCover(rightTemple.cover),
           rightAvatarUrl: TinygrailAssetUrls.normalizeAvatar(
             rightTemple.avatar,
           ),
@@ -149,8 +145,8 @@ class LatestTempleCard extends StatelessWidget {
               : () => onCharacterTap!(rightTemple),
           onRightAssetTap: currentOnLeft
               ? (onLinkedAssetTap == null
-                  ? null
-                  : () => onLinkedAssetTap!(item, linkedTemple))
+                    ? null
+                    : () => onLinkedAssetTap!(item, linkedTemple))
               : (onAssetTap == null ? null : () => onAssetTap!(item)),
         );
       },

@@ -6,14 +6,14 @@ import 'package:magrail_app/features/bot/model/bot_models.dart';
 class BotRepository {
   /// 创建 fuyuake bot 仓库
   BotRepository()
-      : _dio = Dio(
-          BaseOptions(
-            baseUrl: _baseUrl,
-            connectTimeout: const Duration(seconds: 15),
-            receiveTimeout: const Duration(seconds: 30),
-            responseType: ResponseType.json,
-          ),
-        );
+    : _dio = Dio(
+        BaseOptions(
+          baseUrl: _baseUrl,
+          connectTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 30),
+          responseType: ResponseType.json,
+        ),
+      );
 
   static const _baseUrl = 'https://api.fuyuake.top/xsb/';
 
@@ -195,7 +195,8 @@ class BotRepository {
 String _encodeFormFields(List<MapEntry<String, String>> fields) {
   return fields
       .map(
-        (entry) => '${Uri.encodeQueryComponent(entry.key)}='
+        (entry) =>
+            '${Uri.encodeQueryComponent(entry.key)}='
             '${Uri.encodeQueryComponent(entry.value)}',
       )
       .join('&');
@@ -209,9 +210,7 @@ Map<String, Object?>? _asStringKeyMap(Object? value) {
     return null;
   }
 
-  return value.map(
-    (key, itemValue) => MapEntry(key.toString(), itemValue),
-  );
+  return value.map((key, itemValue) => MapEntry(key.toString(), itemValue));
 }
 
 /// 转换对象列表
@@ -230,9 +229,7 @@ List<T> _asObjectList<T>(
       .whereType<Map<Object?, Object?>>()
       .map(
         (item) => fromJson(
-          item.map(
-            (key, itemValue) => MapEntry(key.toString(), itemValue),
-          ),
+          item.map((key, itemValue) => MapEntry(key.toString(), itemValue)),
         ),
       )
       .toList(growable: false);

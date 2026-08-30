@@ -122,9 +122,6 @@ class _UserTradeLogPageState extends State<UserTradeLogPage> {
   ///
   /// [characterId] 角色 ID
   void _openCharacterDetail(int characterId) {
-    openCharacterDetail(
-      context,
-      characterId: characterId,
-    );
+    openCharacterDetail(context, characterId: characterId);
   }
 }

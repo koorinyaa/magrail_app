@@ -218,93 +218,95 @@ class _UserTemplePageState extends State<UserTemplePage> {
   ///
   /// [controller] 用户圣殿快照分页控制器
   Widget _buildSnapshotPage(UserTempleSnapshotPageController controller) {
-    final page = TinygrailPagedSliverPage<UserTempleSnapshotEntry,
-        UserTempleSnapshotEntry>(
-      controller: controller,
-      title: _title,
-      appBarActions: _isCurrentUser
-          ? [
-              SizedBox(
-                width: kToolbarHeight,
-                child: Center(
-                  child: IconButton(
-                    onPressed: _openTempleRepairSheet,
-                    icon: const Icon(
-                      LucideIcons.wrench,
-                      size: 22,
+    final page =
+        TinygrailPagedSliverPage<
+          UserTempleSnapshotEntry,
+          UserTempleSnapshotEntry
+        >(
+          controller: controller,
+          title: _title,
+          appBarActions: _isCurrentUser
+              ? [
+                  SizedBox(
+                    width: kToolbarHeight,
+                    child: Center(
+                      child: IconButton(
+                        onPressed: _openTempleRepairSheet,
+                        icon: const Icon(LucideIcons.wrench, size: 22),
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ]
-          : null,
-      appBarBottom: UserTempleSortToolbar(
-        controller: controller,
-        onSortSelected: (sort) {
-          unawaited(_selectSort(sort));
-        },
-      ),
-      scrollController: _scrollController,
-      loadingSliver: const UserTempleSkeletonGrid(),
-      emptySliverBuilder: (context, pagedController) {
-        final isFiltering = controller.searchKeyword.isNotEmpty;
-        return PagedSliverState(
-          title: isFiltering ? '未找到圣殿' : '暂无圣殿',
-          message: isFiltering ? '没有符合搜索条件的圣殿' : '该用户没有可展示的圣殿',
-          icon: isFiltering
-              ? Icons.search_off_rounded
-              : Icons.hourglass_empty_rounded,
-        );
-      },
-      contentSliversBuilder: (context, entries, onItemBuilt) {
-        if (controller.usesVirtualLevelGrid) {
-          return [
-            UserTempleLevelVirtualSliver(
-              controller: controller,
-              scrollController: _scrollController,
-              levelSliverController: _levelSliverController,
-              ownerLabel: _ownerLabel,
-              onCharacterTap: _openCharacterDetail,
-              onAssetTap: _openTempleAssetDialog,
-            ),
-          ];
-        }
-        final items = [for (final entry in entries) entry.item];
-        final showLevelHeaders =
-            controller.sort == UserTempleSnapshotSort.characterLevel;
-        return [
-          UserTempleResponsiveGrid(
-            items: items,
-            ownerLabel: _ownerLabel,
-            showLevelHeaders: showLevelHeaders,
-            rightContentInset: showLevelHeaders
-                ? UserTempleResponsiveGrid.levelRailReservedWidth
-                : 0,
-            sortValues: _buildSortValues(entries, controller.sort),
-            onItemBuilt: onItemBuilt,
-            onCharacterTap: _openCharacterDetail,
-            onAssetTap: _openTempleAssetDialog,
+                ]
+              : null,
+          appBarBottom: UserTempleSortToolbar(
+            controller: controller,
+            onSortSelected: (sort) {
+              unawaited(_selectSort(sort));
+            },
           ),
-        ];
-      },
-      completedLabel: '没有更多圣殿了',
-      showPaginationFooter: () => !controller.usesVirtualLevelGrid,
-      bottomContentPadding: CharacterSearchInputBar.height + 48,
-    );
+          scrollController: _scrollController,
+          loadingSliver: const UserTempleSkeletonGrid(),
+          emptySliverBuilder: (context, pagedController) {
+            final isFiltering = controller.searchKeyword.isNotEmpty;
+            return PagedSliverState(
+              title: isFiltering ? '未找到圣殿' : '暂无圣殿',
+              message: isFiltering ? '没有符合搜索条件的圣殿' : '该用户没有可展示的圣殿',
+              icon: isFiltering
+                  ? Icons.search_off_rounded
+                  : Icons.hourglass_empty_rounded,
+            );
+          },
+          contentSliversBuilder: (context, entries, onItemBuilt) {
+            if (controller.usesVirtualLevelGrid) {
+              return [
+                UserTempleLevelVirtualSliver(
+                  controller: controller,
+                  scrollController: _scrollController,
+                  levelSliverController: _levelSliverController,
+                  ownerLabel: _ownerLabel,
+                  onCharacterTap: _openCharacterDetail,
+                  onAssetTap: _openTempleAssetDialog,
+                ),
+              ];
+            }
+            final items = [for (final entry in entries) entry.item];
+            final showLevelHeaders =
+                controller.sort == UserTempleSnapshotSort.characterLevel;
+            return [
+              UserTempleResponsiveGrid(
+                items: items,
+                ownerLabel: _ownerLabel,
+                showLevelHeaders: showLevelHeaders,
+                rightContentInset: showLevelHeaders
+                    ? UserTempleResponsiveGrid.levelRailReservedWidth
+                    : 0,
+                sortValues: _buildSortValues(entries, controller.sort),
+                onItemBuilt: onItemBuilt,
+                onCharacterTap: _openCharacterDetail,
+                onAssetTap: _openTempleAssetDialog,
+              ),
+            ];
+          },
+          completedLabel: '没有更多圣殿了',
+          showPaginationFooter: () => !controller.usesVirtualLevelGrid,
+          bottomContentPadding: CharacterSearchInputBar.height + 48,
+        );
     return ListenableBuilder(
       listenable: controller,
       child: page,
       builder: (context, child) {
         final showLevelRail =
             controller.sort == UserTempleSnapshotSort.characterLevel &&
-                controller.levelPositions.isNotEmpty &&
-                !controller.isInitialLoading &&
-                controller.items.isNotEmpty;
+            controller.levelPositions.isNotEmpty &&
+            !controller.isInitialLoading &&
+            controller.items.isNotEmpty;
         final mediaPadding = MediaQuery.paddingOf(context);
         final viewInsets = MediaQuery.viewInsetsOf(context);
-        final bottomInset =
-            viewInsets.bottom > 0 ? viewInsets.bottom : mediaPadding.bottom;
-        final railAreaTop = mediaPadding.top +
+        final bottomInset = viewInsets.bottom > 0
+            ? viewInsets.bottom
+            : mediaPadding.bottom;
+        final railAreaTop =
+            mediaPadding.top +
             SecondaryPageSliverAppBar.defaultToolbarHeight +
             UserTempleSortToolbar.toolbarHeight +
             8;
@@ -313,9 +315,10 @@ class _UserTemplePageState extends State<UserTemplePage> {
         final availableRailHeight =
             (MediaQuery.sizeOf(context).height - railAreaTop - railAreaBottom)
                 .clamp(0.0, double.infinity);
-        final railHeight = (controller.levelPositions.length *
-                UserCharacterLevelRail.itemExtent)
-            .clamp(0.0, availableRailHeight);
+        final railHeight =
+            (controller.levelPositions.length *
+                    UserCharacterLevelRail.itemExtent)
+                .clamp(0.0, availableRailHeight);
         final railTop = railAreaTop + (availableRailHeight - railHeight) / 2;
         return Stack(
           children: [
@@ -395,35 +398,35 @@ class _UserTemplePageState extends State<UserTemplePage> {
   ) {
     return switch (sort) {
       UserTempleSnapshotSort.singleDividend => {
-          for (final entry in entries)
-            entry.item.id: UserTempleSortValue(
-              label: sort.label,
-              value: Formatters.tinygrailCurrency(entry.singleDividend),
-            ),
-        },
+        for (final entry in entries)
+          entry.item.id: UserTempleSortValue(
+            label: sort.label,
+            value: Formatters.tinygrailCurrency(entry.singleDividend),
+          ),
+      },
       UserTempleSnapshotSort.totalDividend => {
-          for (final entry in entries)
-            entry.item.id: UserTempleSortValue(
-              label: sort.label,
-              value: Formatters.tinygrailCompactValue(
-                entry.totalDividend,
-                prefix: '₵',
-              ),
+        for (final entry in entries)
+          entry.item.id: UserTempleSortValue(
+            label: sort.label,
+            value: Formatters.tinygrailCompactValue(
+              entry.totalDividend,
+              prefix: '₵',
             ),
-        },
+          ),
+      },
       UserTempleSnapshotSort.starForces => {
-          for (final entry in entries)
-            entry.item.id: UserTempleSortValue(
-              icon: Icons.auto_awesome_rounded,
-              value: Formatters.groupedNumber(entry.item.starForces),
-            ),
-        },
+        for (final entry in entries)
+          entry.item.id: UserTempleSortValue(
+            icon: Icons.auto_awesome_rounded,
+            value: Formatters.groupedNumber(entry.item.starForces),
+          ),
+      },
       UserTempleSnapshotSort.create => {
-          for (final entry in entries)
-            entry.item.id: UserTempleSortValue(
-              value: _formatCreateDate(entry.item.create),
-            ),
-        },
+        for (final entry in entries)
+          entry.item.id: UserTempleSortValue(
+            value: _formatCreateDate(entry.item.create),
+          ),
+      },
       _ => const <int, UserTempleSortValue>{},
     };
   }

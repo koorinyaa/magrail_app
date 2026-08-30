@@ -39,7 +39,7 @@ class UserAuctionRow extends StatelessWidget {
 
   /// 角色详情点击回调
   final void Function(UserAuctionApiItem item, String? avatarHeroTag)?
-      onCharacterTap;
+  onCharacterTap;
 
   /// 取消竞拍回调
   final ValueChanged<UserAuctionApiItem>? onCancelAuction;
@@ -53,6 +53,7 @@ class UserAuctionRow extends StatelessWidget {
   static const String _hiddenNameText = '******';
   static const String _hiddenValueText = '***';
 
+  /// 判断用户拍卖是否进行中
   bool get _isAuctioning => item.state == 0;
 
   /// 构建用户拍卖行
@@ -149,8 +150,9 @@ class UserAuctionRow extends StatelessWidget {
                                 amountText: Formatters.groupedNumber(
                                   item.amount,
                                 ),
-                                valueColor:
-                                    _isAuctioning ? _successColor : null,
+                                valueColor: _isAuctioning
+                                    ? _successColor
+                                    : null,
                               ),
                               if (_isAuctioning) ...[
                                 const SizedBox(height: 3),
@@ -161,24 +163,27 @@ class UserAuctionRow extends StatelessWidget {
                                       value: _resolvePrivacyText(
                                         _formatOptionalCount(detail?.state),
                                       ),
-                                      valueColor:
-                                          _resolveInfoColor(colorScheme),
+                                      valueColor: _resolveInfoColor(
+                                        colorScheme,
+                                      ),
                                     ),
                                     _AuctionIconMetricData(
                                       icon: Icons.gavel_rounded,
                                       value: _resolvePrivacyText(
                                         _formatOptionalCount(detail?.type),
                                       ),
-                                      valueColor:
-                                          _resolveInfoColor(colorScheme),
+                                      valueColor: _resolveInfoColor(
+                                        colorScheme,
+                                      ),
                                     ),
                                     _AuctionIconMetricData(
                                       icon: Icons.account_balance_rounded,
                                       value: _resolvePrivacyText(
                                         Formatters.groupedNumber(item.type),
                                       ),
-                                      valueColor:
-                                          _resolveInfoColor(colorScheme),
+                                      valueColor: _resolveInfoColor(
+                                        colorScheme,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -316,9 +321,7 @@ class _AuctionCharacterAvatar extends StatelessWidget {
               ),
             Material(
               color: Colors.transparent,
-              child: InkWell(
-                onTap: onTap,
-              ),
+              child: InkWell(onTap: onTap),
             ),
           ],
         ),
@@ -332,9 +335,7 @@ class _CancelAuctionButton extends StatelessWidget {
   /// 创建用户拍卖取消按钮
   ///
   /// [onPressed] 点击回调
-  const _CancelAuctionButton({
-    required this.onPressed,
-  });
+  const _CancelAuctionButton({required this.onPressed});
 
   /// 点击回调
   final VoidCallback onPressed;
@@ -460,9 +461,7 @@ class _AuctionInlineIconMetricRow extends StatelessWidget {
   /// 创建用户拍卖左对齐图标指标行
   ///
   /// [metrics] 指标数据
-  const _AuctionInlineIconMetricRow({
-    required this.metrics,
-  });
+  const _AuctionInlineIconMetricRow({required this.metrics});
 
   /// 指标数据
   final List<_AuctionIconMetricData> metrics;
@@ -479,19 +478,12 @@ class _AuctionInlineIconMetricRow extends StatelessWidget {
       TextSpan(
         children: [
           for (var index = 0; index < metrics.length; index++) ...[
-            if (index > 0)
-              const WidgetSpan(
-                child: SizedBox(width: 9),
-              ),
+            if (index > 0) const WidgetSpan(child: SizedBox(width: 9)),
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: Padding(
                 padding: const EdgeInsets.only(right: 3),
-                child: Icon(
-                  metrics[index].icon,
-                  size: 14,
-                  color: iconColor,
-                ),
+                child: Icon(metrics[index].icon, size: 14, color: iconColor),
               ),
             ),
             TextSpan(

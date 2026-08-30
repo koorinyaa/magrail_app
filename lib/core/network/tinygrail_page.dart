@@ -17,10 +17,19 @@ class TinygrailPage<T> {
     required this.itemsPerPage,
   });
 
+  /// 当前页条目
   final List<T> items;
+
+  /// 当前页码
   final int currentPage;
+
+  /// 总页数
   final int totalPages;
+
+  /// 总条目数
   final int totalItems;
+
+  /// 每页条目数量
   final int itemsPerPage;
 
   /// 从 JSON 创建 Tinygrail 通用分页数据
@@ -32,10 +41,8 @@ class TinygrailPage<T> {
     T Function(Map<String, Object?> json) itemFromJson,
   ) {
     return TinygrailPage(
-      items: TinygrailResponseParser.asObjectList(
-            json['Items'],
-            itemFromJson,
-          ) ??
+      items:
+          TinygrailResponseParser.asObjectList(json['Items'], itemFromJson) ??
           <T>[],
       currentPage: TinygrailResponseParser.asInt(json['CurrentPage']),
       totalPages: TinygrailResponseParser.asInt(json['TotalPages']),

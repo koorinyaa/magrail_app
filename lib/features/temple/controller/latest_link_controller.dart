@@ -46,9 +46,7 @@ class LatestLinkController extends ChangeNotifier {
   /// 加载最新连接展示组
   ///
   /// [showSkeleton] 是否显示首次加载骨架
-  Future<void> load({
-    required bool showSkeleton,
-  }) async {
+  Future<void> load({required bool showSkeleton}) async {
     if (_isDisposed || _isLoading) {
       return;
     }

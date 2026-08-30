@@ -17,10 +17,10 @@ class CharacterDetailUserCharacter {
 
   /// 创建空的角色详情指定用户持股资料
   const CharacterDetailUserCharacter.empty()
-      : amount = 0,
-        total = 0,
-        sacrifices = 0,
-        price = 0;
+    : amount = 0,
+      total = 0,
+      sacrifices = 0,
+      price = 0;
 
   /// 可用活股数量
   final int amount;

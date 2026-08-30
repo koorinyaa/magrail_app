@@ -7,26 +7,23 @@ extension _UserAssetAnalysisShareOverlayPreview
   ///
   /// [context] 当前组件树上下文
   /// [imageBytes] 当前主题长图字节
-  Widget _buildPreview(
-    BuildContext context, {
-    required Uint8List? imageBytes,
-  }) {
+  Widget _buildPreview(BuildContext context, {required Uint8List? imageBytes}) {
     return switch ((_isGenerating, _generationError, imageBytes)) {
       (true, _, _) => _buildLoadingPreview(context),
       (false, final String error, _) => _buildFailedPreview(context, error),
       (false, null, final Uint8List bytes) => Center(
-          child: FittedBox(
-            fit: BoxFit.contain,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.memory(
-                bytes,
-                filterQuality: FilterQuality.medium,
-                gaplessPlayback: true,
-              ),
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.memory(
+              bytes,
+              filterQuality: FilterQuality.medium,
+              gaplessPlayback: true,
             ),
           ),
         ),
+      ),
       _ => _buildLoadingPreview(context),
     };
   }

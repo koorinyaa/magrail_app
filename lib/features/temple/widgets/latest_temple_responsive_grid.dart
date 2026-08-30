@@ -16,6 +16,7 @@ class LatestTempleResponsiveGrid extends StatelessWidget {
   /// [onItemBuilt] 条目构建回调
   /// [onAssetTap] 圣殿资产入口点击回调
   /// [onLinkedAssetTap] LINK 圣殿资产入口点击回调
+  /// [key] Flutter 组件标识
   const LatestTempleResponsiveGrid({
     super.key,
     required this.items,
@@ -48,7 +49,7 @@ class LatestTempleResponsiveGrid extends StatelessWidget {
 
   /// LINK 圣殿资产入口点击回调
   final void Function(TempleApiItem ownerItem, TempleApiItem linkedItem)?
-      onLinkedAssetTap;
+  onLinkedAssetTap;
 
   /// 构建最新圣殿自适应瀑布网格
   ///
@@ -77,21 +78,18 @@ class LatestTempleResponsiveGrid extends StatelessWidget {
               crossAxisSpacing: _crossAxisSpacing,
               childAspectRatio: 3 / 4,
             ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                onItemBuilt?.call(index);
-                return LatestTempleCard(
-                  item: items[index],
-                  width: layout.cardWidth,
-                  heroTagPrefix: 'latest-temple-page-cover',
-                  onCharacterTap: onCharacterTap,
-                  onUserTap: onUserTap,
-                  onAssetTap: onAssetTap,
-                  onLinkedAssetTap: onLinkedAssetTap,
-                );
-              },
-              childCount: items.length,
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              onItemBuilt?.call(index);
+              return LatestTempleCard(
+                item: items[index],
+                width: layout.cardWidth,
+                heroTagPrefix: 'latest-temple-page-cover',
+                onCharacterTap: onCharacterTap,
+                onUserTap: onUserTap,
+                onAssetTap: onAssetTap,
+                onLinkedAssetTap: onLinkedAssetTap,
+              );
+            }, childCount: items.length),
           ),
         );
       },
@@ -110,9 +108,10 @@ class LatestTempleResponsiveGrid extends StatelessWidget {
       0.0,
       crossAxisExtent - _horizontalPadding * 2 - horizontalSafeArea,
     );
-    final rawCount = ((contentWidth + _crossAxisSpacing) /
-            (_minCardWidth + _crossAxisSpacing))
-        .floor();
+    final rawCount =
+        ((contentWidth + _crossAxisSpacing) /
+                (_minCardWidth + _crossAxisSpacing))
+            .floor();
     final crossAxisCount = rawCount.clamp(2, 6).toInt();
     final cardWidth = math.max(
       0.0,
@@ -131,11 +130,9 @@ class LatestTempleResponsiveGrid extends StatelessWidget {
 class LatestTempleSkeletonGrid extends StatelessWidget {
   /// 创建最新圣殿自适应骨架网格
   ///
+  /// [key] Flutter 组件标识
   /// [itemCount] 骨架卡片数量
-  const LatestTempleSkeletonGrid({
-    super.key,
-    this.itemCount = 12,
-  });
+  const LatestTempleSkeletonGrid({super.key, this.itemCount = 12});
 
   /// 骨架卡片数量
   final int itemCount;
@@ -167,12 +164,9 @@ class LatestTempleSkeletonGrid extends StatelessWidget {
               crossAxisSpacing: LatestTempleResponsiveGrid._crossAxisSpacing,
               childAspectRatio: 3 / 4,
             ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return const _LatestTempleSkeletonCard();
-              },
-              childCount: itemCount,
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              return const _LatestTempleSkeletonCard();
+            }, childCount: itemCount),
           ),
         );
       },

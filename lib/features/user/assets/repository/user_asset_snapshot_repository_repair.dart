@@ -6,12 +6,9 @@ extension UserAssetSnapshotRepositoryRepair on UserAssetSnapshotRepository {
   ///
   /// [username] 用户名
   Future<
-      ({
-        List<UserTempleApiItem> temples,
-        List<UserCharacterApiItem> characters,
-      })> fetchTempleRepairSource({
-    required String username,
-  }) async {
+    ({List<UserTempleApiItem> temples, List<UserCharacterApiItem> characters})
+  >
+  fetchTempleRepairSource({required String username}) async {
     final resolvedUsername = username.trim();
     if (resolvedUsername.isEmpty) {
       throw StateError('缺少用户名');
@@ -35,9 +32,6 @@ extension UserAssetSnapshotRepositoryRepair on UserAssetSnapshotRepository {
     ]);
     final templeResult = results[0] as _AllTemplesResult;
     final characterResult = results[1] as _AllCharactersResult;
-    return (
-      temples: templeResult.items,
-      characters: characterResult.items,
-    );
+    return (temples: templeResult.items, characters: characterResult.items);
   }
 }

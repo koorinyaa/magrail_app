@@ -73,25 +73,22 @@ class CharacterAssetSkeletonSliverList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverFixedExtentList(
       itemExtent: _CharacterAssetSkeletonSliverListMetrics.itemExtent,
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          return _CharacterAssetSkeletonListItem(
-            horizontalPadding: itemHorizontalPadding,
-            child: CharacterAssetRowSkeleton(
-              showLevel: showLevel,
-              metricCount: metricCount,
-              showTrailing: showTrailing,
-              trailingWidth: trailingWidth,
-              trailingHeight: trailingHeight,
-              contentPadding: contentPadding,
-              titleMetricSpacing: titleMetricSpacing,
-              metricSpacing: metricSpacing,
-              primaryMetricAsPill: primaryMetricAsPill,
-            ),
-          );
-        },
-        childCount: itemCount,
-      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        return _CharacterAssetSkeletonListItem(
+          horizontalPadding: itemHorizontalPadding,
+          child: CharacterAssetRowSkeleton(
+            showLevel: showLevel,
+            metricCount: metricCount,
+            showTrailing: showTrailing,
+            trailingWidth: trailingWidth,
+            trailingHeight: trailingHeight,
+            contentPadding: contentPadding,
+            titleMetricSpacing: titleMetricSpacing,
+            metricSpacing: metricSpacing,
+            primaryMetricAsPill: primaryMetricAsPill,
+          ),
+        );
+      }, childCount: itemCount),
     );
   }
 }

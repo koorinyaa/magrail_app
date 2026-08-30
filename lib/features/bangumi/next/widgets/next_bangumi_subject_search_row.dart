@@ -87,9 +87,7 @@ class NextBangumiSubjectSearchRow extends StatelessWidget {
                       ],
                       if (resolvedThirdLineTags.isNotEmpty) ...[
                         const Spacer(),
-                        _BangumiSubjectMetaTagList(
-                          tags: resolvedThirdLineTags,
-                        ),
+                        _BangumiSubjectMetaTagList(tags: resolvedThirdLineTags),
                       ],
                     ],
                   ),
@@ -99,9 +97,7 @@ class NextBangumiSubjectSearchRow extends StatelessWidget {
                 const SizedBox(width: 10),
                 SizedBox(
                   height: _bangumiSubjectCoverHeight,
-                  child: Center(
-                    child: _BangumiSubjectScore(score: item.score),
-                  ),
+                  child: Center(child: _BangumiSubjectScore(score: item.score)),
                 ),
               ],
               const SizedBox(width: 4),
@@ -118,9 +114,7 @@ class _BangumiSubjectMetaTagList extends StatelessWidget {
   /// 创建 Next Bangumi 条目元标签列表
   ///
   /// [tags] 元标签文本
-  const _BangumiSubjectMetaTagList({
-    required this.tags,
-  });
+  const _BangumiSubjectMetaTagList({required this.tags});
 
   /// 元标签文本
   final List<String> tags;
@@ -152,9 +146,7 @@ class _BangumiSubjectMetaTag extends StatelessWidget {
   /// 创建 Next Bangumi 条目元标签胶囊
   ///
   /// [text] 标签文本
-  const _BangumiSubjectMetaTag({
-    required this.text,
-  });
+  const _BangumiSubjectMetaTag({required this.text});
 
   /// 标签文本
   final String text;
@@ -200,9 +192,7 @@ class _BangumiSubjectCover extends StatelessWidget {
   /// 创建 Next Bangumi 条目封面
   ///
   /// [coverUrl] 封面地址
-  const _BangumiSubjectCover({
-    required this.coverUrl,
-  });
+  const _BangumiSubjectCover({required this.coverUrl});
 
   /// 封面地址
   final String coverUrl;
@@ -242,9 +232,7 @@ class _BangumiSubjectScore extends StatelessWidget {
   /// 创建 Next Bangumi 条目评分
   ///
   /// [score] 评分
-  const _BangumiSubjectScore({
-    required this.score,
-  });
+  const _BangumiSubjectScore({required this.score});
 
   /// 评分
   final double score;
@@ -259,11 +247,7 @@ class _BangumiSubjectScore extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          Icons.star_rounded,
-          size: 15,
-          color: colorScheme.primary,
-        ),
+        Icon(Icons.star_rounded, size: 15, color: colorScheme.primary),
         const SizedBox(width: 3),
         Text(
           score.toStringAsFixed(2),

@@ -1,5 +1,6 @@
 part of '../temple_asset_magic_character_search_panel.dart';
 
+/// 圣殿资产魔法道具搜索结果行
 class _TempleAssetMagicSearchRow extends StatelessWidget {
   /// 创建圣殿资产魔法道具搜索结果行
   ///
@@ -167,9 +168,7 @@ class _TempleAssetMagicSearchSectionDivider extends StatelessWidget {
   /// 创建圣殿资产魔法道具搜索分区分割线
   ///
   /// [text] 分区标题
-  const _TempleAssetMagicSearchSectionDivider({
-    required this.text,
-  });
+  const _TempleAssetMagicSearchSectionDivider({required this.text});
 
   /// 分区标题
   final String text;
@@ -187,11 +186,7 @@ class _TempleAssetMagicSearchSectionDivider extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Divider(
-              height: 1,
-              thickness: 1,
-              color: dividerColor,
-            ),
+            child: Divider(height: 1, thickness: 1, color: dividerColor),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -206,11 +201,7 @@ class _TempleAssetMagicSearchSectionDivider extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Divider(
-              height: 1,
-              thickness: 1,
-              color: dividerColor,
-            ),
+            child: Divider(height: 1, thickness: 1, color: dividerColor),
           ),
         ],
       ),
@@ -306,9 +297,7 @@ class _TempleAssetMagicInlineWarning extends StatelessWidget {
   /// 创建圣殿资产魔法行内警告
   ///
   /// [text] 警告文本
-  const _TempleAssetMagicInlineWarning({
-    required this.text,
-  });
+  const _TempleAssetMagicInlineWarning({required this.text});
 
   /// 警告文本
   final String text;
@@ -345,9 +334,7 @@ class _TempleAssetMagicEmptyText extends StatelessWidget {
   /// 创建圣殿资产魔法空文本
   ///
   /// [text] 展示文本
-  const _TempleAssetMagicEmptyText({
-    required this.text,
-  });
+  const _TempleAssetMagicEmptyText({required this.text});
 
   /// 展示文本
   final String text;

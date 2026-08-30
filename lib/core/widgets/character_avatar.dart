@@ -7,6 +7,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 class CharacterAvatar extends StatelessWidget {
   /// 创建角色头像
   ///
+  /// [key] Flutter 组件标识
   /// [imageUrl] 头像地址
   /// [size] 头像边长
   /// [borderRadius] 头像圆角
@@ -39,10 +40,7 @@ class CharacterAvatar extends StatelessWidget {
         width: size,
         height: size,
         child: imageUrl.isEmpty
-            ? _CharacterAvatarFallback(
-                size: size,
-                borderRadius: borderRadius,
-              )
+            ? _CharacterAvatarFallback(size: size, borderRadius: borderRadius)
             : CachedNetworkImage(
                 imageUrl: imageUrl,
                 fit: BoxFit.cover,

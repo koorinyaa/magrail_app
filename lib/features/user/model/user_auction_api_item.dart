@@ -84,9 +84,7 @@ final class UserAuctionApiItem {
   /// 复制用户拍卖接口条目
   ///
   /// [auctionDetail] 当前拍卖详情
-  UserAuctionApiItem copyWith({
-    AuctionApiItem? auctionDetail,
-  }) {
+  UserAuctionApiItem copyWith({AuctionApiItem? auctionDetail}) {
     return UserAuctionApiItem(
       id: id,
       characterId: characterId,

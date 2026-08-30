@@ -8,9 +8,8 @@ import 'package:magrail_app/features/user/widgets/user_avatar.dart';
 import 'package:magrail_app/features/user/widgets/user_profile_card_components.dart';
 
 /// 角色董事会成员持股查询回调
-typedef CharacterDetailBoardMemberStockResolver = Future<int?> Function(
-  CharacterDetailBoardMember member,
-);
+typedef CharacterDetailBoardMemberStockResolver =
+    Future<int?> Function(CharacterDetailBoardMember member);
 
 /// 角色董事会成员行
 class CharacterDetailBoardMemberRow extends StatefulWidget {
@@ -158,8 +157,9 @@ class _CharacterDetailBoardMemberRowState
                         text: _stockLabel,
                         backgroundColor: _stockPillColor(context),
                         isEnabled: _canRevealStock,
-                        onPressed:
-                            _canRevealStock ? _handleRevealStockPressed : null,
+                        onPressed: _canRevealStock
+                            ? _handleRevealStockPressed
+                            : null,
                       ),
                       const SizedBox(height: 2),
                       _BoardMemberTempleLine(
@@ -258,7 +258,8 @@ class _CharacterDetailBoardMemberRowState
     final parsed = TinygrailFormatters.parseServerTime(
       widget.member.lastActiveDate,
     );
-    final isInactive = parsed != null &&
+    final isInactive =
+        parsed != null &&
         DateTime.now().difference(parsed.toLocal()) >= const Duration(days: 5);
     if (isInactive) {
       final isDark =
@@ -431,9 +432,7 @@ class _BoardMemberSerialText extends StatelessWidget {
   /// 创建董事会成员序列号文本
   ///
   /// [serialNumber] 成员序列号
-  const _BoardMemberSerialText({
-    required this.serialNumber,
-  });
+  const _BoardMemberSerialText({required this.serialNumber});
 
   /// 成员序列号
   final int serialNumber;
@@ -538,11 +537,7 @@ class _BoardMemberTempleLine extends StatelessWidget {
         ),
         if (isEnabled) ...[
           const SizedBox(width: 2),
-          Icon(
-            Icons.chevron_right_rounded,
-            size: 13,
-            color: resolvedColor,
-          ),
+          Icon(Icons.chevron_right_rounded, size: 13, color: resolvedColor),
         ],
       ],
     );

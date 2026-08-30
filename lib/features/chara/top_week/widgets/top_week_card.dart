@@ -104,8 +104,9 @@ class _TopWeekCard extends StatelessWidget {
   ///
   /// [context] 当前组件树上下文
   void _openImageViewer(BuildContext context) {
-    final imageUrl =
-        entry.coverUrl.isNotEmpty ? entry.coverUrl : entry.avatarUrl;
+    final imageUrl = entry.coverUrl.isNotEmpty
+        ? entry.coverUrl
+        : entry.avatarUrl;
     if (imageUrl.isEmpty) {
       return;
     }
@@ -114,10 +115,7 @@ class _TopWeekCard extends StatelessWidget {
       PageRouteBuilder<void>(
         opaque: false,
         pageBuilder: (context, animation, secondaryAnimation) =>
-            FullscreenImageViewerPage(
-          imageUrl: imageUrl,
-          heroTag: _heroTag,
-        ),
+            FullscreenImageViewerPage(imageUrl: imageUrl, heroTag: _heroTag),
       ),
     );
   }
@@ -200,10 +198,7 @@ class _TopWeekCard extends StatelessWidget {
   ///
   /// [text] 数据文本
   /// [icon] 数据图标
-  Widget _buildDataCapsule({
-    required String text,
-    IconData? icon,
-  }) {
+  Widget _buildDataCapsule({required String text, IconData? icon}) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
@@ -271,9 +266,7 @@ class _TopWeekRankBadge extends StatelessWidget {
   /// 创建每周萌王排名角标
   ///
   /// [entry] 每周萌王条目
-  const _TopWeekRankBadge({
-    required this.entry,
-  });
+  const _TopWeekRankBadge({required this.entry});
 
   final TopWeekEntry entry;
 
@@ -356,9 +349,7 @@ class _TopWeekMetricRow extends StatelessWidget {
   /// 创建每周萌王数据行
   ///
   /// [entry] 每周萌王条目
-  const _TopWeekMetricRow({
-    required this.entry,
-  });
+  const _TopWeekMetricRow({required this.entry});
 
   final TopWeekEntry entry;
 
@@ -389,9 +380,7 @@ class _TopWeekMetricRow extends StatelessWidget {
             ),
           ),
           TextSpan(text: entry.bidders),
-          const WidgetSpan(
-            child: SizedBox(width: 9),
-          ),
+          const WidgetSpan(child: SizedBox(width: 9)),
           WidgetSpan(
             alignment: PlaceholderAlignment.middle,
             child: Padding(
@@ -404,9 +393,7 @@ class _TopWeekMetricRow extends StatelessWidget {
             ),
           ),
           TextSpan(text: entry.bidAmount),
-          const WidgetSpan(
-            child: SizedBox(width: 9),
-          ),
+          const WidgetSpan(child: SizedBox(width: 9)),
           WidgetSpan(
             alignment: PlaceholderAlignment.middle,
             child: Padding(
@@ -514,10 +501,7 @@ class _TopWeekAuctionSummary extends StatelessWidget {
   ///
   /// [entry] 每周萌王条目
   /// [onTap] 点击角色名称区域回调
-  const _TopWeekAuctionSummary({
-    required this.entry,
-    required this.onTap,
-  });
+  const _TopWeekAuctionSummary({required this.entry, required this.onTap});
 
   final TopWeekEntry entry;
   final VoidCallback onTap;
@@ -608,10 +592,7 @@ class _TopWeekAuctionButton extends StatelessWidget {
   ///
   /// [entry] 每周萌王条目
   /// [onPressed] 点击回调
-  const _TopWeekAuctionButton({
-    required this.entry,
-    required this.onPressed,
-  });
+  const _TopWeekAuctionButton({required this.entry, required this.onPressed});
 
   final TopWeekEntry entry;
   final VoidCallback onPressed;

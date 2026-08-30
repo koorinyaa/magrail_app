@@ -17,9 +17,8 @@ const String _hiddenPrivateValue = '******';
 /// 查询用户角色未公开持股
 ///
 /// [item] 用户角色条目
-typedef UserCharacterHoldingResolver = Future<int?> Function(
-  UserCharacterApiItem item,
-);
+typedef UserCharacterHoldingResolver =
+    Future<int?> Function(UserCharacterApiItem item);
 
 /// 用户角色资产行
 class UserCharacterAssetRow extends StatelessWidget {
@@ -121,39 +120,40 @@ class UserCharacterAssetRow extends StatelessWidget {
   CharacterAssetMetric _secondaryMetric() {
     return switch (sort) {
       UserCharacterSnapshotSort.towerRank => CharacterAssetMetric(
-          value: '通天塔 '
-              '${item.rank <= 0 ? '--' : '${Formatters.groupedNumber(item.rank)}名'}'
-              ' · 星之力 ${Formatters.groupedNumber(item.starForces)}',
-          isValueMuted: true,
-        ),
+        value:
+            '通天塔 '
+            '${item.rank <= 0 ? '--' : '${Formatters.groupedNumber(item.rank)}名'}'
+            ' · 星之力 ${Formatters.groupedNumber(item.starForces)}',
+        isValueMuted: true,
+      ),
       UserCharacterSnapshotSort.stars => CharacterAssetMetric(
-          value: '',
-          valueWidget: TowerStarsRow(
-            stars: item.stars,
-            iconSize: 10,
-            spacing: 1,
-            runSpacing: 0,
-          ),
-          isValueMuted: true,
+        value: '',
+        valueWidget: TowerStarsRow(
+          stars: item.stars,
+          iconSize: 10,
+          spacing: 1,
+          runSpacing: 0,
         ),
+        isValueMuted: true,
+      ),
       UserCharacterSnapshotSort.singleDividend => CharacterAssetMetric(
-          label: '股息',
-          value: Formatters.tinygrailCurrency(item.singleDividend),
-          isValueMuted: true,
-        ),
+        label: '股息',
+        value: Formatters.tinygrailCurrency(item.singleDividend),
+        isValueMuted: true,
+      ),
       UserCharacterSnapshotSort.totalDividend => CharacterAssetMetric(
-          label: '总息',
-          value: Formatters.tinygrailCompactValue(
-            item.totalDividend,
-            prefix: '₵',
-          ),
-          isValueMuted: true,
+        label: '总息',
+        value: Formatters.tinygrailCompactValue(
+          item.totalDividend,
+          prefix: '₵',
         ),
+        isValueMuted: true,
+      ),
       _ => CharacterAssetMetric(
-          label: '固定资产',
-          value: _formatCount(item.sacrifices),
-          isValueMuted: true,
-        ),
+        label: '固定资产',
+        value: _formatCount(item.sacrifices),
+        isValueMuted: true,
+      ),
     };
   }
 }

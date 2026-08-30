@@ -13,32 +13,28 @@ class LevelBadge extends StatelessWidget {
     required this.level,
     this.zeroCount = 0,
     this.isCompact = false,
-  })  : _fixedLabel = null,
-        _fixedBackgroundColor = null;
+  }) : _fixedLabel = null,
+       _fixedBackgroundColor = null;
 
   /// 创建 ICO 状态标签
   ///
   /// [key] Flutter 组件标识
   /// [isCompact] 是否使用更小尺寸
-  const LevelBadge.ico({
-    super.key,
-    this.isCompact = false,
-  })  : level = 0,
-        zeroCount = 0,
-        _fixedLabel = 'ico',
-        _fixedBackgroundColor = const Color(0xFFFF9800);
+  const LevelBadge.ico({super.key, this.isCompact = false})
+    : level = 0,
+      zeroCount = 0,
+      _fixedLabel = 'ico',
+      _fixedBackgroundColor = const Color(0xFFFF9800);
 
   /// 创建未上市状态标签
   ///
   /// [key] Flutter 组件标识
   /// [isCompact] 是否使用更小尺寸
-  const LevelBadge.unlisted({
-    super.key,
-    this.isCompact = false,
-  })  : level = 0,
-        zeroCount = 0,
-        _fixedLabel = '未上市',
-        _fixedBackgroundColor = const Color(0xFF9CA3AF);
+  const LevelBadge.unlisted({super.key, this.isCompact = false})
+    : level = 0,
+      zeroCount = 0,
+      _fixedLabel = '未上市',
+      _fixedBackgroundColor = const Color(0xFF9CA3AF);
 
   /// 等级数值
   final int level;

@@ -80,9 +80,7 @@ mixin _UserRepositoryPageQueries {
       return TinygrailPage(
         items: pageData.items
             .map(
-              (item) => item.copyWith(
-                auctionDetail: details[item.characterId],
-              ),
+              (item) => item.copyWith(auctionDetail: details[item.characterId]),
             )
             .toList(growable: false),
         currentPage: pageData.currentPage,
@@ -127,9 +125,7 @@ mixin _UserRepositoryPageQueries {
   /// 获取当前用户道具列表
   ///
   /// [pageSize] 单次请求道具数量
-  Future<List<UserItemApiItem>> fetchUserItems({
-    int pageSize = 50,
-  }) async {
+  Future<List<UserItemApiItem>> fetchUserItems({int pageSize = 50}) async {
     final json = await _apiClient.getJson<Map<String, Object?>>(
       'chara/user/item/0/1/$pageSize',
     );

@@ -43,7 +43,8 @@ class _TempleRepairSelectionHeader extends StatelessWidget {
             shape: const CircleBorder(),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             visualDensity: VisualDensity.compact,
-            onChanged: controller.repairableCount > 0 &&
+            onChanged:
+                controller.repairableCount > 0 &&
                     !controller.isSubmitting &&
                     !controller.isRefreshing
                 ? (_) => controller.toggleAll()
@@ -156,8 +157,9 @@ class _TempleRepairRow extends StatelessWidget {
                     aspectRatio: 3 / 4,
                     child: TempleCoverImage(
                       coverUrl: TinygrailAssetUrls.getSmallCover(temple.cover),
-                      avatarUrl:
-                          TinygrailAssetUrls.normalizeAvatar(temple.avatar),
+                      avatarUrl: TinygrailAssetUrls.normalizeAvatar(
+                        temple.avatar,
+                      ),
                       fallbackAvatarAlignment: Alignment.center,
                       placeholderIconSize: 24,
                     ),
@@ -197,12 +199,12 @@ class _TempleRepairRow extends StatelessWidget {
                       child: LinearProgressIndicator(
                         value: progress,
                         minHeight: 4,
-                        backgroundColor:
-                            colorScheme.onSurfaceVariant.withValues(
-                          alpha: colorScheme.brightness == Brightness.dark
-                              ? 0.24
-                              : 0.14,
-                        ),
+                        backgroundColor: colorScheme.onSurfaceVariant
+                            .withValues(
+                              alpha: colorScheme.brightness == Brightness.dark
+                                  ? 0.24
+                                  : 0.14,
+                            ),
                       ),
                     ),
                     const SizedBox(height: 9),
@@ -228,7 +230,8 @@ class _TempleRepairRow extends StatelessWidget {
                           _TempleRepairMetric(
                             label: '可用活股',
                             value: entry.availableAmount,
-                            isError: entry.requiredAmount > 0 &&
+                            isError:
+                                entry.requiredAmount > 0 &&
                                 entry.availableAmount < entry.requiredAmount,
                           ),
                         ],

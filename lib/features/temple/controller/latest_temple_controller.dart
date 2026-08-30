@@ -40,9 +40,7 @@ class LatestTempleController extends ChangeNotifier {
   /// 加载最新圣殿条目
   ///
   /// [showSkeleton] 是否显示首次加载骨架
-  Future<void> load({
-    required bool showSkeleton,
-  }) async {
+  Future<void> load({required bool showSkeleton}) async {
     if (_isDisposed || _isLoading) {
       return;
     }
@@ -53,9 +51,7 @@ class LatestTempleController extends ChangeNotifier {
     }
 
     try {
-      final page = await _repository.fetchLatestTemplePage(
-        pageSize: pageSize,
-      );
+      final page = await _repository.fetchLatestTemplePage(pageSize: pageSize);
       if (_isDisposed) {
         return;
       }

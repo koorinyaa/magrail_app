@@ -6,10 +6,7 @@ class _PreviewFailedState extends StatelessWidget {
   ///
   /// [message] 失败状态说明
   /// [onRetry] 重试回调
-  const _PreviewFailedState({
-    required this.message,
-    required this.onRetry,
-  });
+  const _PreviewFailedState({required this.message, required this.onRetry});
 
   /// 失败状态说明
   final String message;
@@ -23,14 +20,8 @@ class _PreviewFailedState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: AppSafeAreaInsets.symmetricHorizontal(
-        context,
-        horizontal: 12,
-      ),
-      child: AppLoadFailedState(
-        message: message,
-        onActionPressed: onRetry,
-      ),
+      padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 12),
+      child: AppLoadFailedState(message: message, onActionPressed: onRetry),
     );
   }
 }
@@ -104,9 +95,7 @@ class _LinkSkeletonCard extends StatelessWidget {
   /// 创建 LINK 预览骨架卡片
   ///
   /// [width] 卡片宽度
-  const _LinkSkeletonCard({
-    required this.width,
-  });
+  const _LinkSkeletonCard({required this.width});
 
   /// 卡片宽度
   final double width;
@@ -122,7 +111,8 @@ class _LinkSkeletonCard extends StatelessWidget {
         children: [
           Bone(
             width: width,
-            height: CharacterDetailLinkCard.imageHeight *
+            height:
+                CharacterDetailLinkCard.imageHeight *
                 width /
                 CharacterDetailLinkCard.defaultWidth,
             borderRadius: BorderRadius.circular(24),
@@ -154,9 +144,7 @@ class _TempleSkeletonCard extends StatelessWidget {
   /// 创建固定资产预览骨架卡片
   ///
   /// [width] 卡片宽度
-  const _TempleSkeletonCard({
-    required this.width,
-  });
+  const _TempleSkeletonCard({required this.width});
 
   /// 卡片宽度
   final double width;

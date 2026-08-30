@@ -1,5 +1,6 @@
 part of '../character_detail_repository.dart';
 
+/// 角色详情交易操作
 extension CharacterDetailRepositoryTradeActions on CharacterDetailRepository {
   /// 买入角色
   ///

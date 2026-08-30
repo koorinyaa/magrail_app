@@ -69,19 +69,13 @@ class SecondaryPageSliverAppBar extends StatelessWidget {
       ),
       leading: IconButton(
         onPressed: onBackPressed ?? () => Navigator.of(context).maybePop(),
-        icon: const Icon(
-          Icons.chevron_left_rounded,
-          size: 30,
-        ),
+        icon: const Icon(Icons.chevron_left_rounded, size: 30),
       ),
       title: Text(
         title,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          fontSize: 17,
-          fontWeight: FontWeight.w700,
-        ),
+        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
       ),
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,

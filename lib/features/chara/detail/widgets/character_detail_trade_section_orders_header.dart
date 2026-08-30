@@ -27,11 +27,7 @@ class _TradeSheetHeader extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return AppBottomSheetHeader(
-      icon: icon,
-      title: title,
-      subtitle: subtitle,
-    );
+    return AppBottomSheetHeader(icon: icon, title: title, subtitle: subtitle);
   }
 }
 
@@ -41,10 +37,7 @@ class _TradeOrdersHeader extends StatelessWidget {
   ///
   /// [bidCount] 当前买入委托数量
   /// [askCount] 当前卖出委托数量
-  const _TradeOrdersHeader({
-    required this.bidCount,
-    required this.askCount,
-  });
+  const _TradeOrdersHeader({required this.bidCount, required this.askCount});
 
   /// 当前买入委托数量
   final int bidCount;

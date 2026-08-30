@@ -44,6 +44,12 @@ extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
   }
 
   /// 写入用户资产元数据
+  ///
+  /// [transaction] SQLite 事务
+  /// [username] 用户名
+  /// [nickname] 用户昵称
+  /// [characterTotalItems] 角色总条目数
+  /// [templeTotalItems] 圣殿总条目数
   Future<void> _upsertMetadata(
     sqflite.Transaction transaction, {
     required String username,
@@ -51,19 +57,18 @@ extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
     required int characterTotalItems,
     required int templeTotalItems,
   }) {
-    return transaction.insert(
-      _metaTableName,
-      {
-        'username': username,
-        'nickname': nickname,
-        'character_total_items': characterTotalItems,
-        'temple_total_items': templeTotalItems,
-      },
-      conflictAlgorithm: sqflite.ConflictAlgorithm.replace,
-    );
+    return transaction.insert(_metaTableName, {
+      'username': username,
+      'nickname': nickname,
+      'character_total_items': characterTotalItems,
+      'temple_total_items': templeTotalItems,
+    }, conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
   }
 
   /// 读取用户资产元数据
+  ///
+  /// [executor] SQLite 执行器
+  /// [username] 用户名
   Future<Map<String, Object?>?> _readMetadata(
     sqflite.DatabaseExecutor executor,
     String username,
@@ -78,6 +83,10 @@ extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
   }
 
   /// 替换用户角色明细
+  ///
+  /// [transaction] SQLite 事务
+  /// [username] 用户名
+  /// [rows] 待写入的角色快照明细
   Future<void> _replaceCharacterRows(
     sqflite.Transaction transaction, {
     required String username,
@@ -122,6 +131,10 @@ extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
   }
 
   /// 替换用户圣殿明细
+  ///
+  /// [transaction] SQLite 事务
+  /// [username] 用户名
+  /// [rows] 待写入的圣殿快照明细
   Future<void> _replaceTempleRows(
     sqflite.Transaction transaction, {
     required String username,
@@ -160,6 +173,12 @@ extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
   }
 
   /// 写入两类原始数据状态
+  ///
+  /// [transaction] SQLite 事务
+  /// [username] 用户名
+  /// [sourceState] 两类数据的版本与更新时间状态
+  /// [characterContentHash] 角色快照内容哈希
+  /// [templeContentHash] 圣殿快照内容哈希
   Future<void> _writeSourceState(
     sqflite.Transaction transaction, {
     required String username,
@@ -167,25 +186,24 @@ extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
     required String characterContentHash,
     required String templeContentHash,
   }) {
-    return transaction.insert(
-      _sourceStateTableName,
-      {
-        'username': username,
-        'schema_version': sourceState.revisions.schemaVersion,
-        'character_revision': sourceState.revisions.characters,
-        'temple_revision': sourceState.revisions.temples,
-        'character_updated_at_milliseconds':
-            sourceState.charactersUpdatedAtMilliseconds,
-        'temple_updated_at_milliseconds':
-            sourceState.templesUpdatedAtMilliseconds,
-        'character_content_hash': characterContentHash,
-        'temple_content_hash': templeContentHash,
-      },
-      conflictAlgorithm: sqflite.ConflictAlgorithm.replace,
-    );
+    return transaction.insert(_sourceStateTableName, {
+      'username': username,
+      'schema_version': sourceState.revisions.schemaVersion,
+      'character_revision': sourceState.revisions.characters,
+      'temple_revision': sourceState.revisions.temples,
+      'character_updated_at_milliseconds':
+          sourceState.charactersUpdatedAtMilliseconds,
+      'temple_updated_at_milliseconds':
+          sourceState.templesUpdatedAtMilliseconds,
+      'character_content_hash': characterContentHash,
+      'temple_content_hash': templeContentHash,
+    }, conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
   }
 
   /// 读取两类原始数据持久化状态
+  ///
+  /// [executor] SQLite 执行器
+  /// [username] 用户名
   Future<_StoredUserAssetSourceState?> _readStoredSourceState(
     sqflite.DatabaseExecutor executor,
     String username,
@@ -207,10 +225,12 @@ extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
           temples: _rowInt(row['temple_revision']),
           schemaVersion: _rowInt(row['schema_version']),
         ),
-        charactersUpdatedAtMilliseconds:
-            _rowInt(row['character_updated_at_milliseconds']),
-        templesUpdatedAtMilliseconds:
-            _rowInt(row['temple_updated_at_milliseconds']),
+        charactersUpdatedAtMilliseconds: _rowInt(
+          row['character_updated_at_milliseconds'],
+        ),
+        templesUpdatedAtMilliseconds: _rowInt(
+          row['temple_updated_at_milliseconds'],
+        ),
       ),
       characterContentHash: row['character_content_hash'] as String? ?? '',
       templeContentHash: row['temple_content_hash'] as String? ?? '',
@@ -218,6 +238,9 @@ extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
   }
 
   /// 读取用户角色快照明细
+  ///
+  /// [executor] SQLite 执行器
+  /// [username] 用户名
   Future<List<UserCharacterSnapshotPayload>> _readCharacterRows(
     sqflite.DatabaseExecutor executor,
     String username,
@@ -291,6 +314,10 @@ extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
   }
 
   /// 统计用户在指定快照表中的明细数量
+  ///
+  /// [executor] SQLite 执行器
+  /// [tableName] 快照表名称
+  /// [username] 用户名
   Future<int> _countRows(
     sqflite.DatabaseExecutor executor, {
     required String tableName,
@@ -307,6 +334,10 @@ extension _UserAssetSnapshotDatabasePersistence on UserAssetSnapshotDatabase {
 /// 两类原始数据持久化状态
 class _StoredUserAssetSourceState {
   /// 创建两类原始数据持久化状态
+  ///
+  /// [sourceState] 两类数据的版本与更新时间状态
+  /// [characterContentHash] 角色快照内容哈希
+  /// [templeContentHash] 圣殿快照内容哈希
   const _StoredUserAssetSourceState({
     required this.sourceState,
     required this.characterContentHash,
@@ -319,6 +350,9 @@ class _StoredUserAssetSourceState {
 }
 
 /// 生成下一来源版本
+///
+/// [current] 当前版本号
+/// [changed] 是否发生变化
 int _nextRevision(int? current, bool changed) {
   final resolved = current ?? 0;
   if (!changed) {
@@ -328,6 +362,8 @@ int _nextRevision(int? current, bool changed) {
 }
 
 /// 将 SQLite 数值转换为整数
+///
+/// [value] SQLite 原始数值
 int _rowInt(Object? value) {
   return switch (value) {
     int number => number,
@@ -338,6 +374,8 @@ int _rowInt(Object? value) {
 }
 
 /// 将 SQLite 数值转换为浮点数
+///
+/// [value] SQLite 原始数值
 double _rowDouble(Object? value) {
   return switch (value) {
     num number => number.toDouble(),
@@ -347,6 +385,9 @@ double _rowDouble(Object? value) {
 }
 
 /// 生成当前用户角色排序 SQL
+///
+/// [sort] 排序字段
+/// [direction] 排序方向
 String _characterOrderBy(
   UserCharacterSnapshotSort sort,
   UserCharacterSnapshotSortDirection direction,
@@ -354,8 +395,8 @@ String _characterOrderBy(
   final resolvedDirection = _sqlDirection(direction);
   final rankDirection =
       direction == UserCharacterSnapshotSortDirection.descending
-          ? 'ASC'
-          : 'DESC';
+      ? 'ASC'
+      : 'DESC';
   return switch (sort) {
     UserCharacterSnapshotSort.holdings =>
       'c.user_total $resolvedDirection, c.row_order ASC',
@@ -378,6 +419,8 @@ String _characterOrderBy(
 }
 
 /// 生成受控排序方向 SQL
+///
+/// [direction] 排序方向
 String _sqlDirection(UserCharacterSnapshotSortDirection direction) {
   return direction == UserCharacterSnapshotSortDirection.ascending
       ? 'ASC'

@@ -13,11 +13,9 @@ final class TinygrailOosRepository {
   ///
   /// [apiClient] Tinygrail API 客户端
   /// [dio] Dio 客户端
-  const TinygrailOosRepository({
-    required ApiClient apiClient,
-    required Dio dio,
-  })  : _apiClient = apiClient,
-        _dio = dio;
+  const TinygrailOosRepository({required ApiClient apiClient, required Dio dio})
+    : _apiClient = apiClient,
+      _dio = dio;
 
   static const String _baseUrl =
       'https://tinygrail.oss-cn-hangzhou.aliyuncs.com';
@@ -42,10 +40,7 @@ final class TinygrailOosRepository {
   ///
   /// [bytes] 文件字节
   /// [contentType] 文件 MIME 类型
-  String hashDataUrl({
-    required Uint8List bytes,
-    required String contentType,
-  }) {
+  String hashDataUrl({required Uint8List bytes, required String contentType}) {
     final dataUrl = 'data:$contentType;base64,${base64Encode(bytes)}';
     return md5.convert(utf8.encode(dataUrl)).toString();
   }
@@ -64,17 +59,16 @@ final class TinygrailOosRepository {
     final json = await _apiClient.postJson<Map<String, Object?>>(
       'chara/oss/sign/$path/$hash/$encodedType',
     );
-    final response = TinygrailResponse<TinygrailOosSignature>.fromJson(
-      json,
-      (value) {
-        final valueJson = TinygrailResponseParser.asObjectMap(value);
-        if (valueJson == null) {
-          return null;
-        }
+    final response = TinygrailResponse<TinygrailOosSignature>.fromJson(json, (
+      value,
+    ) {
+      final valueJson = TinygrailResponseParser.asObjectMap(value);
+      if (valueJson == null) {
+        return null;
+      }
 
-        return TinygrailOosSignature.fromJson(valueJson);
-      },
-    );
+      return TinygrailOosSignature.fromJson(valueJson);
+    });
 
     if (!response.isSuccess || response.value == null) {
       throw StateError(response.message ?? '获取 OOS 签名失败');

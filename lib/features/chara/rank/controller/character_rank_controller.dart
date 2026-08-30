@@ -6,8 +6,9 @@ import 'package:magrail_app/features/chara/rank/model/character_rank_entry.dart'
 import 'package:magrail_app/features/chara/rank/repository/character_rank_repository.dart';
 
 /// 角色排序分页控制器
-class CharacterRankPageController extends TinygrailPagedListController<
-    CharacterRankEntry, CharacterRankEntry> {
+class CharacterRankPageController
+    extends
+        TinygrailPagedListController<CharacterRankEntry, CharacterRankEntry> {
   /// 创建角色排序分页控制器
   ///
   /// [repository] 角色排序仓库
@@ -15,8 +16,8 @@ class CharacterRankPageController extends TinygrailPagedListController<
   CharacterRankPageController({
     required CharacterRankRepository repository,
     required this.sortType,
-  })  : _repository = repository,
-        super(pageSize: CharacterRankRepository.pageSize);
+  }) : _repository = repository,
+       super(pageSize: CharacterRankRepository.pageSize);
 
   final CharacterRankRepository _repository;
 
@@ -32,10 +33,7 @@ class CharacterRankPageController extends TinygrailPagedListController<
     required int page,
     required int pageSize,
   }) {
-    return _repository.fetchRankPage(
-      sortType: sortType,
-      page: page,
-    );
+    return _repository.fetchRankPage(sortType: sortType, page: page);
   }
 
   /// 转换角色排序分页条目
@@ -61,21 +59,21 @@ class AllCharacterFullListPageController
     required super.waitForScrollIdle,
     super.onBeforeFullItemsReplaced,
     super.onDataRefreshFailed,
-  })  : _repository = repository,
-        super(
-          pageSize: CharacterRankRepository.pageSize,
-          availableSorts: const <CharacterFullListSort>[
-            CharacterFullListSort.dividend,
-            CharacterFullListSort.level,
-            CharacterFullListSort.towerRank,
-            CharacterFullListSort.stars,
-            CharacterFullListSort.circulation,
-            CharacterFullListSort.currentPrice,
-            CharacterFullListSort.fluctuation,
-            CharacterFullListSort.marketValue,
-            CharacterFullListSort.listedDate,
-          ],
-        );
+  }) : _repository = repository,
+       super(
+         pageSize: CharacterRankRepository.pageSize,
+         availableSorts: const <CharacterFullListSort>[
+           CharacterFullListSort.dividend,
+           CharacterFullListSort.level,
+           CharacterFullListSort.towerRank,
+           CharacterFullListSort.stars,
+           CharacterFullListSort.circulation,
+           CharacterFullListSort.currentPrice,
+           CharacterFullListSort.fluctuation,
+           CharacterFullListSort.marketValue,
+           CharacterFullListSort.listedDate,
+         ],
+       );
 
   final CharacterRankRepository _repository;
 

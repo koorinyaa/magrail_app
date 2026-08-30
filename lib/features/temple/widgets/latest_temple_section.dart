@@ -30,6 +30,7 @@ class LatestTempleCarousel extends StatelessWidget {
   /// [magicRepository] 圣殿资产魔法道具仓库
   /// [oosRepository] Tinygrail OOS 仓库
   /// [userRepository] 用户仓库
+  /// [key] Flutter 组件标识
   const LatestTempleCarousel({
     super.key,
     required this.items,
@@ -82,20 +83,14 @@ class LatestTempleCarousel extends StatelessWidget {
 
     if (isLoadFailed && !showSkeleton && (items == null || items!.isEmpty)) {
       return Padding(
-        padding: AppSafeAreaInsets.symmetricHorizontal(
-          context,
-          horizontal: 24,
-        ),
+        padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 24),
         child: _LatestTempleErrorState(onRetry: onRetry),
       );
     }
 
     if (!showSkeleton && items != null && items!.isEmpty) {
       return Padding(
-        padding: AppSafeAreaInsets.symmetricHorizontal(
-          context,
-          horizontal: 24,
-        ),
+        padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 24),
         child: const _LatestTempleEmptyState(),
       );
     }
@@ -137,11 +132,7 @@ class LatestTempleCarousel extends StatelessWidget {
           },
           onAssetTap: (item) => _openTempleAssetDialog(context, item),
           onLinkedAssetTap: (ownerItem, linkedItem) {
-            _openLinkedTempleAssetDialog(
-              context,
-              ownerItem,
-              linkedItem,
-            );
+            _openLinkedTempleAssetDialog(context, ownerItem, linkedItem);
           },
         );
       },
@@ -210,9 +201,7 @@ class _LatestTempleSkeletonCard extends StatelessWidget {
   /// 创建最新圣殿加载骨架卡片
   ///
   /// [width] 卡片宽度
-  const _LatestTempleSkeletonCard({
-    required this.width,
-  });
+  const _LatestTempleSkeletonCard({required this.width});
 
   /// 卡片宽度
   final double width;
@@ -237,9 +226,7 @@ class _LatestTempleErrorState extends StatelessWidget {
   /// 创建首页最新圣殿加载失败状态
   ///
   /// [onRetry] 重试回调
-  const _LatestTempleErrorState({
-    required this.onRetry,
-  });
+  const _LatestTempleErrorState({required this.onRetry});
 
   /// 重试回调
   final Future<void> Function() onRetry;

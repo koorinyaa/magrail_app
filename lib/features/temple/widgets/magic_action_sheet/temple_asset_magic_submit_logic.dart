@@ -1,5 +1,6 @@
 part of '../temple_asset_magic_action_sheet.dart';
 
+/// 圣殿资产魔法道具提交操作
 extension _TempleAssetMagicSubmitLogic on _TempleAssetMagicActionSheetState {
   /// 提交混沌魔方并返回抽取结果
   Future<TinygrailCharacterRewardItem> _submitChaosCubeDraw() {
@@ -17,7 +18,6 @@ extension _TempleAssetMagicSubmitLogic on _TempleAssetMagicActionSheetState {
   /// 提交指定目标的鲤鱼之眼
   ///
   /// [consumeCharacterId] 消耗圣殿角色 ID
-
   /// [targetCharacterId] 目标角色 ID
   Future<String> _submitFisheyeForTarget({
     required int consumeCharacterId,
@@ -95,7 +95,6 @@ extension _TempleAssetMagicSubmitLogic on _TempleAssetMagicActionSheetState {
   /// 生成异常文案
   ///
   /// [error] 捕获到的异常
-
   /// [fallback] 兜底文案
   String _messageForError(Object error, String fallback) {
     return resolveUserErrorMessage(error, fallback: fallback);

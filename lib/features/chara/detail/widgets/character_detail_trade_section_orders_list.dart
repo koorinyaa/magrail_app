@@ -33,16 +33,8 @@ class _TradeOrdersList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rows = <_TradeOrderRowData>[
-      for (final bid in bids)
-        _TradeOrderRowData(
-          order: bid,
-          isBid: true,
-        ),
-      for (final ask in asks)
-        _TradeOrderRowData(
-          order: ask,
-          isBid: false,
-        ),
+      for (final bid in bids) _TradeOrderRowData(order: bid, isBid: true),
+      for (final ask in asks) _TradeOrderRowData(order: ask, isBid: false),
     ];
 
     if (rows.isEmpty) {
@@ -72,10 +64,7 @@ final class _TradeOrderRowData {
   ///
   /// [order] 当前委托
   /// [isBid] 是否买入委托
-  const _TradeOrderRowData({
-    required this.order,
-    required this.isBid,
-  });
+  const _TradeOrderRowData({required this.order, required this.isBid});
 
   /// 当前委托
   final CharacterDetailTradeOrder order;
@@ -148,10 +137,7 @@ class _TradeOrderRow extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              _TradeOrderSideChip(
-                text: sideText,
-                color: sideColor,
-              ),
+              _TradeOrderSideChip(text: sideText, color: sideColor),
               if (order.isIceberg) ...[
                 const SizedBox(width: 6),
                 _TradeOrderSideChip(
@@ -228,10 +214,7 @@ class _TradeOrderRow extends StatelessWidget {
   /// [context] 当前组件树上下文
   Future<void> _handleCancelPressed(BuildContext context) async {
     try {
-      final message = await controller.cancelOrder(
-        order: order,
-        isBid: isBid,
-      );
+      final message = await controller.cancelOrder(order: order, isBid: isBid);
       if (!context.mounted || message == null) {
         return;
       }
@@ -260,10 +243,7 @@ class _TradeOrderSideChip extends StatelessWidget {
   ///
   /// [text] 标签文本
   /// [color] 标签颜色
-  const _TradeOrderSideChip({
-    required this.text,
-    required this.color,
-  });
+  const _TradeOrderSideChip({required this.text, required this.color});
 
   /// 标签文本
   final String text;
@@ -353,11 +333,7 @@ class _TradeOrderCancelButton extends StatelessWidget {
                     ),
                   )
                 else
-                  Icon(
-                    Icons.close_rounded,
-                    size: 14,
-                    color: foregroundColor,
-                  ),
+                  Icon(Icons.close_rounded, size: 14, color: foregroundColor),
                 const SizedBox(width: 4),
                 Text(
                   '取消',

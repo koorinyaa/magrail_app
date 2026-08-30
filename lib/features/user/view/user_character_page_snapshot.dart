@@ -91,8 +91,9 @@ extension _UserCharacterPageSnapshot on _UserCharacterPageState {
     final backendController = _backendController;
     final backendItems =
         backendController?.items ?? const <UserCharacterApiItem>[];
-    final oldPixels =
-        _scrollController.hasClients ? _scrollController.position.pixels : 0.0;
+    final oldPixels = _scrollController.hasClients
+        ? _scrollController.position.pixels
+        : 0.0;
     final oldIndex = _readBackendVisibleCharacterIndex(backendItems);
     final oldItem = oldIndex == null || backendItems.isEmpty
         ? null
@@ -110,10 +111,10 @@ extension _UserCharacterPageSnapshot on _UserCharacterPageState {
     final absoluteIndex = oldItem == null
         ? 0
         : await repository.readCharacterDefaultAbsoluteIndex(
-              username: widget.username,
-              characterId: oldItem.characterId,
-            ) ??
-            0;
+                username: widget.username,
+                characterId: oldItem.characterId,
+              ) ??
+              0;
     if (!mounted) {
       return false;
     }

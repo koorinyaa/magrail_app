@@ -276,9 +276,7 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
           ),
           child: Stack(
             children: [
-              Positioned.fill(
-                child: _buildSearchContent(context),
-              ),
+              Positioned.fill(child: _buildSearchContent(context)),
               Positioned(
                 left: 0,
                 right: 0,
@@ -309,10 +307,10 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
     final hasResults = _hasVisibleResults;
     final isLoadingBangumiMore =
         _searchSource == _CharacterSearchSource.bangumi &&
-            _isBangumiLoadingMore;
+        _isBangumiLoadingMore;
     final isLoadingBangumiSubjectMore =
         _searchSource == _CharacterSearchSource.bangumiSubject &&
-            _isBangumiSubjectLoadingMore;
+        _isBangumiSubjectLoadingMore;
     if ((_isSearching ||
             _isSearchingTemples ||
             isLoadingBangumiMore ||
@@ -349,7 +347,8 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
     }
 
     if (!hasResults) {
-      final text = _searchSource == _CharacterSearchSource.tinygrail &&
+      final text =
+          _searchSource == _CharacterSearchSource.tinygrail &&
               !_hasSearched &&
               _searchController.text.trim().isEmpty
           ? '输入角色 ID 或名称开始搜索'
@@ -585,9 +584,6 @@ class _CharacterSearchPageState extends State<CharacterSearchPage> {
 ///
 /// [error] 原始错误
 /// [fallback] 无法解析时的兜底文案
-String _messageForError(
-  Object error, {
-  String fallback = '搜索角色失败',
-}) {
+String _messageForError(Object error, {String fallback = '搜索角色失败'}) {
   return resolveUserErrorMessage(error, fallback: fallback);
 }

@@ -94,13 +94,14 @@ extension _UserTemplePageSnapshot on _UserTemplePageState {
     final backendController = _otherUserController;
     final backendItems =
         backendController?.items ?? const <UserTempleApiItem>[];
-    final oldPixels =
-        _scrollController.hasClients ? _scrollController.position.pixels : 0.0;
+    final oldPixels = _scrollController.hasClients
+        ? _scrollController.position.pixels
+        : 0.0;
     final oldDistanceFromTop = _scrollController.hasClients
         ? (_scrollController.position.pixels -
-                _scrollController.position.minScrollExtent)
-            .clamp(0.0, double.infinity)
-            .toDouble()
+                  _scrollController.position.minScrollExtent)
+              .clamp(0.0, double.infinity)
+              .toDouble()
         : 0.0;
     final oldIndex = _readBackendVisibleTempleIndex(backendItems);
     final oldItem = oldIndex == null || backendItems.isEmpty
@@ -119,10 +120,10 @@ extension _UserTemplePageSnapshot on _UserTemplePageState {
     final absoluteIndex = oldItem == null
         ? 0
         : await repository.readTempleDefaultAbsoluteIndex(
-              username: widget.username,
-              templeId: oldItem.id,
-            ) ??
-            0;
+                username: widget.username,
+                templeId: oldItem.id,
+              ) ??
+              0;
     if (!mounted) {
       return false;
     }

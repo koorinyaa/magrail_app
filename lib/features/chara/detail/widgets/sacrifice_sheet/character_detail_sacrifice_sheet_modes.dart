@@ -1,12 +1,11 @@
 part of '../character_detail_sacrifice_sheet.dart';
 
+/// 角色资产重组类型选择
 class _SacrificeModeCards extends StatelessWidget {
   /// 创建资产重组类型卡片组
   ///
   /// [controller] 资产重组抽屉控制器
-  const _SacrificeModeCards({
-    required this.controller,
-  });
+  const _SacrificeModeCards({required this.controller});
 
   /// 资产重组抽屉控制器
   final CharacterDetailSacrificeSheetController controller;
@@ -21,18 +20,16 @@ class _SacrificeModeCards extends StatelessWidget {
       description: '将股份转化为固定资产，同时获得现金奖励并掉落道具',
       selectedColor: const Color(0xFF17C964),
       selected: controller.mode == CharacterDetailSacrificeMode.restructure,
-      onPressed: () => controller.updateMode(
-        CharacterDetailSacrificeMode.restructure,
-      ),
+      onPressed: () =>
+          controller.updateMode(CharacterDetailSacrificeMode.restructure),
     );
     final financing = _SacrificeModeCard(
       title: '股权融资',
       description: '将股份出售给幻想乡，立刻获取现金，不会补充固定资产',
       selectedColor: const Color(0xFFF25C62),
       selected: controller.mode == CharacterDetailSacrificeMode.financing,
-      onPressed: () => controller.updateMode(
-        CharacterDetailSacrificeMode.financing,
-      ),
+      onPressed: () =>
+          controller.updateMode(CharacterDetailSacrificeMode.financing),
     );
 
     return Row(
@@ -87,8 +84,8 @@ class _SacrificeModeCard extends StatelessWidget {
     final backgroundColor = selected
         ? selectedColor.withValues(alpha: isDark ? 0.18 : 0.10)
         : isDark
-            ? Colors.white.withValues(alpha: 0.06)
-            : Colors.black.withValues(alpha: 0.035);
+        ? Colors.white.withValues(alpha: 0.06)
+        : Colors.black.withValues(alpha: 0.035);
     final borderColor = selected
         ? selectedColor.withValues(alpha: 0.72)
         : colorScheme.outlineVariant.withValues(alpha: isDark ? 0.28 : 0.52);
@@ -107,10 +104,7 @@ class _SacrificeModeCard extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: borderColor,
-                width: selected ? 1.4 : 1,
-              ),
+              border: Border.all(color: borderColor, width: selected ? 1.4 : 1),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

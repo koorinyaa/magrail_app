@@ -40,8 +40,9 @@ class _PackedCharacterBubble extends StatelessWidget {
       UserAssetAnalysisAssetProportionMode.assets =>
         bubble.templeAssets > bubble.characterShares,
     };
-    final sourceColor =
-        templeDominant ? _templeDividendColor : _characterDividendColor;
+    final sourceColor = templeDominant
+        ? _templeDividendColor
+        : _characterDividendColor;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isCore = item.rank == 0;
     final isFeatured = item.rank < _featuredBubbleCount;
@@ -55,13 +56,7 @@ class _PackedCharacterBubble extends StatelessWidget {
         shape: BoxShape.circle,
         gradient: SweepGradient(
           colors: isCore
-              ? const [
-                  _coreCyan,
-                  _coreMint,
-                  _coreGold,
-                  _coreCoral,
-                  _coreCyan,
-                ]
+              ? const [_coreCyan, _coreMint, _coreGold, _coreCoral, _coreCyan]
               : [
                   sourceColor.withValues(alpha: 0.60),
                   sourceColor,
@@ -137,10 +132,7 @@ class _PackedCharacterBubble extends StatelessWidget {
                   color: Colors.white.withValues(alpha: isDark ? 0.18 : 0.78),
                 ),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(1),
-                child: avatar,
-              ),
+              child: Padding(padding: const EdgeInsets.all(1), child: avatar),
             ),
           ),
         ),

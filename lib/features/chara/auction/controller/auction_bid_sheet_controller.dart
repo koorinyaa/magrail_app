@@ -22,12 +22,12 @@ class AuctionBidSheetController extends ChangeNotifier {
     required double basePrice,
     required int maxAmount,
     AuctionApiItem? initialAuction,
-  })  : _repository = repository,
-        _characterId = characterId,
-        _characterName = characterName,
-        _basePrice = basePrice,
-        _maxAmount = maxAmount,
-        _auction = initialAuction {
+  }) : _repository = repository,
+       _characterId = characterId,
+       _characterName = characterName,
+       _basePrice = basePrice,
+       _maxAmount = maxAmount,
+       _auction = initialAuction {
     _hasUserBid = _hasAuctionBidInfo(initialAuction);
     priceController = TextEditingController(
       text: _formatInputPrice(_resolveInitialPrice()),
@@ -100,14 +100,14 @@ class AuctionBidSheetController extends ChangeNotifier {
 
   /// 角色展示名称
   String get displayName {
-    final name = TinygrailFormatters.decodeHtmlEntities(
-      _characterName,
-    ).trim();
+    final name = TinygrailFormatters.decodeHtmlEntities(_characterName).trim();
     return name.isEmpty ? '#$_characterId' : name;
   }
 
+  /// 计算拍卖最低出价
   double get _minPrice => _basePrice.ceilToDouble();
 
+  /// 获取当前可撤销拍卖 ID
   int? get _cancelAuctionId => _auction?.id;
 
   /// 初始化拍卖详情
@@ -237,10 +237,7 @@ class AuctionBidSheetController extends ChangeNotifier {
   ///
   /// [error] 原始错误
   /// [fallback] 兜底文案
-  static String resolveErrorMessage(
-    Object error, {
-    required String fallback,
-  }) {
+  static String resolveErrorMessage(Object error, {required String fallback}) {
     return resolveUserErrorMessage(error, fallback: fallback);
   }
 
@@ -324,10 +321,7 @@ class AuctionBidSheetController extends ChangeNotifier {
   ///
   /// [auction] 当前拍卖详情
   /// [notify] 是否通知界面刷新
-  void _syncInputsFromAuction(
-    AuctionApiItem? auction, {
-    bool notify = true,
-  }) {
+  void _syncInputsFromAuction(AuctionApiItem? auction, {bool notify = true}) {
     final bid = auction;
     if (bid == null || bid.price <= 0 || bid.amount <= 0) {
       return;

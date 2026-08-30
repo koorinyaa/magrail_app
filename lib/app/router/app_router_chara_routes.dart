@@ -42,9 +42,7 @@ List<RouteBase> buildCharaRoutes(AppDependencies dependencies) {
             auctionRepository: dependencies.repositories.auction,
             tradeHistoryRepository:
                 dependencies.repositories.characterTradeHistory,
-            characterId: int.tryParse(
-              queryParameters['characterId'] ?? '',
-            ),
+            characterId: int.tryParse(queryParameters['characterId'] ?? ''),
             initialName: queryParameters['name'],
             initialAvatarUrl: queryParameters['avatarUrl'],
             initialAvatarHeroTag: queryParameters['avatarHeroTag'],
@@ -62,10 +60,8 @@ List<RouteBase> buildCharaRoutes(AppDependencies dependencies) {
           key: state.pageKey,
           child: CharacterGmTradeHistoryPage(
             repository: dependencies.repositories.characterTradeHistory,
-            characterId: int.tryParse(
-                  queryParameters['characterId'] ?? '',
-                ) ??
-                0,
+            characterId:
+                int.tryParse(queryParameters['characterId'] ?? '') ?? 0,
             characterName: queryParameters['name'],
           ),
         );
@@ -77,31 +73,32 @@ List<RouteBase> buildCharaRoutes(AppDependencies dependencies) {
       pageBuilder: (context, state) {
         final queryParameters = state.uri.queryParameters;
         final routeExtra = _characterCollectionsRouteExtra(state.extra);
-        final collectionsController =
-            _characterCollectionsController(state.extra);
+        final collectionsController = _characterCollectionsController(
+          state.extra,
+        );
 
         return MaterialPage(
           key: state.pageKey,
           child: CharacterDetailBoardPage(
             repository: dependencies.repositories.characterDetail,
-            templeRepository: routeExtra?.templeRepository ??
+            templeRepository:
+                routeExtra?.templeRepository ??
                 dependencies.repositories.temple,
-            magicRepository: routeExtra?.magicRepository ??
+            magicRepository:
+                routeExtra?.magicRepository ??
                 dependencies.repositories.templeAssetMagic,
             oosRepository:
                 routeExtra?.oosRepository ?? dependencies.repositories.oos,
             userRepository:
                 routeExtra?.userRepository ?? dependencies.repositories.user,
-            characterId: int.tryParse(
-                  queryParameters['characterId'] ?? '',
-                ) ??
-                0,
+            characterId:
+                int.tryParse(queryParameters['characterId'] ?? '') ?? 0,
             characterName: queryParameters['name'] ?? '',
             totalShares: int.tryParse(queryParameters['total'] ?? '') ?? 0,
             currentUserName: routeExtra?.currentUserName ?? '',
             revealPrivateUserHoldings:
                 dependencies.preferences.hiddenFeaturesEnabled &&
-                    dependencies.preferences.revealPrivateUserHoldingsEnabled,
+                dependencies.preferences.revealPrivateUserHoldingsEnabled,
             collectionsController: collectionsController,
           ),
         );
@@ -113,22 +110,23 @@ List<RouteBase> buildCharaRoutes(AppDependencies dependencies) {
       pageBuilder: (context, state) {
         final queryParameters = state.uri.queryParameters;
         final routeExtra = _characterCollectionsRouteExtra(state.extra);
-        final collectionsController =
-            _characterCollectionsController(state.extra);
+        final collectionsController = _characterCollectionsController(
+          state.extra,
+        );
 
         return MaterialPage(
           key: state.pageKey,
           child: CharacterDetailLinksPage(
-            characterId: int.tryParse(
-                  queryParameters['characterId'] ?? '',
-                ) ??
-                0,
+            characterId:
+                int.tryParse(queryParameters['characterId'] ?? '') ?? 0,
             characterName: queryParameters['name'] ?? '',
             avatarUrl: queryParameters['avatarUrl'] ?? '',
             repository: dependencies.repositories.characterDetail,
-            templeRepository: routeExtra?.templeRepository ??
+            templeRepository:
+                routeExtra?.templeRepository ??
                 dependencies.repositories.temple,
-            magicRepository: routeExtra?.magicRepository ??
+            magicRepository:
+                routeExtra?.magicRepository ??
                 dependencies.repositories.templeAssetMagic,
             oosRepository:
                 routeExtra?.oosRepository ?? dependencies.repositories.oos,
@@ -146,22 +144,23 @@ List<RouteBase> buildCharaRoutes(AppDependencies dependencies) {
       pageBuilder: (context, state) {
         final queryParameters = state.uri.queryParameters;
         final routeExtra = _characterCollectionsRouteExtra(state.extra);
-        final collectionsController =
-            _characterCollectionsController(state.extra);
+        final collectionsController = _characterCollectionsController(
+          state.extra,
+        );
 
         return MaterialPage(
           key: state.pageKey,
           child: CharacterDetailTemplesPage(
-            characterId: int.tryParse(
-                  queryParameters['characterId'] ?? '',
-                ) ??
-                0,
+            characterId:
+                int.tryParse(queryParameters['characterId'] ?? '') ?? 0,
             characterName: queryParameters['name'] ?? '',
             avatarUrl: queryParameters['avatarUrl'] ?? '',
             repository: dependencies.repositories.characterDetail,
-            templeRepository: routeExtra?.templeRepository ??
+            templeRepository:
+                routeExtra?.templeRepository ??
                 dependencies.repositories.temple,
-            magicRepository: routeExtra?.magicRepository ??
+            magicRepository:
+                routeExtra?.magicRepository ??
                 dependencies.repositories.templeAssetMagic,
             oosRepository:
                 routeExtra?.oosRepository ?? dependencies.repositories.oos,
@@ -246,9 +245,7 @@ List<RouteBase> buildCharaRoutes(AppDependencies dependencies) {
       path: '/tower-ranking',
       pageBuilder: (context, state) => MaterialPage(
         key: state.pageKey,
-        child: TowerRankingPage(
-          repository: dependencies.repositories.tower,
-        ),
+        child: TowerRankingPage(repository: dependencies.repositories.tower),
       ),
     ),
     GoRoute(
@@ -256,9 +253,7 @@ List<RouteBase> buildCharaRoutes(AppDependencies dependencies) {
       path: '/tower-log',
       pageBuilder: (context, state) => MaterialPage(
         key: state.pageKey,
-        child: TowerLogPage(
-          repository: dependencies.repositories.tower,
-        ),
+        child: TowerLogPage(repository: dependencies.repositories.tower),
       ),
     ),
   ];

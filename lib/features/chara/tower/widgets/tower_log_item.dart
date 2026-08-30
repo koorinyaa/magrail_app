@@ -5,9 +5,7 @@ class _TowerLogItem extends StatelessWidget {
   /// 创建通天塔日志项
   ///
   /// [item] 通天塔日志接口条目
-  const _TowerLogItem({
-    required this.item,
-  });
+  const _TowerLogItem({required this.item});
 
   /// 通天塔日志接口条目
   final TowerLogApiItem item;
@@ -42,10 +40,7 @@ class _TowerLogItem extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                _TowerLogAvatar(
-                  imageUrl: avatarUrl,
-                  heroTag: avatarHeroTag,
-                ),
+                _TowerLogAvatar(imageUrl: avatarUrl, heroTag: avatarHeroTag),
                 const SizedBox(width: _towerLogAvatarTextGap),
                 Expanded(
                   child: Column(
@@ -61,9 +56,7 @@ class _TowerLogItem extends StatelessWidget {
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
+                              style: Theme.of(context).textTheme.bodyMedium
                                   ?.copyWith(
                                     color: colorScheme.onSurface,
                                     fontWeight: FontWeight.w700,
@@ -89,10 +82,10 @@ class _TowerLogItem extends StatelessWidget {
                   child: Text(
                     TinygrailFormatters.relativeTime(item.logTime),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w500,
-                          height: 1,
-                        ),
+                      color: colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w500,
+                      height: 1,
+                    ),
                   ),
                 ),
                 SizedBox(
@@ -137,10 +130,7 @@ class _TowerLogAvatar extends StatelessWidget {
   ///
   /// [imageUrl] 头像地址
   /// [heroTag] 头像转场标识
-  const _TowerLogAvatar({
-    required this.imageUrl,
-    required this.heroTag,
-  });
+  const _TowerLogAvatar({required this.imageUrl, required this.heroTag});
 
   /// 头像地址
   final String imageUrl;
@@ -176,9 +166,7 @@ class _TowerLogRankBadge extends StatelessWidget {
   /// 创建通天塔日志排名徽标
   ///
   /// [rank] 通天塔排名
-  const _TowerLogRankBadge({
-    required this.rank,
-  });
+  const _TowerLogRankBadge({required this.rank});
 
   final int rank;
 
@@ -219,10 +207,7 @@ class _TowerLogRankChangeBadge extends StatelessWidget {
   ///
   /// [rank] 当前排名
   /// [oldRank] 变动前排名
-  const _TowerLogRankChangeBadge({
-    required this.rank,
-    required this.oldRank,
-  });
+  const _TowerLogRankChangeBadge({required this.rank, required this.oldRank});
 
   final int rank;
   final int oldRank;
@@ -279,9 +264,7 @@ class _TowerLogActionButton extends StatelessWidget {
   /// 创建通天塔日志行为按钮
   ///
   /// [item] 通天塔日志接口条目
-  const _TowerLogActionButton({
-    required this.item,
-  });
+  const _TowerLogActionButton({required this.item});
 
   final TowerLogApiItem item;
 
@@ -314,10 +297,7 @@ class _TowerLogActionButton extends StatelessWidget {
       return;
     }
 
-    context.pushNamed(
-      'userDetail',
-      queryParameters: {'username': username},
-    );
+    context.pushNamed('userDetail', queryParameters: {'username': username});
   }
 }
 
@@ -326,9 +306,7 @@ class _TowerLogActionText extends StatelessWidget {
   /// 创建通天塔日志行为文本
   ///
   /// [item] 通天塔日志接口条目
-  const _TowerLogActionText({
-    required this.item,
-  });
+  const _TowerLogActionText({required this.item});
 
   final TowerLogApiItem item;
 
@@ -355,10 +333,7 @@ class _TowerLogActionText extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          action,
-          style: style,
-        ),
+        Text(action, style: style),
         if (hasUser) ...[
           const SizedBox(width: 4),
           Flexible(
@@ -370,18 +345,10 @@ class _TowerLogActionText extends StatelessWidget {
             ),
           ),
         ],
-        Text(
-          ' $amountText',
-          style: style,
-        ),
+        Text(' $amountText', style: style),
         if (item.type == 5) ...[
           const SizedBox(width: 3),
-          const Icon(
-            Symbols.star,
-            size: 12,
-            fill: 1,
-            color: Color(0xFFF2B72F),
-          ),
+          const Icon(Symbols.star, size: 12, fill: 1, color: Color(0xFFF2B72F)),
         ],
       ],
     );

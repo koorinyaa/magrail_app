@@ -5,8 +5,11 @@ import 'package:magrail_app/features/chara/detail/repository/character_detail_re
 
 /// 角色详情 ICO 参与者控制器
 class CharacterDetailIcoParticipantsController
-    extends TinygrailPagedListController<CharacterDetailIcoParticipant,
-        CharacterDetailIcoParticipant> {
+    extends
+        TinygrailPagedListController<
+          CharacterDetailIcoParticipant,
+          CharacterDetailIcoParticipant
+        > {
   /// 创建角色详情 ICO 参与者控制器
   ///
   /// [repository] 角色详情仓库
@@ -16,8 +19,8 @@ class CharacterDetailIcoParticipantsController
     required CharacterDetailRepository repository,
     required int icoId,
     super.pageSize = defaultPageSize,
-  })  : _repository = repository,
-        _icoId = icoId;
+  }) : _repository = repository,
+       _icoId = icoId;
 
   /// ICO 参与者默认分页数量
   static const int defaultPageSize = 24;

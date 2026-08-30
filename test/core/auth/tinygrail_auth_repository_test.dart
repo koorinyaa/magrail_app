@@ -12,39 +12,24 @@ void main() {
       dio: Dio(),
       cookieJar: cookieJar,
     );
-    final oldCookie = Cookie(
-      '.AspNetCore.Identity.Application',
-      'old-session',
-    )
+    final oldCookie = Cookie('.AspNetCore.Identity.Application', 'old-session')
       ..domain = TinygrailSiteConfig.siteUri.host
       ..path = '/';
-    await cookieJar.saveFromResponse(
-      TinygrailSiteConfig.siteUri,
-      [oldCookie],
-    );
+    await cookieJar.saveFromResponse(TinygrailSiteConfig.siteUri, [oldCookie]);
     expect(await repository.hasTinygrailCookie(), isTrue);
 
     final oldGeneration = repository.captureSessionGeneration();
     expect(oldGeneration, isNotNull);
 
     final clearOperation = repository.clearSession();
-    expect(
-      repository.isSessionGenerationCurrent(oldGeneration!),
-      isFalse,
-    );
+    expect(repository.isSessionGenerationCurrent(oldGeneration!), isFalse);
     await clearOperation;
     expect(repository.captureSessionGeneration(), isNull);
 
-    final newCookie = Cookie(
-      '.AspNetCore.Identity.Application',
-      'new-session',
-    )
+    final newCookie = Cookie('.AspNetCore.Identity.Application', 'new-session')
       ..domain = TinygrailSiteConfig.siteUri.host
       ..path = '/';
-    await cookieJar.saveFromResponse(
-      TinygrailSiteConfig.siteUri,
-      [newCookie],
-    );
+    await cookieJar.saveFromResponse(TinygrailSiteConfig.siteUri, [newCookie]);
     final concurrentChecks = await Future.wait([
       repository.hasTinygrailCookie(),
       repository.hasTinygrailCookie(),
@@ -55,9 +40,6 @@ void main() {
     expect(newGeneration, isNotNull);
     expect(newGeneration, isNot(oldGeneration));
     expect(repository.isSessionGenerationCurrent(oldGeneration), isFalse);
-    expect(
-      repository.isSessionGenerationCurrent(newGeneration!),
-      isTrue,
-    );
+    expect(repository.isSessionGenerationCurrent(newGeneration!), isTrue);
   });
 }

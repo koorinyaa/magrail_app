@@ -115,8 +115,10 @@ class _CharacterDetailBoardPageState extends State<CharacterDetailBoardPage> {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return TinygrailPagedSliverPage<CharacterDetailBoardMember,
-        CharacterDetailBoardMember>(
+    return TinygrailPagedSliverPage<
+      CharacterDetailBoardMember,
+      CharacterDetailBoardMember
+    >(
       controller: _controller,
       title: _title,
       loadingSliver: const CharacterDetailBoardSkeletonSliverList(),
@@ -136,8 +138,9 @@ class _CharacterDetailBoardPageState extends State<CharacterDetailBoardPage> {
             onItemBuilt: onItemBuilt,
             onMemberTap: _openUser,
             onTempleTap: _openTempleAssetCard,
-            onRevealStock:
-                widget.revealPrivateUserHoldings ? _revealMemberStock : null,
+            onRevealStock: widget.revealPrivateUserHoldings
+                ? _revealMemberStock
+                : null,
           ),
         ];
       },
@@ -167,8 +170,9 @@ class _CharacterDetailBoardPageState extends State<CharacterDetailBoardPage> {
   ///
   /// [temple] 董事会成员对应圣殿
   TempleAssetDialogSource _sourceForTemple(CharacterDetailTempleItem temple) {
-    final characterId =
-        temple.characterId > 0 ? temple.characterId : widget.characterId;
+    final characterId = temple.characterId > 0
+        ? temple.characterId
+        : widget.characterId;
 
     return TempleAssetDialogSource(
       ownerName: temple.ownerName,
@@ -186,10 +190,7 @@ class _CharacterDetailBoardPageState extends State<CharacterDetailBoardPage> {
       return;
     }
 
-    context.pushNamed(
-      'userDetail',
-      queryParameters: {'username': username},
-    );
+    context.pushNamed('userDetail', queryParameters: {'username': username});
   }
 
   /// 查询董事会成员未公开持股

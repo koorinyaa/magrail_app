@@ -39,24 +39,24 @@ class CharacterPoolPageController
     required super.waitForScrollIdle,
     super.onBeforeFullItemsReplaced,
     super.onDataRefreshFailed,
-  })  : _repository = repository,
-        _username = username,
-        _auctionRepository = auctionRepository,
-        super(
-          availableSorts: const <CharacterFullListSort>[
-            CharacterFullListSort.quantity,
-            CharacterFullListSort.level,
-            CharacterFullListSort.dividend,
-            CharacterFullListSort.towerRank,
-            CharacterFullListSort.stars,
-            CharacterFullListSort.circulation,
-            CharacterFullListSort.currentPrice,
-            CharacterFullListSort.fluctuation,
-            CharacterFullListSort.marketValue,
-            CharacterFullListSort.listedDate,
-          ],
-          initialSort: CharacterFullListSort.quantity,
-        );
+  }) : _repository = repository,
+       _username = username,
+       _auctionRepository = auctionRepository,
+       super(
+         availableSorts: const <CharacterFullListSort>[
+           CharacterFullListSort.quantity,
+           CharacterFullListSort.level,
+           CharacterFullListSort.dividend,
+           CharacterFullListSort.towerRank,
+           CharacterFullListSort.stars,
+           CharacterFullListSort.circulation,
+           CharacterFullListSort.currentPrice,
+           CharacterFullListSort.fluctuation,
+           CharacterFullListSort.marketValue,
+           CharacterFullListSort.listedDate,
+         ],
+         initialSort: CharacterFullListSort.quantity,
+       );
 
   final UserRepository _repository;
   final String _username;
@@ -75,8 +75,9 @@ class CharacterPoolPageController
   static const int _maxConcurrentAuctionBatchRequests = 3;
 
   // 快速滚动期间只保留最后触发的批次，停止构建后再加入请求队列
-  static const Duration _auctionBatchDebounceDelay =
-      Duration(milliseconds: 150);
+  static const Duration _auctionBatchDebounceDelay = Duration(
+    milliseconds: 150,
+  );
 
   /// 当前用户竞拍映射
   Map<int, AuctionApiItem> get auctionMap => _auctionMap;
@@ -139,10 +140,7 @@ class CharacterPoolPageController
   /// [item] 角色池条目
   /// [sort] 排序字段
   @override
-  num sortValueOf(
-    UserCharacterApiItem item,
-    CharacterFullListSort sort,
-  ) {
+  num sortValueOf(UserCharacterApiItem item, CharacterFullListSort sort) {
     return switch (sort) {
       CharacterFullListSort.quantity => item.state,
       CharacterFullListSort.level => item.level,
@@ -191,9 +189,7 @@ class CharacterPoolPageController
 
     final syncSerial = ++_auctionSyncSerial;
     try {
-      final auctionMap = await auctionRepository.fetchAuctionMap(
-        [characterId],
-      );
+      final auctionMap = await auctionRepository.fetchAuctionMap([characterId]);
       if (_isPageDisposed || syncSerial != _auctionSyncSerial) {
         return;
       }
@@ -262,10 +258,10 @@ class CharacterPoolPageController
       final mergedMap = replace
           ? nextMap
           : (Map<int, AuctionApiItem>.of(_auctionMap)
-            ..removeWhere(
-              (characterId, _) => characterIdSet.contains(characterId),
-            )
-            ..addAll(nextMap));
+              ..removeWhere(
+                (characterId, _) => characterIdSet.contains(characterId),
+              )
+              ..addAll(nextMap));
       if (mapEquals(_auctionMap, mergedMap)) {
         return false;
       }
@@ -292,14 +288,18 @@ class CharacterPoolPageController
     _auctionBatchDebounce?.cancel();
     _auctionBatchDebounce = null;
     final batchStart = (visibleIndex ~/ _auctionBatchSize) * _auctionBatchSize;
-    final batchEnd =
-        (batchStart + _auctionBatchSize).clamp(0, currentItems.length);
+    final batchEnd = (batchStart + _auctionBatchSize).clamp(
+      0,
+      currentItems.length,
+    );
     final characterIds = <int>[
       for (var index = batchStart; index < batchEnd; index += 1)
-        if (!_resolvedAuctionCharacterIds
-                .contains(currentItems[index].characterId) &&
-            !_loadingAuctionCharacterIds
-                .contains(currentItems[index].characterId))
+        if (!_resolvedAuctionCharacterIds.contains(
+              currentItems[index].characterId,
+            ) &&
+            !_loadingAuctionCharacterIds.contains(
+              currentItems[index].characterId,
+            ))
           currentItems[index].characterId,
     ];
     if (characterIds.isEmpty) {
@@ -362,9 +362,7 @@ class CharacterPoolPageController
       _resolvedAuctionCharacterIds.addAll(characterIds);
       final characterIdSet = characterIds.toSet();
       final mergedMap = Map<int, AuctionApiItem>.of(_auctionMap)
-        ..removeWhere(
-          (characterId, _) => characterIdSet.contains(characterId),
-        )
+        ..removeWhere((characterId, _) => characterIdSet.contains(characterId))
         ..addAll(nextMap);
       if (!mapEquals(_auctionMap, mergedMap)) {
         _auctionMap = mergedMap;

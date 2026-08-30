@@ -13,10 +13,7 @@ class UserMarketOrderPage extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [repository] 用户仓库
-  const UserMarketOrderPage({
-    super.key,
-    required this.repository,
-  });
+  const UserMarketOrderPage({super.key, required this.repository});
 
   /// 用户仓库
   final UserRepository repository;
@@ -59,8 +56,10 @@ class _UserMarketOrderPageState extends State<UserMarketOrderPage> {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return TinygrailTabbedPagedSliverPage<UserMarketOrderApiItem,
-        UserMarketOrderApiItem>(
+    return TinygrailTabbedPagedSliverPage<
+      UserMarketOrderApiItem,
+      UserMarketOrderApiItem
+    >(
       title: '委托订单',
       tabs: [
         _buildOrderTab(
@@ -85,7 +84,7 @@ class _UserMarketOrderPageState extends State<UserMarketOrderPage> {
   /// [side] 委托订单方向
   /// [controller] 委托订单分页控制器
   TinygrailPagedTab<UserMarketOrderApiItem, UserMarketOrderApiItem>
-      _buildOrderTab({
+  _buildOrderTab({
     required String label,
     required UserMarketOrderSide side,
     required UserMarketOrderPageController controller,
@@ -170,10 +169,7 @@ class _UserMarketOrderPageState extends State<UserMarketOrderPage> {
   ///
   /// [item] 用户委托订单条目
   /// [avatarHeroTag] 头像转场标识
-  void _handleOrderTap(
-    UserMarketOrderApiItem item,
-    String? avatarHeroTag,
-  ) {
+  void _handleOrderTap(UserMarketOrderApiItem item, String? avatarHeroTag) {
     openCharacterDetail(
       context,
       characterId: item.characterId,

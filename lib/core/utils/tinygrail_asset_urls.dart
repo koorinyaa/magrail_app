@@ -10,11 +10,7 @@ class TinygrailAssetUrls {
       'https://tinygrail.oss-cn-hangzhou.aliyuncs.com/';
   static const String _defaultAvatarUrl =
       'https://lain.bgm.tv/pic/user/l/icon.jpg';
-  static const Set<String> _bangumiHosts = {
-    'bgm.tv',
-    'bangumi.tv',
-    'chii.in',
-  };
+  static const Set<String> _bangumiHosts = {'bgm.tv', 'bangumi.tv', 'chii.in'};
 
   static bool _useBangumiMirror = false;
   static String _bangumiMirrorHost = BangumiMirrorConfig.defaultHost;
@@ -52,16 +48,12 @@ class TinygrailAssetUrls {
     if (normalizedCover.contains('/crt/')) {
       if (size == TinygrailCoverSize.large &&
           normalizedCover.contains('/crt/m/')) {
-        return _applyBangumiMirror(
-          normalizedCover.replaceFirst('/m/', '/l/'),
-        );
+        return _applyBangumiMirror(normalizedCover.replaceFirst('/m/', '/l/'));
       }
 
       if (size == TinygrailCoverSize.small &&
           normalizedCover.contains('/crt/g/')) {
-        return _applyBangumiMirror(
-          normalizedCover.replaceFirst('/g/', '/m/'),
-        );
+        return _applyBangumiMirror(normalizedCover.replaceFirst('/g/', '/m/'));
       }
 
       return _applyBangumiMirror(normalizedCover);

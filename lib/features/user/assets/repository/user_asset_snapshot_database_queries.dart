@@ -155,8 +155,9 @@ extension UserAssetSnapshotDatabaseLevelIndex on UserAssetSnapshotDatabase {
       }
       final level = _rowInt(anchorRows.first['character_level']);
       final rowOrder = _rowInt(anchorRows.first['row_order']);
-      final comparison =
-          direction == UserTempleSnapshotSortDirection.ascending ? '<' : '>';
+      final comparison = direction == UserTempleSnapshotSortDirection.ascending
+          ? '<'
+          : '>';
       final countRows = await transaction.rawQuery(
         'SELECT COUNT(*) AS item_count FROM $_templeTableName t '
         'WHERE t.username = ? ${searchFilter.clause} '
@@ -173,11 +174,8 @@ extension UserAssetSnapshotDatabaseLevelIndex on UserAssetSnapshotDatabase {
   /// [username] 用户名
   /// [direction] 等级排序方向
   /// [searchKeyword] 角色 ID 或名称筛选词
-  Future<
-      ({
-        List<UserCharacterLevelPosition> positions,
-        int revision,
-      })> readCharacterLevelIndex({
+  Future<({List<UserCharacterLevelPosition> positions, int revision})>
+  readCharacterLevelIndex({
     required String username,
     required UserCharacterSnapshotSortDirection direction,
     required String searchKeyword,
@@ -218,11 +216,8 @@ extension UserAssetSnapshotDatabaseLevelIndex on UserAssetSnapshotDatabase {
   /// [username] 用户名
   /// [direction] 排序方向
   /// [searchKeyword] 角色 ID 或名称筛选词
-  Future<
-      ({
-        List<UserTempleLevelPosition> positions,
-        int revision,
-      })> readTempleLevelIndex({
+  Future<({List<UserTempleLevelPosition> positions, int revision})>
+  readTempleLevelIndex({
     required String username,
     required UserTempleSnapshotSortDirection direction,
     required String searchKeyword,
@@ -290,8 +285,9 @@ extension UserAssetSnapshotDatabaseLevelIndex on UserAssetSnapshotDatabase {
     return (clause: '', arguments: const <Object?>[]);
   }
   // 角色 ID 常用 #123 形式输入，仅纯数字编号去掉前缀参与模糊匹配
-  final normalizedKeyword =
-      RegExp(r'^#[0-9]+$').hasMatch(keyword) ? keyword.substring(1) : keyword;
+  final normalizedKeyword = RegExp(r'^#[0-9]+$').hasMatch(keyword)
+      ? keyword.substring(1)
+      : keyword;
   // LIKE 通配符按字面量搜索，避免扩大筛选范围
   final escapedKeyword = normalizedKeyword
       .replaceAll(r'\', r'\\')
@@ -299,7 +295,8 @@ extension UserAssetSnapshotDatabaseLevelIndex on UserAssetSnapshotDatabase {
       .replaceAll('_', r'\_');
   final searchPattern = '%$escapedKeyword%';
   return (
-    clause: "AND (CAST($alias.character_id AS TEXT) LIKE ? ESCAPE '\\' "
+    clause:
+        "AND (CAST($alias.character_id AS TEXT) LIKE ? ESCAPE '\\' "
         "OR $alias.name LIKE ? ESCAPE '\\')",
     arguments: <Object?>[searchPattern, searchPattern],
   );

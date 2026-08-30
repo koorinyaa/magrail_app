@@ -28,9 +28,7 @@ class _TowerLogContent {
         realtimeItems.isNotEmpty && historyItems.isNotEmpty;
 
     if (controller.isInitialLoading) {
-      return [
-        const _TowerLogSkeletonSliverList(),
-      ];
+      return [const _TowerLogSkeletonSliverList()];
     }
 
     if (controller.initialError != null) {
@@ -57,7 +55,8 @@ class _TowerLogContent {
 
     return [
       SliverList.builder(
-        itemCount: realtimeItems.length +
+        itemCount:
+            realtimeItems.length +
             (hasRealtimeDivider ? 1 : 0) +
             historyItems.length +
             1,
@@ -126,10 +125,7 @@ class _TowerLogSeparatedItem extends StatelessWidget {
   ///
   /// [item] 通天塔日志接口条目
   /// [showDivider] 是否显示底部分割线
-  const _TowerLogSeparatedItem({
-    required this.item,
-    required this.showDivider,
-  });
+  const _TowerLogSeparatedItem({required this.item, required this.showDivider});
 
   /// 通天塔日志接口条目
   final TowerLogApiItem item;

@@ -8,9 +8,8 @@ class StCharacterRepository {
   /// 创建 ST 角色仓库
   ///
   /// [apiClient] Tinygrail API 客户端
-  const StCharacterRepository({
-    required ApiClient apiClient,
-  }) : _apiClient = apiClient;
+  const StCharacterRepository({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   /// ST 角色每页数量
   static const int pageSize = 24;
@@ -29,17 +28,16 @@ class StCharacterRepository {
       'chara/delist/chara/$page/$pageSize',
     );
     final response =
-        TinygrailResponse<TinygrailPage<StCharacterEntry>>.fromJson(
-      json,
-      (value) {
-        final valueJson = TinygrailResponseParser.asObjectMap(value);
-        if (valueJson == null) {
-          return null;
-        }
+        TinygrailResponse<TinygrailPage<StCharacterEntry>>.fromJson(json, (
+          value,
+        ) {
+          final valueJson = TinygrailResponseParser.asObjectMap(value);
+          if (valueJson == null) {
+            return null;
+          }
 
-        return TinygrailPage.fromJson(valueJson, StCharacterEntry.fromJson);
-      },
-    );
+          return TinygrailPage.fromJson(valueJson, StCharacterEntry.fromJson);
+        });
 
     final pageData = response.value;
     if (!response.isSuccess || pageData == null) {

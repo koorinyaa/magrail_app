@@ -1,5 +1,6 @@
 part of 'user_detail_page.dart';
 
+/// 用户详情页资产操作
 extension _UserDetailPageActions on _UserDetailPageState {
   /// 查询其他用户的角色未公开持股
   ///
@@ -24,27 +25,19 @@ extension _UserDetailPageActions on _UserDetailPageState {
       return;
     }
 
-    await Clipboard.setData(
-      ClipboardData(text: '@${profile.userId}'),
-    );
+    await Clipboard.setData(ClipboardData(text: '@${profile.userId}'));
     if (!context.mounted) {
       return;
     }
 
-    AppToast.info(
-      context,
-      text: '已复制用户ID',
-    );
+    AppToast.info(context, text: '已复制用户ID');
   }
 
   /// 处理用户菜单入口点击
   ///
   /// [context] 当前组件树上下文
   /// [action] 用户菜单入口
-  void _handleActionPressed(
-    BuildContext context,
-    UserActionEntry action,
-  ) {
+  void _handleActionPressed(BuildContext context, UserActionEntry action) {
     switch (action.type) {
       case UserActionType.syncRate:
         _openSyncRate(context);
@@ -103,12 +96,7 @@ extension _UserDetailPageActions on _UserDetailPageState {
       return;
     }
 
-    unawaited(
-      showUserSyncRateDialog(
-        context,
-        syncRate: syncRate,
-      ),
-    );
+    unawaited(showUserSyncRateDialog(context, syncRate: syncRate));
   }
 
   /// 打开股息预测底部抽屉
@@ -148,8 +136,9 @@ extension _UserDetailPageActions on _UserDetailPageState {
       return;
     }
 
-    final actionType =
-        shouldBan ? UserActionType.block : UserActionType.unblock;
+    final actionType = shouldBan
+        ? UserActionType.block
+        : UserActionType.unblock;
     _setActionBusyState(actionType, value: true);
 
     try {
@@ -228,10 +217,7 @@ extension _UserDetailPageActions on _UserDetailPageState {
 
       AppToast.error(
         context,
-        text: _resolveActionErrorMessage(
-          error,
-          fallback: '领取每周分红失败',
-        ),
+        text: _resolveActionErrorMessage(error, fallback: '领取每周分红失败'),
       );
     } finally {
       _setActionBusyState(UserActionType.weeklyBonus, value: false);
@@ -275,10 +261,7 @@ extension _UserDetailPageActions on _UserDetailPageState {
 
       AppToast.error(
         context,
-        text: _resolveActionErrorMessage(
-          error,
-          fallback: '领取签到奖励失败',
-        ),
+        text: _resolveActionErrorMessage(error, fallback: '领取签到奖励失败'),
       );
     } finally {
       _setActionBusyState(UserActionType.dailyBonus, value: false);
@@ -325,10 +308,7 @@ extension _UserDetailPageActions on _UserDetailPageState {
 
       AppToast.error(
         context,
-        text: _resolveActionErrorMessage(
-          error,
-          fallback: '领取节日福利失败',
-        ),
+        text: _resolveActionErrorMessage(error, fallback: '领取节日福利失败'),
       );
     } finally {
       _setActionBusyState(UserActionType.holidayBonus, value: false);
@@ -339,10 +319,7 @@ extension _UserDetailPageActions on _UserDetailPageState {
   ///
   /// [error] 原始错误
   /// [fallback] 兜底文案
-  String _resolveActionErrorMessage(
-    Object error, {
-    required String fallback,
-  }) {
+  String _resolveActionErrorMessage(Object error, {required String fallback}) {
     return resolveUserErrorMessage(error, fallback: fallback);
   }
 }

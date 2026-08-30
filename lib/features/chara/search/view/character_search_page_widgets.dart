@@ -5,9 +5,7 @@ class _CharacterSearchSectionLabel extends StatelessWidget {
   /// 创建角色搜索结果分区标题
   ///
   /// [text] 分区标题文本
-  const _CharacterSearchSectionLabel({
-    required this.text,
-  });
+  const _CharacterSearchSectionLabel({required this.text});
 
   /// 分区标题文本
   final String text;
@@ -39,10 +37,7 @@ class _CharacterSearchRow extends StatelessWidget {
   ///
   /// [item] 搜索结果角色
   /// [onTap] 点击回调
-  const _CharacterSearchRow({
-    required this.item,
-    required this.onTap,
-  });
+  const _CharacterSearchRow({required this.item, required this.onTap});
 
   /// 搜索结果角色
   final CharacterDetailSearchItem item;
@@ -252,9 +247,7 @@ class _CharacterSearchEmptyText extends StatelessWidget {
   /// 创建角色搜索空文本
   ///
   /// [text] 展示文本
-  const _CharacterSearchEmptyText({
-    required this.text,
-  });
+  const _CharacterSearchEmptyText({required this.text});
 
   /// 展示文本
   final String text;
@@ -285,9 +278,7 @@ class _CharacterSearchInlineWarning extends StatelessWidget {
   /// 创建角色搜索行内错误
   ///
   /// [text] 错误文本
-  const _CharacterSearchInlineWarning({
-    required this.text,
-  });
+  const _CharacterSearchInlineWarning({required this.text});
 
   /// 错误文本
   final String text;
@@ -448,9 +439,7 @@ class _CharacterSearchTempleProgress extends StatelessWidget {
   /// 创建圣殿搜索结果资产进度
   ///
   /// [item] 用户圣殿条目
-  const _CharacterSearchTempleProgress({
-    required this.item,
-  });
+  const _CharacterSearchTempleProgress({required this.item});
 
   /// 用户圣殿条目
   final UserTempleApiItem item;

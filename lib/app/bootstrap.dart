@@ -105,8 +105,9 @@ class AppRepositories {
       ranking: RankingRepository(apiClient: apiClient),
       characterRank: CharacterRankRepository(apiClient: apiClient),
       characterDetail: CharacterDetailRepository(apiClient: apiClient),
-      characterTradeHistory:
-          CharacterTradeHistoryRepository(apiClient: apiClient),
+      characterTradeHistory: CharacterTradeHistoryRepository(
+        apiClient: apiClient,
+      ),
       tower: TowerRepository(apiClient: apiClient),
       icoCharacter: IcoCharacterRepository(apiClient: apiClient),
       stCharacter: StCharacterRepository(apiClient: apiClient),
@@ -248,8 +249,10 @@ Future<AppDependencies> bootstrap() async {
     mirrorHost: preferences.bangumiMirrorHost,
   );
 
-  final authRepository =
-      TinygrailAuthRepository(dio: dio, cookieJar: cookieJar);
+  final authRepository = TinygrailAuthRepository(
+    dio: dio,
+    cookieJar: cookieJar,
+  );
   final updateController = AppUpdateController(
     repository: AppUpdateRepository(
       dio: Dio(

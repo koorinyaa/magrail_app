@@ -113,9 +113,8 @@ class _MainHomeViewState extends State<MainHomeView> {
       repository: widget.topWeekRepository,
       auctionRepository: widget.auctionRepository,
     )..initialize();
-    _towerController = TowerController(
-      repository: widget.towerRepository,
-    )..initialize();
+    _towerController = TowerController(repository: widget.towerRepository)
+      ..initialize();
     _latestTempleController = LatestTempleController(
       repository: widget.templeRepository,
     )..initialize();
@@ -220,9 +219,7 @@ class _MainHomeViewState extends State<MainHomeView> {
                   userRepository: widget.userRepository,
                 ),
               ),
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 120),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 120)),
             ],
           ),
         );
@@ -287,17 +284,11 @@ class _MainHomeViewState extends State<MainHomeView> {
       case UserAssetsFetchStatus.success:
         return true;
       case UserAssetsFetchStatus.authExpired:
-        AppToast.error(
-          context,
-          text: '登录已过期',
-        );
+        AppToast.error(context, text: '登录已过期');
         final isAuthorized = await _openAuthPage();
         return isAuthorized == true;
       case UserAssetsFetchStatus.failure:
-        AppToast.error(
-          context,
-          text: result.message ?? '用户资产加载失败',
-        );
+        AppToast.error(context, text: result.message ?? '用户资产加载失败');
         return false;
     }
   }

@@ -26,12 +26,10 @@ class UserDetailController extends ChangeNotifier {
     required UserRepository repository,
     required UserAssetSnapshotCoordinator snapshotCoordinator,
     String? username,
-  })  : _repository = repository,
-        _snapshotCoordinator = snapshotCoordinator,
-        _charaOverviewLoader = UserCharaOverviewLoader(
-          repository: repository,
-        ),
-        _username = username {
+  }) : _repository = repository,
+       _snapshotCoordinator = snapshotCoordinator,
+       _charaOverviewLoader = UserCharaOverviewLoader(repository: repository),
+       _username = username {
     _snapshotCoordinator.addListener(_handleSnapshotCoordinatorChanged);
   }
 
@@ -295,7 +293,8 @@ class UserDetailController extends ChangeNotifier {
       return;
     }
     final eventUsername = event.username.trim().toLowerCase();
-    final isRelevant = eventUsername == profile.name.trim().toLowerCase() ||
+    final isRelevant =
+        eventUsername == profile.name.trim().toLowerCase() ||
         eventUsername == currentUser.name.trim().toLowerCase();
     if (isRelevant) {
       unawaited(_refreshSyncRate());
@@ -307,7 +306,8 @@ class UserDetailController extends ChangeNotifier {
     final loadGeneration = ++_syncRateLoadGeneration;
     final profile = _profile;
     final currentUser = _repository.readCachedCurrentUserAssets();
-    final isSameUser = profile != null &&
+    final isSameUser =
+        profile != null &&
         currentUser != null &&
         profile.name.trim().toLowerCase() ==
             currentUser.name.trim().toLowerCase();
@@ -352,10 +352,7 @@ class UserDetailController extends ChangeNotifier {
   ///
   /// [loadGeneration] 本次同步率读取世代
   /// [nextSyncRate] 最新同步率
-  void _replaceSyncRate(
-    int loadGeneration,
-    UserSyncRate? nextSyncRate,
-  ) {
+  void _replaceSyncRate(int loadGeneration, UserSyncRate? nextSyncRate) {
     if (_isDisposed || loadGeneration != _syncRateLoadGeneration) {
       return;
     }
@@ -443,10 +440,12 @@ class UserDetailController extends ChangeNotifier {
           username: username,
           nickname: _profile?.nickname ?? '',
           isCurrentUser: currentUser,
-          characterTotalItems:
-              result.didLoadCharacters ? result.characterTotalItems : null,
-          templeTotalItems:
-              result.didLoadTemples ? result.templeTotalItems : null,
+          characterTotalItems: result.didLoadCharacters
+              ? result.characterTotalItems
+              : null,
+          templeTotalItems: result.didLoadTemples
+              ? result.templeTotalItems
+              : null,
         ),
       );
 

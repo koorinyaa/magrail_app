@@ -63,8 +63,9 @@ class _TinygrailTabbedPageHeader extends StatelessWidget {
     BuildContext context, {
     required bool useSecondaryTitleStyle,
   }) {
-    final titleHeight =
-        useSecondaryTitleStyle ? _secondaryTitleHeight : AppPageTitleBar.height;
+    final titleHeight = useSecondaryTitleStyle
+        ? _secondaryTitleHeight
+        : AppPageTitleBar.height;
 
     return MediaQuery.paddingOf(context).top +
         titleHeight +
@@ -173,18 +174,12 @@ class _TinygrailSecondaryTitleBar extends StatelessWidget {
       leading: showBackButton
           ? IconButton(
               onPressed: () => Navigator.of(context).maybePop(),
-              icon: const Icon(
-                Icons.chevron_left_rounded,
-                size: 30,
-              ),
+              icon: const Icon(Icons.chevron_left_rounded, size: 30),
             )
           : null,
       title: Text(
         title,
-        style: const TextStyle(
-          fontSize: 17,
-          fontWeight: FontWeight.w700,
-        ),
+        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
       ),
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
@@ -254,8 +249,9 @@ class _TinygrailPagedTabHeader extends StatelessWidget
     return DecoratedBox(
       decoration: BoxDecoration(
         border: Border(
-          bottom:
-              showDivider ? BorderSide(color: dividerColor) : BorderSide.none,
+          bottom: showDivider
+              ? BorderSide(color: dividerColor)
+              : BorderSide.none,
         ),
       ),
       child: SizedBox(
@@ -366,8 +362,9 @@ class _TinygrailPagedTabTrack extends StatelessWidget {
 
   /// 解析页面滚动进度
   double _resolvePageProgress() {
-    final rawProgress =
-        pageController.hasClients ? pageController.page : selectedIndex;
+    final rawProgress = pageController.hasClients
+        ? pageController.page
+        : selectedIndex;
     final progress = rawProgress ?? selectedIndex.toDouble();
     return progress.clamp(0, labels.length - 1).toDouble();
   }
@@ -378,9 +375,7 @@ class _TinygrailPagedTabIndicator extends StatelessWidget {
   /// 创建 Tinygrail 分页标签选中指示器
   ///
   /// [isDark] 是否为深色模式
-  const _TinygrailPagedTabIndicator({
-    required this.isDark,
-  });
+  const _TinygrailPagedTabIndicator({required this.isDark});
 
   /// 是否为深色模式
   final bool isDark;
@@ -391,8 +386,9 @@ class _TinygrailPagedTabIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final backgroundColor =
-        isDark ? colorScheme.surfaceContainerHighest : colorScheme.surface;
+    final backgroundColor = isDark
+        ? colorScheme.surfaceContainerHighest
+        : colorScheme.surface;
     final shadowColor = Colors.black.withValues(alpha: isDark ? 0.26 : 0.10);
 
     return DecoratedBox(

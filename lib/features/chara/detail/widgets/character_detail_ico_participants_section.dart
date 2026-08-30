@@ -160,10 +160,7 @@ class _CharacterDetailIcoParticipantsSectionState
       return;
     }
 
-    context.pushNamed(
-      'userDetail',
-      queryParameters: {'username': username},
-    );
+    context.pushNamed('userDetail', queryParameters: {'username': username});
   }
 
   /// 获取错误展示文案
@@ -270,20 +267,17 @@ class _IcoParticipantsGrid extends StatelessWidget {
       ),
       sliver: SliverGrid(
         gridDelegate: _IcoParticipantsGridMetrics.delegate,
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final item = items[index];
+        delegate: SliverChildBuilderDelegate((context, index) {
+          final item = items[index];
 
-            onItemBuilt(index);
-            return _IcoParticipantRow(
-              participant: item,
-              prediction: prediction,
-              serialNumber: index + 1,
-              onTap: () => onParticipantTap(item),
-            );
-          },
-          childCount: items.length,
-        ),
+          onItemBuilt(index);
+          return _IcoParticipantRow(
+            participant: item,
+            prediction: prediction,
+            serialNumber: index + 1,
+            onTap: () => onParticipantTap(item),
+          );
+        }, childCount: items.length),
       ),
     );
   }
@@ -342,14 +336,8 @@ class _IcoParticipantsErrorSliver extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: AppSafeAreaInsets.symmetricHorizontal(
-          context,
-          horizontal: 12,
-        ),
-        child: AppLoadFailedState(
-          message: message,
-          onActionPressed: onRetry,
-        ),
+        padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 12),
+        child: AppLoadFailedState(message: message, onActionPressed: onRetry),
       ),
     );
   }

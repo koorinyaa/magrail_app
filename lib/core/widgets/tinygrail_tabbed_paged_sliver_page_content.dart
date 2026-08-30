@@ -81,7 +81,8 @@ class _TinygrailPagedTabContentState<T, R>
       builder: (context, child) {
         final controller = widget.tab.controller;
         final items = controller.items;
-        final isStateOnlyContent = !controller.isInitialLoading &&
+        final isStateOnlyContent =
+            !controller.isInitialLoading &&
             (controller.initialError != null || items.isEmpty);
 
         return RefreshIndicator(
@@ -96,9 +97,7 @@ class _TinygrailPagedTabContentState<T, R>
             slivers: [
               if (widget.topContentPadding > 0)
                 SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: widget.topContentPadding,
-                  ),
+                  child: SizedBox(height: widget.topContentPadding),
                 ),
               if (controller.isInitialLoading)
                 widget.tab.loadingSliver
@@ -126,7 +125,8 @@ class _TinygrailPagedTabContentState<T, R>
               if (!isStateOnlyContent)
                 SliverToBoxAdapter(
                   child: SizedBox(
-                    height: 24 +
+                    height:
+                        24 +
                         widget.bottomContentPadding +
                         MediaQuery.paddingOf(context).bottom,
                   ),
@@ -159,10 +159,7 @@ class _TinygrailPagedTabContentState<T, R>
       return;
     }
 
-    AppToast.error(
-      context,
-      text: '刷新失败，请检查网络后重试',
-    );
+    AppToast.error(context, text: '刷新失败，请检查网络后重试');
   }
 
   /// 将当前标签页滚动到顶部

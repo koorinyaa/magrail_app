@@ -95,8 +95,9 @@ class _TradeHeaderActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final foregroundColor =
-        action.isHighlighted ? colorScheme.primary : colorScheme.onSurface;
+    final foregroundColor = action.isHighlighted
+        ? colorScheme.primary
+        : colorScheme.onSurface;
     final resolvedForegroundColor = onPressed == null && !isLoading
         ? colorScheme.onSurface.withValues(alpha: 0.48)
         : foregroundColor;
@@ -119,11 +120,7 @@ class _TradeHeaderActionButton extends StatelessWidget {
                 ),
               )
             else
-              Icon(
-                action.icon,
-                size: 22,
-                color: resolvedForegroundColor,
-              ),
+              Icon(action.icon, size: 22, color: resolvedForegroundColor),
             const SizedBox(height: 6),
             Text(
               action.label,

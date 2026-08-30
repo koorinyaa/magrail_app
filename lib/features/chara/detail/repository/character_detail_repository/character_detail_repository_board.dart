@@ -1,5 +1,6 @@
 part of '../character_detail_repository.dart';
 
+/// 角色详情董事会查询
 extension CharacterDetailRepositoryBoardQueries on CharacterDetailRepository {
   /// 获取角色董事会分页数据
   ///
@@ -7,7 +8,7 @@ extension CharacterDetailRepositoryBoardQueries on CharacterDetailRepository {
   /// [page] 页码
   /// [pageSize] 每页数量
   Future<TinygrailPage<CharacterDetailBoardMember>>
-      fetchCharacterBoardMemberPage({
+  fetchCharacterBoardMemberPage({
     required int characterId,
     required int page,
     required int pageSize,
@@ -17,19 +18,19 @@ extension CharacterDetailRepositoryBoardQueries on CharacterDetailRepository {
     );
     final response =
         TinygrailResponse<TinygrailPage<CharacterDetailBoardMember>>.fromJson(
-      json,
-      (value) {
-        final valueJson = TinygrailResponseParser.asObjectMap(value);
-        if (valueJson == null) {
-          return null;
-        }
+          json,
+          (value) {
+            final valueJson = TinygrailResponseParser.asObjectMap(value);
+            if (valueJson == null) {
+              return null;
+            }
 
-        return TinygrailPage<CharacterDetailBoardMember>.fromJson(
-          valueJson,
-          CharacterDetailBoardMember.fromJson,
+            return TinygrailPage<CharacterDetailBoardMember>.fromJson(
+              valueJson,
+              CharacterDetailBoardMember.fromJson,
+            );
+          },
         );
-      },
-    );
 
     final pageData = response.value;
     if (!response.isSuccess || pageData == null) {
@@ -66,15 +67,14 @@ extension CharacterDetailRepositoryBoardQueries on CharacterDetailRepository {
         'chara/kill/votes/$characterId',
       );
       final response =
-          TinygrailResponse<List<CharacterDetailKillVote>>.fromJson(
-        json,
-        (value) {
-          return TinygrailResponseParser.asObjectList(
+          TinygrailResponse<List<CharacterDetailKillVote>>.fromJson(json, (
             value,
-            CharacterDetailKillVote.fromJson,
-          );
-        },
-      );
+          ) {
+            return TinygrailResponseParser.asObjectList(
+              value,
+              CharacterDetailKillVote.fromJson,
+            );
+          });
 
       if (!response.isSuccess) {
         return const <CharacterDetailKillVote>[];

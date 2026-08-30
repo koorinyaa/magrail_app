@@ -7,12 +7,12 @@ class TowerLogRealtimeClient {
   /// 创建通天塔日志实时客户端
   ///
   /// [onLog] 收到实时日志后的回调
-  TowerLogRealtimeClient({
-    required void Function(TowerLogApiItem item) onLog,
-  }) : _onLog = onLog;
+  TowerLogRealtimeClient({required void Function(TowerLogApiItem item) onLog})
+    : _onLog = onLog;
 
-  static final String _hubUrl =
-      TinygrailSiteConfig.siteUri.resolve('actionhub').toString();
+  static final String _hubUrl = TinygrailSiteConfig.siteUri
+      .resolve('actionhub')
+      .toString();
 
   final void Function(TowerLogApiItem item) _onLog;
 
@@ -26,10 +26,10 @@ class TowerLogRealtimeClient {
       return;
     }
 
-    final connection =
-        HubConnectionBuilder().withUrl(_hubUrl).withAutomaticReconnect(
-      retryDelays: const <int>[0, 2000, 5000, 10000],
-    ).build();
+    final connection = HubConnectionBuilder()
+        .withUrl(_hubUrl)
+        .withAutomaticReconnect(retryDelays: const <int>[0, 2000, 5000, 10000])
+        .build();
 
     connection.on('ReceiveStarLog', _handleStarLog);
     connection.onclose(({error}) {
@@ -98,9 +98,7 @@ class TowerLogRealtimeClient {
     }
 
     if (value is Map) {
-      return value.map(
-        (key, value) => MapEntry(key.toString(), value),
-      );
+      return value.map((key, value) => MapEntry(key.toString(), value));
     }
 
     return null;

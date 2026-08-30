@@ -47,7 +47,8 @@ class CharacterDetailFloatingToolbar extends StatelessWidget {
     final safePadding = MediaQuery.paddingOf(context);
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
-    final backgroundAlpha = progress *
+    final backgroundAlpha =
+        progress *
         (isDark
             ? AppBlurStyle.darkSurfaceAlpha
             : AppBlurStyle.lightSurfaceAlpha);
@@ -120,12 +121,10 @@ class _CharacterDetailTopActions extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final iconButtonStyle =
         (IconButtonTheme.of(context).style ?? const ButtonStyle()).copyWith(
-      foregroundColor: WidgetStatePropertyAll(colorScheme.onSurface),
-      fixedSize: WidgetStatePropertyAll(
-        Size.square(toolbarHeight),
-      ),
-      padding: const WidgetStatePropertyAll(EdgeInsets.zero),
-    );
+          foregroundColor: WidgetStatePropertyAll(colorScheme.onSurface),
+          fixedSize: WidgetStatePropertyAll(Size.square(toolbarHeight)),
+          padding: const WidgetStatePropertyAll(EdgeInsets.zero),
+        );
 
     return IconButtonTheme(
       data: IconButtonThemeData(style: iconButtonStyle),
@@ -144,10 +143,7 @@ class _CharacterDetailTopActions extends StatelessWidget {
                   child: Center(
                     child: IconButton(
                       onPressed: () => Navigator.of(context).maybePop(),
-                      icon: const Icon(
-                        Icons.chevron_left_rounded,
-                        size: 30,
-                      ),
+                      icon: const Icon(Icons.chevron_left_rounded, size: 30),
                     ),
                   ),
                 ),
@@ -159,10 +155,7 @@ class _CharacterDetailTopActions extends StatelessWidget {
                   child: Center(
                     child: IconButton(
                       onPressed: onSearchPressed,
-                      icon: const Icon(
-                        Icons.search_rounded,
-                        size: 22,
-                      ),
+                      icon: const Icon(Icons.search_rounded, size: 22),
                     ),
                   ),
                 ),

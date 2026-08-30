@@ -68,9 +68,7 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
     }
     final serialized = await compute(
       _serializeUserTempleSnapshotRows,
-      _TempleRowsSerializeRequest(
-        temples: templeResult.items,
-      ),
+      _TempleRowsSerializeRequest(temples: templeResult.items),
     );
     return _database.upsertTempleSnapshot(
       username: username,
@@ -103,21 +101,22 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
     }
 
     late final Future<_AllCharactersResult> operation;
-    operation = _fetchAllCharacters(
-      username: username,
-      requestGate: requestGate,
-      onProgress: onProgress,
-      totalItemsHint: totalItemsHint,
-    ).whenComplete(() {
-      if (identical(
-        UserAssetSnapshotRepository._characterFetchOperations[operationKey],
-        operation,
-      )) {
-        UserAssetSnapshotRepository._characterFetchOperations.remove(
-          operationKey,
-        );
-      }
-    });
+    operation =
+        _fetchAllCharacters(
+          username: username,
+          requestGate: requestGate,
+          onProgress: onProgress,
+          totalItemsHint: totalItemsHint,
+        ).whenComplete(() {
+          if (identical(
+            UserAssetSnapshotRepository._characterFetchOperations[operationKey],
+            operation,
+          )) {
+            UserAssetSnapshotRepository._characterFetchOperations.remove(
+              operationKey,
+            );
+          }
+        });
     UserAssetSnapshotRepository._characterFetchOperations[operationKey] =
         operation;
     return operation;
@@ -184,8 +183,9 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
       pageSize: totalItems < 1 ? 1 : totalItems,
       requestGate: requestGate,
     );
-    var responseTotalItems =
-        fullPage.totalItems > 0 ? fullPage.totalItems : fullPage.items.length;
+    var responseTotalItems = fullPage.totalItems > 0
+        ? fullPage.totalItems
+        : fullPage.items.length;
     if (fullPage.items.length < responseTotalItems) {
       // 探测或预览后数量增长时仅扩大容量重试一次，避免写入半截快照
       fullPage = await _fetchUserCharacterPage(
@@ -194,8 +194,9 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
         pageSize: responseTotalItems,
         requestGate: requestGate,
       );
-      responseTotalItems =
-          fullPage.totalItems > 0 ? fullPage.totalItems : fullPage.items.length;
+      responseTotalItems = fullPage.totalItems > 0
+          ? fullPage.totalItems
+          : fullPage.items.length;
     }
     totalItems = responseTotalItems;
     if (fullPage.items.length < totalItems) {
@@ -248,21 +249,22 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
     }
 
     late final Future<_AllTemplesResult> operation;
-    operation = _fetchAllTemples(
-      username: username,
-      requestGate: requestGate,
-      onProgress: onProgress,
-      totalItemsHint: totalItemsHint,
-    ).whenComplete(() {
-      if (identical(
-        UserAssetSnapshotRepository._templeFetchOperations[operationKey],
-        operation,
-      )) {
-        UserAssetSnapshotRepository._templeFetchOperations.remove(
-          operationKey,
-        );
-      }
-    });
+    operation =
+        _fetchAllTemples(
+          username: username,
+          requestGate: requestGate,
+          onProgress: onProgress,
+          totalItemsHint: totalItemsHint,
+        ).whenComplete(() {
+          if (identical(
+            UserAssetSnapshotRepository._templeFetchOperations[operationKey],
+            operation,
+          )) {
+            UserAssetSnapshotRepository._templeFetchOperations.remove(
+              operationKey,
+            );
+          }
+        });
     UserAssetSnapshotRepository._templeFetchOperations[operationKey] =
         operation;
     return operation;
@@ -329,8 +331,9 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
       pageSize: totalItems < 1 ? 1 : totalItems,
       requestGate: requestGate,
     );
-    var responseTotalItems =
-        fullPage.totalItems > 0 ? fullPage.totalItems : fullPage.items.length;
+    var responseTotalItems = fullPage.totalItems > 0
+        ? fullPage.totalItems
+        : fullPage.items.length;
     if (fullPage.items.length < responseTotalItems) {
       // 探测或预览后数量增长时仅扩大容量重试一次，避免写入半截快照
       fullPage = await _fetchUserTemplePage(
@@ -339,8 +342,9 @@ extension _UserAssetSnapshotRepositoryFetching on UserAssetSnapshotRepository {
         pageSize: responseTotalItems,
         requestGate: requestGate,
       );
-      responseTotalItems =
-          fullPage.totalItems > 0 ? fullPage.totalItems : fullPage.items.length;
+      responseTotalItems = fullPage.totalItems > 0
+          ? fullPage.totalItems
+          : fullPage.items.length;
     }
     totalItems = responseTotalItems;
     if (fullPage.items.length < totalItems) {
@@ -427,7 +431,7 @@ class _UserAssetSnapshotRequestGate {
   ///
   /// [maxConcurrent] 最大并发请求数
   _UserAssetSnapshotRequestGate(int maxConcurrent)
-      : _maxConcurrent = maxConcurrent < 1 ? 1 : maxConcurrent;
+    : _maxConcurrent = maxConcurrent < 1 ? 1 : maxConcurrent;
 
   final int _maxConcurrent;
   final List<void Function()> _queue = [];
@@ -441,14 +445,11 @@ class _UserAssetSnapshotRequestGate {
     _queue.add(() {
       _runningCount += 1;
       Future.sync(action)
-          .then(
-        completer.complete,
-        onError: completer.completeError,
-      )
+          .then(completer.complete, onError: completer.completeError)
           .whenComplete(() {
-        _runningCount -= 1;
-        _pump();
-      });
+            _runningCount -= 1;
+            _pump();
+          });
     });
     _pump();
     return completer.future;
@@ -469,10 +470,7 @@ class _AllCharactersResult {
   ///
   /// [items] 用户全部角色
   /// [totalItems] 接口返回总数
-  const _AllCharactersResult({
-    required this.items,
-    required this.totalItems,
-  });
+  const _AllCharactersResult({required this.items, required this.totalItems});
 
   /// 用户全部角色
   final List<UserCharacterApiItem> items;
@@ -487,10 +485,7 @@ class _AllTemplesResult {
   ///
   /// [items] 用户全部圣殿
   /// [totalItems] 接口返回总数
-  const _AllTemplesResult({
-    required this.items,
-    required this.totalItems,
-  });
+  const _AllTemplesResult({required this.items, required this.totalItems});
 
   /// 用户全部圣殿
   final List<UserTempleApiItem> items;

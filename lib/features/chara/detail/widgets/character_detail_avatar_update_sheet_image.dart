@@ -5,9 +5,7 @@ final class _PickedAvatarImage {
   /// 创建已选择的头像图片
   ///
   /// [bytes] 图片字节
-  const _PickedAvatarImage({
-    required this.bytes,
-  });
+  const _PickedAvatarImage({required this.bytes});
 
   /// 图片字节
   final Uint8List bytes;
@@ -102,10 +100,7 @@ String? _resolveImageContentType(XFile pickedFile, List<int> bytes) {
     return pathMimeType;
   }
 
-  return lookupMimeType(
-    pickedFile.name,
-    headerBytes: bytes,
-  )?.trim();
+  return lookupMimeType(pickedFile.name, headerBytes: bytes)?.trim();
 }
 
 /// 生成角色头像 JPEG 字节

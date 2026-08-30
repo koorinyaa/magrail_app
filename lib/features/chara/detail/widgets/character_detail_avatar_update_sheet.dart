@@ -63,8 +63,9 @@ Future<void> showCharacterAvatarUpdateSheet(
       const topGap = 32.0;
       final availableHeight =
           mediaQuery.size.height - mediaQuery.padding.top - topGap;
-      final maxHeight =
-          availableHeight.clamp(0.0, mediaQuery.size.height).toDouble();
+      final maxHeight = availableHeight
+          .clamp(0.0, mediaQuery.size.height)
+          .toDouble();
 
       return ConstrainedBox(
         constraints: BoxConstraints(maxHeight: maxHeight),
@@ -153,13 +154,15 @@ class _CharacterAvatarUpdateSheetState
     final isDark = colorScheme.brightness == Brightness.dark;
 
     return AnimatedContainer(
-      duration:
-          _isDraggingSheet ? Duration.zero : const Duration(milliseconds: 180),
+      duration: _isDraggingSheet
+          ? Duration.zero
+          : const Duration(milliseconds: 180),
       curve: Curves.easeOutCubic,
       transform: Matrix4.translationValues(0, _sheetDragOffset, 0),
       child: Padding(
-        padding:
-            EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(context).bottom,
+        ),
         child: ClipRRect(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           child: DecoratedBox(
@@ -206,13 +209,16 @@ class _CharacterAvatarUpdateSheetState
                           }
 
                           setState(() {
-                            _sheetDragOffset =
-                                math.max(0, _sheetDragOffset + delta);
+                            _sheetDragOffset = math.max(
+                              0,
+                              _sheetDragOffset + delta,
+                            );
                           });
                         },
                         onVerticalDragEnd: (details) {
                           final velocity = details.primaryVelocity ?? 0;
-                          final shouldClose = _sheetDragOffset > 120 ||
+                          final shouldClose =
+                              _sheetDragOffset > 120 ||
                               (_sheetDragOffset > 56 && velocity > 1600);
 
                           if (shouldClose) {
@@ -240,9 +246,7 @@ class _CharacterAvatarUpdateSheetState
                           children: [
                             const AppBottomSheetDragHandle(),
                             const SizedBox(height: 14),
-                            _CharacterAvatarUpdateHeader(
-                              header: widget.header,
-                            ),
+                            _CharacterAvatarUpdateHeader(header: widget.header),
                           ],
                         ),
                       ),
@@ -260,7 +264,7 @@ class _CharacterAvatarUpdateSheetState
                               style: TextButton.styleFrom(
                                 backgroundColor: isDark
                                     ? colorScheme.surfaceContainerHighest
-                                        .withValues(alpha: 0.5)
+                                          .withValues(alpha: 0.5)
                                     : colorScheme.surfaceContainerHigh,
                                 disabledBackgroundColor: colorScheme.onSurface
                                     .withValues(alpha: 0.08),
@@ -417,9 +421,7 @@ class _CharacterAvatarUpdateHeader extends StatelessWidget {
   /// 创建角色头像更换抽屉标题
   ///
   /// [header] 已上市角色头部资料
-  const _CharacterAvatarUpdateHeader({
-    required this.header,
-  });
+  const _CharacterAvatarUpdateHeader({required this.header});
 
   /// 已上市角色头部资料
   final CharacterDetailTradeHeader header;

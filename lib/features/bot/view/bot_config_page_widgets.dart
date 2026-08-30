@@ -50,9 +50,9 @@ class _BotDivider extends StatelessWidget {
       thickness: 0.5,
       indent: 16,
       endIndent: 16,
-      color: Theme.of(context).colorScheme.outlineVariant.withValues(
-            alpha: 0.72,
-          ),
+      color: Theme.of(
+        context,
+      ).colorScheme.outlineVariant.withValues(alpha: 0.72),
     );
   }
 }
@@ -119,8 +119,9 @@ class _BotSwitchRow extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color:
-                          colorScheme.onSurfaceVariant.withValues(alpha: 0.72),
+                      color: colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.72,
+                      ),
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       height: 1.25,
@@ -237,7 +238,8 @@ class _BotSelectRow extends StatelessWidget {
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                     ),
-                    child: valueWidget ??
+                    child:
+                        valueWidget ??
                         Text(
                           value,
                           maxLines: 1,

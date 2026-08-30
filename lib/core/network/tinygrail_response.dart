@@ -15,8 +15,13 @@ class TinygrailResponse<T> {
     required this.value,
   });
 
+  /// 接口状态码
   final int state;
+
+  /// 接口消息
   final String? message;
+
+  /// 接口数据
   final T? value;
 
   /// 是否请求成功
@@ -112,9 +117,7 @@ class TinygrailResponseParser {
       return null;
     }
 
-    return value.map(
-      (key, itemValue) => MapEntry(key.toString(), itemValue),
-    );
+    return value.map((key, itemValue) => MapEntry(key.toString(), itemValue));
   }
 
   /// 转换对象数组
@@ -133,9 +136,7 @@ class TinygrailResponseParser {
         .whereType<Map<Object?, Object?>>()
         .map(
           (item) => fromJson(
-            item.map(
-              (key, itemValue) => MapEntry(key.toString(), itemValue),
-            ),
+            item.map((key, itemValue) => MapEntry(key.toString(), itemValue)),
           ),
         )
         .toList(growable: false);

@@ -49,19 +49,13 @@ class _TempleAssetMediaCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SizedBox(
-                  width: _templeAssetThumbnailWidth,
-                  child: visual,
-                ),
+                SizedBox(width: _templeAssetThumbnailWidth, child: visual),
                 const SizedBox(width: 14),
                 Expanded(child: metrics),
               ],
             ),
           ),
-          if (showActions) ...[
-            const SizedBox(height: 10),
-            actions,
-          ],
+          if (showActions) ...[const SizedBox(height: 10), actions],
         ],
       ),
     );

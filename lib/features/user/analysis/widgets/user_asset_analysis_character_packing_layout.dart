@@ -38,8 +38,8 @@ class _PackedBubbleLayout {
           ratio: maxValue <= 0
               ? 0
               : (_characterBubbleValue(bubble, mode) / maxValue)
-                  .clamp(0, 1)
-                  .toDouble(),
+                    .clamp(0, 1)
+                    .toDouble(),
         ),
     ];
     _packSiblings(circles);
@@ -53,7 +53,8 @@ class _PackedBubbleLayout {
       for (var index = 0; index < circles.length; index += 1)
         _PackedBubbleLayoutItem(
           bubble: circles[index].bubble,
-          center: center +
+          center:
+              center +
               Offset(
                 (circles[index].x - anchor.x) * scale,
                 (circles[index].y - anchor.y) * scale,

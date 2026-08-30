@@ -15,17 +15,17 @@ extension _UserAssetSnapshotDatabaseSchema on UserAssetSnapshotDatabase {
     }
     final nextOpeningDatabase = sqflite
         .openDatabase(
-      _databasePath,
-      version: userAssetSnapshotSchemaVersion,
-      singleInstance: true,
-      onCreate: _createSchema,
-      onUpgrade: _recreateSchemaForVersionChange,
-      onDowngrade: _recreateSchemaForVersionChange,
-    )
+          _databasePath,
+          version: userAssetSnapshotSchemaVersion,
+          singleInstance: true,
+          onCreate: _createSchema,
+          onUpgrade: _recreateSchemaForVersionChange,
+          onDowngrade: _recreateSchemaForVersionChange,
+        )
         .then((database) {
-      UserAssetSnapshotDatabase._databases[_databasePath] = database;
-      return database;
-    });
+          UserAssetSnapshotDatabase._databases[_databasePath] = database;
+          return database;
+        });
     UserAssetSnapshotDatabase._openingDatabases[_databasePath] =
         nextOpeningDatabase;
     return nextOpeningDatabase.whenComplete(() {
