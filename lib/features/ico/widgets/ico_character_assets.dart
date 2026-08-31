@@ -51,9 +51,19 @@ class IcoCharacterCarousel extends StatelessWidget {
       emptyMessage: emptyMessage,
       skeletonTrailingWidth: 84,
       itemBuilder: (context, item) {
+        final avatarUrl = TinygrailAssetUrls.normalizeAvatar(item.icon);
+        final avatarHeroTag = createCharacterDetailAvatarHeroTag(
+          characterId: item.characterId,
+          avatarUrl: avatarUrl,
+          source: item,
+        );
+
         return IcoCharacterRow(
           item: item,
-          onTap: onIcoTap == null ? null : () => onIcoTap?.call(item, null),
+          avatarHeroTag: avatarHeroTag,
+          onTap: onIcoTap == null
+              ? null
+              : () => onIcoTap?.call(item, avatarHeroTag),
         );
       },
     );
