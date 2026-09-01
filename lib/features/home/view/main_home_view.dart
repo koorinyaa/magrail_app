@@ -11,7 +11,7 @@ import 'package:magrail_app/features/chara/detail/repository/character_detail_re
 import 'package:magrail_app/features/chara/top_week/controller/top_week_controller.dart';
 import 'package:magrail_app/features/chara/top_week/model/top_week_entry.dart';
 import 'package:magrail_app/features/chara/top_week/repository/top_week_repository.dart';
-import 'package:magrail_app/features/chara/top_week/widgets/top_week_refresh_status_button.dart';
+import 'package:magrail_app/features/chara/top_week/view/top_week_list_page.dart';
 import 'package:magrail_app/features/chara/top_week/widgets/top_week_section.dart';
 import 'package:magrail_app/features/chara/tower/controller/tower_controller.dart';
 import 'package:magrail_app/features/chara/tower/model/tower_entry.dart';
@@ -154,15 +154,12 @@ class _MainHomeViewState extends State<MainHomeView> {
             slivers: [
               PageSectionSliver(
                 title: '每周萌王',
-                titleTrailing: TopWeekRefreshStatusButton(
-                  label: _topWeekController.refreshLabel,
-                  onPressed: _topWeekController.refresh,
-                ),
                 trailing: HomeSectionActionButton(
                   icon: Icons.history_rounded,
                   label: '往期',
                   onPressed: () => _openTopWeekHistory(context),
                 ),
+                onHeaderTap: () => _openTopWeekList(context),
                 child: TopWeekCarousel(
                   entries: _topWeekController.entries,
                   isLoading: _topWeekController.isLoading,
@@ -324,6 +321,25 @@ class _MainHomeViewState extends State<MainHomeView> {
     context.pushNamed('topWeekHistory');
   }
 
+  /// 打开当前每周萌王二级列表页面
+  ///
+  /// [context] 当前组件树上下文
+  void _openTopWeekList(BuildContext context) {
+    Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (context) {
+          return TopWeekListPage(
+            controller: _topWeekController,
+            onCharacterPressed: (entry, avatarHeroTag) {
+              _openTopWeekCharacter(entry, avatarHeroTag);
+            },
+            onAuctionPressed: _openTopWeekAuction,
+          );
+        },
+      ),
+    );
+  }
+
   /// 打开通天塔二级页面
   ///
   /// [context] 当前组件树上下文
@@ -355,12 +371,14 @@ class _MainHomeViewState extends State<MainHomeView> {
   /// 打开每周萌王角色详情页
   ///
   /// [entry] 每周萌王条目
-  void _openTopWeekCharacter(TopWeekEntry entry) {
+  /// [avatarHeroTag] 头像转场标识
+  void _openTopWeekCharacter(TopWeekEntry entry, [String? avatarHeroTag]) {
     openCharacterDetail(
       context,
       characterId: entry.characterId,
       name: entry.name,
       avatarUrl: entry.avatarUrl,
+      avatarHeroTag: avatarHeroTag,
     );
   }
 

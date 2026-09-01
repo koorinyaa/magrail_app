@@ -9,6 +9,7 @@ import 'package:magrail_app/features/chara/top_week/model/top_week_entry.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 part 'top_week_card.dart';
+part 'top_week_auction_panel.dart';
 part 'top_week_skeleton.dart';
 
 /// 每周萌王横向轮播
