@@ -7,6 +7,7 @@ import 'package:magrail_app/features/chara/top_week/controller/top_week_controll
 import 'package:magrail_app/features/chara/top_week/model/top_week_entry.dart';
 import 'package:magrail_app/features/chara/top_week/repository/top_week_repository.dart';
 import 'package:magrail_app/features/chara/top_week/view/top_week_list_page.dart';
+import 'package:magrail_app/features/chara/top_week/widgets/top_week_list.dart';
 
 /// 验证每周萌王二级页面复用共享数据并支持下拉刷新
 void main() {
@@ -42,6 +43,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('角色一'), findsOneWidget);
+    expect(tester.getSize(find.byType(TopWeekListRow)).height, 88);
     expect(find.textContaining('12 / 均价'), findsOneWidget);
     expect(find.textContaining('(刚刚更新)'), findsOneWidget);
     expect(find.byIcon(Icons.refresh_rounded), findsNothing);

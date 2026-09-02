@@ -22,7 +22,7 @@ class TopWeekList extends StatelessWidget {
     required this.onAuctionPressed,
   });
 
-  static const double _itemExtent = 80;
+  static const double _itemExtent = 88;
   static const double _horizontalPadding = 12;
   static const double _rankWidth = 34;
   static const double _rankAvatarGap = 6;
@@ -506,7 +506,7 @@ class _TopWeekListSkeletonRow extends StatelessWidget {
       ),
       child: const Skeletonizer.zone(
         child: SizedBox(
-          height: 64,
+          height: TopWeekList._itemExtent - 14,
           child: Row(
             children: [
               SizedBox(
