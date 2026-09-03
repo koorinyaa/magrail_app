@@ -95,10 +95,12 @@ class IcoCharacterSliverList extends StatelessWidget {
       delegate: SliverChildBuilderDelegate((context, index) {
         final item = items[index];
         final avatarUrl = TinygrailAssetUrls.normalizeAvatar(item.icon);
+        // 一级预览进入二级列表时不做 Hero，列表进入角色详情仍保留独立转场标识
         final avatarHeroTag = createCharacterDetailAvatarHeroTag(
           characterId: item.characterId,
           avatarUrl: avatarUrl,
           source: item,
+          heroTagPrefix: 'ico-list-character-detail-avatar',
         );
 
         return CharacterAssetListItemShell(
