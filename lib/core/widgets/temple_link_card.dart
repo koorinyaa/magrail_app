@@ -245,9 +245,10 @@ class TempleLinkCard extends StatelessWidget {
     required double splitGap,
     required double scale,
   }) {
+    final nameFontSize = (_baseNameFontSize * scale).clamp(11.0, 16.0).toDouble();
     final style = TextStyle(
       color: const Color(0xD6FFFFFF),
-      fontSize: (_baseNameFontSize * scale).clamp(11.0, 16.0),
+      fontSize: nameFontSize,
       fontWeight: FontWeight.w800,
       height: 1,
       shadows: const [
@@ -258,6 +259,7 @@ class TempleLinkCard extends StatelessWidget {
     final nameHorizontalPadding = _baseNameHorizontalPadding * scale;
     final nameSplitPadding = _baseNameSplitPadding * scale;
     final nameBottomPadding = _baseNameBottomPadding * scale;
+    final nameRegionHeight = nameBottomPadding + nameFontSize + 6;
     final splitLeft = rightShapeOffset - splitGap / 2;
     final splitRight = rightShapeOffset + splitGap / 2;
     final leftNameWidth = math.max(
@@ -268,6 +270,17 @@ class TempleLinkCard extends StatelessWidget {
     return Positioned.fill(
       child: Stack(
         children: [
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: nameRegionHeight,
+            child: const Listener(
+              // 底部角色名称区域占用整行命中区域，避免空白点击落入封面查看层
+              behavior: HitTestBehavior.opaque,
+              child: SizedBox.expand(),
+            ),
+          ),
           Positioned(
             left: nameHorizontalPadding,
             bottom: nameBottomPadding,

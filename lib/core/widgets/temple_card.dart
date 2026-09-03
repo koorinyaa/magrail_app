@@ -230,88 +230,98 @@ class TempleCard extends StatelessWidget {
   /// 构建角色信息
   Widget _buildRoleInfo() {
     return Positioned(
-      left: 14,
-      right: 14,
-      bottom: 18,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (showCharacterInfo) ...[
-            Material(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(10),
-              child: InkWell(
-                onTap: onCharacterTap,
-                borderRadius: BorderRadius.circular(10),
-                splashColor: Colors.white.withValues(alpha: 0.10),
-                highlightColor: Colors.white.withValues(alpha: 0.05),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 2,
-                    vertical: 3,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          characterName,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 15.5,
-                            fontWeight: FontWeight.w900,
-                            height: 1.05,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 7),
-                      LevelBadge(level: characterLevel, zeroCount: zeroCount),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 4),
-          ],
-          Row(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: Listener(
+        // 底部跳转面板占用整行命中区域，避免空白点击落入图片查看层
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 0, 14, 18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Expanded(
-                child: Material(
+              if (showCharacterInfo) ...[
+                Material(
                   color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                   child: InkWell(
-                    onTap: onUserTap,
-                    borderRadius: BorderRadius.circular(8),
+                    onTap: onCharacterTap,
+                    borderRadius: BorderRadius.circular(10),
                     splashColor: Colors.white.withValues(alpha: 0.10),
                     highlightColor: Colors.white.withValues(alpha: 0.05),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 2,
-                        vertical: 3,
-                      ),
-                      child: Text(
-                        ownerLabel,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.80),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          height: 1,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 2,
+                          vertical: 3,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                characterName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15.5,
+                                  fontWeight: FontWeight.w900,
+                                  height: 1.05,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 7),
+                            LevelBadge(level: characterLevel, zeroCount: zeroCount),
+                          ],
                         ),
                       ),
                     ),
                   ),
                 ),
+                const SizedBox(height: 4),
+              ],
+              Row(
+                children: [
+                  Expanded(
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                      child: InkWell(
+                        onTap: onUserTap,
+                        borderRadius: BorderRadius.circular(8),
+                        splashColor: Colors.white.withValues(alpha: 0.10),
+                        highlightColor: Colors.white.withValues(alpha: 0.05),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 2,
+                            vertical: 3,
+                          ),
+                          child: Text(
+                            ownerLabel,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.80),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              height: 1,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  _TempleCardStarBadge(highlighted: starForces >= 10000),
+                ],
               ),
-              const SizedBox(width: 8),
-              _TempleCardStarBadge(highlighted: starForces >= 10000),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
