@@ -19,18 +19,19 @@ extension _UserDetailPageActions on _UserDetailPageState {
   /// 复制用户 ID
   ///
   /// [context] 当前组件树上下文
-  Future<void> _copyUserId(BuildContext context) async {
-    final profile = _controller.profile;
-    if (profile == null) {
-      return;
-    }
-
-    await Clipboard.setData(ClipboardData(text: '@${profile.userId}'));
+  /// [value] 写入剪贴板的 ID 文本
+  /// [copiedMessage] 复制成功提示文案
+  Future<void> _copyUserId(
+    BuildContext context, {
+    required String value,
+    required String copiedMessage,
+  }) async {
+    await Clipboard.setData(ClipboardData(text: value));
     if (!context.mounted) {
       return;
     }
 
-    AppToast.info(context, text: '已复制用户ID');
+    AppToast.info(context, text: copiedMessage);
   }
 
   /// 处理用户菜单入口点击

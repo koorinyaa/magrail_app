@@ -369,7 +369,16 @@ class _UserDetailPageState extends State<UserDetailPage> {
               hideBalanceAndAssets: _hidePrivateAssetValues,
               onRecordPressed: () => _openRedPacketLogs(profile),
               onSendPressed: () => _openSendRedPacket(profile),
-              onCopyPressed: () => _copyUserId(context),
+              onTinygrailIdCopyPressed: () => _copyUserId(
+                context,
+                value: '${profile.userId}',
+                copiedMessage: '已复制小圣杯ID',
+              ),
+              onBangumiIdCopyPressed: () => _copyUserId(
+                context,
+                value: profile.name.trim(),
+                copiedMessage: '已复制BGM ID',
+              ),
             ),
             if (actions.isNotEmpty) ...[
               const SizedBox(height: 12),

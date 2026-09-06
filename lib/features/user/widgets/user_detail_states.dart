@@ -86,10 +86,46 @@ class UserDetailSkeleton extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              Bone(
-                width: 86,
-                height: 14,
-                borderRadius: BorderRadius.circular(5),
+              Row(
+                children: [
+                  Bone(
+                    width: 14,
+                    height: 14,
+                    borderRadius: BorderRadius.circular(7),
+                  ),
+                  const SizedBox(width: 4),
+                  Bone(
+                    width: 46,
+                    height: 14,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  const SizedBox(width: 6),
+                  Bone(
+                    width: 14,
+                    height: 14,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  const SizedBox(width: 12),
+                  Bone(
+                    width: 14,
+                    height: 14,
+                    borderRadius: BorderRadius.circular(7),
+                  ),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Bone(
+                      width: 64,
+                      height: 14,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Bone(
+                    width: 14,
+                    height: 14,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ],
               ),
               const SizedBox(height: 22),
               Bone(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 /// 用户资料卡操作按钮组
 class UserProfileCardActions extends StatelessWidget {
@@ -205,56 +206,146 @@ class UserProfileIdRow extends StatelessWidget {
   /// 创建用户 ID 行
   ///
   /// [key] Flutter 组件标识
-  /// [userId] 用户 ID
-  /// [onCopyPressed] 复制按钮点击回调
+  /// [tinygrailId] 小圣杯 ID
+  /// [bangumiId] BGM ID
+  /// [onTinygrailCopyPressed] 复制小圣杯 ID 点击回调
+  /// [onBangumiCopyPressed] 复制 BGM ID 点击回调
   const UserProfileIdRow({
     super.key,
-    required this.userId,
-    required this.onCopyPressed,
+    required this.tinygrailId,
+    required this.bangumiId,
+    required this.onTinygrailCopyPressed,
+    required this.onBangumiCopyPressed,
   });
 
-  /// 用户 ID
-  final int userId;
+  static const String _tinygrailLogoAsset =
+      'assets/images/tinygrail/tinygrail_logo.jpg';
+  static const String _bangumiLogoAsset = 'assets/icons/bangumi.svg';
 
-  /// 复制按钮点击回调
-  final VoidCallback onCopyPressed;
+  /// 小圣杯 ID
+  final int tinygrailId;
+
+  /// BGM ID
+  final String bangumiId;
+
+  /// 复制小圣杯 ID 点击回调
+  final VoidCallback onTinygrailCopyPressed;
+
+  /// 复制 BGM ID 点击回调
+  final VoidCallback onBangumiCopyPressed;
 
   /// 构建用户 ID 行
   ///
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final resolvedBangumiId = bangumiId.trim();
 
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(4),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onCopyPressed,
-          borderRadius: BorderRadius.circular(4),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '@$userId',
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  height: 1.2,
-                ),
+    return Row(
+      children: [
+        _UserProfileIdItem(
+          leading: ShaderMask(
+            blendMode: BlendMode.dstIn,
+            shaderCallback: (bounds) => const RadialGradient(
+              colors: [Color(0xFFFFFFFF), Color(0x00FFFFFF)],
+            ).createShader(bounds),
+            child: ClipOval(
+              child: Image.asset(
+                _tinygrailLogoAsset,
+                fit: BoxFit.cover,
               ),
-              const SizedBox(width: 6),
-              Icon(
-                Icons.copy_rounded,
-                size: 14,
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ],
+            ),
           ),
+          value: '$tinygrailId',
+          onPressed: onTinygrailCopyPressed,
+        ),
+        if (resolvedBangumiId.isNotEmpty) ...[
+          const SizedBox(width: 12),
+          Flexible(
+            child: _UserProfileIdItem(
+              leading: SvgPicture.asset(
+                _bangumiLogoAsset,
+                fit: BoxFit.contain,
+              ),
+              value: resolvedBangumiId,
+              onPressed: onBangumiCopyPressed,
+              hasFlexibleValue: true,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// 用户资料卡单个 ID 项
+class _UserProfileIdItem extends StatelessWidget {
+  /// 创建用户资料卡单个 ID 项
+  ///
+  /// [leading] ID 来源图标
+  /// [value] ID 文本
+  /// [onPressed] 复制 ID 点击回调
+  /// [hasFlexibleValue] ID 文本是否按剩余宽度省略
+  const _UserProfileIdItem({
+    required this.leading,
+    required this.value,
+    required this.onPressed,
+    this.hasFlexibleValue = false,
+  });
+
+  /// ID 来源图标
+  final Widget leading;
+
+  /// ID 文本
+  final String value;
+
+  /// 复制 ID 点击回调
+  final VoidCallback onPressed;
+
+  /// ID 文本是否按剩余宽度省略
+  final bool hasFlexibleValue;
+
+  /// 构建用户资料卡单个 ID 项
+  ///
+  /// [context] 当前组件树上下文
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final valueText = Text(
+      value,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(
+        color: colorScheme.onSurfaceVariant,
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        height: 1.2,
+      ),
+    );
+
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(4),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox.square(dimension: 14, child: leading),
+            const SizedBox(width: 4),
+            if (hasFlexibleValue)
+              Flexible(child: valueText)
+            else
+              valueText,
+            const SizedBox(width: 6),
+            Icon(
+              Icons.copy_rounded,
+              size: 14,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ],
         ),
       ),
     );

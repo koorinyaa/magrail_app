@@ -55,6 +55,7 @@ flutter:
   assets:
     - assets/icons/app_icon.svg
     - assets/icons/app_icon_cropped.png
+    - assets/icons/bangumi.svg
     - assets/icons/github.svg
     - assets/icons/torii.svg
     - assets/images/donate/

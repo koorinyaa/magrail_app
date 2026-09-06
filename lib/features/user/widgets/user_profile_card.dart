@@ -12,7 +12,8 @@ class UserProfileCard extends StatefulWidget {
   /// [profile] 用户详情页资料
   /// [onRecordPressed] 红包记录按钮点击回调
   /// [onSendPressed] 发送红包按钮点击回调
-  /// [onCopyPressed] 复制 ID 按钮点击回调
+  /// [onTinygrailIdCopyPressed] 复制小圣杯 ID 按钮点击回调
+  /// [onBangumiIdCopyPressed] 复制 BGM ID 按钮点击回调
   /// [isCurrentUser] 是否为当前登录用户
   /// [hideBalanceAndAssets] 是否隐藏余额和资产
   const UserProfileCard({
@@ -20,7 +21,8 @@ class UserProfileCard extends StatefulWidget {
     required this.profile,
     required this.onRecordPressed,
     required this.onSendPressed,
-    required this.onCopyPressed,
+    required this.onTinygrailIdCopyPressed,
+    required this.onBangumiIdCopyPressed,
     required this.isCurrentUser,
     required this.hideBalanceAndAssets,
   });
@@ -34,8 +36,11 @@ class UserProfileCard extends StatefulWidget {
   /// 发送红包按钮点击回调
   final VoidCallback onSendPressed;
 
-  /// 复制 ID 按钮点击回调
-  final VoidCallback onCopyPressed;
+  /// 复制小圣杯 ID 按钮点击回调
+  final VoidCallback onTinygrailIdCopyPressed;
+
+  /// 复制 BGM ID 按钮点击回调
+  final VoidCallback onBangumiIdCopyPressed;
 
   /// 是否为当前登录用户
   final bool isCurrentUser;
@@ -150,8 +155,11 @@ class _UserProfileCardState extends State<UserProfileCard> {
                       ),
                       const SizedBox(height: 5),
                       UserProfileIdRow(
-                        userId: widget.profile.userId,
-                        onCopyPressed: widget.onCopyPressed,
+                        tinygrailId: widget.profile.userId,
+                        bangumiId: widget.profile.name,
+                        onTinygrailCopyPressed:
+                            widget.onTinygrailIdCopyPressed,
+                        onBangumiCopyPressed: widget.onBangumiIdCopyPressed,
                       ),
                       if (widget.profile.isBanned) ...[
                         const SizedBox(height: 5),
