@@ -250,10 +250,7 @@ class UserProfileIdRow extends StatelessWidget {
               colors: [Color(0xFFFFFFFF), Color(0x00FFFFFF)],
             ).createShader(bounds),
             child: ClipOval(
-              child: Image.asset(
-                _tinygrailLogoAsset,
-                fit: BoxFit.cover,
-              ),
+              child: Image.asset(_tinygrailLogoAsset, fit: BoxFit.cover),
             ),
           ),
           value: '$tinygrailId',
@@ -263,10 +260,7 @@ class UserProfileIdRow extends StatelessWidget {
           const SizedBox(width: 12),
           Flexible(
             child: _UserProfileIdItem(
-              leading: SvgPicture.asset(
-                _bangumiLogoAsset,
-                fit: BoxFit.contain,
-              ),
+              leading: SvgPicture.asset(_bangumiLogoAsset, fit: BoxFit.contain),
               value: resolvedBangumiId,
               onPressed: onBangumiCopyPressed,
               hasFlexibleValue: true,
@@ -335,10 +329,7 @@ class _UserProfileIdItem extends StatelessWidget {
           children: [
             SizedBox.square(dimension: 14, child: leading),
             const SizedBox(width: 4),
-            if (hasFlexibleValue)
-              Flexible(child: valueText)
-            else
-              valueText,
+            if (hasFlexibleValue) Flexible(child: valueText) else valueText,
             const SizedBox(width: 6),
             Icon(
               Icons.copy_rounded,

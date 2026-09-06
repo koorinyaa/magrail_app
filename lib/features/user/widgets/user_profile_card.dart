@@ -157,8 +157,7 @@ class _UserProfileCardState extends State<UserProfileCard> {
                       UserProfileIdRow(
                         tinygrailId: widget.profile.userId,
                         bangumiId: widget.profile.name,
-                        onTinygrailCopyPressed:
-                            widget.onTinygrailIdCopyPressed,
+                        onTinygrailCopyPressed: widget.onTinygrailIdCopyPressed,
                         onBangumiCopyPressed: widget.onBangumiIdCopyPressed,
                       ),
                       if (widget.profile.isBanned) ...[
