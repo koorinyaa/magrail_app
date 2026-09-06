@@ -2,42 +2,34 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-/// 应用柔色背景
-class AppSoftBackground extends StatelessWidget {
-  /// 创建应用柔色背景
+/// 用户详情页日间柔色色块背景
+class UserDetailSoftBackground extends StatelessWidget {
+  /// 创建用户详情页日间柔色色块背景
   ///
   /// [key] Flutter 组件标识
-  /// [isDark] 是否使用深色模式
-  const AppSoftBackground({super.key, required this.isDark});
+  const UserDetailSoftBackground({super.key});
 
-  /// 是否使用深色模式
-  final bool isDark;
-
-  /// 构建应用柔色背景
+  /// 构建用户详情页日间柔色色块背景
   ///
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    if (isDark) {
+    if (Theme.of(context).brightness == Brightness.dark) {
       return const SizedBox.shrink();
     }
 
-    return Positioned.fill(
-      child: CustomPaint(painter: _SoftColorBlobPainter(isDark: isDark)),
+    return const Positioned.fill(
+      child: CustomPaint(painter: _UserDetailSoftColorBlobPainter()),
     );
   }
 }
 
-/// 应用柔色色块绘制器
-class _SoftColorBlobPainter extends CustomPainter {
-  /// 创建应用柔色色块绘制器
-  ///
-  /// [isDark] 是否使用深色模式
-  const _SoftColorBlobPainter({required this.isDark});
+/// 用户详情页日间柔色色块绘制器
+class _UserDetailSoftColorBlobPainter extends CustomPainter {
+  /// 创建用户详情页日间柔色色块绘制器
+  const _UserDetailSoftColorBlobPainter();
 
-  final bool isDark;
-
-  /// 绘制应用柔色色块
+  /// 绘制用户详情页日间柔色色块
   ///
   /// [canvas] 绘制画布
   /// [size] 绘制区域尺寸
@@ -86,10 +78,10 @@ class _SoftColorBlobPainter extends CustomPainter {
     canvas.restore();
   }
 
-  /// 绘制单个柔色色块
+  /// 绘制单个日间柔色色块
   ///
   /// [canvas] 绘制画布
-  /// [paint] 画笔
+  /// [paint] 色块画笔
   /// [color] 色块颜色
   /// [offset] 色块左上偏移
   /// [width] 色块宽度
@@ -133,11 +125,11 @@ class _SoftColorBlobPainter extends CustomPainter {
     canvas.drawPath(path, paint);
   }
 
-  /// 判断柔色背景是否需要重绘
+  /// 判断用户详情页日间柔色色块是否需要重绘
   ///
   /// [oldDelegate] 上一次绘制器
   @override
-  bool shouldRepaint(covariant _SoftColorBlobPainter oldDelegate) {
-    return oldDelegate.isDark != isDark;
+  bool shouldRepaint(covariant _UserDetailSoftColorBlobPainter oldDelegate) {
+    return false;
   }
 }

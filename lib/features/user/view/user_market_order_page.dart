@@ -74,7 +74,6 @@ class _UserMarketOrderPageState extends State<UserMarketOrderPage> {
         ),
       ],
       onTabPrepared: _handleTabPrepared,
-      useSecondaryTitleStyle: true,
     );
   }
 

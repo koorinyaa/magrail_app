@@ -8,7 +8,6 @@ import 'package:magrail_app/core/feedback/app_toast.dart';
 import 'package:magrail_app/core/storage/app_preferences.dart';
 import 'package:magrail_app/core/utils/user_error_message.dart';
 import 'package:magrail_app/core/widgets/app_confirm_dialog.dart';
-import 'package:magrail_app/core/widgets/app_soft_background.dart';
 import 'package:magrail_app/features/auth/view/tinygrail_auth_page.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
@@ -34,6 +33,7 @@ import 'package:magrail_app/features/user/widgets/user_chara_overview_states.dar
 import 'package:magrail_app/features/user/widgets/user_detail_states.dart';
 import 'package:magrail_app/features/user/widgets/user_detail_top_actions.dart';
 import 'package:magrail_app/features/user/widgets/user_profile_card.dart';
+import 'package:magrail_app/features/user/widgets/user_detail_soft_background.dart';
 import 'package:magrail_app/features/user/widgets/user_red_packet_send_sheet.dart';
 import 'package:magrail_app/features/user/widgets/user_share_bonus_forecast_sheet.dart';
 import 'package:magrail_app/features/user/widgets/user_sync_rate_dialog.dart';
@@ -217,7 +217,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
             : const Color(0xFFF5F7FB),
         body: Stack(
           children: [
-            AppSoftBackground(isDark: isDark),
+            const UserDetailSoftBackground(),
             SafeArea(
               bottom: false,
               child: ListenableBuilder(

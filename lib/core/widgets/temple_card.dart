@@ -275,7 +275,10 @@ class TempleCard extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 7),
-                            LevelBadge(level: characterLevel, zeroCount: zeroCount),
+                            LevelBadge(
+                              level: characterLevel,
+                              zeroCount: zeroCount,
+                            ),
                           ],
                         ),
                       ),

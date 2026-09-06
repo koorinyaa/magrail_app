@@ -46,9 +46,7 @@ void main() {
     navigator.pop();
     await tester.pump();
 
-    await tester.tapAt(
-      imageOrigin + Offset(185, imageSize.height - 32),
-    );
+    await tester.tapAt(imageOrigin + Offset(185, imageSize.height - 32));
     await tester.pump();
 
     expect(navigator.canPop(), isFalse);

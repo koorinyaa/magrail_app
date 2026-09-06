@@ -245,7 +245,9 @@ class TempleLinkCard extends StatelessWidget {
     required double splitGap,
     required double scale,
   }) {
-    final nameFontSize = (_baseNameFontSize * scale).clamp(11.0, 16.0).toDouble();
+    final nameFontSize = (_baseNameFontSize * scale)
+        .clamp(11.0, 16.0)
+        .toDouble();
     final style = TextStyle(
       color: const Color(0xD6FFFFFF),
       fontSize: nameFontSize,

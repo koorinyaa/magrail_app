@@ -4,72 +4,28 @@ part of 'tinygrail_tabbed_paged_sliver_page.dart';
 class _TinygrailTabbedPageHeader extends StatelessWidget {
   /// 创建 Tinygrail 标签分页页面固定头部
   ///
-  /// [title] 页面标题
-  /// [labels] 标签文案列表
-  /// [selectedIndex] 当前选中的标签索引
-  /// [pageController] 页面控制器
-  /// [onSelected] 标签点击回调
-  /// [showBackButton] 是否显示返回按钮
-  /// [onSearchPressed] 搜索按钮点击回调
-  /// [useBlurHeader] 是否使用模糊顶部栏
-  /// [useSecondaryTitleStyle] 是否使用二级页面标题样式
-  const _TinygrailTabbedPageHeader({
-    required this.title,
-    required this.labels,
-    required this.selectedIndex,
-    required this.pageController,
-    required this.onSelected,
-    required this.showBackButton,
-    required this.onSearchPressed,
-    required this.useBlurHeader,
-    required this.useSecondaryTitleStyle,
-  });
+  /// [title] 二级页面标题
+  /// [tabBar] 声明固定高度的标签栏
+  const _TinygrailTabbedPageHeader({required this.title, required this.tabBar});
 
-  static const double _secondaryTitleHeight =
+  static const double _titleHeight =
       SecondaryPageSliverAppBar.defaultToolbarHeight;
 
-  /// 页面标题
+  /// 二级页面标题
   final String title;
 
-  /// 标签文案列表
-  final List<String> labels;
-
-  /// 当前选中的标签索引
-  final int selectedIndex;
-
-  /// 页面控制器
-  final PageController pageController;
-
-  /// 标签点击回调
-  final ValueChanged<int> onSelected;
-
-  /// 是否显示返回按钮
-  final bool showBackButton;
-
-  /// 搜索按钮点击回调
-  final VoidCallback? onSearchPressed;
-
-  /// 是否使用模糊顶部栏
-  final bool useBlurHeader;
-
-  /// 是否使用二级页面标题样式
-  final bool useSecondaryTitleStyle;
+  /// 声明固定高度的标签栏
+  final PreferredSizeWidget tabBar;
 
   /// 解析固定头部在页面中的可见高度
   ///
   /// [context] 当前组件树上下文
-  /// [useSecondaryTitleStyle] 是否使用二级页面标题样式
+  /// [tabBarHeight] 标签栏占用的固定高度
   static double visibleHeight(
     BuildContext context, {
-    required bool useSecondaryTitleStyle,
+    required double tabBarHeight,
   }) {
-    final titleHeight = useSecondaryTitleStyle
-        ? _secondaryTitleHeight
-        : AppPageTitleBar.height;
-
-    return MediaQuery.paddingOf(context).top +
-        titleHeight +
-        _TinygrailPagedTabHeader.height;
+    return MediaQuery.paddingOf(context).top + _titleHeight + tabBarHeight;
   }
 
   /// 构建 Tinygrail 标签分页页面固定头部
@@ -88,25 +44,8 @@ class _TinygrailTabbedPageHeader extends StatelessWidget {
     final content = Column(
       children: [
         SizedBox(height: topPadding),
-        if (useSecondaryTitleStyle)
-          _TinygrailSecondaryTitleBar(
-            title: title,
-            showBackButton: showBackButton,
-            onSearchPressed: onSearchPressed,
-          )
-        else
-          AppPageTitleBar(
-            title: title,
-            showBackButton: showBackButton,
-            onSearchPressed: onSearchPressed,
-          ),
-        _TinygrailPagedTabHeader(
-          labels: labels,
-          selectedIndex: selectedIndex,
-          pageController: pageController,
-          onSelected: onSelected,
-          showDivider: useBlurHeader,
-        ),
+        _TinygrailSecondaryTitleBar(title: title),
+        tabBar,
       ],
     );
 
@@ -115,21 +54,19 @@ class _TinygrailTabbedPageHeader extends StatelessWidget {
       child: SizedBox(
         height: visibleHeight(
           context,
-          useSecondaryTitleStyle: useSecondaryTitleStyle,
+          tabBarHeight: tabBar.preferredSize.height,
         ),
-        child: useBlurHeader
-            ? ClipRect(
-                child: BackdropFilter(
-                  filter: AppBlurStyle.filter,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: AppBlurStyle.surfaceColor(context),
-                    ),
-                    child: content,
-                  ),
-                ),
-              )
-            : content,
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: AppBlurStyle.filter,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppBlurStyle.surfaceColor(context),
+              ),
+              child: content,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -140,22 +77,10 @@ class _TinygrailSecondaryTitleBar extends StatelessWidget {
   /// 创建 Tinygrail 标签分页二级页面标题栏
   ///
   /// [title] 页面标题
-  /// [showBackButton] 是否显示返回按钮
-  /// [onSearchPressed] 搜索按钮点击回调
-  const _TinygrailSecondaryTitleBar({
-    required this.title,
-    required this.showBackButton,
-    required this.onSearchPressed,
-  });
+  const _TinygrailSecondaryTitleBar({required this.title});
 
   /// 页面标题
   final String title;
-
-  /// 是否显示返回按钮
-  final bool showBackButton;
-
-  /// 搜索按钮点击回调
-  final VoidCallback? onSearchPressed;
 
   /// 构建 Tinygrail 标签分页二级页面标题栏
   ///
@@ -166,31 +91,22 @@ class _TinygrailSecondaryTitleBar extends StatelessWidget {
 
     return AppBar(
       primary: false,
-      toolbarHeight: _TinygrailTabbedPageHeader._secondaryTitleHeight,
+      toolbarHeight: _TinygrailTabbedPageHeader._titleHeight,
       centerTitle: true,
       backgroundColor: Colors.transparent,
       foregroundColor: colorScheme.onSurface,
       forceMaterialTransparency: true,
-      leading: showBackButton
-          ? IconButton(
-              onPressed: () => Navigator.of(context).maybePop(),
-              icon: const Icon(Icons.chevron_left_rounded, size: 30),
-            )
-          : null,
+      leading: IconButton(
+        onPressed: () => Navigator.of(context).maybePop(),
+        icon: const Icon(Icons.chevron_left_rounded, size: 30),
+      ),
       title: Text(
         title,
         style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
       ),
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
-      actions: onSearchPressed == null
-          ? const [SizedBox(width: kToolbarHeight)]
-          : [
-              IconButton(
-                onPressed: onSearchPressed,
-                icon: const Icon(Icons.search_rounded, size: 22),
-              ),
-            ],
+      actions: const [SizedBox(width: kToolbarHeight)],
     );
   }
 }
@@ -204,13 +120,11 @@ class _TinygrailPagedTabHeader extends StatelessWidget
   /// [selectedIndex] 当前选中的标签索引
   /// [pageController] 页面控制器
   /// [onSelected] 标签点击回调
-  /// [showDivider] 是否显示底部分割线
   const _TinygrailPagedTabHeader({
     required this.labels,
     required this.selectedIndex,
     required this.pageController,
     required this.onSelected,
-    required this.showDivider,
   });
 
   /// 标签栏高度
@@ -227,9 +141,6 @@ class _TinygrailPagedTabHeader extends StatelessWidget
 
   /// 标签点击回调
   final ValueChanged<int> onSelected;
-
-  /// 是否显示底部分割线
-  final bool showDivider;
 
   /// 固定区域尺寸
   @override
@@ -248,11 +159,7 @@ class _TinygrailPagedTabHeader extends StatelessWidget
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        border: Border(
-          bottom: showDivider
-              ? BorderSide(color: dividerColor)
-              : BorderSide.none,
-        ),
+        border: Border(bottom: BorderSide(color: dividerColor)),
       ),
       child: SizedBox(
         height: preferredSize.height,

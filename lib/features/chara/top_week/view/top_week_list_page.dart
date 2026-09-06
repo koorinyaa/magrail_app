@@ -109,9 +109,7 @@ class _TopWeekListPageState extends State<TopWeekListPage> {
         onAuctionPressed: widget.onAuctionPressed,
       ),
       SliverToBoxAdapter(
-        child: SizedBox(
-          height: 24 + MediaQuery.paddingOf(context).bottom,
-        ),
+        child: SizedBox(height: 24 + MediaQuery.paddingOf(context).bottom),
       ),
     ];
   }

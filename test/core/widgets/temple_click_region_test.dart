@@ -39,9 +39,7 @@ void main() {
 
     final cardRect = tester.getRect(find.byType(TempleCard));
     final levelBadgeRect = tester.getRect(find.byType(LevelBadge));
-    await tester.tapAt(
-      Offset(cardRect.right - 20, levelBadgeRect.center.dy),
-    );
+    await tester.tapAt(Offset(cardRect.right - 20, levelBadgeRect.center.dy));
 
     expect(characterPressed, isTrue);
     expect(imagePressed, isFalse);

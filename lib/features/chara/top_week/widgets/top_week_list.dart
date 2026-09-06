@@ -537,9 +537,7 @@ class _TopWeekListSkeletonRow extends StatelessWidget {
                           child: Bone(
                             width: 92,
                             height: 16,
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(5),
-                            ),
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
                           ),
                         ),
                         SizedBox(width: 6),

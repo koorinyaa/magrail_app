@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:magrail_app/core/auth/tinygrail_auth_repository.dart';
 import 'package:magrail_app/core/feedback/app_toast.dart';
 import 'package:magrail_app/core/storage/app_preferences.dart';
-import 'package:magrail_app/core/widgets/app_soft_background.dart';
 import 'package:magrail_app/features/auth/view/tinygrail_auth_page.dart';
 import 'package:magrail_app/features/chara/auction/repository/auction_repository.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
@@ -14,11 +13,12 @@ import 'package:magrail_app/features/chara/view/character_page.dart';
 import 'package:magrail_app/features/home/view/main_home_view.dart';
 import 'package:magrail_app/features/ico/repository/ico_character_repository.dart';
 import 'package:magrail_app/features/main_navigation/model/main_tab.dart';
-import 'package:magrail_app/features/main_navigation/widgets/chrome/main_top_bar.dart';
+import 'package:magrail_app/features/main_navigation/widgets/chrome/main_navigation_search_header.dart';
 import 'package:magrail_app/features/main_navigation/widgets/navigation/main_mobile_navigation_dock.dart';
 import 'package:magrail_app/features/oos/repository/tinygrail_oos_repository.dart';
 import 'package:magrail_app/features/ranking/repository/ranking_repository.dart';
 import 'package:magrail_app/features/ranking/view/ranking_page.dart';
+import 'package:magrail_app/features/ranking/widgets/ranking_tab_bar.dart';
 import 'package:magrail_app/features/scratch_ticket/repository/scratch_ticket_repository.dart';
 import 'package:magrail_app/features/temple/repository/temple_asset_magic_repository.dart';
 import 'package:magrail_app/features/temple/repository/temple_repository.dart';
@@ -127,6 +127,8 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   int _rankingScrollResetToken = 0;
   int _rankingScrollToTopToken = 0;
   bool _isOpeningProfile = false;
+  // 切换标签或结束头像入口任务后，旧异步结果不能重新发起导航
+  int _profileNavigationGeneration = 0;
   late bool _useLiquidGlass;
 
   /// 初始化主导航页面状态
@@ -150,16 +152,11 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF111318)
-          : const Color(0xFFF5F7FB),
+      backgroundColor: _mainNavigationBackgroundColor(context),
       extendBody: true,
       body: Stack(
         children: [
-          AppSoftBackground(isDark: isDark),
           _buildMainContent(),
           Align(
             alignment: Alignment.bottomCenter,
@@ -180,25 +177,75 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       return Positioned.fill(child: _buildTabContent());
     }
 
-    return SafeArea(
-      bottom: false,
-      child: Column(
+    final searchHeaderHeight = MainNavigationSearchHeader.occupiedHeight(
+      context,
+    );
+    return Positioned.fill(
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          MainTopBar(
-            title: _topBarTitle,
-            onSearchPressed: _handleSearchPressed,
-          ),
-          Expanded(child: _buildTabContent()),
+          _buildTabContent(topContentPadding: searchHeaderHeight),
+          Positioned(top: 0, left: 0, right: 0, child: _buildSearchHeader()),
         ],
       ),
     );
   }
 
+  /// 构建随用户资料更新的主导航搜索头部
+  ///
+  /// [bottom] 与搜索框共用渐变背景的底部标签栏
+  Widget _buildSearchHeader({PreferredSizeWidget? bottom}) {
+    return ListenableBuilder(
+      listenable: widget.userRepository,
+      builder: (context, child) {
+        return MainNavigationSearchHeader(
+          backgroundColor: _mainNavigationBackgroundColor(context),
+          onSearchPressed: _handleSearchPressed,
+          onProfilePressed: _openProfileTab,
+          profile: widget.userRepository.readCachedCurrentUserAssets(),
+          bottom: bottom,
+        );
+      },
+    );
+  }
+
+  /// 构建排行榜一体化悬浮头部
+  ///
+  /// [context] 当前组件树上下文
+  /// [labels] 榜单标签文案
+  /// [selectedIndex] 当前榜单索引
+  /// [pageController] 提供页面连续滑动进度的控制器
+  /// [onSelected] 分页页面的榜单切换回调
+  PreferredSizeWidget _buildRankingHeader(
+    BuildContext context,
+    List<String> labels,
+    int selectedIndex,
+    PageController pageController,
+    ValueChanged<int> onSelected,
+  ) {
+    final tabBar = RankingTabBar(
+      labels: labels,
+      selectedIndex: selectedIndex,
+      pageController: pageController,
+      onSelected: onSelected,
+    );
+
+    return PreferredSize(
+      preferredSize: Size.fromHeight(
+        MainNavigationSearchHeader.occupiedHeight(context, bottom: tabBar),
+      ),
+      child: _buildSearchHeader(bottom: tabBar),
+    );
+  }
+
   /// 构建标签页内容
-  Widget _buildTabContent() {
+  ///
+  /// [topContentPadding] 顶部搜索栏占用的滚动内容高度
+  Widget _buildTabContent({double topContentPadding = 0}) {
     return switch (_currentTab) {
       MainTab.home => MainHomeView(
         scrollController: _homeScrollController,
+        topContentPadding: topContentPadding,
         authRepository: widget.authRepository,
         preferences: widget.preferences,
         topWeekRepository: widget.topWeekRepository,
@@ -218,11 +265,13 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         oosRepository: widget.oosRepository,
         userRepository: widget.userRepository,
         bottomContentPadding: 92,
+        headerBuilder: _buildRankingHeader,
         scrollResetToken: _rankingScrollResetToken,
         scrollToTopToken: _rankingScrollToTopToken,
       ),
       MainTab.character => CharacterPage(
         scrollController: _characterScrollController,
+        topContentPadding: topContentPadding,
         rankRepository: widget.characterRankRepository,
         icoCharacterRepository: widget.icoCharacterRepository,
       ),
@@ -245,23 +294,10 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     };
   }
 
-  /// 顶部栏标题
-  String get _topBarTitle {
-    if (_currentTab != MainTab.home) {
-      return _currentTab.title;
-    }
-
-    final cachedUser = widget.userRepository.readCachedCurrentUserAssets();
-    final nickname = cachedUser?.nickname.trim();
-    if (nickname == null || nickname.isEmpty) {
-      return MainTab.home.title;
-    }
-
-    return 'Hi! $nickname';
-  }
-
   /// 退出登录后切换到首页
   void _switchToHomeAfterSignOut() {
+    _profileNavigationGeneration += 1;
+    _isOpeningProfile = false;
     if (!mounted || _currentTab == MainTab.home) {
       return;
     }
@@ -293,6 +329,8 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       return;
     }
 
+    _profileNavigationGeneration += 1;
+    _isOpeningProfile = false;
     if (tab == _currentTab) {
       _scrollCurrentTabToTop();
       return;
@@ -304,6 +342,15 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       }
       _currentTab = tab;
     });
+  }
+
+  /// 读取主导航页面背景色
+  ///
+  /// [context] 当前组件树上下文
+  Color _mainNavigationBackgroundColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF111318)
+        : const Color(0xFFF5F7FB);
   }
 
   /// 打开个人资产一级页面
@@ -318,18 +365,19 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     }
 
     _isOpeningProfile = true;
+    final generation = ++_profileNavigationGeneration;
     try {
       // 用户资产页保护正式会话边界：无 Cookie 时先授权，取消授权则保持当前标签页
       final hasCookie = await widget.authRepository.hasTinygrailCookie();
-      if (!mounted) {
+      if (!_isProfileNavigationCurrent(generation)) {
         return;
       }
 
       if (!hasCookie) {
         final isAuthorized = await _openAuthPage(
-          onAuthenticated: _loadProfileAndSwitchAfterAuth,
+          onAuthenticated: () => _loadProfileAndSwitchAfterAuth(generation),
         );
-        if (!mounted || isAuthorized != true) {
+        if (!_isProfileNavigationCurrent(generation) || isAuthorized != true) {
           return;
         }
 
@@ -349,6 +397,9 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       }
 
       final result = await widget.userRepository.fetchUserAssets();
+      if (!_isProfileNavigationCurrent(generation)) {
+        return;
+      }
       switch (result.status) {
         case UserAssetsFetchStatus.success:
           if (!mounted) {
@@ -363,9 +414,10 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           }
           AppToast.error(context, text: '登录已过期');
           final isAuthorized = await _openAuthPage(
-            onAuthenticated: _loadProfileAndSwitchAfterAuth,
+            onAuthenticated: () => _loadProfileAndSwitchAfterAuth(generation),
           );
-          if (!mounted || isAuthorized != true) {
+          if (!_isProfileNavigationCurrent(generation) ||
+              isAuthorized != true) {
             return;
           }
         case UserAssetsFetchStatus.failure:
@@ -374,9 +426,23 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           }
           AppToast.error(context, text: result.message ?? '用户资产加载失败');
       }
+    } catch (_) {
+      if (mounted && _isProfileNavigationCurrent(generation)) {
+        AppToast.error(context, text: '用户资产加载失败，请稍后重试');
+      }
     } finally {
-      _isOpeningProfile = false;
+      if (generation == _profileNavigationGeneration) {
+        _isOpeningProfile = false;
+        _profileNavigationGeneration += 1;
+      }
     }
+  }
+
+  /// 判断头像入口任务是否仍对应用户最后的导航操作
+  ///
+  /// [generation] 任务开始时捕获的页面代际
+  bool _isProfileNavigationCurrent(int generation) {
+    return mounted && generation == _profileNavigationGeneration;
   }
 
   /// 打开 Tinygrail 授权页面
@@ -397,14 +463,16 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   }
 
   /// 授权成功后加载当前用户资产并切换到一级用户页
-  Future<void> _loadProfileAndSwitchAfterAuth() async {
-    if (!mounted) {
+  ///
+  /// [generation] 头像入口任务的页面代际
+  Future<void> _loadProfileAndSwitchAfterAuth(int generation) async {
+    if (!_isProfileNavigationCurrent(generation)) {
       return;
     }
 
     // 授权页关闭前预取用户资产，避免底层先露出旧页面再切换
     final result = await widget.userRepository.fetchUserAssets();
-    if (!mounted) {
+    if (!mounted || !_isProfileNavigationCurrent(generation)) {
       return;
     }
 
@@ -461,7 +529,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     );
   }
 
-  /// 处理搜索按钮点击
+  /// 处理搜索入口点击
   Future<void> _handleSearchPressed() {
     return showCharacterSearchPage(
       context,

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:magrail_app/core/analytics/app_activity_reporter.dart';
 import 'package:magrail_app/core/auth/tinygrail_auth_repository.dart';
 import 'package:magrail_app/core/network/api_client.dart';
@@ -27,9 +28,10 @@ import 'package:magrail_app/features/user/model/user_temple_api_item.dart';
 import 'package:magrail_app/features/user/model/user_trade_log_api_item.dart';
 
 part 'user_repository/user_repository_page_queries.dart';
+part 'user_repository/user_repository_assets.dart';
 
-/// 用户仓库
-class UserRepository with _UserRepositoryPageQueries {
+/// 用户仓库及当前登录资料缓存状态
+class UserRepository extends ChangeNotifier with _UserRepositoryPageQueries {
   /// 创建用户仓库
   ///
   /// [apiClient] Tinygrail API 客户端
@@ -37,7 +39,7 @@ class UserRepository with _UserRepositoryPageQueries {
   /// [preferences] 本地偏好设置
   /// [auctionRepository] 拍卖仓库
   /// [activityReporter] 应用活跃状态上报器
-  const UserRepository({
+  UserRepository({
     required ApiClient apiClient,
     required TinygrailAuthRepository authRepository,
     required AppPreferences preferences,
@@ -159,71 +161,9 @@ class UserRepository with _UserRepositoryPageQueries {
   /// 获取用户资产
   ///
   /// [username] 用户名，不传时获取当前登录用户
-  Future<UserAssetsFetchResult> fetchUserAssets({String? username}) async {
-    final isCurrentUserRequest = _shouldCacheCurrentUserAssets(username);
-    if (isCurrentUserRequest) {
-      try {
-        final hasCookie = await _authRepository.hasTinygrailCookie();
-        if (!hasCookie) {
-          return _handleCurrentUserAuthExpired('请先授权');
-        }
-      } catch (_) {
-        return _handleCurrentUserAuthExpired('请先授权');
-      }
-    }
-
-    final path = username == null || username.isEmpty
-        ? 'chara/user/assets'
-        : 'chara/user/assets/${_encodeUsername(username)}';
-
-    try {
-      final json = await _apiClient.getJson<Map<String, Object?>>(path);
-      final response = TinygrailResponse<UserDetailProfile>.fromJson(json, (
-        value,
-      ) {
-        final valueJson = TinygrailResponseParser.asObjectMap(value);
-        if (valueJson == null) {
-          return null;
-        }
-
-        return UserDetailProfile.fromJson(valueJson);
-      });
-
-      final profile = response.value;
-      if (!response.isSuccess || profile == null) {
-        final message = response.message ?? '获取用户资产失败';
-        if (isCurrentUserRequest) {
-          return _handleCurrentUserAuthExpired(message);
-        }
-
-        return UserAssetsFetchResult.failure(message);
-      }
-
-      if (isCurrentUserRequest) {
-        try {
-          await cacheCurrentUserAssets(profile);
-        } catch (_) {
-          // 缓存写入失败不影响本次接口结果返回
-        }
-        // 接口已确认当前会话后再上报登录用户，避免使用未校验的页面参数
-        unawaited(
-          _activityReporter.report(
-            userId: profile.userId,
-            username: profile.name,
-          ),
-        );
-      }
-
-      return UserAssetsFetchResult.success(profile);
-    } on ApiException catch (error) {
-      if (isCurrentUserRequest &&
-          (error.statusCode == 401 || error.statusCode == 403)) {
-        return _handleCurrentUserAuthExpired(error.message);
-      }
-      return UserAssetsFetchResult.failure(error.message);
-    } catch (_) {
-      return const UserAssetsFetchResult.failure('获取用户资产失败');
-    }
+  /// 当前用户请求在会话变更后不写入缓存或发布旧结果
+  Future<UserAssetsFetchResult> fetchUserAssets({String? username}) {
+    return _fetchAssets(username: username);
   }
 
   /// 向用户发送红包
@@ -423,16 +363,17 @@ class UserRepository with _UserRepositoryPageQueries {
     }
   }
 
-  /// 缓存当前登录用户资产
+  /// 持久化当前用户资料并通知监听者
   ///
   /// [profile] 用户资产资料
-  Future<void> cacheCurrentUserAssets(UserDetailProfile profile) {
-    return _preferences.setCurrentUserAssetsCache(
+  Future<void> cacheCurrentUserAssets(UserDetailProfile profile) async {
+    await _preferences.setCurrentUserAssetsCache(
       jsonEncode({
         'UpdatedAt': _cacheUpdatedAtMilliseconds(),
         'Profile': profile.toJson(),
       }),
     );
+    notifyListeners();
   }
 
   /// 缓存当前登录用户角色资产预览
@@ -444,12 +385,13 @@ class UserRepository with _UserRepositoryPageQueries {
     return _preferences.setCurrentUserCharaOverviewCache(jsonEncode(cacheJson));
   }
 
-  /// 清除当前登录用户资料和角色资产预览缓存
+  /// 清除当前用户资料和预览缓存并通知监听者
   Future<void> clearCurrentUserAssetsCache() async {
     await Future.wait([
       _preferences.clearCurrentUserAssetsCache(),
       _preferences.clearCurrentUserCharaOverviewCache(),
     ]);
+    notifyListeners();
   }
 
   /// 清除退出用户的资料缓存、完整资产快照和资产分析缓存
@@ -488,25 +430,6 @@ class UserRepository with _UserRepositoryPageQueries {
       itemFromJson: UserMarketOrderApiItem.fromJson,
       fallbackMessage: fallbackMessage,
     );
-  }
-
-  /// 处理当前用户会话失效
-  ///
-  /// [message] 会话失效提示
-  Future<UserAssetsFetchResult> _handleCurrentUserAuthExpired(
-    String message,
-  ) async {
-    // 会话失效时清除资料缓存，并把设备最新登录状态更新为空
-    await clearCurrentUserAssetsCache();
-    unawaited(_activityReporter.report());
-    return UserAssetsFetchResult.authExpired(message);
-  }
-
-  /// 判断本次资产结果是否应写入当前用户缓存
-  ///
-  /// [username] 用户名，空值表示当前用户入口
-  bool _shouldCacheCurrentUserAssets(String? username) {
-    return isCachedCurrentUser(username);
   }
 
   /// 编码用户名路径段

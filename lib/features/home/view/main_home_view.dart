@@ -35,6 +35,7 @@ class MainHomeView extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [scrollController] 首页滚动控制器
+  /// [topContentPadding] 顶部搜索栏占用的滚动内容高度
   /// [authRepository] Tinygrail 授权仓库
   /// [preferences] 本地偏好设置
   /// [topWeekRepository] 每周萌王仓库
@@ -48,6 +49,7 @@ class MainHomeView extends StatefulWidget {
   const MainHomeView({
     super.key,
     required this.scrollController,
+    this.topContentPadding = 0,
     required this.authRepository,
     required this.preferences,
     required this.topWeekRepository,
@@ -62,6 +64,9 @@ class MainHomeView extends StatefulWidget {
 
   /// 首页滚动控制器
   final ScrollController scrollController;
+
+  /// 顶部搜索栏占用的滚动内容高度
+  final double topContentPadding;
 
   /// Tinygrail 授权仓库
   final TinygrailAuthRepository authRepository;
@@ -147,11 +152,16 @@ class _MainHomeViewState extends State<MainHomeView> {
       ]),
       builder: (context, child) {
         return RefreshIndicator(
+          edgeOffset: widget.topContentPadding,
           onRefresh: _refreshHome,
           child: CustomScrollView(
             controller: widget.scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
+              if (widget.topContentPadding > 0)
+                SliverToBoxAdapter(
+                  child: SizedBox(height: widget.topContentPadding),
+                ),
               PageSectionSliver(
                 title: '每周萌王',
                 trailing: HomeSectionActionButton(

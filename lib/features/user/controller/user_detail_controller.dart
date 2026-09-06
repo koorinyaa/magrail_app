@@ -161,6 +161,9 @@ class UserDetailController extends ChangeNotifier {
     }
     _notifyIfActive();
 
+    var sessionGeneration = isCurrentUser
+        ? _repository.captureCurrentUserSessionGeneration()
+        : null;
     final result = await _repository.fetchUserAssets(username: _username);
     if (_isDisposed) {
       return;
@@ -176,11 +179,15 @@ class UserDetailController extends ChangeNotifier {
         return;
       }
 
+      if (_discardStaleProfile(sessionGeneration)) {
+        return;
+      }
       var nextProfile = profile;
       final previousProfileName = _profile?.name;
       if (_repository.isCachedCurrentUser(_username)) {
+        sessionGeneration ??= _repository.captureCurrentUserSessionGeneration();
         final holidayName = await _repository.fetchHolidayName();
-        if (_isDisposed) {
+        if (_isDisposed || _discardStaleProfile(sessionGeneration)) {
           return;
         }
 
@@ -193,7 +200,7 @@ class UserDetailController extends ChangeNotifier {
         } catch (_) {
           // 节日状态缓存失败不影响当前用户资料展示
         }
-        if (_isDisposed) {
+        if (_isDisposed || _discardStaleProfile(sessionGeneration)) {
           return;
         }
       }
@@ -235,6 +242,20 @@ class UserDetailController extends ChangeNotifier {
     _isLoading = false;
     _isRefreshing = false;
     _notifyIfActive();
+  }
+
+  /// 丢弃跨会话的用户资料并结束当前刷新
+  ///
+  /// [generation] 刷新捕获的当前用户会话代际
+  bool _discardStaleProfile(int? generation) {
+    if (generation == null ||
+        _repository.isCurrentUserSessionGenerationCurrent(generation)) {
+      return false;
+    }
+    _isLoading = false;
+    _isRefreshing = false;
+    _notifyIfActive();
+    return true;
   }
 
   /// 构建当前可见操作入口

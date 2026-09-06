@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:magrail_app/core/widgets/paged_sliver_state.dart';
 import 'package:magrail_app/core/widgets/tinygrail_tabbed_paged_sliver_page.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
-import 'package:magrail_app/features/chara/search/view/character_search_page.dart';
 import 'package:magrail_app/features/oos/repository/tinygrail_oos_repository.dart';
 import 'package:magrail_app/features/ranking/controller/ranking_controller.dart';
 import 'package:magrail_app/features/ranking/model/ranking_entry.dart';
@@ -28,6 +27,7 @@ class RankingPage extends StatefulWidget {
   /// [oosRepository] Tinygrail OOS 仓库
   /// [userRepository] 用户仓库
   /// [bottomContentPadding] 滚动内容底部额外预留高度
+  /// [headerBuilder] 主导航提供的搜索与榜单标签悬浮头部
   /// [scrollResetToken] 滚动位置重置信号
   /// [scrollToTopToken] 平滑滚动到顶部信号
   const RankingPage({
@@ -38,6 +38,7 @@ class RankingPage extends StatefulWidget {
     required this.magicRepository,
     required this.oosRepository,
     required this.userRepository,
+    required this.headerBuilder,
     this.bottomContentPadding = 0,
     this.scrollResetToken = 0,
     this.scrollToTopToken = 0,
@@ -63,6 +64,9 @@ class RankingPage extends StatefulWidget {
 
   /// 滚动内容底部额外预留高度
   final double bottomContentPadding;
+
+  /// 主导航提供的搜索与榜单标签悬浮头部
+  final TinygrailPagedHeaderBuilder headerBuilder;
 
   /// 滚动位置重置信号
   final int scrollResetToken;
@@ -107,14 +111,11 @@ class _RankingPageState extends State<RankingPage> {
   @override
   Widget build(BuildContext context) {
     return TinygrailTabbedPagedSliverPage<RankingEntry, RankingEntry>(
-      title: '排行榜',
-      showBackButton: false,
-      onSearchPressed: _openCharacterSearchPage,
       bottomContentPadding: widget.bottomContentPadding,
       scrollResetToken: widget.scrollResetToken,
       scrollToTopToken: widget.scrollToTopToken,
-      useBlurHeader: false,
       tabs: [_buildRefineTab(), _buildWealthTab()],
+      headerBuilder: widget.headerBuilder,
       onTabPrepared: _handleTabPrepared,
     );
   }
@@ -212,18 +213,6 @@ class _RankingPageState extends State<RankingPage> {
         userRepository: widget.userRepository,
         currentUserName: currentUserName,
       ),
-    );
-  }
-
-  /// 打开角色搜索页
-  Future<void> _openCharacterSearchPage() {
-    return showCharacterSearchPage(
-      context,
-      repository: widget.characterDetailRepository,
-      templeRepository: widget.templeRepository,
-      magicRepository: widget.magicRepository,
-      oosRepository: widget.oosRepository,
-      userRepository: widget.userRepository,
     );
   }
 }

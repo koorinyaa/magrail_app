@@ -23,17 +23,22 @@ class CharacterPage extends StatefulWidget {
   ///
   /// [key] Flutter 组件标识
   /// [scrollController] 角色页滚动控制器
+  /// [topContentPadding] 顶部搜索栏占用的滚动内容高度
   /// [rankRepository] 角色排序仓库
   /// [icoCharacterRepository] ICO 角色仓库
   const CharacterPage({
     super.key,
     required this.scrollController,
+    this.topContentPadding = 0,
     required this.rankRepository,
     required this.icoCharacterRepository,
   });
 
   /// 角色页滚动控制器
   final ScrollController scrollController;
+
+  /// 顶部搜索栏占用的滚动内容高度
+  final double topContentPadding;
 
   /// 角色排序仓库
   final CharacterRankRepository rankRepository;
@@ -86,11 +91,16 @@ class _CharacterPageState extends State<CharacterPage> {
       listenable: _contentListenable,
       builder: (context, child) {
         return RefreshIndicator(
+          edgeOffset: widget.topContentPadding,
           onRefresh: _refresh,
           child: CustomScrollView(
             controller: widget.scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
+              if (widget.topContentPadding > 0)
+                SliverToBoxAdapter(
+                  child: SizedBox(height: widget.topContentPadding),
+                ),
               SliverToBoxAdapter(
                 child: CharacterQuickEntryBar(
                   onValhallaTap: _openValhallaPage,

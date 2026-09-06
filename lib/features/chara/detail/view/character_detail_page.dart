@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:magrail_app/core/auth/tinygrail_auth_repository.dart';
 import 'package:magrail_app/core/storage/app_preferences.dart';
-import 'package:magrail_app/core/widgets/app_soft_background.dart';
 import 'package:magrail_app/features/auth/view/tinygrail_auth_page.dart';
 import 'package:magrail_app/features/chara/auction/repository/auction_repository.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
@@ -200,7 +199,6 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
             : const Color(0xFFF5F7FB),
         body: Stack(
           children: [
-            AppSoftBackground(isDark: isDark),
             SafeArea(
               bottom: false,
               child: ListenableBuilder(
