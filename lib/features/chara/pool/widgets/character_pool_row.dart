@@ -21,7 +21,7 @@ enum CharacterPoolRowType {
 /// 角色池资产行
 class CharacterPoolRow extends StatelessWidget {
   /// 竞拍按钮固定尺寸
-  static const Size auctionButtonSize = Size(46, 22);
+  static const Size auctionButtonSize = Size(52, 28);
 
   /// 创建角色池资产行
   ///

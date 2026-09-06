@@ -207,7 +207,8 @@ class MainNavigationSearchHeader extends StatelessWidget {
                                     quality: GlassQuality.minimal,
                                     child: Icon(
                                       Icons.person_rounded,
-                                      size: CharacterSearchInputBar.height * 0.5,
+                                      size:
+                                          CharacterSearchInputBar.height * 0.5,
                                       color: colorScheme.onSurfaceVariant,
                                     ),
                                   )
