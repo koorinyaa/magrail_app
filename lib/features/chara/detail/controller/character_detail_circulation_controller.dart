@@ -155,8 +155,8 @@ class CharacterDetailCirculationController extends ChangeNotifier {
     _taskCount = 0;
     _notify();
     try {
-      // 相邻请求至少间隔 300 毫秒，避免响应较快时三并发仍产生密集请求
-      const requestInterval = Duration(milliseconds: 300);
+      // 相邻请求至少间隔 200 毫秒，避免响应较快时三并发仍产生密集请求
+      const requestInterval = Duration(milliseconds: 200);
       final sinceLastRequest = Stopwatch()..start();
       // 总人数为零时仍检查第一页，不能将变化后的持股用户直接遗漏
       final page = await _repository.fetchCharacterBoardMemberPage(
