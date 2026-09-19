@@ -78,19 +78,8 @@ class NextBangumiRepository {
     }
 
     try {
-      var cookies = await _cookieManager.getCookies(domain: options.uri);
-      if (!cookies.any(
-        (cookie) => cookie.name.trim().isNotEmpty && cookie.value.isNotEmpty,
-      )) {
-        final officialHost = Uri.parse(_apiBaseUrl).host;
-        final fallbackHost = options.uri.host == officialHost
-            ? 'next.${TinygrailAssetUrls.bangumiMirrorHost}'
-            : officialHost;
-        // 当前请求域名没有 Cookie 时尝试复用另一侧的 WebView 会话
-        cookies = await _cookieManager.getCookies(
-          domain: options.uri.replace(host: fallbackHost),
-        );
-      }
+      // 镜像可动态变更，只读取请求目标的会话，禁止转交其他域名的 Cookie
+      final cookies = await _cookieManager.getCookies(domain: options.uri);
       final cookieHeader = cookies
           .where(
             (cookie) =>

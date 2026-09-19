@@ -27,9 +27,6 @@ class TinygrailAssetUrls {
     _bangumiMirrorHost = BangumiMirrorConfig.resolveHost(mirrorHost);
   }
 
-  /// 当前 Bangumi 镜像域名
-  static String get bangumiMirrorHost => _bangumiMirrorHost;
-
   /// 获取圣殿封面地址
   ///
   /// [cover] 原始封面地址

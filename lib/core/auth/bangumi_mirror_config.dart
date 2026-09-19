@@ -4,7 +4,7 @@ class BangumiMirrorConfig {
   const BangumiMirrorConfig._();
 
   /// 默认 Bangumi 镜像域名
-  static const String defaultHost = 'bangumi.pro';
+  static const String defaultHost = 'bangumi.vip';
 
   // 仅接受含顶级域名且每段长度符合 DNS 限制的主机名
   static final RegExp _hostPattern = RegExp(

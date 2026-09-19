@@ -9,7 +9,6 @@ import 'package:magrail_app/core/feedback/app_toast.dart';
 import 'package:magrail_app/core/storage/app_preferences.dart';
 import 'package:magrail_app/core/update/app_update_controller.dart';
 import 'package:magrail_app/core/update/app_update_dialog.dart';
-import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
 import 'package:magrail_app/core/viewer/fullscreen_image_viewer_page.dart';
 import 'package:magrail_app/core/widgets/app_confirm_dialog.dart';
 import 'package:magrail_app/core/widgets/app_loading_dialog.dart';
@@ -100,8 +99,9 @@ class UserSettingsPage extends StatefulWidget {
 class _UserSettingsPageState extends State<UserSettingsPage> {
   bool _isSigningOut = false;
   bool _isUpdatingBangumiMirror = false;
-  late bool _useBangumiMirror;
-  late String _bangumiMirrorHost;
+
+  /// 自定义输入只显示已保存的地址，未设置时保持空白
+  String get _bangumiMirrorHost => widget.preferences.bangumiMirrorHost ?? '';
   late bool _hiddenFeaturesEnabled;
   late bool _revealPrivateUserHoldingsEnabled;
   late bool _useLiquidGlass;
@@ -112,16 +112,36 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
   @override
   void initState() {
     super.initState();
-    _useBangumiMirror = widget.preferences.useBangumiMirror;
-    _bangumiMirrorHost = BangumiMirrorConfig.resolveHost(
-      widget.preferences.bangumiMirrorHost,
-    );
+    widget.preferences.addListener(_handleMirrorPreferencesChanged);
     _hiddenFeaturesEnabled = widget.preferences.hiddenFeaturesEnabled;
     _revealPrivateUserHoldingsEnabled =
         widget.preferences.revealPrivateUserHoldingsEnabled;
     _useLiquidGlass = widget.preferences.useLiquidGlass;
     _showBotAction = widget.preferences.showBotAction;
     _themeMode = widget.preferences.themeMode;
+  }
+
+  /// 接收默认域名和镜像设置变化
+  void _handleMirrorPreferencesChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  /// 更新镜像设置保存状态，防止连续切换
+  ///
+  /// [updating] 是否正在保存镜像开关
+  void _setMirrorUpdating(bool updating) {
+    if (mounted) {
+      setState(() => _isUpdatingBangumiMirror = updating);
+    }
+  }
+
+  /// 释放镜像设置监听
+  @override
+  void dispose() {
+    widget.preferences.removeListener(_handleMirrorPreferencesChanged);
+    super.dispose();
   }
 
   /// 构建用户设置二级页面
@@ -178,33 +198,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _SettingsSurface(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _BangumiMirrorSwitchTile(
-                            value: _useBangumiMirror,
-                            mirrorHost: _bangumiMirrorHost,
-                            onChanged: _handleBangumiMirrorChanged,
-                          ),
-                          Divider(
-                            height: 1,
-                            thickness: 0.5,
-                            indent: 50,
-                            endIndent: 16,
-                            color: colorScheme.outlineVariant.withValues(
-                              alpha: 0.72,
-                            ),
-                          ),
-                          _SettingsValueActionTile(
-                            icon: Icons.dns_rounded,
-                            label: '自定义镜像',
-                            value: _bangumiMirrorHost,
-                            onPressed: _openBangumiMirrorEditor,
-                          ),
-                        ],
-                      ),
-                    ),
+                    _buildMirrorSettings(context),
                     const SizedBox(height: 16),
                     _SettingsSurface(
                       child: Column(
@@ -350,93 +344,6 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
     });
   }
 
-  /// 保存自定义镜像域名并同步后续请求
-  ///
-  /// [input] 用户输入的镜像域名或 HTTP(S) 地址
-  Future<bool> _saveBangumiMirrorHost(String input) async {
-    final trimmedInput = input.trim();
-    final normalizedHost = BangumiMirrorConfig.normalizeHost(trimmedInput);
-    if (trimmedInput.isNotEmpty && normalizedHost == null) {
-      AppToast.error(context, text: '请输入有效的镜像地址');
-      return false;
-    }
-
-    final resolvedHost = normalizedHost ?? BangumiMirrorConfig.defaultHost;
-    try {
-      if (resolvedHost == BangumiMirrorConfig.defaultHost) {
-        await widget.preferences.clearBangumiMirrorHost();
-      } else {
-        await widget.preferences.setBangumiMirrorHost(resolvedHost);
-      }
-      TinygrailAssetUrls.configureBangumiMirror(
-        useMirror: _useBangumiMirror,
-        mirrorHost: resolvedHost,
-      );
-      if (mounted) {
-        setState(() {
-          _bangumiMirrorHost = resolvedHost;
-        });
-      }
-      return true;
-    } catch (_) {
-      if (mounted) {
-        AppToast.error(context, text: '保存设置失败，请稍后重试');
-      }
-      return false;
-    }
-  }
-
-  /// 处理 Bangumi 镜像开关变化
-  ///
-  /// [value] 是否使用 Bangumi 镜像
-  Future<void> _handleBangumiMirrorChanged(bool value) async {
-    if (_isUpdatingBangumiMirror) {
-      return;
-    }
-
-    final previousValue = _useBangumiMirror;
-    setState(() {
-      _useBangumiMirror = value;
-      _isUpdatingBangumiMirror = true;
-    });
-    TinygrailAssetUrls.configureBangumiMirror(
-      useMirror: value,
-      mirrorHost: _bangumiMirrorHost,
-    );
-
-    try {
-      await widget.preferences.setUseBangumiMirror(value);
-      if (!mounted) {
-        return;
-      }
-
-      AppToast.info(
-        context,
-        text: value
-            ? '已启用 $_bangumiMirrorHost 镜像'
-            : '已关闭 $_bangumiMirrorHost 镜像',
-      );
-    } catch (_) {
-      TinygrailAssetUrls.configureBangumiMirror(
-        useMirror: previousValue,
-        mirrorHost: _bangumiMirrorHost,
-      );
-      if (!mounted) {
-        return;
-      }
-
-      setState(() {
-        _useBangumiMirror = previousValue;
-      });
-      AppToast.error(context, text: '保存设置失败，请稍后重试');
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isUpdatingBangumiMirror = false;
-        });
-      }
-    }
-  }
 
   /// 处理液态玻璃开关变化
   ///

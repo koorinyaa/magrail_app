@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:magrail_app/core/analytics/app_activity_reporter.dart';
+import 'package:magrail_app/core/auth/bangumi_mirror_repository.dart';
 import 'package:magrail_app/core/auth/tinygrail_auth_repository.dart';
 import 'package:magrail_app/core/auth/tinygrail_site_config.dart';
 import 'package:magrail_app/core/network/api_client.dart';
@@ -41,6 +42,7 @@ class AppDependencies {
   /// [apiClient] Tinygrail API 客户端
   /// [authRepository] Tinygrail 授权仓库
   /// [preferences] 本地偏好设置
+  /// [mirrorRepository] 默认镜像配置缓存与更新仓库
   /// [updateController] 应用更新控制器
   /// [secureStorage] 安全存储
   /// [activityReporter] 应用活跃状态上报器
@@ -50,6 +52,7 @@ class AppDependencies {
     required this.apiClient,
     required this.authRepository,
     required this.preferences,
+    required this.mirrorRepository,
     required this.updateController,
     required this.secureStorage,
     required this.activityReporter,
@@ -65,6 +68,9 @@ class AppDependencies {
 
   /// 本地偏好设置
   final AppPreferences preferences;
+
+  /// 默认镜像配置缓存与更新仓库
+  final BangumiMirrorRepository mirrorRepository;
 
   /// 应用更新控制器
   final AppUpdateController updateController;
@@ -230,6 +236,18 @@ Future<AppDependencies> bootstrap() async {
   final apiClient = ApiClient(dio);
   final secureStorage = const SecureStorage(FlutterSecureStorage());
   final preferences = AppPreferences(await SharedPreferences.getInstance());
+  final mirrorRepository = BangumiMirrorRepository(
+    preferences: preferences,
+    cacheFile: File('${supportDirectory.path}/bangumi_mirror.json'),
+  );
+  await mirrorRepository.loadCache();
+  // 设置页与后台更新共用一个生效出口，仅采用已保存的镜像选择
+  preferences.addListener(() {
+    TinygrailAssetUrls.configureBangumiMirror(
+      useMirror: preferences.useBangumiMirror,
+      mirrorHost: preferences.effectiveBangumiMirrorHost,
+    );
+  });
   // 统计客户端不复用 Tinygrail Dio，避免向独立域名附带业务会话 Cookie
   final activityReporter = AppActivityReporter(
     dio: Dio(
@@ -246,7 +264,7 @@ Future<AppDependencies> bootstrap() async {
   // 启动时同步 Bangumi 镜像偏好，供静态资源地址工具使用
   TinygrailAssetUrls.configureBangumiMirror(
     useMirror: preferences.useBangumiMirror,
-    mirrorHost: preferences.bangumiMirrorHost,
+    mirrorHost: preferences.effectiveBangumiMirrorHost,
   );
 
   final authRepository = TinygrailAuthRepository(
@@ -293,6 +311,7 @@ Future<AppDependencies> bootstrap() async {
   );
 
   return AppDependencies(
+    mirrorRepository: mirrorRepository,
     apiClient: apiClient,
     authRepository: authRepository,
     preferences: preferences,

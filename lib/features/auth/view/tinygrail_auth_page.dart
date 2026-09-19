@@ -2,11 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:magrail_app/core/auth/bangumi_auth_config.dart';
-import 'package:magrail_app/core/auth/bangumi_mirror_config.dart';
 import 'package:magrail_app/core/auth/tinygrail_auth_repository.dart';
 import 'package:magrail_app/core/feedback/app_toast.dart';
 import 'package:magrail_app/core/storage/app_preferences.dart';
-import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
 import 'package:magrail_app/core/utils/user_error_message.dart';
 import 'package:magrail_app/core/widgets/app_confirm_dialog.dart';
 import 'package:magrail_app/core/widgets/secondary_page_sliver_app_bar.dart';
@@ -53,10 +51,9 @@ class _TinygrailAuthPageState extends State<TinygrailAuthPage> {
   @override
   void initState() {
     super.initState();
+    // 授权页面固定本次域名，后台刷新默认配置不重载正在进行的登录
     _useBangumiMirror = widget.preferences.useBangumiMirror;
-    _bangumiMirrorHost = BangumiMirrorConfig.resolveHost(
-      widget.preferences.bangumiMirrorHost,
-    );
+    _bangumiMirrorHost = widget.preferences.effectiveBangumiMirrorHost;
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
@@ -91,7 +88,7 @@ class _TinygrailAuthPageState extends State<TinygrailAuthPage> {
                   _AuthMirrorSwitchTile(
                     value: _useBangumiMirror,
                     mirrorHost: _bangumiMirrorHost,
-                    isUpdating: _isUpdatingMirror,
+                    isUpdating: _isUpdatingMirror || _isConsumingCallback,
                     onChanged: _handleBangumiMirrorChanged,
                   ),
                   Expanded(
@@ -129,36 +126,36 @@ class _TinygrailAuthPageState extends State<TinygrailAuthPage> {
   ///
   /// [value] 是否使用 Bangumi 镜像
   Future<void> _handleBangumiMirrorChanged(bool value) async {
-    if (_isUpdatingMirror) {
+    // 回调正在建立正式会话时不允许重新加载授权入口
+    if (_isUpdatingMirror || _isConsumingCallback) {
       return;
     }
 
-    final previousValue = _useBangumiMirror;
-    setState(() {
-      _useBangumiMirror = value;
-      _isUpdatingMirror = true;
-    });
-    TinygrailAssetUrls.configureBangumiMirror(
-      useMirror: value,
-      mirrorHost: _bangumiMirrorHost,
-    );
-
+    setState(() => _isUpdatingMirror = true);
     try {
+      // 授权页共用镜像总开关，关闭再开启仍保留用户自定义地址
       await widget.preferences.setUseBangumiMirror(value);
-      await _controller.loadRequest(_authorizeUri);
-    } catch (_) {
       if (!mounted) {
         return;
       }
-
       setState(() {
-        _useBangumiMirror = previousValue;
+        _useBangumiMirror = widget.preferences.useBangumiMirror;
+        _bangumiMirrorHost = widget.preferences.effectiveBangumiMirrorHost;
       });
-      TinygrailAssetUrls.configureBangumiMirror(
-        useMirror: previousValue,
-        mirrorHost: _bangumiMirrorHost,
-      );
-      AppToast.error(context, text: '保存设置失败，请稍后重试');
+    } catch (_) {
+      if (mounted) {
+        AppToast.error(context, text: '保存设置失败，请稍后重试');
+        setState(() => _isUpdatingMirror = false);
+      }
+      return;
+    }
+    try {
+      await _controller.loadRequest(_authorizeUri);
+    } catch (_) {
+      // 加载失败不伪装成设置回滚，保持页面开关与已持久化模式一致
+      if (mounted) {
+        AppToast.error(context, text: '授权页面加载失败，请重试');
+      }
     } finally {
       if (mounted) {
         setState(() {

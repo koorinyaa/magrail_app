@@ -61,6 +61,7 @@ class _MagrailAppState extends State<MagrailApp> {
     );
     _appLifecycleListener = AppLifecycleListener(onResume: _handleAppResumed);
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(widget.dependencies.mirrorRepository.refresh());
       unawaited(_checkForStartupUpdate());
       unawaited(_refreshCurrentUserStateSilently(preloadAssets: true));
     });
@@ -175,6 +176,7 @@ class _MagrailAppState extends State<MagrailApp> {
 
   /// 处理应用重新进入前台
   void _handleAppResumed() {
+    unawaited(widget.dependencies.mirrorRepository.refresh());
     unawaited(_refreshCurrentUserStateSilently(preloadAssets: false));
   }
 

@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:magrail_app/core/auth/bangumi_mirror_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// 本地偏好设置
-class AppPreferences {
+class AppPreferences extends ChangeNotifier {
   /// 创建本地偏好设置
   ///
   /// [_preferences] SharedPreferences 实例
-  AppPreferences(this._preferences);
+  AppPreferences(this._preferences)
+    : _useBangumiMirror = _preferences.getBool(_useBangumiMirrorKey) ?? false,
+      _customBangumiMirrorHost = _preferences.getString(_bangumiMirrorHostKey);
 
   final SharedPreferences _preferences;
 
   static const _prefersDarkModeKey = 'prefers_dark_mode';
   static const _themeModeKey = 'theme_mode';
   static const _useBangumiMirrorKey = 'use_bangumi_mirror';
-  static const _bangumiMirrorHostKey = 'bangumi_mirror_host';
+  static const _bangumiMirrorHostKey = 'bangumi_custom_mirror_host';
+  // 镜像设置写入成功后才用于请求，避免保存失败时提前切换域名
+  bool _useBangumiMirror;
+  String? _customBangumiMirrorHost;
+  bool _isSavingMirror = false;
+  String _defaultBangumiMirrorHost = BangumiMirrorConfig.defaultHost;
   static const _currentUserAssetsCacheKey = 'tinygrail_current_user_assets';
   static const _currentUserCharaOverviewCacheKey =
       'tinygrail_current_user_chara_overview';
@@ -58,32 +66,89 @@ class AppPreferences {
     return prefersDarkMode ? ThemeMode.dark : ThemeMode.light;
   }
 
-  /// 读取 Bangumi 镜像偏好
-  bool get useBangumiMirror =>
-      _preferences.getBool(_useBangumiMirrorKey) ?? false;
+  /// 是否启用镜像，关闭时使用官方域名
+  bool get useBangumiMirror => _useBangumiMirror;
 
-  /// 保存 Bangumi 镜像偏好
+  /// 最近有效配置中的默认镜像域名
+  String get defaultBangumiMirrorHost => _defaultBangumiMirrorHost;
+
+  /// 自定义地址优先，未设置时使用最近有效的默认地址
+  String get effectiveBangumiMirrorHost =>
+      BangumiMirrorConfig.normalizeHost(bangumiMirrorHost) ?? defaultBangumiMirrorHost;
+
+  /// 更新已通过校验的默认配置，不覆盖自定义域名
   ///
-  /// [value] 是否使用 Bangumi 镜像
-  Future<void> setUseBangumiMirror(bool value) {
-    return _preferences.setBool(_useBangumiMirrorKey, value);
+  /// [host] 从本地缓存或远端配置读取的域名
+  void updateDefaultBangumiMirrorHost(String host) {
+    final normalized = BangumiMirrorConfig.normalizeHost(host);
+    if (normalized == null || normalized == _defaultBangumiMirrorHost) {
+      return;
+    }
+    _defaultBangumiMirrorHost = normalized;
+    notifyListeners();
   }
 
-  /// 读取 Bangumi 镜像域名
+  /// 保存镜像总开关，不改变已保存的自定义地址
+  ///
+  /// [value] 是否启用镜像
+  Future<void> setUseBangumiMirror(bool value) async {
+    if (_isSavingMirror) {
+      throw StateError('镜像设置正在保存');
+    }
+    _isSavingMirror = true;
+    final previousValue = _useBangumiMirror;
+    try {
+      final saved = await _preferences.setBool(_useBangumiMirrorKey, value);
+      if (!saved) {
+        throw StateError('保存镜像开关失败');
+      }
+      _useBangumiMirror = value;
+    } catch (_) {
+      await _preferences.setBool(_useBangumiMirrorKey, previousValue);
+      rethrow;
+    } finally {
+      _isSavingMirror = false;
+      notifyListeners();
+    }
+  }
+
+  /// 读取用户保存的自定义域名，未设置时为空
   String? get bangumiMirrorHost {
-    return _preferences.getString(_bangumiMirrorHostKey);
+    return _customBangumiMirrorHost;
   }
 
-  /// 保存 Bangumi 镜像域名
+  /// 保存自定义镜像域名，空字符串清除覆盖并恢复默认地址
   ///
-  /// [value] Bangumi 镜像域名
-  Future<void> setBangumiMirrorHost(String value) {
-    return _preferences.setString(_bangumiMirrorHostKey, value);
-  }
-
-  /// 清除 Bangumi 镜像域名
-  Future<void> clearBangumiMirrorHost() {
-    return _preferences.remove(_bangumiMirrorHostKey);
+  /// [value] 自定义域名，空字符串表示使用默认配置
+  Future<void> setBangumiMirrorHost(String value) async {
+    final host = BangumiMirrorConfig.normalizeHost(value);
+    if (value.trim().isNotEmpty && host == null) {
+      throw ArgumentError('无效的镜像地址');
+    }
+    if (_isSavingMirror) {
+      throw StateError('镜像设置正在保存');
+    }
+    _isSavingMirror = true;
+    final previousHost = bangumiMirrorHost;
+    try {
+      final saved = host == null
+          ? await _preferences.remove(_bangumiMirrorHostKey)
+          : await _preferences.setString(_bangumiMirrorHostKey, host);
+      if (!saved) {
+        throw StateError('保存镜像地址失败');
+      }
+      _customBangumiMirrorHost = host;
+    } catch (_) {
+      if (previousHost == null) {
+        await _preferences.remove(_bangumiMirrorHostKey);
+      } else {
+        await _preferences.setString(_bangumiMirrorHostKey, previousHost);
+      }
+      rethrow;
+    } finally {
+      _isSavingMirror = false;
+      notifyListeners();
+    }
   }
 
   /// 读取当前登录用户资产缓存
