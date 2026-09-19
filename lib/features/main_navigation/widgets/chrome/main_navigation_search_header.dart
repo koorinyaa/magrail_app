@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import 'package:liquid_glass_widgets/theme/glass_theme_helpers.dart';
+import 'package:magrail_app/core/theme/app_blur_style.dart';
 import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 import 'package:magrail_app/features/chara/search/widgets/character_search_input_bar.dart';
 import 'package:magrail_app/features/user/model/user_detail_profile.dart';
@@ -90,6 +92,13 @@ class MainNavigationSearchHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
+    // 搜索入口与头像占位共享磨砂配置，其余效果继承组件当前主题
+    final searchGlassSettings = GlassThemeHelpers.resolveSettings(context).copyWith(
+      blur: AppBlurStyle.sigma,
+      glassColor: isDark
+          ? const Color(0xFF52525B).withValues(alpha: 0.35)
+          : const Color(0xFFD4D4D8).withValues(alpha: 0.45),
+    );
     final avatarFeedbackColor = isDark ? Colors.white : Colors.black;
     final systemOverlayStyle = SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -110,22 +119,14 @@ class MainNavigationSearchHeader extends StatelessWidget {
             for (final stop in _backgroundGradientStops)
               gradientStart + (1 - gradientStart) * stop,
           ];
-    final searchGlassSettings = isDark
-        ? const LiquidGlassSettings(
-            glassColor: Color(0x1AFFFFFF),
-            thickness: 0,
-            blur: 0,
-            glowIntensity: 0,
-            shadowElevation: 0,
-          )
-        : const LiquidGlassSettings(
-            visibility: 0,
-            glassColor: Colors.transparent,
-            thickness: 0,
-            blur: 0,
-            glowIntensity: 0,
-            shadowElevation: 0,
-          );
+    final surfaceColor = Color.alphaBlend(
+      colorScheme.surfaceContainer.withValues(alpha: 0.8),
+      backgroundColor,
+    ).withValues(
+      alpha: isDark
+          ? AppBlurStyle.darkSurfaceAlpha
+          : AppBlurStyle.lightSurfaceAlpha,
+    );
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: systemOverlayStyle,
@@ -136,24 +137,31 @@ class MainNavigationSearchHeader extends StatelessWidget {
           children: [
             Positioned.fill(
               child: IgnorePointer(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      stops: gradientStops,
-                      colors: [
-                        backgroundColor,
-                        backgroundColor,
-                        backgroundColor.withValues(alpha: 0.99),
-                        backgroundColor.withValues(alpha: 0.96),
-                        backgroundColor.withValues(alpha: 0.9),
-                        backgroundColor.withValues(alpha: 0.8),
-                        backgroundColor.withValues(alpha: 0.65),
-                        backgroundColor.withValues(alpha: 0.45),
-                        backgroundColor.withValues(alpha: 0.2),
-                        backgroundColor.withValues(alpha: 0),
-                      ],
+                // 先采样后方内容，再在同一模糊图层内淡出结果，避免外层离屏遮罩隔断采样
+                child: ClipRect(
+                  child: BackdropFilter(
+                    filter: AppBlurStyle.filter,
+                    child: CustomPaint(
+                      foregroundPainter: _SearchHeaderFadePainter(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          stops: gradientStops,
+                          colors: [
+                            Colors.white,
+                            Colors.white,
+                            Colors.white.withValues(alpha: 0.99),
+                            Colors.white.withValues(alpha: 0.96),
+                            Colors.white.withValues(alpha: 0.9),
+                            Colors.white.withValues(alpha: 0.8),
+                            Colors.white.withValues(alpha: 0.65),
+                            Colors.white.withValues(alpha: 0.45),
+                            Colors.white.withValues(alpha: 0.2),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                      child: ColoredBox(color: surfaceColor),
                     ),
                   ),
                 ),
@@ -250,5 +258,40 @@ class MainNavigationSearchHeader extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// 在搜索头部模糊图层内淡出完整磨砂画面
+class _SearchHeaderFadePainter extends CustomPainter {
+  /// 创建磨砂结果渐隐绘制器
+  ///
+  /// [gradient] 磨砂画面从可见到透明的纵向遮罩
+  const _SearchHeaderFadePainter({required this.gradient});
+
+  /// 磨砂结果的透明度遮罩
+  final LinearGradient gradient;
+
+  /// 对已绘制的模糊背景和灰色表面应用渐隐
+  ///
+  /// [canvas] 所属 BackdropFilter 图层的画布
+  /// [size] 搜索头部背景尺寸
+  @override
+  void paint(Canvas canvas, Size size) {
+    final bounds = Offset.zero & size;
+    // 混合当前模糊图层
+    canvas.drawRect(
+      bounds,
+      Paint()
+        ..blendMode = BlendMode.dstIn
+        ..shader = gradient.createShader(bounds),
+    );
+  }
+
+  /// 在渐隐范围变化时更新遮罩
+  ///
+  /// [oldDelegate] 上一次的渐隐绘制配置
+  @override
+  bool shouldRepaint(_SearchHeaderFadePainter oldDelegate) {
+    return gradient != oldDelegate.gradient;
   }
 }
