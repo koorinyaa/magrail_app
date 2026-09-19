@@ -260,9 +260,9 @@ class _IcoParticipantsGrid extends StatelessWidget {
     return SliverPadding(
       padding: AppSafeAreaInsets.fromLTRB(
         context,
-        left: 12,
+        left: AppSafeAreaInsets.previewHorizontal,
         top: 0,
-        right: 12,
+        right: AppSafeAreaInsets.previewHorizontal,
         bottom: 0,
       ),
       sliver: SliverGrid(
@@ -296,9 +296,9 @@ class _IcoParticipantsSkeletonGrid extends StatelessWidget {
     return SliverPadding(
       padding: AppSafeAreaInsets.fromLTRB(
         context,
-        left: 12,
+        left: AppSafeAreaInsets.previewHorizontal,
         top: 0,
-        right: 12,
+        right: AppSafeAreaInsets.previewHorizontal,
         bottom: 0,
       ),
       sliver: SliverGrid(
@@ -336,7 +336,10 @@ class _IcoParticipantsErrorSliver extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 12),
+        padding: AppSafeAreaInsets.symmetricHorizontal(
+          context,
+          horizontal: AppSafeAreaInsets.previewHorizontal,
+        ),
         child: AppLoadFailedState(message: message, onActionPressed: onRetry),
       ),
     );
@@ -359,9 +362,9 @@ class _IcoParticipantsEmptySliver extends StatelessWidget {
       child: Padding(
         padding: AppSafeAreaInsets.fromLTRB(
           context,
-          left: 24,
+          left: AppSafeAreaInsets.previewHorizontal,
           top: 8,
-          right: 24,
+          right: AppSafeAreaInsets.previewHorizontal,
           bottom: 24,
         ),
         child: Text(

@@ -2,6 +2,12 @@ import 'package:flutter/widgets.dart';
 
 /// 应用安全区间距工具
 class AppSafeAreaInsets {
+  /// 一级页面基础左右边距
+  static const double primaryPageHorizontal = 16;
+
+  /// 区块标题、预览内容及对应状态的基础左右边距
+  static const double previewHorizontal = 16;
+
   /// 禁止创建应用安全区间距工具
   const AppSafeAreaInsets._();
 

@@ -64,9 +64,9 @@ class RankingTabBar extends StatelessWidget implements PreferredSizeWidget {
       child: Padding(
         padding: AppSafeAreaInsets.fromLTRB(
           context,
-          left: 24,
+          left: AppSafeAreaInsets.primaryPageHorizontal,
           top: 0,
-          right: 24,
+          right: AppSafeAreaInsets.primaryPageHorizontal,
           bottom: 0,
         ),
         child: LayoutBuilder(

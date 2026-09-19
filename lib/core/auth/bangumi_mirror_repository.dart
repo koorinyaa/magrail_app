@@ -60,7 +60,10 @@ class BangumiMirrorRepository {
       }
       await _cacheFile.parent.create(recursive: true);
       final pending = File('${_cacheFile.path}.pending');
-      await pending.writeAsString(jsonEncode({'defaultHost': host}), flush: true);
+      await pending.writeAsString(
+        jsonEncode({'defaultHost': host}),
+        flush: true,
+      );
       // 写完后替换正式缓存，避免中断写入破坏上次可用地址
       await pending.rename(_cacheFile.path);
       _preferences.updateDefaultBangumiMirrorHost(host);

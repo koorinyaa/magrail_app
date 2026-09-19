@@ -64,7 +64,7 @@ class TowerRankingCarousel extends StatelessWidget {
           return Padding(
             padding: AppSafeAreaInsets.symmetricHorizontal(
               context,
-              horizontal: 24,
+              horizontal: AppSafeAreaInsets.primaryPageHorizontal,
             ),
             child: _TowerRankingErrorState(onRetry: onRetry),
           );
@@ -74,7 +74,7 @@ class TowerRankingCarousel extends StatelessWidget {
           return Padding(
             padding: AppSafeAreaInsets.symmetricHorizontal(
               context,
-              horizontal: 24,
+              horizontal: AppSafeAreaInsets.primaryPageHorizontal,
             ),
             child: const _TowerRankingEmptyState(),
           );
@@ -90,7 +90,7 @@ class TowerRankingCarousel extends StatelessWidget {
           separatorExtent: 12,
           padding: AppSafeAreaInsets.symmetricHorizontal(
             context,
-            horizontal: 24,
+            horizontal: AppSafeAreaInsets.primaryPageHorizontal,
           ),
           clipBehavior: Clip.none,
           itemBuilder: (context, index) {

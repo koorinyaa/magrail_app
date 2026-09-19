@@ -67,7 +67,7 @@ class CharacterAssetPreviewCarousel<T> extends StatelessWidget {
           return Padding(
             padding: AppSafeAreaInsets.symmetricHorizontal(
               context,
-              horizontal: 24,
+              horizontal: AppSafeAreaInsets.primaryPageHorizontal,
             ),
             child: _CharacterAssetPreviewEmpty(message: emptyMessage),
           );
@@ -85,7 +85,7 @@ class CharacterAssetPreviewCarousel<T> extends StatelessWidget {
           separatorExtent: 12,
           padding: AppSafeAreaInsets.symmetricHorizontal(
             context,
-            horizontal: 24,
+            horizontal: AppSafeAreaInsets.primaryPageHorizontal,
           ),
           clipBehavior: Clip.none,
           itemBuilder: (context, index) {

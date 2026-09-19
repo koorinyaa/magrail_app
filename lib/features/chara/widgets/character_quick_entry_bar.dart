@@ -23,12 +23,6 @@ class CharacterQuickEntryBar extends StatelessWidget {
   /// 平板入口布局最大宽度，避免卡片过度横向拉伸
   static const double _maximumContentWidth = 760;
 
-  /// 平板布局起始宽度
-  static const double _tabletBreakpoint = 600;
-
-  /// 平板入口横向边距
-  static const double _tabletHorizontalPadding = 24;
-
   static const double _contentHeight = 162;
 
   /// 创建角色页快捷入口栏
@@ -58,16 +52,12 @@ class CharacterQuickEntryBar extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final horizontalPadding =
-        MediaQuery.sizeOf(context).width >= _tabletBreakpoint
-        ? _tabletHorizontalPadding
-        : 16.0;
     return Padding(
       padding: AppSafeAreaInsets.fromLTRB(
         context,
-        left: horizontalPadding,
+        left: AppSafeAreaInsets.primaryPageHorizontal,
         top: 0,
-        right: horizontalPadding,
+        right: AppSafeAreaInsets.primaryPageHorizontal,
         bottom: 0,
       ),
       child: LayoutBuilder(

@@ -16,14 +16,19 @@ class UserLinkOverviewCarousel extends StatelessWidget {
   /// [links] 用户连接预览
   /// [isLoading] 是否正在加载
   /// [onCharacterTap] 角色名称点击回调
+  /// [horizontalPadding] 区块基础左右边距
   /// [onAssetTap] 圣殿资产入口点击回调
   const UserLinkOverviewCarousel({
     super.key,
+    this.horizontalPadding = AppSafeAreaInsets.previewHorizontal,
     required this.links,
     required this.isLoading,
     this.onCharacterTap,
     this.onAssetTap,
   });
+
+  /// 区块基础左右边距
+  final double horizontalPadding;
 
   /// 用户连接预览
   final List<UserLinkApiItem>? links;
@@ -48,7 +53,10 @@ class UserLinkOverviewCarousel extends StatelessWidget {
 
     if (!showSkeleton && resolvedLinks.isEmpty) {
       return Padding(
-        padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 24),
+        padding: AppSafeAreaInsets.symmetricHorizontal(
+          context,
+          horizontal: horizontalPadding,
+        ),
         child: const _UserOverviewInlineEmpty(message: '暂无连接'),
       );
     }
@@ -60,7 +68,7 @@ class UserLinkOverviewCarousel extends StatelessWidget {
       separatorExtent: 14,
       padding: AppSafeAreaInsets.symmetricHorizontal(
         context,
-        horizontal: 24,
+        horizontal: horizontalPadding,
         vertical: 6,
       ),
       clipBehavior: Clip.none,
@@ -89,15 +97,20 @@ class UserTempleOverviewCarousel extends StatelessWidget {
   /// [temples] 用户圣殿预览
   /// [isLoading] 是否正在加载
   /// [onCharacterTap] 角色区域点击回调
+  /// [horizontalPadding] 区块基础左右边距
   /// [onAssetTap] 圣殿资产入口点击回调
   const UserTempleOverviewCarousel({
     super.key,
+    this.horizontalPadding = AppSafeAreaInsets.previewHorizontal,
     required this.profile,
     required this.temples,
     required this.isLoading,
     this.onCharacterTap,
     this.onAssetTap,
   });
+
+  /// 区块基础左右边距
+  final double horizontalPadding;
 
   static const double _cardWidth = 180;
   static final double _cardHeight = UserTempleCard.heightForWidth(_cardWidth);
@@ -128,7 +141,10 @@ class UserTempleOverviewCarousel extends StatelessWidget {
 
     if (!showSkeleton && resolvedTemples.isEmpty) {
       return Padding(
-        padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 24),
+        padding: AppSafeAreaInsets.symmetricHorizontal(
+          context,
+          horizontal: horizontalPadding,
+        ),
         child: const _UserOverviewInlineEmpty(message: '暂无圣殿'),
       );
     }
@@ -140,7 +156,7 @@ class UserTempleOverviewCarousel extends StatelessWidget {
       separatorExtent: 10,
       padding: AppSafeAreaInsets.symmetricHorizontal(
         context,
-        horizontal: 24,
+        horizontal: horizontalPadding,
         vertical: 6,
       ),
       clipBehavior: Clip.none,

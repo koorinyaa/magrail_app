@@ -241,7 +241,6 @@ class _SettingsNewBadge extends StatelessWidget {
   }
 }
 
-
 /// 设置页普通开关
 class _SettingsSwitchTile extends StatelessWidget {
   /// 创建设置页普通开关

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 import 'package:magrail_app/core/theme/app_blur_style.dart';
 import 'package:magrail_app/features/user/model/user_detail_profile.dart';
 import 'package:magrail_app/features/user/widgets/user_avatar.dart';
@@ -88,9 +89,17 @@ class UserDetailFloatingTopActions extends StatelessWidget {
             decoration: BoxDecoration(color: backgroundColor),
             child: Padding(
               padding: EdgeInsets.only(
-                left: safePadding.left,
+                left:
+                    safePadding.left +
+                    (showBackButton
+                        ? 0
+                        : AppSafeAreaInsets.primaryPageHorizontal),
                 top: safePadding.top,
-                right: safePadding.right + 12,
+                right:
+                    safePadding.right +
+                    (showBackButton
+                        ? 12
+                        : AppSafeAreaInsets.primaryPageHorizontal),
               ),
               child: _UserDetailTopActions(
                 toolbarHeight: toolbarHeight,

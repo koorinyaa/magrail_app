@@ -42,10 +42,7 @@ extension _UserSettingsPageMirrorActions on _UserSettingsPageState {
     try {
       await widget.preferences.setUseBangumiMirror(value);
       if (mounted) {
-        AppToast.info(
-          context,
-          text: value ? '已启用镜像' : '已关闭镜像',
-        );
+        AppToast.info(context, text: value ? '已启用镜像' : '已关闭镜像');
       }
     } catch (_) {
       if (mounted) {

@@ -25,7 +25,8 @@ class TempleRefineRankingSliverGrid extends StatelessWidget {
     required this.onAssetTap,
   });
 
-  static const double _horizontalPadding = 12;
+  static const double _horizontalPadding =
+      AppSafeAreaInsets.primaryPageHorizontal;
   static const double _spacing = 10;
   static const double _maxCardExtent = 190;
   static const double _cardAspectRatio = 3 / 4;

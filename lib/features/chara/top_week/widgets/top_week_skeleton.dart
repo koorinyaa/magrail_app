@@ -17,7 +17,7 @@ class _TopWeekSkeletonCarousel extends StatelessWidget {
       separatorExtent: 12,
       padding: AppSafeAreaInsets.symmetricHorizontal(
         context,
-        horizontal: 24,
+        horizontal: AppSafeAreaInsets.primaryPageHorizontal,
         vertical: 6,
       ),
       clipBehavior: Clip.none,

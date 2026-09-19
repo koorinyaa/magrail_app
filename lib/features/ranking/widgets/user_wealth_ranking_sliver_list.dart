@@ -44,9 +44,9 @@ class UserWealthRankingSliverList extends StatelessWidget {
         return Padding(
           padding: AppSafeAreaInsets.fromLTRB(
             context,
-            left: 12,
+            left: AppSafeAreaInsets.primaryPageHorizontal,
             top: 0,
-            right: 12,
+            right: AppSafeAreaInsets.primaryPageHorizontal,
             bottom: 6,
           ),
           child: _WealthRankingRow(item: item),
@@ -78,9 +78,9 @@ class UserWealthRankingSkeletonList extends StatelessWidget {
         return Padding(
           padding: AppSafeAreaInsets.fromLTRB(
             context,
-            left: 12,
+            left: AppSafeAreaInsets.primaryPageHorizontal,
             top: 0,
-            right: 12,
+            right: AppSafeAreaInsets.primaryPageHorizontal,
             bottom: 6,
           ),
           child: const _WealthRankingSkeletonRow(),

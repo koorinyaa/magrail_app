@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:magrail_app/core/auth/tinygrail_auth_repository.dart';
 import 'package:magrail_app/core/feedback/app_toast.dart';
@@ -163,6 +164,7 @@ class _MainHomeViewState extends State<MainHomeView> {
                   child: SizedBox(height: widget.topContentPadding),
                 ),
               PageSectionSliver(
+                horizontalPadding: AppSafeAreaInsets.primaryPageHorizontal,
                 title: '每周萌王',
                 trailing: HomeSectionActionButton(
                   icon: Icons.history_rounded,
@@ -178,6 +180,7 @@ class _MainHomeViewState extends State<MainHomeView> {
                 ),
               ),
               PageSectionSliver(
+                horizontalPadding: AppSafeAreaInsets.primaryPageHorizontal,
                 topSpacing: 22,
                 title: '通天塔(β)',
                 trailing: HomeSectionActionButton(
@@ -195,6 +198,7 @@ class _MainHomeViewState extends State<MainHomeView> {
                 ),
               ),
               PageSectionSliver(
+                horizontalPadding: AppSafeAreaInsets.primaryPageHorizontal,
                 topSpacing: 22,
                 title: '最新连接',
                 onHeaderTap: _openLatestLinks,
@@ -211,6 +215,7 @@ class _MainHomeViewState extends State<MainHomeView> {
                 ),
               ),
               PageSectionSliver(
+                horizontalPadding: AppSafeAreaInsets.primaryPageHorizontal,
                 topSpacing: 22,
                 title: '最新圣殿',
                 onHeaderTap: _openLatestTemples,

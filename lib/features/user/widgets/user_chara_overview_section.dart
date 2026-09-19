@@ -37,9 +37,11 @@ class UserCharaOverviewSection extends StatelessWidget {
   /// [onTempleCharacterTap] 圣殿和连接角色点击回调
   /// [onTempleAssetTap] 圣殿资产入口点击回调
   /// [onCharacterTap] 角色条目点击回调
+  /// [horizontalPadding] 区块标题、预览内容及对应状态的基础左右边距
   /// [onIcoTap] ICO 条目点击回调
   const UserCharaOverviewSection({
     super.key,
+    this.horizontalPadding = AppSafeAreaInsets.previewHorizontal,
     required this.profile,
     required this.links,
     required this.temples,
@@ -63,6 +65,9 @@ class UserCharaOverviewSection extends StatelessWidget {
     this.onCharacterTap,
     this.onIcoTap,
   });
+
+  /// 区块基础左右边距，不含系统安全区
+  final double horizontalPadding;
 
   /// 用户资料
   final UserDetailProfile profile;
@@ -169,9 +174,9 @@ class UserCharaOverviewSection extends StatelessWidget {
         child: Padding(
           padding: AppSafeAreaInsets.fromLTRB(
             context,
-            left: 24,
+            left: horizontalPadding,
             top: 18,
-            right: 24,
+            right: horizontalPadding,
             bottom: 0,
           ),
           child: UserOverviewMessage(message: '角色资产加载失败', onRetry: onRetry),
@@ -184,9 +189,9 @@ class UserCharaOverviewSection extends StatelessWidget {
         child: Padding(
           padding: AppSafeAreaInsets.fromLTRB(
             context,
-            left: 10,
+            left: horizontalPadding,
             top: 18,
-            right: 10,
+            right: horizontalPadding,
             bottom: 0,
           ),
           child: const UserOverviewMessage(message: '暂无角色资产'),
@@ -198,10 +203,12 @@ class UserCharaOverviewSection extends StatelessWidget {
       slivers: showSkeleton
           ? [
               PageSectionSliver(
+                horizontalPadding: horizontalPadding,
                 topSpacing: 12,
                 title: linksTitle,
                 onHeaderTap: onLinksHeaderTap,
                 child: UserLinkOverviewCarousel(
+                  horizontalPadding: horizontalPadding,
                   links: links,
                   isLoading: true,
                   onCharacterTap: onTempleCharacterTap,
@@ -209,10 +216,12 @@ class UserCharaOverviewSection extends StatelessWidget {
                 ),
               ),
               PageSectionSliver(
+                horizontalPadding: horizontalPadding,
                 topSpacing: 22,
                 title: templesTitle,
                 onHeaderTap: onTemplesHeaderTap,
                 child: UserTempleOverviewCarousel(
+                  horizontalPadding: horizontalPadding,
                   profile: profile,
                   temples: temples,
                   isLoading: true,
@@ -221,10 +230,12 @@ class UserCharaOverviewSection extends StatelessWidget {
                 ),
               ),
               PageSectionSliver(
+                horizontalPadding: horizontalPadding,
                 topSpacing: 22,
                 title: charactersTitle,
                 onHeaderTap: onCharactersHeaderTap,
                 child: UserCharacterAssetCarousel(
+                  horizontalPadding: horizontalPadding,
                   characters: characters,
                   isLoading: true,
                   hideHoldings: hidePrivateValues,
@@ -233,10 +244,12 @@ class UserCharaOverviewSection extends StatelessWidget {
                 ),
               ),
               PageSectionSliver(
+                horizontalPadding: horizontalPadding,
                 topSpacing: 22,
                 title: icosTitle,
                 onHeaderTap: onIcosHeaderTap,
                 child: UserIcoAssetCarousel(
+                  horizontalPadding: horizontalPadding,
                   icos: icos,
                   isLoading: true,
                   hideInvestment: hidePrivateValues,
@@ -282,10 +295,12 @@ class UserCharaOverviewSection extends StatelessWidget {
     if (links.isNotEmpty) {
       slivers.add(
         PageSectionSliver(
+          horizontalPadding: horizontalPadding,
           topSpacing: _resolveTopSpacing(slivers),
           title: linksTitle,
           onHeaderTap: onLinksHeaderTap,
           child: UserLinkOverviewCarousel(
+            horizontalPadding: horizontalPadding,
             links: links,
             isLoading: false,
             onCharacterTap: onTempleCharacterTap,
@@ -298,10 +313,12 @@ class UserCharaOverviewSection extends StatelessWidget {
     if (temples.isNotEmpty) {
       slivers.add(
         PageSectionSliver(
+          horizontalPadding: horizontalPadding,
           topSpacing: _resolveTopSpacing(slivers),
           title: templesTitle,
           onHeaderTap: onTemplesHeaderTap,
           child: UserTempleOverviewCarousel(
+            horizontalPadding: horizontalPadding,
             profile: profile,
             temples: temples,
             isLoading: false,
@@ -315,10 +332,12 @@ class UserCharaOverviewSection extends StatelessWidget {
     if (characters.isNotEmpty) {
       slivers.add(
         PageSectionSliver(
+          horizontalPadding: horizontalPadding,
           topSpacing: _resolveTopSpacing(slivers),
           title: charactersTitle,
           onHeaderTap: onCharactersHeaderTap,
           child: UserCharacterAssetCarousel(
+            horizontalPadding: horizontalPadding,
             characters: characters,
             isLoading: false,
             hideHoldings: hidePrivateValues,
@@ -332,10 +351,12 @@ class UserCharaOverviewSection extends StatelessWidget {
     if (icos.isNotEmpty) {
       slivers.add(
         PageSectionSliver(
+          horizontalPadding: horizontalPadding,
           topSpacing: _resolveTopSpacing(slivers),
           title: icosTitle,
           onHeaderTap: onIcosHeaderTap,
           child: UserIcoAssetCarousel(
+            horizontalPadding: horizontalPadding,
             icos: icos,
             isLoading: false,
             hideInvestment: hidePrivateValues,

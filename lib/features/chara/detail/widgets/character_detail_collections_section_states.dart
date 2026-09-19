@@ -20,7 +20,10 @@ class _PreviewFailedState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 12),
+      padding: AppSafeAreaInsets.symmetricHorizontal(
+        context,
+        horizontal: AppSafeAreaInsets.previewHorizontal,
+      ),
       child: AppLoadFailedState(message: message, onActionPressed: onRetry),
     );
   }
@@ -45,9 +48,9 @@ class _LinkPreviewSkeleton extends StatelessWidget {
       separatorExtent: 12,
       padding: AppSafeAreaInsets.fromLTRB(
         context,
-        left: 24,
+        left: AppSafeAreaInsets.previewHorizontal,
         top: 0,
-        right: 24,
+        right: AppSafeAreaInsets.previewHorizontal,
         bottom: 0,
       ),
       itemBuilder: (context, index) {
@@ -78,9 +81,9 @@ class _TemplePreviewSkeleton extends StatelessWidget {
       separatorExtent: 12,
       padding: AppSafeAreaInsets.fromLTRB(
         context,
-        left: 24,
+        left: AppSafeAreaInsets.previewHorizontal,
         top: 0,
-        right: 24,
+        right: AppSafeAreaInsets.previewHorizontal,
         bottom: 0,
       ),
       itemBuilder: (context, index) {

@@ -195,7 +195,7 @@ class _CharacterDetailBoardSectionState
           separatorExtent: 12,
           padding: AppSafeAreaInsets.symmetricHorizontal(
             context,
-            horizontal: 24,
+            horizontal: AppSafeAreaInsets.previewHorizontal,
           ),
           clipBehavior: Clip.none,
           itemBuilder: (context, columnIndex) {
@@ -403,7 +403,10 @@ class _BoardPreviewFailedState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 12),
+      padding: AppSafeAreaInsets.symmetricHorizontal(
+        context,
+        horizontal: AppSafeAreaInsets.previewHorizontal,
+      ),
       child: AppLoadFailedState(message: message, onActionPressed: onRetry),
     );
   }
@@ -422,7 +425,10 @@ class _BoardPreviewEmptyState extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 24),
+      padding: AppSafeAreaInsets.symmetricHorizontal(
+        context,
+        horizontal: AppSafeAreaInsets.previewHorizontal,
+      ),
       child: SizedBox(
         height: 88,
         child: Center(
@@ -464,7 +470,7 @@ class _BoardPreviewSkeleton extends StatelessWidget {
           separatorExtent: 12,
           padding: AppSafeAreaInsets.symmetricHorizontal(
             context,
-            horizontal: 24,
+            horizontal: AppSafeAreaInsets.previewHorizontal,
           ),
           clipBehavior: Clip.none,
           itemBuilder: (context, columnIndex) {

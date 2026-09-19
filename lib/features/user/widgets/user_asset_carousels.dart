@@ -19,15 +19,20 @@ class UserCharacterAssetCarousel extends StatelessWidget {
   /// [isLoading] 是否正在加载
   /// [hideHoldings] 是否隐藏持股数量
   /// [onRevealHoldings] 未公开持股查询回调
+  /// [horizontalPadding] 区块基础左右边距
   /// [onCharacterTap] 角色条目点击回调
   const UserCharacterAssetCarousel({
     super.key,
+    this.horizontalPadding = AppSafeAreaInsets.previewHorizontal,
     required this.characters,
     required this.isLoading,
     this.hideHoldings = false,
     this.onRevealHoldings,
     this.onCharacterTap,
   });
+
+  /// 区块基础左右边距
+  final double horizontalPadding;
 
   /// 用户角色预览
   final List<UserCharacterApiItem>? characters;
@@ -51,6 +56,7 @@ class UserCharacterAssetCarousel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _UserAssetCarousel<UserCharacterApiItem>(
+      horizontalPadding: horizontalPadding,
       items: characters,
       isLoading: isLoading,
       emptyMessage: '暂无角色',
@@ -86,14 +92,19 @@ class UserIcoAssetCarousel extends StatelessWidget {
   /// [icos] 用户 ICO 预览
   /// [isLoading] 是否正在加载
   /// [hideInvestment] 是否隐藏已注资金额
+  /// [horizontalPadding] 区块基础左右边距
   /// [onIcoTap] ICO 条目点击回调
   const UserIcoAssetCarousel({
     super.key,
+    this.horizontalPadding = AppSafeAreaInsets.previewHorizontal,
     required this.icos,
     required this.isLoading,
     this.hideInvestment = false,
     this.onIcoTap,
   });
+
+  /// 区块基础左右边距
+  final double horizontalPadding;
 
   /// 用户 ICO 预览
   final List<UserIcoApiItem>? icos;
@@ -113,6 +124,7 @@ class UserIcoAssetCarousel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _UserAssetCarousel<UserIcoApiItem>(
+      horizontalPadding: horizontalPadding,
       items: icos,
       isLoading: isLoading,
       emptyMessage: '暂无ICO',
@@ -150,8 +162,10 @@ class _UserAssetCarousel<T> extends StatelessWidget {
   /// [itemBuilder] 条目构建器
   /// [showLevelSkeleton] 是否显示等级骨架
   /// [skeletonMetricCount] 数据项骨架数量
+  /// [horizontalPadding] 区块基础左右边距
   /// [showTrailingSkeleton] 是否显示右侧胶囊骨架
   const _UserAssetCarousel({
+    this.horizontalPadding = AppSafeAreaInsets.previewHorizontal,
     required this.items,
     required this.isLoading,
     required this.emptyMessage,
@@ -160,6 +174,9 @@ class _UserAssetCarousel<T> extends StatelessWidget {
     this.skeletonMetricCount = 2,
     this.showTrailingSkeleton = false,
   });
+
+  /// 区块基础左右边距
+  final double horizontalPadding;
 
   // 预览接口每次取 24 条，按每列 4 条呈现为 6 列
   static const int _rowsPerColumn = 4;
@@ -205,7 +222,7 @@ class _UserAssetCarousel<T> extends StatelessWidget {
           return Padding(
             padding: AppSafeAreaInsets.symmetricHorizontal(
               context,
-              horizontal: 24,
+              horizontal: horizontalPadding,
             ),
             child: _UserAssetInlineEmpty(message: emptyMessage),
           );
@@ -223,7 +240,7 @@ class _UserAssetCarousel<T> extends StatelessWidget {
           separatorExtent: 12,
           padding: AppSafeAreaInsets.symmetricHorizontal(
             context,
-            horizontal: 24,
+            horizontal: horizontalPadding,
           ),
           clipBehavior: Clip.none,
           itemBuilder: (context, index) {

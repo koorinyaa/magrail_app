@@ -81,14 +81,20 @@ class LatestLinkCarousel extends StatelessWidget {
 
     if (isLoadFailed && !showSkeleton && (pairs == null || pairs!.isEmpty)) {
       return Padding(
-        padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 24),
+        padding: AppSafeAreaInsets.symmetricHorizontal(
+          context,
+          horizontal: AppSafeAreaInsets.primaryPageHorizontal,
+        ),
         child: _LatestLinkErrorState(onRetry: onRetry),
       );
     }
 
     if (!showSkeleton && pairs != null && pairs!.isEmpty) {
       return Padding(
-        padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 24),
+        padding: AppSafeAreaInsets.symmetricHorizontal(
+          context,
+          horizontal: AppSafeAreaInsets.primaryPageHorizontal,
+        ),
         child: const _LatestLinkEmptyState(),
       );
     }
@@ -102,7 +108,7 @@ class LatestLinkCarousel extends StatelessWidget {
       separatorExtent: 14,
       padding: AppSafeAreaInsets.symmetricHorizontal(
         context,
-        horizontal: 24,
+        horizontal: AppSafeAreaInsets.primaryPageHorizontal,
         vertical: 6,
       ),
       clipBehavior: Clip.none,

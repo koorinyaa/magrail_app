@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 import 'package:magrail_app/core/widgets/app_load_failed_state.dart';
 import 'package:magrail_app/core/widgets/page_section_sliver.dart';
 import 'package:magrail_app/features/user/widgets/user_asset_carousels.dart';
@@ -9,38 +10,62 @@ class UserCharaOverviewSkeletonSection extends StatelessWidget {
   /// 创建用户角色资产预览骨架区
   ///
   /// [key] Flutter 组件标识
-  const UserCharaOverviewSkeletonSection({super.key});
+  /// [horizontalPadding] 区块基础左右边距
+  const UserCharaOverviewSkeletonSection({
+    super.key,
+    this.horizontalPadding = AppSafeAreaInsets.previewHorizontal,
+  });
+
+  /// 区块基础左右边距
+  final double horizontalPadding;
 
   /// 构建用户角色资产预览骨架区
   ///
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return const SliverMainAxisGroup(
+    return SliverMainAxisGroup(
       slivers: [
         PageSectionSliver(
+          horizontalPadding: horizontalPadding,
           topSpacing: 12,
           title: '连接',
-          child: UserLinkOverviewCarousel(links: null, isLoading: true),
+          child: UserLinkOverviewCarousel(
+            horizontalPadding: horizontalPadding,
+            links: null,
+            isLoading: true,
+          ),
         ),
         PageSectionSliver(
+          horizontalPadding: horizontalPadding,
           topSpacing: 22,
           title: '圣殿',
           child: UserTempleOverviewCarousel(
+            horizontalPadding: horizontalPadding,
             profile: null,
             temples: null,
             isLoading: true,
           ),
         ),
         PageSectionSliver(
+          horizontalPadding: horizontalPadding,
           topSpacing: 22,
           title: '角色',
-          child: UserCharacterAssetCarousel(characters: null, isLoading: true),
+          child: UserCharacterAssetCarousel(
+            horizontalPadding: horizontalPadding,
+            characters: null,
+            isLoading: true,
+          ),
         ),
         PageSectionSliver(
+          horizontalPadding: horizontalPadding,
           topSpacing: 22,
           title: 'ICO',
-          child: UserIcoAssetCarousel(icos: null, isLoading: true),
+          child: UserIcoAssetCarousel(
+            horizontalPadding: horizontalPadding,
+            icos: null,
+            isLoading: true,
+          ),
         ),
       ],
     );

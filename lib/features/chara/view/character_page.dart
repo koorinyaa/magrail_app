@@ -109,6 +109,7 @@ class _CharacterPageState extends State<CharacterPage> {
                 ),
               ),
               PageSectionSliver(
+                horizontalPadding: AppSafeAreaInsets.primaryPageHorizontal,
                 topSpacing: 12,
                 title: 'ICO',
                 onHeaderTap: _icoController.hasLoadedData
@@ -117,6 +118,7 @@ class _CharacterPageState extends State<CharacterPage> {
                 child: _buildIcoContent(context),
               ),
               PageSectionSliver(
+                horizontalPadding: AppSafeAreaInsets.primaryPageHorizontal,
                 topSpacing: 22,
                 title: '所有角色',
                 onHeaderTap: _openAllCharactersPage,
@@ -152,9 +154,9 @@ class _CharacterPageState extends State<CharacterPage> {
       return Padding(
         padding: AppSafeAreaInsets.fromLTRB(
           context,
-          left: 24,
+          left: AppSafeAreaInsets.primaryPageHorizontal,
           top: 0,
-          right: 24,
+          right: AppSafeAreaInsets.primaryPageHorizontal,
           bottom: 0,
         ),
         child: AppLoadFailedState(
@@ -181,9 +183,9 @@ class _CharacterPageState extends State<CharacterPage> {
       return Padding(
         padding: AppSafeAreaInsets.fromLTRB(
           context,
-          left: 24,
+          left: AppSafeAreaInsets.primaryPageHorizontal,
           top: 0,
-          right: 24,
+          right: AppSafeAreaInsets.primaryPageHorizontal,
           bottom: 0,
         ),
         child: CharacterPoolOverviewMessage(

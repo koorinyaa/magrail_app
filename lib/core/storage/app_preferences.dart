@@ -74,7 +74,8 @@ class AppPreferences extends ChangeNotifier {
 
   /// 自定义地址优先，未设置时使用最近有效的默认地址
   String get effectiveBangumiMirrorHost =>
-      BangumiMirrorConfig.normalizeHost(bangumiMirrorHost) ?? defaultBangumiMirrorHost;
+      BangumiMirrorConfig.normalizeHost(bangumiMirrorHost) ??
+      defaultBangumiMirrorHost;
 
   /// 更新已通过校验的默认配置，不覆盖自定义域名
   ///

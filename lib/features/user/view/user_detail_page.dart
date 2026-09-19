@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:magrail_app/core/auth/tinygrail_auth_repository.dart';
@@ -133,6 +134,7 @@ class UserDetailPage extends StatefulWidget {
 
 /// 用户详情页状态
 class _UserDetailPageState extends State<UserDetailPage> {
+  /// 用户资料和功能卡片的基础左右边距
   static const double _horizontalPadding = 10;
   static const double _topToolbarHeight = 48;
   // 工具栏下方保留资料卡头像向上溢出的视觉空间
@@ -324,7 +326,9 @@ class _UserDetailPageState extends State<UserDetailPage> {
     if (_controller.isLoading && profile == null) {
       return [
         _buildTopContentSliver(child: const UserDetailSkeleton()),
-        const UserCharaOverviewSkeletonSection(),
+        const UserCharaOverviewSkeletonSection(
+          horizontalPadding: AppSafeAreaInsets.previewHorizontal,
+        ),
       ];
     }
 
@@ -393,6 +397,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
         ),
       ),
       UserCharaOverviewSection(
+        horizontalPadding: AppSafeAreaInsets.previewHorizontal,
         profile: profile,
         links: _controller.links,
         temples: _controller.temples,

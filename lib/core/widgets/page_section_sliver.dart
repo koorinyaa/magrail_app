@@ -12,6 +12,7 @@ class PageSectionSliver extends StatelessWidget {
   /// [titleTrailing] 标题右侧辅助组件
   /// [trailing] 右侧操作组件
   /// [onHeaderTap] 标题点击回调
+  /// [horizontalPadding] 标题基础左右边距
   const PageSectionSliver({
     super.key,
     required this.title,
@@ -20,6 +21,7 @@ class PageSectionSliver extends StatelessWidget {
     this.titleTrailing,
     this.trailing,
     this.onHeaderTap,
+    this.horizontalPadding = AppSafeAreaInsets.previewHorizontal,
   });
 
   /// 区块标题
@@ -40,6 +42,9 @@ class PageSectionSliver extends StatelessWidget {
   /// 标题点击回调
   final VoidCallback? onHeaderTap;
 
+  /// 标题基础左右边距
+  final double horizontalPadding;
+
   /// 构建页面内容区块 sliver
   ///
   /// [context] 当前组件树上下文
@@ -54,9 +59,9 @@ class PageSectionSliver extends StatelessWidget {
             Padding(
               padding: AppSafeAreaInsets.fromLTRB(
                 context,
-                left: 24,
+                left: horizontalPadding,
                 top: 0,
-                right: 24,
+                right: horizontalPadding,
                 bottom: 0,
               ),
               child: _SectionHeader(

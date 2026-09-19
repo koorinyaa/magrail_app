@@ -344,7 +344,6 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
     });
   }
 
-
   /// 处理液态玻璃开关变化
   ///
   /// [value] 是否启用液态玻璃

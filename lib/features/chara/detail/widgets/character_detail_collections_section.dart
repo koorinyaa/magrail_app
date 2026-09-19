@@ -149,9 +149,9 @@ class _CharacterDetailCollectionsSectionState
       separatorExtent: 12,
       padding: AppSafeAreaInsets.fromLTRB(
         context,
-        left: 24,
+        left: AppSafeAreaInsets.previewHorizontal,
         top: 0,
-        right: 24,
+        right: AppSafeAreaInsets.previewHorizontal,
         bottom: 0,
       ),
       itemBuilder: (context, index) {
@@ -193,9 +193,9 @@ class _CharacterDetailCollectionsSectionState
       separatorExtent: 12,
       padding: AppSafeAreaInsets.fromLTRB(
         context,
-        left: 24,
+        left: AppSafeAreaInsets.previewHorizontal,
         top: 0,
-        right: 24,
+        right: AppSafeAreaInsets.previewHorizontal,
         bottom: 0,
       ),
       itemBuilder: (context, index) {

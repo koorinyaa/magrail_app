@@ -284,9 +284,9 @@ class _NextBangumiSubjectCharacterEmptySliver extends StatelessWidget {
       child: Padding(
         padding: AppSafeAreaInsets.fromLTRB(
           context,
-          left: 24,
+          left: AppSafeAreaInsets.previewHorizontal,
           top: 8,
-          right: 24,
+          right: AppSafeAreaInsets.previewHorizontal,
           bottom: 16,
         ),
         child: Text(

@@ -93,12 +93,13 @@ class MainNavigationSearchHeader extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
     // 搜索入口与头像占位共享磨砂配置，其余效果继承组件当前主题
-    final searchGlassSettings = GlassThemeHelpers.resolveSettings(context).copyWith(
-      blur: AppBlurStyle.sigma,
-      glassColor: isDark
-          ? const Color(0xFF52525B).withValues(alpha: 0.35)
-          : const Color(0xFFD4D4D8).withValues(alpha: 0.45),
-    );
+    final searchGlassSettings = GlassThemeHelpers.resolveSettings(context)
+        .copyWith(
+          blur: AppBlurStyle.sigma,
+          glassColor: isDark
+              ? const Color(0xFF52525B).withValues(alpha: 0.35)
+              : const Color(0xFFD4D4D8).withValues(alpha: 0.45),
+        );
     final avatarFeedbackColor = isDark ? Colors.white : Colors.black;
     final systemOverlayStyle = SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -119,14 +120,15 @@ class MainNavigationSearchHeader extends StatelessWidget {
             for (final stop in _backgroundGradientStops)
               gradientStart + (1 - gradientStart) * stop,
           ];
-    final surfaceColor = Color.alphaBlend(
-      colorScheme.surfaceContainer.withValues(alpha: 0.8),
-      backgroundColor,
-    ).withValues(
-      alpha: isDark
-          ? AppBlurStyle.darkSurfaceAlpha
-          : AppBlurStyle.lightSurfaceAlpha,
-    );
+    final surfaceColor =
+        Color.alphaBlend(
+          colorScheme.surfaceContainer.withValues(alpha: 0.8),
+          backgroundColor,
+        ).withValues(
+          alpha: isDark
+              ? AppBlurStyle.darkSurfaceAlpha
+              : AppBlurStyle.lightSurfaceAlpha,
+        );
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: systemOverlayStyle,
@@ -179,9 +181,9 @@ class MainNavigationSearchHeader extends StatelessWidget {
                   Padding(
                     padding: AppSafeAreaInsets.fromLTRB(
                       context,
-                      left: 24,
+                      left: AppSafeAreaInsets.primaryPageHorizontal,
                       top: _searchRowPadding,
-                      right: 24,
+                      right: AppSafeAreaInsets.primaryPageHorizontal,
                       bottom: bottom == null
                           ? _searchRowPadding
                           : _searchTabSpacing,

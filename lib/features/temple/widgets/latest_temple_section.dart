@@ -83,14 +83,20 @@ class LatestTempleCarousel extends StatelessWidget {
 
     if (isLoadFailed && !showSkeleton && (items == null || items!.isEmpty)) {
       return Padding(
-        padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 24),
+        padding: AppSafeAreaInsets.symmetricHorizontal(
+          context,
+          horizontal: AppSafeAreaInsets.primaryPageHorizontal,
+        ),
         child: _LatestTempleErrorState(onRetry: onRetry),
       );
     }
 
     if (!showSkeleton && items != null && items!.isEmpty) {
       return Padding(
-        padding: AppSafeAreaInsets.symmetricHorizontal(context, horizontal: 24),
+        padding: AppSafeAreaInsets.symmetricHorizontal(
+          context,
+          horizontal: AppSafeAreaInsets.primaryPageHorizontal,
+        ),
         child: const _LatestTempleEmptyState(),
       );
     }
@@ -104,7 +110,7 @@ class LatestTempleCarousel extends StatelessWidget {
       separatorExtent: 10,
       padding: AppSafeAreaInsets.symmetricHorizontal(
         context,
-        horizontal: 24,
+        horizontal: AppSafeAreaInsets.primaryPageHorizontal,
         vertical: 6,
       ),
       clipBehavior: Clip.none,
