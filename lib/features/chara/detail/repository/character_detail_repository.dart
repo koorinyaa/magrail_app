@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:magrail_app/core/network/api_client.dart';
 import 'package:magrail_app/core/network/tinygrail_page.dart';
 import 'package:magrail_app/core/network/tinygrail_response.dart';
@@ -27,8 +28,7 @@ class CharacterDetailRepository {
   /// 创建角色详情仓库
   ///
   /// [apiClient] Tinygrail API 客户端
-  const CharacterDetailRepository({required ApiClient apiClient})
-    : _apiClient = apiClient;
+  const CharacterDetailRepository({required this._apiClient});
 
   final ApiClient _apiClient;
 }

@@ -8,6 +8,7 @@ import 'package:magrail_app/features/auth/view/tinygrail_auth_page.dart';
 import 'package:magrail_app/features/chara/auction/repository/auction_repository.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
 import 'package:magrail_app/features/chara/detail/controller/character_detail_controller.dart';
+import 'package:magrail_app/features/chara/detail/controller/character_detail_circulation_controller.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_basic_info.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_history_item.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_sacrifice_result.dart';
@@ -103,7 +104,8 @@ class CharacterDetailPage extends StatefulWidget {
 }
 
 /// 角色详情页状态
-class _CharacterDetailPageState extends State<CharacterDetailPage> {
+class _CharacterDetailPageState extends State<CharacterDetailPage>
+    with WidgetsBindingObserver {
   static const double _topToolbarHeight = 48;
   static const double _topActionBlurExtent = 72;
   static const double _historyBarHeight = 104;
@@ -113,6 +115,8 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
       _historyBarHeight - _topIdentityFadeExtent;
 
   late final CharacterDetailController _controller;
+  late final CharacterDetailCirculationController _circulationController;
+  ModalRoute<dynamic>? _pageRoute;
   late final ScrollController _scrollController;
   // 顶部浮层只跟随滚动进度刷新，避免整页内容频繁重建
   late final ValueNotifier<double> _topActionBlurProgress;
@@ -139,6 +143,58 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
       initialAvatarUrl: widget.initialAvatarUrl,
       initialAvatarHeroTag: widget.initialAvatarHeroTag,
     )..initialize();
+    _circulationController = CharacterDetailCirculationController(
+      repository: widget.repository,
+      preferences: widget.preferences,
+      onSettlement: () =>
+          _controller.refreshCurrentCharacter(showLoading: true),
+    );
+    _controller.addListener(_syncCirculationCharacter);
+    _syncCirculationCharacter();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  /// 将流通任务绑定到当前角色
+  void _syncCirculationCharacter() {
+    _circulationController.selectCharacter(_controller.current?.characterId);
+  }
+
+  /// 监听页面转场，弹窗不触发页面离开取消
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (_pageRoute == route) return;
+    _pageRoute?.secondaryAnimation?.removeStatusListener(_handlePageTransition);
+    _pageRoute?.animation?.removeStatusListener(_handlePopTransition);
+    _pageRoute = route;
+    route?.secondaryAnimation?.addStatusListener(_handlePageTransition);
+    route?.animation?.addStatusListener(_handlePopTransition);
+  }
+
+  /// 打开其他页面时立即取消流通请求
+  ///
+  /// [status] 当前页面的次级转场状态
+  void _handlePageTransition(AnimationStatus status) {
+    if (status == AnimationStatus.forward ||
+        status == AnimationStatus.completed) {
+      _circulationController.cancel();
+    }
+  }
+
+  /// 返回上一页时取消尚未完成的采集
+  ///
+  /// [status] 当前页面的转场状态
+  void _handlePopTransition(AnimationStatus status) {
+    if (status == AnimationStatus.reverse) _circulationController.cancel();
+  }
+
+  /// 恢复前台时重新检查结算时间
+  ///
+  /// [state] 应用生命周期状态
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _circulationController.checkTime();
   }
 
   /// 同步路由切换后的当前角色
@@ -168,6 +224,11 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
   /// 释放角色详情页状态
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _pageRoute?.secondaryAnimation?.removeStatusListener(_handlePageTransition);
+    _pageRoute?.animation?.removeStatusListener(_handlePopTransition);
+    _controller.removeListener(_syncCirculationCharacter);
+    _circulationController.dispose();
     _scrollController.removeListener(_handleScrollOffsetChanged);
     _scrollController.dispose();
     _topActionBlurProgress.dispose();
@@ -243,6 +304,7 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
                           ),
                         ),
                       CharacterDetailPageBody(
+                        circulationController: _circulationController,
                         current: current,
                         pageType: currentPageType,
                         tradeHeader: _controller.currentTradeHeader,
@@ -430,6 +492,8 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
 
   /// 打开角色搜索页
   Future<void> _openCharacterSearchPage() {
+    // 搜索页使用独立转场，不能依赖当前页面的次级动画取消任务
+    _circulationController.cancel();
     return showCharacterSearchPage(
       context,
       repository: widget.repository,

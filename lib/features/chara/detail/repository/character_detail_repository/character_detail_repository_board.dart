@@ -7,14 +7,17 @@ extension CharacterDetailRepositoryBoardQueries on CharacterDetailRepository {
   /// [characterId] 角色 ID
   /// [page] 页码
   /// [pageSize] 每页数量
+  /// [cancelToken] 取消本次用户列表请求
   Future<TinygrailPage<CharacterDetailBoardMember>>
   fetchCharacterBoardMemberPage({
     required int characterId,
     required int page,
     required int pageSize,
+    CancelToken? cancelToken,
   }) async {
     final json = await _apiClient.getJson<Map<String, Object?>>(
       'chara/users/$characterId/$page/$pageSize',
+      cancelToken: cancelToken,
     );
     final response =
         TinygrailResponse<TinygrailPage<CharacterDetailBoardMember>>.fromJson(

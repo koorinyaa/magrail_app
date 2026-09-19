@@ -209,7 +209,10 @@ class _TowerLogRankChangeBadge extends StatelessWidget {
   /// [oldRank] 变动前排名
   const _TowerLogRankChangeBadge({required this.rank, required this.oldRank});
 
+  /// 当前排名
   final int rank;
+
+  /// 变动前排名
   final int oldRank;
 
   /// 构建通天塔日志排名变化徽标
@@ -223,39 +226,7 @@ class _TowerLogRankChangeBadge extends StatelessWidget {
 
     final promoted = rank < oldRank;
     final value = (rank - oldRank).abs();
-    final color = promoted ? const Color(0xFFFF5A91) : const Color(0xFF38A8E8);
-
-    return Container(
-      height: 16,
-      margin: const EdgeInsets.only(left: 3),
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            promoted
-                ? Icons.arrow_upward_rounded
-                : Icons.arrow_downward_rounded,
-            size: 10,
-            color: color,
-          ),
-          const SizedBox(width: 1),
-          Text(
-            '$value',
-            style: TextStyle(
-              color: color,
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-              height: 1,
-            ),
-          ),
-        ],
-      ),
-    );
+    return NumericChangeBadge(text: '$value', increased: promoted);
   }
 }
 

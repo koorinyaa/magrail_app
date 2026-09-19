@@ -59,7 +59,6 @@ class CharacterDetailTradeHeaderSkeleton extends StatelessWidget {
                   98.0,
                   38.0,
                   74.0,
-                  80.0,
                   86.0,
                   86.0,
                   68.0,
@@ -71,6 +70,52 @@ class CharacterDetailTradeHeaderSkeleton extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999),
                   ),
               ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Bone(
+                  width: 100,
+                  height: 13,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                Bone(
+                  width: 90,
+                  height: 13,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ],
+            ),
+            const SizedBox(height: 7),
+            Bone(
+              height: 4,
+              width: double.infinity,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              height: 13,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Bone(
+                    width: 88,
+                    height: 13,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  SizedBox(
+                    width: 24,
+                    child: Center(
+                      child: Bone(
+                        width: 13,
+                        height: 13,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

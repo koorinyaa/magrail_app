@@ -12,17 +12,19 @@ class CharacterDetailBoardSectionController extends ChangeNotifier {
   ///
   /// [repository] 角色详情仓库
   /// [characterId] 角色 ID
+  /// [onLoaded] 加载状态回调，空值表示未就绪
   CharacterDetailBoardSectionController({
-    required CharacterDetailRepository repository,
-    required int characterId,
-  }) : _repository = repository,
-       _characterId = characterId;
+    required this._repository,
+    required this._characterId,
+    this._onLoaded,
+  });
 
   /// 董事会预览请求数量
   static const int previewPageSize = 20;
 
   final CharacterDetailRepository _repository;
   final int _characterId;
+  final void Function(int?)? _onLoaded;
 
   TinygrailPage<CharacterDetailBoardMember>? _page;
   var _isLoading = false;
@@ -59,6 +61,10 @@ class CharacterDetailBoardSectionController extends ChangeNotifier {
     final requestId = ++_requestId;
     _isLoading = true;
     _errorMessage = '';
+    // 延后通知父级，避免预览初始化期间触发父级组件重建
+    scheduleMicrotask(() {
+      if (_isCurrentRequest(requestId)) _onLoaded?.call(null);
+    });
     _notify();
 
     try {
@@ -82,6 +88,7 @@ class CharacterDetailBoardSectionController extends ChangeNotifier {
     } finally {
       if (_isCurrentRequest(requestId)) {
         _isLoading = false;
+        _onLoaded?.call(hasError ? null : _page?.totalItems);
         _notify();
       }
     }

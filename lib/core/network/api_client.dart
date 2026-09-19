@@ -17,14 +17,17 @@ class ApiClient {
   ///
   /// [path] API 路径
   /// [queryParameters] URL 查询参数
+  /// [cancelToken] 本次 GET 请求的取消令牌
   Future<T> getJson<T>(
     String path, {
     Map<String, Object?>? queryParameters,
+    CancelToken? cancelToken,
   }) async {
     try {
       final response = await _dio.get<T>(
         path,
         queryParameters: queryParameters,
+        cancelToken: cancelToken,
       );
       return response.data as T;
     } on DioException catch (error) {

@@ -13,6 +13,25 @@ class AppPreferences extends ChangeNotifier {
 
   final SharedPreferences _preferences;
 
+  /// 读取角色实际流通缓存
+  ///
+  /// [characterId] 角色 ID
+  String? readCharacterCirculation(int characterId) {
+    return _preferences.getString('character_circulation_$characterId');
+  }
+
+  /// 保存角色实际流通缓存并检查持久化结果
+  ///
+  /// [characterId] 角色 ID
+  /// [value] 完整计算结果的 JSON，空值表示删除
+  Future<void> saveCharacterCirculation(int characterId, String? value) async {
+    final key = 'character_circulation_$characterId';
+    final saved = value == null
+        ? await _preferences.remove(key)
+        : await _preferences.setString(key, value);
+    if (!saved) throw StateError('实际流通缓存保存失败');
+  }
+
   static const _prefersDarkModeKey = 'prefers_dark_mode';
   static const _themeModeKey = 'theme_mode';
   static const _useBangumiMirrorKey = 'use_bangumi_mirror';

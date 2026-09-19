@@ -29,7 +29,6 @@ class _TradeHeaderBadges extends StatelessWidget {
             accentColor: const Color(0xFFF5A524),
           ),
         _TradeHeaderDividendChip(header: header),
-        _TradeHeaderCirculationChip(header: header),
         _TradeHeaderStatChip(
           label: '英灵殿',
           value: _formatOptionalAmount(header.valhallaAmount),

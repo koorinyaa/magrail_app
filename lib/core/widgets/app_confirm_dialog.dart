@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 /// [cancelText] 取消按钮文案
 /// [confirmText] 确认按钮文案
 /// [showCancelButton] 是否显示取消按钮
+/// [showConfirmButton] 是否显示确认按钮
 /// [icon] 标题图标
 /// [iconWidget] 标题自定义图标
 /// [confirmColor] 确认按钮背景色
@@ -26,6 +27,7 @@ Future<bool> showAppConfirmDialog(
   String cancelText = '取消',
   String confirmText = '确认',
   bool showCancelButton = true,
+  bool showConfirmButton = true,
   IconData? icon,
   Widget? iconWidget,
   Color? confirmColor,
@@ -60,6 +62,7 @@ Future<bool> showAppConfirmDialog(
                 cancelText: cancelText,
                 confirmText: confirmText,
                 showCancelButton: showCancelButton,
+                showConfirmButton: showConfirmButton,
                 icon: icon,
                 iconWidget: iconWidget,
                 confirmColor: confirmColor,
@@ -114,6 +117,7 @@ class AppConfirmDialog extends StatelessWidget {
   /// [cancelText] 取消按钮文案
   /// [confirmText] 确认按钮文案
   /// [showCancelButton] 是否显示取消按钮
+  /// [showConfirmButton] 是否显示确认按钮
   /// [icon] 标题图标
   /// [iconWidget] 标题自定义图标
   /// [confirmColor] 确认按钮背景色
@@ -129,6 +133,7 @@ class AppConfirmDialog extends StatelessWidget {
     this.cancelText = '取消',
     this.confirmText = '确认',
     this.showCancelButton = true,
+    this.showConfirmButton = true,
     this.icon,
     this.iconWidget,
     this.confirmColor,
@@ -159,6 +164,9 @@ class AppConfirmDialog extends StatelessWidget {
 
   /// 是否显示取消按钮
   final bool showCancelButton;
+
+  /// 是否显示确认按钮
+  final bool showConfirmButton;
 
   /// 标题图标
   final IconData? icon;
@@ -197,6 +205,7 @@ class AppConfirmDialog extends StatelessWidget {
       cancelText: cancelText,
       confirmText: confirmText,
       showCancelButton: showCancelButton,
+      showConfirmButton: showConfirmButton,
       confirmColor: confirmColor,
       middleButtonText: middleButtonText,
       onConfirm: onConfirm,
@@ -384,6 +393,7 @@ class _AppConfirmDialogActionButtons extends StatefulWidget {
   /// [cancelText] 取消按钮文案
   /// [confirmText] 确认按钮文案
   /// [showCancelButton] 是否显示取消按钮
+  /// [showConfirmButton] 是否显示确认按钮
   /// [confirmColor] 确认按钮背景色
   /// [middleButtonText] 确认按钮和取消按钮之间的按钮文案
   /// [onConfirm] 确认前执行的异步回调
@@ -392,6 +402,7 @@ class _AppConfirmDialogActionButtons extends StatefulWidget {
     required this.cancelText,
     required this.confirmText,
     required this.showCancelButton,
+    required this.showConfirmButton,
     required this.confirmColor,
     required this.middleButtonText,
     required this.onConfirm,
@@ -406,6 +417,9 @@ class _AppConfirmDialogActionButtons extends StatefulWidget {
 
   /// 是否显示取消按钮
   final bool showCancelButton;
+
+  /// 是否显示确认按钮
+  final bool showConfirmButton;
 
   /// 确认按钮背景色
   final Color? confirmColor;
@@ -461,24 +475,25 @@ class _AppConfirmDialogActionButtonsState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        FilledButton(
-          style: FilledButton.styleFrom(
-            foregroundColor: confirmForegroundColor,
-            backgroundColor: resolvedConfirmColor,
-            minimumSize: const Size.fromHeight(40),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(999),
+        if (widget.showConfirmButton)
+          FilledButton(
+            style: FilledButton.styleFrom(
+              foregroundColor: confirmForegroundColor,
+              backgroundColor: resolvedConfirmColor,
+              minimumSize: const Size.fromHeight(40),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(999),
+              ),
+              textStyle: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                height: 1,
+              ),
             ),
-            textStyle: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
-              height: 1,
-            ),
+            onPressed: _isConfirming ? null : () => _handleConfirm(context),
+            child: Text(widget.confirmText),
           ),
-          onPressed: _isConfirming ? null : () => _handleConfirm(context),
-          child: Text(widget.confirmText),
-        ),
         if (middleButtonText != null && middleButtonText.isNotEmpty) ...[
           const SizedBox(height: 6),
           TextButton(
@@ -490,7 +505,9 @@ class _AppConfirmDialogActionButtonsState
           ),
         ],
         if (widget.showCancelButton) ...[
-          const SizedBox(height: 6),
+          if (widget.showConfirmButton ||
+              (middleButtonText != null && middleButtonText.isNotEmpty))
+            const SizedBox(height: 6),
           TextButton(
             style: cancelButtonStyle,
             onPressed: _isConfirming

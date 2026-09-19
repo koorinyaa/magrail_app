@@ -39,6 +39,7 @@ class CharacterDetailBoardSection extends StatefulWidget {
   /// [currentUserName] 当前登录用户名
   /// [revealPrivateUserHoldings] 是否允许查看未公开用户持股
   /// [boardRefreshSignal] 董事会刷新信号
+  /// [onBoardLoaded] 董事会加载状态回调，空值表示未就绪
   const CharacterDetailBoardSection({
     super.key,
     required this.repository,
@@ -51,6 +52,7 @@ class CharacterDetailBoardSection extends StatefulWidget {
     required this.currentUserName,
     required this.revealPrivateUserHoldings,
     required this.boardRefreshSignal,
+    this.onBoardLoaded,
   });
 
   /// 角色详情仓库
@@ -82,6 +84,9 @@ class CharacterDetailBoardSection extends StatefulWidget {
 
   /// 董事会刷新信号
   final ValueListenable<int> boardRefreshSignal;
+
+  /// 董事会加载状态回调
+  final void Function(int?)? onBoardLoaded;
 
   /// 创建角色详情董事会预览区状态
   @override
@@ -156,6 +161,7 @@ class _CharacterDetailBoardSectionState
   /// 创建董事会预览区控制器
   CharacterDetailBoardSectionController _createController() {
     return CharacterDetailBoardSectionController(
+      onLoaded: (total) => widget.onBoardLoaded?.call(total),
       repository: widget.repository,
       characterId: widget.header.characterId,
     )..initialize();

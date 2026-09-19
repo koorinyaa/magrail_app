@@ -27,6 +27,7 @@ class CharacterDetailPublicSections extends StatefulWidget {
   /// [revealPrivateUserHoldings] 是否允许查看未公开用户持股
   /// [collectionsRefreshSignal] 连接与圣殿预览刷新信号
   /// [boardRefreshSignal] 董事会预览刷新信号
+  /// [onBoardLoaded] 董事会加载状态回调
   const CharacterDetailPublicSections({
     super.key,
     required this.repository,
@@ -39,6 +40,7 @@ class CharacterDetailPublicSections extends StatefulWidget {
     required this.revealPrivateUserHoldings,
     required this.collectionsRefreshSignal,
     required this.boardRefreshSignal,
+    this.onBoardLoaded,
   });
 
   /// 角色详情仓库
@@ -70,6 +72,9 @@ class CharacterDetailPublicSections extends StatefulWidget {
 
   /// 董事会预览刷新信号
   final ValueListenable<int> boardRefreshSignal;
+
+  /// 董事会加载状态回调，空值表示未就绪
+  final void Function(int?)? onBoardLoaded;
 
   /// 创建角色详情公开展示区状态
   @override
@@ -141,6 +146,7 @@ class _CharacterDetailPublicSectionsState
     return SliverMainAxisGroup(
       slivers: [
         CharacterDetailBoardSection(
+          onBoardLoaded: widget.onBoardLoaded,
           repository: widget.repository,
           templeRepository: widget.templeRepository,
           magicRepository: widget.magicRepository,

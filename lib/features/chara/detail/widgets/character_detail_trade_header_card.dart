@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:magrail_app/features/chara/detail/controller/character_detail_circulation_controller.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -32,10 +33,12 @@ import 'package:magrail_app/features/oos/repository/tinygrail_oos_repository.dar
 import 'package:magrail_app/features/user/repository/user_repository.dart';
 import 'package:magrail_app/shared/widgets/app_bottom_sheet_header.dart';
 import 'package:magrail_app/shared/widgets/paged_action_grid.dart';
+import 'package:magrail_app/shared/widgets/numeric_change_badge.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 part 'character_detail_trade_header_badges.dart';
+part 'character_detail_trade_header_circulation.dart';
 part 'character_detail_trade_header_badge_dialog_chips.dart';
 part 'character_detail_trade_header_action_entry.dart';
 part 'character_detail_trade_header_actions.dart';
@@ -50,26 +53,119 @@ class CharacterDetailTradeHeaderSection extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [header] 已上市角色头部资料
-  const CharacterDetailTradeHeaderSection({super.key, required this.header});
+  /// [circulationController] 实际流通采集与缓存状态
+  const CharacterDetailTradeHeaderSection({
+    super.key,
+    required this.header,
+    required this.circulationController,
+  });
 
   /// 已上市角色头部资料
   final CharacterDetailTradeHeader header;
+
+  /// 实际流通采集与缓存状态
+  final CharacterDetailCirculationController circulationController;
 
   /// 构建角色详情已上市头部资料区
   ///
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return _TradeHeaderShell(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _TradeHeaderTitleRow(header: header),
-          const SizedBox(height: 8),
-          _TradeHeaderBadges(header: header),
-        ],
-      ),
+    return ListenableBuilder(
+      listenable: circulationController,
+      builder: (context, _) => _buildCard(context),
     );
+  }
+
+  /// 构建包含独立点击区域的头部卡片
+  ///
+  /// [context] 当前组件树上下文
+  Widget _buildCard(BuildContext context) {
+    final snapshot = circulationController.validSnapshot;
+    final footerHeight = (MediaQuery.textScalerOf(context).scale(11) * 1.15)
+        .clamp(13.0, double.infinity);
+
+    return Stack(
+      children: [
+        _TradeHeaderShell(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _TradeHeaderTitleRow(header: header),
+              const SizedBox(height: 8),
+              _TradeHeaderBadges(header: header),
+              const SizedBox(height: 12),
+              _TradeHeaderCirculationProgress(
+                data: _TradeHeaderCirculationProgressData.fromTotal(
+                  snapshot?.total ?? header.total,
+                ),
+                change: snapshot == null ? null : snapshot.total - header.total,
+                level: header.level,
+                updatedAt: circulationController.updatedAtText,
+                statusText: circulationController.statusText,
+                hasError:
+                    !circulationController.isRunning &&
+                    circulationController.statusText.isNotEmpty,
+              ),
+            ],
+          ),
+        ),
+        // 点击区域向信息行上下留白扩展，保持图标居中且不撑高卡片
+        Positioned(
+          right: 16,
+          bottom: 16 + (footerHeight - 24) / 2,
+          width: 24,
+          height: 24,
+          child: IconButton(
+            onPressed: circulationController.canOpenDialog
+                ? () => _confirmCalculation(context)
+                : null,
+            iconSize: 13,
+            icon: const Icon(LucideIcons.refreshCw),
+            style: IconButton.styleFrom(
+              fixedSize: const Size.square(24),
+              minimumSize: const Size.square(24),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              padding: EdgeInsets.zero,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+              foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 使用通用确认框确认计算，提交时重新检查限制
+  ///
+  /// [context] 头部卡片上下文
+  Future<void> _confirmCalculation(BuildContext context) async {
+    final controller = circulationController;
+    if (!controller.beginConfirmation()) return;
+    final id = header.characterId;
+    try {
+      while (context.mounted && controller.characterId == id) {
+        final restriction = controller.restriction;
+        final confirmed = await showAppConfirmDialog(
+          context,
+          title: '计算实际流通',
+          message: restriction.isEmpty ? '是否计算实际流通？计算期间请留在角色页面' : restriction,
+          confirmText: '计算',
+          cancelText: '确认',
+          showConfirmButton: restriction.isEmpty,
+          showCancelButton: restriction.isNotEmpty,
+        );
+        if (!confirmed || !context.mounted || controller.characterId != id)
+          return;
+        if (controller.restriction.isNotEmpty) continue;
+        unawaited(controller.calculate());
+        return;
+      }
+    } finally {
+      controller.endConfirmation();
+    }
   }
 }
 

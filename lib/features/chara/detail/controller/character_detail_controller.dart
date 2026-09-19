@@ -37,18 +37,14 @@ class CharacterDetailController extends ChangeNotifier {
   /// [repository] 角色详情仓库
   /// [userRepository] 用户仓库
   CharacterDetailController({
-    required AppPreferences preferences,
-    required CharacterDetailRepository repository,
-    required UserRepository userRepository,
-    required int? initialCharacterId,
+    required this._preferences,
+    required this._repository,
+    required this._userRepository,
+    required this._initialCharacterId,
     String? initialName,
     String? initialAvatarUrl,
     String? initialAvatarHeroTag,
-  }) : _preferences = preferences,
-       _repository = repository,
-       _userRepository = userRepository,
-       _initialCharacterId = initialCharacterId,
-       _initialName = initialName ?? '',
+  }) : _initialName = initialName ?? '',
        _initialAvatarUrl = initialAvatarUrl ?? '',
        _initialAvatarHeroTag = initialAvatarHeroTag ?? '';
 
@@ -170,6 +166,8 @@ class CharacterDetailController extends ChangeNotifier {
     }
 
     if (showLoading) {
+      // 基础资料先于补充数据返回时，也不能恢复展示上次的结算流通
+      _tradeHeaders.remove(characterId);
       _pageTypes[characterId] = CharacterDetailPageType.pending;
       _notifyIfActive();
     }

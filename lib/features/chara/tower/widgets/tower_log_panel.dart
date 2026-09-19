@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:magrail_app/shared/widgets/numeric_change_badge.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:magrail_app/core/utils/app_safe_area_insets.dart';

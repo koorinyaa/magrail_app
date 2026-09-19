@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:magrail_app/features/chara/detail/controller/character_detail_circulation_controller.dart';
 import 'package:magrail_app/features/chara/auction/repository/auction_repository.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_basic_info.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_history_item.dart';
@@ -60,9 +61,11 @@ class CharacterDetailPageBody extends StatelessWidget {
   /// [onVoteKill] 投票删除回调
   /// [onRevokeVote] 撤回投票回调
   /// [oosRepository] Tinygrail OOS 仓库
+  /// [circulationController] 实际流通控制器
   const CharacterDetailPageBody({
     super.key,
     required this.current,
+    required this.circulationController,
     required this.pageType,
     required this.tradeHeader,
     required this.icoInfo,
@@ -95,6 +98,9 @@ class CharacterDetailPageBody extends StatelessWidget {
 
   /// 当前角色资料
   final CharacterDetailHistoryItem? current;
+
+  /// 实际流通控制器
+  final CharacterDetailCirculationController circulationController;
 
   /// 当前角色对应的页面类型
   final CharacterDetailPageType? pageType;
@@ -206,6 +212,7 @@ class CharacterDetailPageBody extends StatelessWidget {
           isGameMaster: isGameMaster,
         ),
       CharacterDetailPageType.trade => _CharacterDetailTradeBody(
+        circulationController: circulationController,
         key: ValueKey<String>('trade-${currentItem.characterId}'),
         tradeHeader: tradeHeader!,
         auctionRepository: auctionRepository,
@@ -386,8 +393,10 @@ class _CharacterDetailTradeBody extends StatelessWidget {
   /// [onVoteKill] 投票删除回调
   /// [onRevokeVote] 撤回投票回调
   /// [oosRepository] Tinygrail OOS 仓库
+  /// [circulationController] 实际流通控制器
   const _CharacterDetailTradeBody({
     super.key,
+    required this.circulationController,
     required this.tradeHeader,
     required this.auctionRepository,
     required this.tradeHistoryRepository,
@@ -487,6 +496,9 @@ class _CharacterDetailTradeBody extends StatelessWidget {
   /// 撤回投票回调
   final Future<String> Function() onRevokeVote;
 
+  /// 实际流通控制器
+  final CharacterDetailCirculationController circulationController;
+
   /// 构建角色详情已上市主体占位区
   ///
   /// [context] 当前组件树上下文
@@ -498,7 +510,10 @@ class _CharacterDetailTradeBody extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(10, 4, 10, 0),
           sliver: SliverList.list(
             children: [
-              CharacterDetailTradeHeaderSection(header: tradeHeader),
+              CharacterDetailTradeHeaderSection(
+                header: tradeHeader,
+                circulationController: circulationController,
+              ),
               const SizedBox(height: 12),
               CharacterDetailTradeHeaderActions(
                 header: tradeHeader,
@@ -549,6 +564,8 @@ class _CharacterDetailTradeBody extends StatelessWidget {
           ),
         ),
         CharacterDetailPublicSections(
+          onBoardLoaded: (total) =>
+              circulationController.updateBoard(tradeHeader.characterId, total),
           key: ValueKey<String>('public-${tradeHeader.characterId}'),
           repository: repository,
           templeRepository: templeRepository,

@@ -94,6 +94,13 @@ class LevelBadge extends StatelessWidget {
       return fixedBackgroundColor;
     }
 
+    return colorForLevel(level);
+  }
+
+  /// 获取角色等级对应的基础色
+  ///
+  /// [level] 角色等级，非正等级使用中性灰
+  static Color colorForLevel(int level) {
     if (level == 0) {
       return const Color(0xFFD2D2D2);
     }
