@@ -155,6 +155,9 @@ class CharacterDetailCirculationController extends ChangeNotifier {
     _taskCount = 0;
     _notify();
     try {
+      // 相邻请求至少间隔 300 毫秒，避免响应较快时三并发仍产生密集请求
+      const requestInterval = Duration(milliseconds: 300);
+      final sinceLastRequest = Stopwatch()..start();
       // 总人数为零时仍检查第一页，不能将变化后的持股用户直接遗漏
       final page = await _repository.fetchCharacterBoardMemberPage(
         characterId: id,
@@ -175,6 +178,7 @@ class CharacterDetailCirculationController extends ChangeNotifier {
       _taskCount = users.length + 1;
       var nextTask = 0;
       var total = 0;
+      var requestTurn = Future<void>.value();
 
       /// 顺序领取任务，任意失败立即取消其余在途请求
       Future<void> worker() async {
@@ -182,22 +186,34 @@ class CharacterDetailCirculationController extends ChangeNotifier {
           while (_isCurrent(generation) && !token.isCancelled) {
             final index = nextTask++;
             if (index >= _taskCount) return;
-            final int? value;
-            if (index == users.length) {
-              value = await _repository.fetchCharacterPoolAmount(
-                id,
-                cancelToken: token,
-                requireValue: true,
-              );
-            } else {
-              final holding = await _repository.fetchUserCharacterHolding(
-                id,
-                users[index],
-                cancelToken: token,
-                requireTotal: true,
-              );
-              value = holding?.total;
+            final previousTurn = requestTurn;
+            final dispatched = Completer<void>();
+            requestTurn = dispatched.future;
+            late final Future<int?> request;
+            try {
+              await previousTurn;
+              if (!_isCurrent(generation) || token.isCancelled) return;
+              final wait = requestInterval - sinceLastRequest.elapsed;
+              if (wait > Duration.zero) await Future<void>.delayed(wait);
+              if (!_isCurrent(generation) || token.isCancelled) return;
+              sinceLastRequest.reset();
+              request = index == users.length
+                  ? _repository.fetchCharacterPoolAmount(
+                      id,
+                      cancelToken: token,
+                      requireValue: true,
+                    )
+                  : _repository.fetchUserCharacterHolding(
+                      id,
+                      users[index],
+                      cancelToken: token,
+                      requireTotal: true,
+                    ).then((holding) => holding?.total);
+            } finally {
+              // 仅串行安排发起时刻，不等待响应，仍允许最多三个请求在途
+              dispatched.complete();
             }
+            final value = await request;
             if (!_isCurrent(generation) || token.isCancelled) return;
             if (value == null) throw StateError('流通数据不完整');
             total += value;
