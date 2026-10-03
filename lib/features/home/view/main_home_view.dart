@@ -19,6 +19,8 @@ import 'package:magrail_app/features/chara/tower/model/tower_entry.dart';
 import 'package:magrail_app/features/chara/tower/repository/tower_repository.dart';
 import 'package:magrail_app/features/chara/tower/widgets/tower_ranking_section.dart';
 import 'package:magrail_app/core/widgets/page_section_sliver.dart';
+import 'package:magrail_app/features/home/controller/home_date_controller.dart';
+import 'package:magrail_app/features/home/widgets/home_date_banner.dart';
 import 'package:magrail_app/features/home/widgets/home_section_action_button.dart';
 import 'package:magrail_app/features/oos/repository/tinygrail_oos_repository.dart';
 import 'package:magrail_app/features/temple/controller/latest_link_controller.dart';
@@ -106,6 +108,7 @@ class MainHomeView extends StatefulWidget {
 
 /// 首页主视图状态
 class _MainHomeViewState extends State<MainHomeView> {
+  late final HomeDateController _dateController;
   late final TopWeekController _topWeekController;
   late final TowerController _towerController;
   late final LatestTempleController _latestTempleController;
@@ -115,6 +118,7 @@ class _MainHomeViewState extends State<MainHomeView> {
   @override
   void initState() {
     super.initState();
+    _dateController = HomeDateController();
     _topWeekController = TopWeekController(
       repository: widget.topWeekRepository,
       auctionRepository: widget.auctionRepository,
@@ -132,6 +136,7 @@ class _MainHomeViewState extends State<MainHomeView> {
   /// 释放首页主视图状态
   @override
   void dispose() {
+    _dateController.dispose();
     _topWeekController.dispose();
     _towerController.dispose();
     _latestTempleController.dispose();
@@ -163,6 +168,7 @@ class _MainHomeViewState extends State<MainHomeView> {
                 SliverToBoxAdapter(
                   child: SizedBox(height: widget.topContentPadding),
                 ),
+              HomeDateBanner(controller: _dateController),
               PageSectionSliver(
                 horizontalPadding: AppSafeAreaInsets.primaryPageHorizontal,
                 title: '每周萌王',
