@@ -121,6 +121,7 @@ class _TradeHeaderCirculationProgress extends StatelessWidget {
                         child: NumericChangeBadge(
                           text: Formatters.groupedNumber(delta.abs()),
                           increased: delta > 0,
+                          compact: true,
                         ),
                       ),
                   ],
