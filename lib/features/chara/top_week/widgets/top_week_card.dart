@@ -92,8 +92,11 @@ class _TopWeekCard extends StatelessWidget {
           onTap: () => _openImageViewer(context),
           splashColor: Colors.white.withValues(alpha: 0.12),
           highlightColor: Colors.white.withValues(alpha: 0.06),
-          customBorder: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(cardRadius),
+          customBorder: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(cardRadius),
+              topRight: Radius.circular(cardRadius),
+            ),
           ),
         ),
       ),
