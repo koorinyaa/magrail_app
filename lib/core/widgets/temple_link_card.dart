@@ -47,7 +47,8 @@ class TempleLinkCard extends StatelessWidget {
   static const double _baseHeight = 222;
   static const double _baseBorderRadius = 24;
   static const double _baseShapeWidth = 161.5;
-  static const double _baseSplitGap = 4;
+  // 透明斜切间距固定为 2px
+  static const double _splitGap = 2;
   static const double _baseDiagonalInset = 35;
   static const double _baseNameHorizontalPadding = 18;
   static const double _baseNameSplitPadding = 8;
@@ -110,7 +111,6 @@ class TempleLinkCard extends StatelessWidget {
     final radius = BorderRadius.circular(_baseBorderRadius * scale);
     final shapeWidth = _baseShapeWidth * scale;
     final rightShapeOffset = width - shapeWidth;
-    final splitGap = _baseSplitGap * scale;
     final diagonalInset = _baseDiagonalInset * scale;
 
     return DecoratedBox(
@@ -146,7 +146,7 @@ class TempleLinkCard extends StatelessWidget {
                   clipper: _TempleLinkDiagonalClipper(
                     clipLeftSide: true,
                     diagonalInset: diagonalInset,
-                    splitGap: splitGap,
+                    splitGap: _splitGap,
                   ),
                   child: _TempleLinkCoverButton(
                     coverUrl: leftCoverUrl,
@@ -165,7 +165,7 @@ class TempleLinkCard extends StatelessWidget {
                   clipper: _TempleLinkDiagonalClipper(
                     clipLeftSide: false,
                     diagonalInset: diagonalInset,
-                    splitGap: splitGap,
+                    splitGap: _splitGap,
                   ),
                   child: _TempleLinkCoverButton(
                     coverUrl: rightCoverUrl,
@@ -178,7 +178,7 @@ class TempleLinkCard extends StatelessWidget {
               _buildBottomGradient(scale),
               _buildCharacterNames(
                 rightShapeOffset: rightShapeOffset,
-                splitGap: splitGap,
+                splitGap: _splitGap,
                 scale: scale,
               ),
               ..._buildAssetEntryButtons(scale),
