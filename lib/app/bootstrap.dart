@@ -233,7 +233,6 @@ Future<AppDependencies> bootstrap() async {
   // Tinygrail 会话边界：保存 Set-Cookie，并在后续请求自动附带 Cookie
   dio.interceptors.add(CookieManager(cookieJar));
 
-  final apiClient = ApiClient(dio);
   final secureStorage = const SecureStorage(FlutterSecureStorage());
   final preferences = AppPreferences(await SharedPreferences.getInstance());
   final mirrorRepository = BangumiMirrorRepository(
@@ -270,6 +269,16 @@ Future<AppDependencies> bootstrap() async {
   final authRepository = TinygrailAuthRepository(
     dio: dio,
     cookieJar: cookieJar,
+  );
+  try {
+    // 首次确认本地会话，避免排队中的公开请求被无 Cookie 的初次检查作废
+    await authRepository.hasTinygrailCookie();
+  } catch (_) {
+    // Cookie 读取失败由页面会话检查处理，保留应用启动流程
+  }
+  final apiClient = ApiClient(
+    dio,
+    readSessionGeneration: authRepository.captureSessionGeneration,
   );
   final updateController = AppUpdateController(
     repository: AppUpdateRepository(
