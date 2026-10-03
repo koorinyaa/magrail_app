@@ -246,7 +246,7 @@ class _TopWeekCard extends StatelessWidget {
                           color: Colors.white.withValues(alpha: 0.90),
                           fontSize: 12,
                           fontWeight: FontWeight.w900,
-                          height: 1,
+                          height: icon == null ? 1 : null,
                         ),
                       ),
                     ],
