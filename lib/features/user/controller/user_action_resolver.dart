@@ -23,6 +23,11 @@ class UserActionResolver {
     if (isSelf) {
       return [
         const UserActionEntry(type: UserActionType.scratch, label: '刮刮乐'),
+        if (profile.showHoliday)
+          UserActionEntry(
+            type: UserActionType.holidayBonus,
+            label: '${profile.holidayName ?? '节日'}福利',
+          ),
         if (profile.showWeekly)
           const UserActionEntry(
             type: UserActionType.weeklyBonus,
@@ -34,11 +39,6 @@ class UserActionResolver {
         const UserActionEntry(type: UserActionType.myAuction, label: '我的拍卖'),
         const UserActionEntry(type: UserActionType.marketOrder, label: '委托订单'),
         const UserActionEntry(type: UserActionType.myItems, label: '我的道具'),
-        if (profile.showHoliday)
-          UserActionEntry(
-            type: UserActionType.holidayBonus,
-            label: '${profile.holidayName ?? '节日'}福利',
-          ),
         const UserActionEntry(
           type: UserActionType.dividendForecast,
           label: '股息预测',
