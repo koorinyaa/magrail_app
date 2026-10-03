@@ -203,12 +203,14 @@ class CharacterDetailCirculationController extends ChangeNotifier {
                       cancelToken: token,
                       requireValue: true,
                     )
-                  : _repository.fetchUserCharacterHolding(
-                      id,
-                      users[index],
-                      cancelToken: token,
-                      requireTotal: true,
-                    ).then((holding) => holding?.total);
+                  : _repository
+                        .fetchUserCharacterHolding(
+                          id,
+                          users[index],
+                          cancelToken: token,
+                          requireTotal: true,
+                        )
+                        .then((holding) => holding?.total);
             } finally {
               // 仅串行安排发起时刻，不等待响应，仍允许最多三个请求在途
               dispatched.complete();

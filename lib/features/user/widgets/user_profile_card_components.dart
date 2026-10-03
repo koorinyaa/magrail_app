@@ -313,9 +313,6 @@ class _UserProfileIdItem extends StatelessWidget {
         color: colorScheme.onSurfaceVariant,
         fontSize: 13,
         fontWeight: FontWeight.w600,
-        height: 1.2,
-        // 均分文字上下行高留白，使 ID 与两侧图标保持垂直居中
-        leadingDistribution: TextLeadingDistribution.even,
       ),
     );
 
@@ -326,20 +323,23 @@ class _UserProfileIdItem extends StatelessWidget {
       child: InkWell(
         onTap: onPressed,
         borderRadius: BorderRadius.circular(4),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox.square(dimension: 14, child: leading),
-            const SizedBox(width: 4),
-            if (hasFlexibleValue) Flexible(child: valueText) else valueText,
-            const SizedBox(width: 6),
-            Icon(
-              Icons.copy_rounded,
-              size: 14,
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox.square(dimension: 14, child: leading),
+              const SizedBox(width: 4),
+              if (hasFlexibleValue) Flexible(child: valueText) else valueText,
+              const SizedBox(width: 6),
+              Icon(
+                Icons.copy_rounded,
+                size: 14,
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ],
+          ),
         ),
       ),
     );

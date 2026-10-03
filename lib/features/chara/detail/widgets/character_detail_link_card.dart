@@ -243,7 +243,6 @@ class _LinkOwnerButton extends StatelessWidget {
               color: colorScheme.onSurfaceVariant,
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              height: 1,
             ),
           ),
         ),

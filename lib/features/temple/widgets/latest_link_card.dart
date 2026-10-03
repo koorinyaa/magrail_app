@@ -143,7 +143,6 @@ class LatestLinkCard extends StatelessWidget {
                                 : const Color(0xFF73626A),
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
-                            height: 1,
                           ),
                         ),
                       ),

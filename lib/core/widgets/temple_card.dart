@@ -311,7 +311,6 @@ class TempleCard extends StatelessWidget {
                               color: Colors.white.withValues(alpha: 0.80),
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              height: 1,
                             ),
                           ),
                         ),
