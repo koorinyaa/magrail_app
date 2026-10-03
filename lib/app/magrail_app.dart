@@ -5,6 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:magrail_app/core/update/app_update_dialog.dart';
+import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
+import 'package:magrail_app/features/clipboard/controller/clipboard_detail_controller.dart';
+import 'package:magrail_app/features/clipboard/model/clipboard_detail_target.dart';
+import 'package:magrail_app/features/clipboard/widgets/clipboard_detail_dialog.dart';
 
 import 'bootstrap.dart';
 import 'router/app_router.dart';
@@ -45,8 +49,10 @@ class MagrailApp extends StatefulWidget {
 class _MagrailAppState extends State<MagrailApp> {
   late final GlobalKey<NavigatorState> _rootNavigatorKey;
   late final GoRouter _router;
+  late final ClipboardDetailController _clipboardDetailController;
   late final AppLifecycleListener _appLifecycleListener;
   late ThemeMode _themeMode;
+  var _startupUpdateChecked = false;
 
   /// 初始化根组件状态
   @override
@@ -54,13 +60,25 @@ class _MagrailAppState extends State<MagrailApp> {
     super.initState();
     _themeMode = widget._themeMode ?? widget.dependencies.preferences.themeMode;
     _rootNavigatorKey = GlobalKey<NavigatorState>();
+    _clipboardDetailController = ClipboardDetailController(
+      characterRepository: widget.dependencies.repositories.characterDetail,
+      userRepository: widget.dependencies.repositories.user,
+      onMatched: _confirmClipboardDetail,
+    );
     _router = createAppRouter(
       dependencies: widget.dependencies,
       rootNavigatorKey: _rootNavigatorKey,
+      observers: [_clipboardDetailController],
       onThemeModeChanged: _handleThemeModeChanged,
     );
-    _appLifecycleListener = AppLifecycleListener(onResume: _handleAppResumed);
+    _appLifecycleListener = AppLifecycleListener(
+      onResume: _handleAppResumed,
+      onHide: _clipboardDetailController.pause,
+      onPause: _clipboardDetailController.pause,
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _clipboardDetailController.resume();
       unawaited(widget.dependencies.mirrorRepository.refresh());
       unawaited(_checkForStartupUpdate());
       unawaited(_refreshCurrentUserStateSilently(preloadAssets: true));
@@ -71,6 +89,7 @@ class _MagrailAppState extends State<MagrailApp> {
   @override
   void dispose() {
     _appLifecycleListener.dispose();
+    _clipboardDetailController.dispose();
     _router.dispose();
     widget.dependencies.userAssetSnapshotCoordinator.dispose();
     super.dispose();
@@ -135,6 +154,9 @@ class _MagrailAppState extends State<MagrailApp> {
       );
     } catch (_) {
       // 启动检查失败不影响应用正常使用
+    } finally {
+      _startupUpdateChecked = true;
+      unawaited(_clipboardDetailController.presentPending());
     }
   }
 
@@ -176,8 +198,47 @@ class _MagrailAppState extends State<MagrailApp> {
 
   /// 处理应用重新进入前台
   void _handleAppResumed() {
+    _clipboardDetailController.resume();
     unawaited(widget.dependencies.mirrorRepository.refresh());
     unawaited(_refreshCurrentUserStateSilently(preloadAssets: false));
+  }
+
+  /// 确认剪切板匹配结果并在前台打开详情
+  ///
+  /// [target] 已精确匹配的角色或用户
+  Future<bool> _confirmClipboardDetail(ClipboardDetailTarget target) async {
+    final context = _rootNavigatorKey.currentContext;
+    if (!mounted ||
+        !_startupUpdateChecked ||
+        WidgetsBinding.instance.lifecycleState != AppLifecycleState.resumed ||
+        context == null ||
+        !context.mounted) {
+      return false;
+    }
+
+    final confirmed = await showClipboardDetailDialog(context, target: target);
+    if (!confirmed ||
+        !mounted ||
+        !context.mounted ||
+        WidgetsBinding.instance.lifecycleState != AppLifecycleState.resumed) {
+      return true;
+    }
+
+    switch (target) {
+      case ClipboardCharacterTarget(:final character):
+        openCharacterDetail(
+          context,
+          characterId: character.characterId,
+          name: character.name,
+          avatarUrl: character.icon,
+        );
+      case ClipboardUserTarget(:final user):
+        _router.pushNamed(
+          'userDetail',
+          queryParameters: {'username': user.name},
+        );
+    }
+    return true;
   }
 
   /// 解析当前系统栏亮暗模式

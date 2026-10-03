@@ -12,14 +12,17 @@ import 'app_router_user_routes.dart';
 ///
 /// [dependencies] 应用依赖集合
 /// [rootNavigatorKey] 根导航器标识
+/// [observers] 根导航器的路由状态监听者
 /// [onThemeModeChanged] 应用主题模式变化回调
 GoRouter createAppRouter({
   required AppDependencies dependencies,
   GlobalKey<NavigatorState>? rootNavigatorKey,
+  List<NavigatorObserver> observers = const [],
   ValueChanged<ThemeMode>? onThemeModeChanged,
 }) {
   return GoRouter(
     navigatorKey: rootNavigatorKey,
+    observers: observers,
     initialLocation: '/',
     routes: [
       ...buildMainRoutes(dependencies),
