@@ -70,13 +70,7 @@ extension _CharacterSearchPageBangumiSubjectLogic on _CharacterSearchPageState {
     if (keyword.isEmpty) {
       _updateSearchState(() {
         _isSearching = false;
-        _isSearchingTemples = false;
-        _hasSearched = false;
-        _hasSearchedTemples = false;
         _errorMessage = '';
-        _templeErrorMessage = '';
-        _results = const <CharacterDetailSearchItem>[];
-        _templeResults = const <UserTempleApiItem>[];
         _bangumiResults = const <NextBangumiCharacterSearchItem>[];
         _bangumiSubjectResults = const <NextBangumiSubjectSearchItem>[];
         _bangumiStatuses = const <int, CharacterDetailBasicInfo>{};
@@ -88,17 +82,12 @@ extension _CharacterSearchPageBangumiSubjectLogic on _CharacterSearchPageState {
 
     _updateSearchState(() {
       _isSearching = true;
-      _isSearchingTemples = false;
       _errorMessage = '';
-      _templeErrorMessage = '';
-      _results = const <CharacterDetailSearchItem>[];
-      _templeResults = const <UserTempleApiItem>[];
       _bangumiResults = const <NextBangumiCharacterSearchItem>[];
       _bangumiSubjectResults = const <NextBangumiSubjectSearchItem>[];
       _bangumiStatuses = const <int, CharacterDetailBasicInfo>{};
       _resetBangumiPagination();
       _resetBangumiSubjectPagination();
-      _hasSearchedTemples = false;
     });
 
     try {
@@ -112,7 +101,6 @@ extension _CharacterSearchPageBangumiSubjectLogic on _CharacterSearchPageState {
       }
 
       _updateSearchState(() {
-        _hasSearched = true;
         _isSearching = false;
         _bangumiSubjectResults = page.items;
         _syncBangumiSubjectPagination(
@@ -127,7 +115,6 @@ extension _CharacterSearchPageBangumiSubjectLogic on _CharacterSearchPageState {
       }
 
       _updateSearchState(() {
-        _hasSearched = true;
         _isSearching = false;
         _errorMessage = _messageForError(error, fallback: '搜索 BGM 条目失败');
       });

@@ -146,12 +146,17 @@ class _CharacterSearchDivider extends StatelessWidget {
   }
 }
 
-/// 角色搜索骨架列表
+/// 搜索骨架列表
 class _CharacterSearchSkeletonList extends StatelessWidget {
-  /// 创建角色搜索骨架列表
-  const _CharacterSearchSkeletonList();
+  /// 创建搜索骨架列表
+  ///
+  /// [isUser] 是否显示用户搜索骨架
+  const _CharacterSearchSkeletonList({this.isUser = false});
 
-  /// 构建角色搜索骨架列表
+  /// 是否显示用户搜索骨架
+  final bool isUser;
+
+  /// 构建搜索骨架列表
   ///
   /// [context] 当前组件树上下文
   @override
@@ -168,7 +173,7 @@ class _CharacterSearchSkeletonList extends StatelessWidget {
       ),
       itemBuilder: (context, index) {
         if (index == 0) {
-          return const _CharacterSearchSectionLabel(text: '角色');
+          return _CharacterSearchSectionLabel(text: isUser ? '用户' : '角色');
         }
 
         final rowIndex = index - 1;
@@ -176,38 +181,43 @@ class _CharacterSearchSkeletonList extends StatelessWidget {
           return const _CharacterSearchDivider();
         }
 
-        return const Skeletonizer(
+        return Skeletonizer(
           enabled: true,
-          child: _CharacterSearchSkeletonRow(),
+          child: _CharacterSearchSkeletonRow(isUser: isUser),
         );
       },
-      itemCount: 12,
+      itemCount: isUser ? 2 : 12,
     );
   }
 }
 
-/// 角色搜索骨架行
+/// 搜索骨架行
 class _CharacterSearchSkeletonRow extends StatelessWidget {
-  /// 创建角色搜索骨架行
-  const _CharacterSearchSkeletonRow();
+  /// 创建搜索骨架行
+  ///
+  /// [isUser] 是否使用圆形用户头像
+  const _CharacterSearchSkeletonRow({this.isUser = false});
 
-  /// 构建角色搜索骨架行
+  /// 是否使用圆形用户头像
+  final bool isUser;
+
+  /// 构建搜索骨架行
   ///
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 7),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 7),
       child: Row(
         children: [
-          SizedBox(width: 4),
+          const SizedBox(width: 4),
           Bone(
             width: 38,
             height: 38,
-            borderRadius: BorderRadius.all(Radius.circular(14)),
+            borderRadius: BorderRadius.circular(isUser ? 999 : 14),
           ),
-          SizedBox(width: 10),
-          Expanded(
+          const SizedBox(width: 10),
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -235,7 +245,7 @@ class _CharacterSearchSkeletonRow extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(width: 4),
+          const SizedBox(width: 4),
         ],
       ),
     );

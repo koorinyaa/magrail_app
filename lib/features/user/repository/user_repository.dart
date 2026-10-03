@@ -166,6 +166,38 @@ class UserRepository extends ChangeNotifier with _UserRepositoryPageQueries {
     return _fetchAssets(username: username);
   }
 
+  /// 按 BGM ID 精确查询用户资料，不更新缓存或授权状态
+  ///
+  /// [username] BGM ID，无资产资料时返回空值，请求失败时抛出异常
+  Future<UserDetailProfile?> findUserProfile({required String username}) async {
+    final resolvedUsername = username.trim();
+    if (resolvedUsername.isEmpty) {
+      return null;
+    }
+
+    final json = await _apiClient.getJson<Map<String, Object?>>(
+      'chara/user/assets/${_encodeUsername(resolvedUsername)}',
+    );
+    final response = TinygrailResponse<UserDetailProfile>.fromJson(json, (
+      value,
+    ) {
+      final valueJson = TinygrailResponseParser.asObjectMap(value);
+      return valueJson == null ? null : UserDetailProfile.fromJson(valueJson);
+    });
+
+    // 无资产资料属于未匹配，其他接口失败继续交由调用方提示
+    if (!response.isSuccess && response.message == '此用户暂无资产信息。') {
+      return null;
+    }
+
+    final profile = response.value;
+    if (!response.isSuccess || profile == null || profile.name.trim().isEmpty) {
+      throw StateError(response.message ?? '查询用户资料失败');
+    }
+
+    return profile;
+  }
+
   /// 向用户发送红包
   ///
   /// [username] 收款用户名

@@ -76,17 +76,12 @@ extension _CharacterSearchPageBangumiLogic on _CharacterSearchPageState {
     }
 
     _searchDebounce?.cancel();
+    _tinygrailSearchController.reset();
     _updateSearchState(() {
       _searchSource = source;
       _requestId += 1;
       _isSearching = false;
-      _isSearchingTemples = false;
-      _hasSearched = false;
-      _hasSearchedTemples = false;
       _errorMessage = '';
-      _templeErrorMessage = '';
-      _results = const <CharacterDetailSearchItem>[];
-      _templeResults = const <UserTempleApiItem>[];
       _bangumiResults = const <NextBangumiCharacterSearchItem>[];
       _bangumiSubjectResults = const <NextBangumiSubjectSearchItem>[];
       _bangumiStatuses = const <int, CharacterDetailBasicInfo>{};
@@ -100,97 +95,6 @@ extension _CharacterSearchPageBangumiLogic on _CharacterSearchPageState {
     }
   }
 
-  /// 立即执行小圣杯搜索
-  Future<void> _searchTinygrailNow() async {
-    final rawKeyword = _searchController.text.trim();
-    // 角色 ID 常用 #123 形式输入，仅纯数字编号去掉前缀参与搜索
-    final keyword = RegExp(r'^#[0-9]+$').hasMatch(rawKeyword)
-        ? rawKeyword.substring(1)
-        : rawKeyword;
-    final requestId = ++_requestId;
-    final cachedUsername = _cachedCurrentUserName;
-    final shouldSearchTemples = keyword.isNotEmpty && cachedUsername.isNotEmpty;
-
-    _updateSearchState(() {
-      _isSearching = true;
-      _isSearchingTemples = shouldSearchTemples;
-      _errorMessage = '';
-      _templeErrorMessage = '';
-      _results = const <CharacterDetailSearchItem>[];
-      _templeResults = const <UserTempleApiItem>[];
-      _bangumiResults = const <NextBangumiCharacterSearchItem>[];
-      _bangumiSubjectResults = const <NextBangumiSubjectSearchItem>[];
-      _bangumiStatuses = const <int, CharacterDetailBasicInfo>{};
-      _resetBangumiPagination();
-      _resetBangumiSubjectPagination();
-      _hasSearchedTemples = false;
-    });
-
-    final resultsFuture = widget.repository.searchCharacters(
-      keyword,
-      allowEmptyKeyword: true,
-    );
-    final templesFuture = shouldSearchTemples
-        ? widget.userRepository.fetchUserTemplePage(
-            username: cachedUsername,
-            keyword: keyword,
-            pageSize: 12,
-          )
-        : null;
-
-    Object? searchError;
-    Object? templeError;
-    var results = const <CharacterDetailSearchItem>[];
-    var temples = const <UserTempleApiItem>[];
-
-    try {
-      results = await resultsFuture;
-    } catch (error) {
-      searchError = error;
-    }
-
-    if (templesFuture != null) {
-      try {
-        final page = await templesFuture;
-        temples = page.items;
-      } catch (error) {
-        templeError = error;
-      }
-    }
-
-    if (!mounted || requestId != _requestId) {
-      return;
-    }
-
-    if (searchError == null) {
-      _updateSearchState(() {
-        _hasSearched = true;
-        _hasSearchedTemples = shouldSearchTemples;
-        _isSearching = false;
-        _isSearchingTemples = false;
-        _results = results;
-      });
-    } else {
-      _updateSearchState(() {
-        _hasSearched = true;
-        _hasSearchedTemples = shouldSearchTemples;
-        _isSearching = false;
-        _isSearchingTemples = false;
-        _errorMessage = _messageForError(searchError!);
-      });
-    }
-
-    if (templeError == null) {
-      _updateSearchState(() {
-        _templeResults = temples;
-      });
-    } else {
-      _updateSearchState(() {
-        _templeErrorMessage = _messageForError(templeError!);
-      });
-    }
-  }
-
   /// 立即执行 Bangumi 搜索
   Future<void> _searchBangumiNow() async {
     final keyword = _searchController.text.trim();
@@ -198,13 +102,7 @@ extension _CharacterSearchPageBangumiLogic on _CharacterSearchPageState {
     if (keyword.isEmpty) {
       _updateSearchState(() {
         _isSearching = false;
-        _isSearchingTemples = false;
-        _hasSearched = false;
-        _hasSearchedTemples = false;
         _errorMessage = '';
-        _templeErrorMessage = '';
-        _results = const <CharacterDetailSearchItem>[];
-        _templeResults = const <UserTempleApiItem>[];
         _bangumiResults = const <NextBangumiCharacterSearchItem>[];
         _bangumiSubjectResults = const <NextBangumiSubjectSearchItem>[];
         _bangumiStatuses = const <int, CharacterDetailBasicInfo>{};
@@ -216,17 +114,12 @@ extension _CharacterSearchPageBangumiLogic on _CharacterSearchPageState {
 
     _updateSearchState(() {
       _isSearching = true;
-      _isSearchingTemples = false;
       _errorMessage = '';
-      _templeErrorMessage = '';
-      _results = const <CharacterDetailSearchItem>[];
-      _templeResults = const <UserTempleApiItem>[];
       _bangumiResults = const <NextBangumiCharacterSearchItem>[];
       _bangumiSubjectResults = const <NextBangumiSubjectSearchItem>[];
       _bangumiStatuses = const <int, CharacterDetailBasicInfo>{};
       _resetBangumiPagination();
       _resetBangumiSubjectPagination();
-      _hasSearchedTemples = false;
     });
 
     try {
@@ -245,7 +138,6 @@ extension _CharacterSearchPageBangumiLogic on _CharacterSearchPageState {
       }
 
       _updateSearchState(() {
-        _hasSearched = true;
         _isSearching = false;
         _bangumiResults = page.items;
         _bangumiStatuses = statuses;
@@ -261,7 +153,6 @@ extension _CharacterSearchPageBangumiLogic on _CharacterSearchPageState {
       }
 
       _updateSearchState(() {
-        _hasSearched = true;
         _isSearching = false;
         _errorMessage = _messageForError(error);
       });
@@ -441,8 +332,7 @@ extension _CharacterSearchPageBangumiLogic on _CharacterSearchPageState {
   /// 是否存在当前来源可展示的结果
   bool get _hasVisibleResults {
     return switch (_searchSource) {
-      _CharacterSearchSource.tinygrail =>
-        _results.isNotEmpty || _templeResults.isNotEmpty,
+      _CharacterSearchSource.tinygrail => _tinygrailSearchController.hasResults,
       _CharacterSearchSource.bangumi => _bangumiResults.isNotEmpty,
       _CharacterSearchSource.bangumiSubject =>
         _bangumiSubjectResults.isNotEmpty,
