@@ -151,6 +151,7 @@ class CharacterDetailTradeHeaderSection extends StatelessWidget {
         final confirmed = await showAppConfirmDialog(
           context,
           title: '计算实际流通',
+          icon: LucideIcons.calculator,
           message: restriction.isEmpty ? '是否计算实际流通？计算期间请留在角色页面' : restriction,
           confirmText: '计算',
           cancelText: '确认',
