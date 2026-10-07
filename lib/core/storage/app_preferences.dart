@@ -96,7 +96,10 @@ class AppPreferences extends ChangeNotifier {
       'isHandled': isHandled,
     });
     final saving = _clipboardStateWrite.then((_) async {
-      final saved = await _preferences.setString(_clipboardDetailStateKey, value);
+      final saved = await _preferences.setString(
+        _clipboardDetailStateKey,
+        value,
+      );
       if (!saved) throw StateError('剪切板去重记录保存失败');
     });
     _clipboardStateWrite = saving.then<void>((_) {}, onError: (Object _) {});

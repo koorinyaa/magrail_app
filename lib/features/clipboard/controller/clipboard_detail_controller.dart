@@ -33,8 +33,11 @@ class ClipboardDetailController extends NavigatorObserver {
   final CharacterDetailRepository _characterRepository;
   final UserRepository _userRepository;
   final AppPreferences _preferences;
-  final Future<bool> Function(ClipboardDetailTarget target, VoidCallback onShown)
-      _onMatched;
+  final Future<bool> Function(
+    ClipboardDetailTarget target,
+    VoidCallback onShown,
+  )
+  _onMatched;
   late final StreamSubscription<String> _copySubscription;
   // 仅保存最近内容的摘要，展示或内部复制后标记为已处理，内容变化后允许再次提示
   String? _lastFingerprint;
