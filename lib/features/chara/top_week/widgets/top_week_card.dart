@@ -309,7 +309,7 @@ class _TopWeekCard extends StatelessWidget {
       message: '评分决定每周萌王的排名，评分越高，排名越靠前',
       confirmText: '知道了',
       showCancelButton: false,
-      icon: LucideIcons.trophy,
+      icon: Icons.insights_rounded,
     );
   }
 }
