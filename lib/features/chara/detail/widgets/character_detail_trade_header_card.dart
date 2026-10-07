@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:magrail_app/features/chara/detail/controller/character_detail_circulation_controller.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:magrail_app/core/feedback/app_toast.dart';
 import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
+import 'package:magrail_app/core/utils/app_clipboard.dart';
 import 'package:magrail_app/core/utils/formatters.dart';
 import 'package:magrail_app/core/utils/tinygrail_calculations.dart';
 import 'package:magrail_app/core/utils/tinygrail_formatters.dart';
@@ -336,7 +336,7 @@ class _TradeHeaderCharacterIdRow extends StatelessWidget {
   ///
   /// [context] 当前组件树上下文
   Future<void> _copyCharacterId(BuildContext context) async {
-    await Clipboard.setData(ClipboardData(text: '#$characterId'));
+    await AppClipboard.copyText('#$characterId');
     if (!context.mounted) {
       return;
     }

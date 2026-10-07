@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:magrail_app/core/storage/app_preferences.dart';
+import 'package:magrail_app/core/utils/app_clipboard.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_basic_info.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
 import 'package:magrail_app/features/chara/search/model/tinygrail_search_keyword.dart';
@@ -14,19 +16,29 @@ class ClipboardDetailController extends NavigatorObserver {
   ///
   /// [characterRepository] 角色资料查询仓库
   /// [userRepository] 用户精确查询仓库
-  /// [onMatched] 展示确认面板，返回是否已经展示
+  /// [preferences] 剪切板去重记录存储
+  /// [onMatched] 展示确认面板并在展示时调用通知，返回是否已经展示
   ClipboardDetailController({
     required this._characterRepository,
     required this._userRepository,
+    required this._preferences,
     required this._onMatched,
-  });
+  }) {
+    final state = _preferences.clipboardDetailState;
+    _lastFingerprint = state?.fingerprint;
+    _isHandled = state?.isHandled ?? false;
+    _copySubscription = AppClipboard.internalCopies.listen(_handleInternalCopy);
+  }
 
   final CharacterDetailRepository _characterRepository;
   final UserRepository _userRepository;
-  final Future<bool> Function(ClipboardDetailTarget target) _onMatched;
-  // 只记录最近读取内容，内容变化后再次允许提示
-  String? _lastText;
-  var _hasPrompted = false;
+  final AppPreferences _preferences;
+  final Future<bool> Function(ClipboardDetailTarget target, VoidCallback onShown)
+      _onMatched;
+  late final StreamSubscription<String> _copySubscription;
+  // 仅保存最近内容的摘要，展示或内部复制后标记为已处理，内容变化后允许再次提示
+  String? _lastFingerprint;
+  var _isHandled = false;
   var _isReading = false;
   var _isLookingUp = false;
   var _isPresenting = false;
@@ -34,6 +46,8 @@ class ClipboardDetailController extends NavigatorObserver {
   var _disposed = false;
   var _readId = 0;
   var _requestId = 0;
+  // 前后台切换只作废请求，内容变化或内部复制才使旧展示回调失效
+  var _contentId = 0;
   Route<dynamic>? _topRoute;
   Future<dynamic>? _routeExit;
   ClipboardDetailTarget? _pendingTarget;
@@ -65,6 +79,7 @@ class ClipboardDetailController extends NavigatorObserver {
     if (_disposed ||
         !_isForeground ||
         _isPresenting ||
+        _isHandled ||
         _isReading ||
         _routeExit != null ||
         target == null ||
@@ -73,19 +88,35 @@ class ClipboardDetailController extends NavigatorObserver {
       return;
     }
 
-    final text = _lastText;
+    final fingerprint = _lastFingerprint;
+    final requestId = _requestId;
+    final contentId = _contentId;
     _pendingTarget = null;
     _isPresenting = true;
-    _hasPrompted = true;
     var presented = false;
+    var wasShown = false;
     try {
-      presented = await _onMatched(target);
+      presented = await _onMatched(target, () {
+        wasShown = true;
+        if (!_disposed &&
+            contentId == _contentId &&
+            fingerprint != null &&
+            fingerprint == _lastFingerprint) {
+          _isHandled = true;
+          // 面板展示即保存，关闭前退出应用也不会在下次启动时重复提示
+          unawaited(_saveState(fingerprint, isHandled: true));
+        }
+      });
     } catch (_) {
       // 自动提示异常不影响当前页面，后续前台恢复仍可重新尝试
     } finally {
       _isPresenting = false;
-      if (!_disposed && !presented && text == _lastText) {
-        _hasPrompted = false;
+      if (!_disposed &&
+          !presented &&
+          !wasShown &&
+          requestId == _requestId &&
+          fingerprint == _lastFingerprint) {
+        _isHandled = false;
         _pendingTarget = target;
       }
     }
@@ -124,7 +155,38 @@ class ClipboardDetailController extends NavigatorObserver {
   /// 释放控制器并使旧请求结果失效
   void dispose() {
     _disposed = true;
+    unawaited(_copySubscription.cancel());
     pause();
+  }
+
+  /// 内部复制成功后使旧读取、查询及待展示结果失效
+  ///
+  /// [fingerprint] 已由复制入口保存的内容摘要
+  void _handleInternalCopy(String fingerprint) {
+    if (_disposed) return;
+    _readId += 1;
+    _requestId += 1;
+    _contentId += 1;
+    _isReading = false;
+    _isLookingUp = false;
+    _pendingTarget = null;
+    _lastFingerprint = fingerprint;
+    _isHandled = true;
+  }
+
+  /// 保存当前内容处理状态，存储失败时保留本次运行的去重状态
+  ///
+  /// [fingerprint] 本次读取或展示的内容摘要
+  /// [isHandled] 是否已经展示确认面板
+  Future<void> _saveState(String fingerprint, {required bool isHandled}) async {
+    try {
+      await _preferences.saveClipboardDetailState(
+        fingerprint: fingerprint,
+        isHandled: isHandled,
+      );
+    } catch (_) {
+      // 去重记录保存失败不阻止读取、查询或显示确认面板
+    }
   }
 
   /// 读取文本并查询特殊关键词，拒绝读取或请求失败时静默结束
@@ -134,16 +196,20 @@ class ClipboardDetailController extends NavigatorObserver {
     try {
       final data = await Clipboard.getData(Clipboard.kTextPlain);
       if (_disposed || !_isForeground || readId != _readId) return;
-      _isReading = false;
       final text = data?.text?.trim() ?? '';
-      if (text != _lastText) {
-        _lastText = text;
-        _hasPrompted = false;
+      final fingerprint = AppClipboard.fingerprint(text);
+      if (fingerprint != _lastFingerprint) {
+        _lastFingerprint = fingerprint;
+        _contentId += 1;
+        _isHandled = false;
         _pendingTarget = null;
         _isLookingUp = false;
         _requestId += 1;
+        await _saveState(fingerprint, isHandled: false);
+        if (_disposed || !_isForeground || readId != _readId) return;
       }
-      if (_hasPrompted || _isLookingUp) return;
+      _isReading = false;
+      if (_isHandled || _isLookingUp) return;
       if (_pendingTarget != null) {
         await presentPending();
         return;
@@ -159,7 +225,12 @@ class ClipboardDetailController extends NavigatorObserver {
       } finally {
         if (requestId == _requestId) _isLookingUp = false;
       }
-      if (_disposed || !_isForeground || requestId != _requestId) return;
+      if (_disposed ||
+          !_isForeground ||
+          _isHandled ||
+          requestId != _requestId) {
+        return;
+      }
       _pendingTarget = target;
       await presentPending();
     } catch (_) {

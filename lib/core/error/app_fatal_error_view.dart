@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:magrail_app/core/error/app_error_report.dart';
+import 'package:magrail_app/core/utils/app_clipboard.dart';
 
 /// 不可恢复错误页面
 class AppFatalErrorView extends StatefulWidget {
@@ -108,7 +108,7 @@ class _AppFatalErrorViewState extends State<AppFatalErrorView> {
   Future<void> _copyReport() async {
     try {
       final reportText = await widget.report.toClipboardText();
-      await Clipboard.setData(ClipboardData(text: reportText));
+      await AppClipboard.copyText(reportText);
       if (!mounted) {
         return;
       }

@@ -26,7 +26,7 @@ extension _UserDetailPageActions on _UserDetailPageState {
     required String value,
     required String copiedMessage,
   }) async {
-    await Clipboard.setData(ClipboardData(text: value));
+    await AppClipboard.copyText(value);
     if (!context.mounted) {
       return;
     }

@@ -170,7 +170,7 @@ class _IcoHeaderCharacterIdRow extends StatelessWidget {
   ///
   /// [context] 当前组件树上下文
   Future<void> _copyCharacterId(BuildContext context) async {
-    await Clipboard.setData(ClipboardData(text: '#$characterId'));
+    await AppClipboard.copyText('#$characterId');
     if (!context.mounted) {
       return;
     }

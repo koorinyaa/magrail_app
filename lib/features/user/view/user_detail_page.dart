@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:magrail_app/core/auth/tinygrail_auth_repository.dart';
 import 'package:magrail_app/core/feedback/app_toast.dart';
 import 'package:magrail_app/core/storage/app_preferences.dart';
+import 'package:magrail_app/core/utils/app_clipboard.dart';
 import 'package:magrail_app/core/utils/user_error_message.dart';
 import 'package:magrail_app/core/widgets/app_confirm_dialog.dart';
 import 'package:magrail_app/features/auth/view/tinygrail_auth_page.dart';

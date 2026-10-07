@@ -13,9 +13,11 @@ import 'package:magrail_app/features/user/widgets/user_profile_card_components.d
 ///
 /// [context] 当前组件树上下文
 /// [target] 已精确匹配的角色或用户
+/// [onShown] 确认面板首次展示时的通知
 Future<bool> showClipboardDetailDialog(
   BuildContext context, {
   required ClipboardDetailTarget target,
+  required VoidCallback onShown,
 }) async {
   ModalRoute<dynamic>? route;
   final confirmed = await showAppConfirmDialog(
@@ -26,6 +28,9 @@ Future<bool> showClipboardDetailDialog(
     showCancelButton: false,
     content: Builder(
       builder: (context) {
+        if (route == null) {
+          onShown();
+        }
         route = ModalRoute.of(context);
         return _ClipboardDetailContent(target: target);
       },

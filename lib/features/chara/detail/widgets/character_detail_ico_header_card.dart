@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:magrail_app/core/feedback/app_toast.dart';
+import 'package:magrail_app/core/utils/app_clipboard.dart';
 import 'package:magrail_app/core/utils/formatters.dart';
 import 'package:magrail_app/core/utils/tinygrail_formatters.dart';
 import 'package:magrail_app/core/widgets/level_badge.dart';

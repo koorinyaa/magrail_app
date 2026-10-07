@@ -63,6 +63,7 @@ class _MagrailAppState extends State<MagrailApp> {
     _clipboardDetailController = ClipboardDetailController(
       characterRepository: widget.dependencies.repositories.characterDetail,
       userRepository: widget.dependencies.repositories.user,
+      preferences: widget.dependencies.preferences,
       onMatched: _confirmClipboardDetail,
     );
     _router = createAppRouter(
@@ -206,7 +207,11 @@ class _MagrailAppState extends State<MagrailApp> {
   /// 确认剪切板匹配结果并在前台打开详情
   ///
   /// [target] 已精确匹配的角色或用户
-  Future<bool> _confirmClipboardDetail(ClipboardDetailTarget target) async {
+  /// [onShown] 确认面板展示后保存去重记录
+  Future<bool> _confirmClipboardDetail(
+    ClipboardDetailTarget target,
+    VoidCallback onShown,
+  ) async {
     final context = _rootNavigatorKey.currentContext;
     if (!mounted ||
         !_startupUpdateChecked ||
@@ -216,7 +221,11 @@ class _MagrailAppState extends State<MagrailApp> {
       return false;
     }
 
-    final confirmed = await showClipboardDetailDialog(context, target: target);
+    final confirmed = await showClipboardDetailDialog(
+      context,
+      target: target,
+      onShown: onShown,
+    );
     if (!confirmed ||
         !mounted ||
         !context.mounted ||

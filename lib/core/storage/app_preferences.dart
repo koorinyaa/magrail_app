@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:magrail_app/core/auth/bangumi_mirror_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -56,6 +58,50 @@ class AppPreferences extends ChangeNotifier {
   static const _lastPromptedReleaseTagSavedAtKey =
       'last_prompted_release_tag_saved_at';
   static const _lastActivityReportKey = 'last_activity_report_key';
+  static const _clipboardDetailStateKey = 'clipboard_detail_state';
+  // 读取和内部复制共用一条记录，按调用顺序保存以免旧写入覆盖新内容
+  static Future<void> _clipboardStateWrite = Future<void>.value();
+
+  /// 最近一次剪切板内容摘要及处理状态，记录无效时返回空值
+  ({String fingerprint, bool isHandled})? get clipboardDetailState {
+    try {
+      final value = _preferences.getString(_clipboardDetailStateKey);
+      if (value == null) return null;
+      final json = jsonDecode(value);
+      if (json is! Map<String, dynamic>) return null;
+      final fingerprint = json['fingerprint'];
+      final isHandled = json['isHandled'];
+      if (fingerprint is! String ||
+          !RegExp(r'^[0-9a-f]{64}$').hasMatch(fingerprint) ||
+          isHandled is! bool) {
+        return null;
+      }
+      return (fingerprint: fingerprint, isHandled: isHandled);
+    } catch (_) {
+      // 损坏的去重记录不阻止后续读取和提示
+      return null;
+    }
+  }
+
+  /// 覆盖保存剪切板去重记录并检查持久化结果
+  ///
+  /// [fingerprint] 最近读取或内部复制的内容摘要
+  /// [isHandled] 是否已展示确认面板或由应用内部复制
+  Future<void> saveClipboardDetailState({
+    required String fingerprint,
+    required bool isHandled,
+  }) {
+    final value = jsonEncode({
+      'fingerprint': fingerprint,
+      'isHandled': isHandled,
+    });
+    final saving = _clipboardStateWrite.then((_) async {
+      final saved = await _preferences.setString(_clipboardDetailStateKey, value);
+      if (!saved) throw StateError('剪切板去重记录保存失败');
+    });
+    _clipboardStateWrite = saving.then<void>((_) {}, onError: (Object _) {});
+    return saving;
+  }
 
   /// 读取应用主题模式
   ThemeMode get themeMode {
