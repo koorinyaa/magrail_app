@@ -60,7 +60,9 @@ extension _TempleAssetMagicSubmitLogic on _TempleAssetMagicActionSheetState {
       return '请先授权';
     }
 
-    if (!_TempleAssetMagicStateQueries(this)._isStarForcesAction &&
+    // 星光碎片补塔和降塔不受圣殿等级限制
+    if (widget.action != TempleAssetMagicAction.stardust &&
+        !_TempleAssetMagicStateQueries(this)._isStarForcesAction &&
         _data.level <= 0) {
       return '圣殿等级不足';
     }
