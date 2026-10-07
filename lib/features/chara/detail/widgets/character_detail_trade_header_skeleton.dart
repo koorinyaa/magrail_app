@@ -58,11 +58,11 @@ class CharacterDetailTradeHeaderSkeleton extends StatelessWidget {
                   98.0,
                   98.0,
                   38.0,
-                  74.0,
-                  86.0,
-                  86.0,
-                  68.0,
-                  74.0,
+                  62.0,
+                  70.0,
+                  70.0,
+                  62.0,
+                  88.0,
                 ])
                   Bone(
                     width: width,

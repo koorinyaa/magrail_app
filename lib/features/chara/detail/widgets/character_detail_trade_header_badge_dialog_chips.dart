@@ -15,30 +15,10 @@ class _TradeHeaderDividendChip extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final colors = _TradeHeaderChipColors.resolve(context, null);
-
-    return _TradeHeaderChipShell(
-      colors: colors,
-      onPressed: () {
-        _showDividendFormulaDialog(context);
-      },
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Flexible(
-            child: _TradeHeaderChipText(
-              text: '股息 ${Formatters.tinygrailCurrency(header.dividend)}',
-              color: colors.foregroundColor,
-            ),
-          ),
-          const SizedBox(width: 2),
-          Icon(
-            LucideIcons.chevronRight,
-            size: 11,
-            color: colors.foregroundColor,
-          ),
-        ],
-      ),
+    return _TradeHeaderInfoChip(
+      icon: LucideIcons.coins,
+      text: Formatters.tinygrailCurrency(header.dividend),
+      onPressed: () => _showDividendFormulaDialog(context),
     );
   }
 
@@ -65,13 +45,36 @@ class _TradeHeaderDividendChip extends StatelessWidget {
         '\n'
         '当前使用：$appliedFormulaText';
 
-    await showAppConfirmDialog(
+    await _showTradeHeaderInfoDialog(
       context,
-      title: '股息计算方式',
+      title: '股息',
       message: message,
-      confirmText: '知道了',
-      showCancelButton: false,
-      icon: LucideIcons.calculator,
+      icon: LucideIcons.coins,
     );
   }
+}
+
+/// 显示已上市角色胶囊说明
+///
+/// [context] 当前组件树上下文
+/// [title] 数据名称
+/// [message] 数据说明
+/// [icon] 标题图标
+/// [iconWidget] 自定义标题图标，包含所需背景
+Future<void> _showTradeHeaderInfoDialog(
+  BuildContext context, {
+  required String title,
+  required String message,
+  IconData? icon,
+  Widget? iconWidget,
+}) async {
+  await showAppConfirmDialog(
+    context,
+    title: title,
+    message: message,
+    confirmText: '知道了',
+    showCancelButton: false,
+    icon: icon,
+    iconWidget: iconWidget,
+  );
 }

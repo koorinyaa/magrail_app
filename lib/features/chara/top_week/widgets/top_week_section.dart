@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:magrail_app/core/theme/app_blur_style.dart';
 import 'package:magrail_app/core/utils/app_safe_area_insets.dart';
 import 'package:magrail_app/core/viewer/fullscreen_image_viewer_page.dart';
+import 'package:magrail_app/core/widgets/app_confirm_dialog.dart';
 import 'package:magrail_app/core/widgets/level_badge.dart';
 import 'package:magrail_app/core/widgets/snapping_horizontal_list_view.dart';
 import 'package:magrail_app/core/widgets/temple_cover_image.dart';

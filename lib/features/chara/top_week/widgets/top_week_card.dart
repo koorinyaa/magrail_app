@@ -62,8 +62,8 @@ class _TopWeekCard extends StatelessWidget {
                 _buildImageLayer(),
                 _buildReadingOverlay(),
                 _TopWeekRankBadge(entry: entry),
-                _buildMetrics(),
                 _buildImageViewerInkLayer(context),
+                _buildMetrics(context),
                 _TopWeekAuctionPanel(
                   entry: entry,
                   onCharacterPressed: onCharacterPressed,
@@ -170,7 +170,9 @@ class _TopWeekCard extends StatelessWidget {
   }
 
   /// 构建卡片数据区域
-  Widget _buildMetrics() {
+  ///
+  /// [context] 当前组件树上下文
+  Widget _buildMetrics(BuildContext context) {
     return Positioned(
       left: 16,
       right: 16,
@@ -183,15 +185,19 @@ class _TopWeekCard extends StatelessWidget {
             spacing: 6,
             runSpacing: 6,
             children: [
-              _buildDataCapsule(text: entry.surplus),
+              _buildDataCapsule(
+                text: entry.surplus,
+                onTap: () => _showSurplusDialog(context),
+              ),
               _buildDataCapsule(
                 text: entry.score,
                 icon: Icons.insights_rounded,
+                onTap: () => _showScoreDialog(context),
               ),
             ],
           ),
           const SizedBox(height: 6),
-          _TopWeekMetricRow(entry: entry),
+          IgnorePointer(child: _TopWeekMetricRow(entry: entry)),
         ],
       ),
     );
@@ -201,7 +207,12 @@ class _TopWeekCard extends StatelessWidget {
   ///
   /// [text] 数据文本
   /// [icon] 数据图标
-  Widget _buildDataCapsule({required String text, IconData? icon}) {
+  /// [onTap] 胶囊点击回调
+  Widget _buildDataCapsule({
+    required String text,
+    required VoidCallback onTap,
+    IconData? icon,
+  }) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
@@ -217,42 +228,50 @@ class _TopWeekCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
         child: BackdropFilter(
           filter: AppBlurStyle.filter,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.18),
+          child: Material(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(999),
+            child: InkWell(
+              onTap: onTap,
               borderRadius: BorderRadius.circular(999),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.32),
-                width: 0.8,
-              ),
-            ),
-            child: SizedBox(
-              height: 24,
-              child: Center(
-                widthFactor: 1,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (icon != null) ...[
-                        Icon(
-                          icon,
-                          size: 13,
-                          color: Colors.white.withValues(alpha: 0.90),
-                        ),
-                        const SizedBox(width: 4),
-                      ],
-                      Text(
-                        text,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.90),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w900,
-                          height: icon == null ? 1 : null,
-                        ),
+              child: Ink(
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.32),
+                    width: 0.8,
+                  ),
+                ),
+                child: SizedBox(
+                  height: 24,
+                  child: Center(
+                    widthFactor: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (icon != null) ...[
+                            Icon(
+                              icon,
+                              size: 13,
+                              color: Colors.white.withValues(alpha: 0.90),
+                            ),
+                            const SizedBox(width: 4),
+                          ],
+                          Text(
+                            text,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.90),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w900,
+                              height: icon == null ? 1 : null,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -260,6 +279,37 @@ class _TopWeekCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  /// 显示溢出金额计算说明
+  ///
+  /// [context] 当前组件树上下文
+  Future<void> _showSurplusDialog(BuildContext context) async {
+    await showAppConfirmDialog(
+      context,
+      title: '溢出金额',
+      message:
+          '竞拍总金额超出英灵殿股份评估总值的部分\n'
+          '\n'
+          '溢出金额 = 均价 × 竞拍股数 − 评估价 × 英灵殿股数',
+      confirmText: '知道了',
+      showCancelButton: false,
+      icon: LucideIcons.trophy,
+    );
+  }
+
+  /// 显示评分用途说明
+  ///
+  /// [context] 当前组件树上下文
+  Future<void> _showScoreDialog(BuildContext context) async {
+    await showAppConfirmDialog(
+      context,
+      title: '评分',
+      message: '评分决定每周萌王的排名，评分越高，排名越靠前',
+      confirmText: '知道了',
+      showCancelButton: false,
+      icon: LucideIcons.trophy,
     );
   }
 }

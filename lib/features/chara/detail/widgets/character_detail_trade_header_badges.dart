@@ -1,5 +1,8 @@
 part of 'character_detail_trade_header_card.dart';
 
+// 幻想乡沿用角色页入口的红色强调色
+const Color _tradeHeaderGensokyoAccent = Color(0xFFF31260);
+
 /// 已上市头部徽标组
 class _TradeHeaderBadges extends StatelessWidget {
   /// 创建已上市头部徽标组
@@ -27,22 +30,73 @@ class _TradeHeaderBadges extends StatelessWidget {
             icon: LucideIcons.trophy,
             text: '${header.crown}',
             accentColor: const Color(0xFFF5A524),
+            onPressed: () => _showTradeHeaderInfoDialog(
+              context,
+              title: '萌王次数',
+              message: '角色获得每周萌王前三名的累计次数',
+              icon: LucideIcons.trophy,
+            ),
           ),
         _TradeHeaderDividendChip(header: header),
-        _TradeHeaderStatChip(
-          label: '英灵殿',
-          value: _formatOptionalAmount(header.valhallaAmount),
-        ),
-        _TradeHeaderStatChip(
-          label: '幻想乡',
-          value: _formatOptionalAmount(header.gensokyoAmount),
-        ),
-        _TradeHeaderStatChip(
-          label: '奖池',
-          value: _formatOptionalAmount(header.poolAmount),
+        _TradeHeaderInfoChip(
+          iconWidget: _buildTradeHeaderValhallaIcon(context, size: 11),
+          text: _formatOptionalAmount(header.valhallaAmount),
+          accentColor: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFFFBCD18)
+              : const Color(0xFFB8860B),
+          onPressed: () => _showTradeHeaderInfoDialog(
+            context,
+            title: '英灵殿',
+            message: '英灵殿中的活股数量。献祭后的活股会进入英灵殿，可通过竞拍获取',
+            iconWidget: _buildTradeHeaderValhallaIcon(context, size: 40),
+          ),
         ),
         _TradeHeaderInfoChip(
+          iconWidget: _buildTradeHeaderGensokyoIcon(size: 11),
+          text: _formatOptionalAmount(header.gensokyoAmount),
+          accentColor: _tradeHeaderGensokyoAccent,
+          onPressed: () => _showTradeHeaderInfoDialog(
+            context,
+            title: '幻想乡',
+            message:
+                '幻想乡中的活股数量。股权融资，或消耗有星角色的活股使用星光碎片后，'
+                '相应活股会进入幻想乡。可通过鲤鱼之眼或幻想乡刮刮乐取出',
+            iconWidget: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                shape: BoxShape.circle,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: _buildTradeHeaderGensokyoIcon(size: 20),
+              ),
+            ),
+          ),
+        ),
+        _TradeHeaderInfoChip(
+          icon: LucideIcons.ticket,
+          text: _formatOptionalAmount(header.poolAmount),
+          onPressed: () => _showTradeHeaderInfoDialog(
+            context,
+            title: '奖池',
+            message:
+                '该角色的彩票奖池数量，由其在英灵殿、幻想乡及不活跃用户处的活股组成。'
+                '刮刮乐会优先抽取奖池中的活股',
+            icon: LucideIcons.ticket,
+          ),
+        ),
+        _TradeHeaderInfoChip(
+          icon: LucideIcons.calendarDays,
           text: TinygrailFormatters.listedDate(header.listedDate),
+          onPressed: () => _showTradeHeaderInfoDialog(
+            context,
+            title: '上市日期',
+            message:
+                '角色完成 ICO 并上市的时间\n'
+                '\n'
+                '上市时间：${header.listedDate.trim().isEmpty ? '--' : TinygrailFormatters.dateTime(header.listedDate)}',
+            icon: LucideIcons.calendarDays,
+          ),
         ),
       ],
     );
@@ -90,6 +144,12 @@ class _TradeHeaderPriceChip extends StatelessWidget {
       accentColor: accentColor,
       leading: Formatters.tinygrailCurrency(header.current),
       trailing: _TradeHeaderChipText(text: fluctuationText),
+      onPressed: () => _showTradeHeaderInfoDialog(
+        context,
+        title: '现价',
+        message: '当前角色的现价及价格涨跌幅度',
+        icon: LucideIcons.chartLine,
+      ),
     );
   }
 }
@@ -113,6 +173,12 @@ class _TradeHeaderTowerChip extends StatelessWidget {
       leading: '#${header.rank}',
       trailing: _TradeHeaderStarForcesSegment(value: header.starForces),
       accentColor: _accentColor,
+      onPressed: () => _showTradeHeaderInfoDialog(
+        context,
+        title: '通天塔',
+        message: '星之力决定通天塔排名，排名影响股息加成',
+        icon: Symbols.auto_awesome,
+      ),
     );
   }
 
@@ -126,39 +192,18 @@ class _TradeHeaderTowerChip extends StatelessWidget {
   }
 }
 
-/// 已上市头部次级数据 Chip
-class _TradeHeaderStatChip extends StatelessWidget {
-  /// 创建已上市头部次级数据 Chip
-  ///
-  /// [label] 数据名称
-  /// [value] 数据值
-  const _TradeHeaderStatChip({required this.label, required this.value});
-
-  /// 数据名称
-  final String label;
-
-  /// 数据值
-  final String value;
-
-  /// 构建已上市头部次级数据 Chip
-  ///
-  /// [context] 当前组件树上下文
-  @override
-  Widget build(BuildContext context) {
-    return _TradeHeaderInfoChip(text: '$label $value');
-  }
-}
-
 /// 已上市头部复合数据 Chip
 class _TradeHeaderCompositeChip extends StatelessWidget {
   /// 创建已上市头部复合数据 Chip
   ///
   /// [leading] 左侧文本
   /// [trailing] 右侧组件
+  /// [onPressed] 胶囊说明点击回调
   /// [accentColor] Chip 强调色
   const _TradeHeaderCompositeChip({
     required this.leading,
     required this.trailing,
+    required this.onPressed,
     this.accentColor,
   });
 
@@ -167,6 +212,9 @@ class _TradeHeaderCompositeChip extends StatelessWidget {
 
   /// 右侧组件
   final Widget trailing;
+
+  /// 胶囊说明点击回调
+  final VoidCallback onPressed;
 
   /// Chip 强调色
   final Color? accentColor;
@@ -180,8 +228,10 @@ class _TradeHeaderCompositeChip extends StatelessWidget {
 
     return _TradeHeaderChipShell(
       colors: colors,
+      onPressed: onPressed,
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Flexible(
             child: _TradeHeaderChipText(
@@ -216,6 +266,7 @@ class _TradeHeaderStarForcesSegment extends StatelessWidget {
 
     return Row(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Icon(Symbols.auto_awesome, size: 11, fill: 0, color: color),
         const SizedBox(width: 2),
@@ -282,7 +333,6 @@ class _TradeHeaderChipText extends StatelessWidget {
         color: color,
         fontSize: 10.5,
         fontWeight: FontWeight.w700,
-        height: 1,
       ),
     );
   }
@@ -298,7 +348,7 @@ class _TradeHeaderChipShell extends StatelessWidget {
   const _TradeHeaderChipShell({
     required this.colors,
     required this.child,
-    this.onPressed,
+    required this.onPressed,
   });
 
   /// Chip 颜色配置
@@ -308,32 +358,21 @@ class _TradeHeaderChipShell extends StatelessWidget {
   final Widget child;
 
   /// Chip 点击回调
-  final VoidCallback? onPressed;
+  final VoidCallback onPressed;
 
   /// 构建已上市头部 Chip 外壳
   ///
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    final onPressed = this.onPressed;
     final content = Container(
       constraints: const BoxConstraints(minHeight: 22, maxWidth: 260),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       child: DefaultTextStyle.merge(
         style: TextStyle(color: colors.foregroundColor),
         child: child,
       ),
     );
-
-    if (onPressed == null) {
-      return DecoratedBox(
-        decoration: BoxDecoration(
-          color: colors.backgroundColor,
-          borderRadius: BorderRadius.circular(999),
-        ),
-        child: content,
-      );
-    }
 
     return Material(
       color: colors.backgroundColor,
@@ -399,15 +438,29 @@ class _TradeHeaderInfoChip extends StatelessWidget {
   /// 创建已上市头部通用信息 Chip
   ///
   /// [text] Chip 文本
+  /// [onPressed] 胶囊说明点击回调
   /// [icon] Chip 图标
+  /// [iconWidget] 自定义数据图标
   /// [accentColor] Chip 强调色
-  const _TradeHeaderInfoChip({required this.text, this.icon, this.accentColor});
+  const _TradeHeaderInfoChip({
+    required this.text,
+    required this.onPressed,
+    this.icon,
+    this.iconWidget,
+    this.accentColor,
+  });
 
   /// Chip 文本
   final String text;
 
+  /// 胶囊说明点击回调
+  final VoidCallback onPressed;
+
   /// Chip 图标
   final IconData? icon;
+
+  /// 自定义数据图标
+  final Widget? iconWidget;
 
   /// Chip 强调色
   final Color? accentColor;
@@ -421,11 +474,20 @@ class _TradeHeaderInfoChip extends StatelessWidget {
 
     return _TradeHeaderChipShell(
       colors: colors,
+      onPressed: onPressed,
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          if (icon != null) ...[
-            Icon(icon, size: 11, color: colors.foregroundColor),
+          if (iconWidget != null || icon != null) ...[
+            SizedBox.square(
+              dimension: 11,
+              child: Center(
+                child:
+                    iconWidget ??
+                    Icon(icon, size: 11, color: colors.foregroundColor),
+              ),
+            ),
             const SizedBox(width: 4),
           ],
           Flexible(
@@ -438,4 +500,58 @@ class _TradeHeaderInfoChip extends StatelessWidget {
       ),
     );
   }
+}
+
+/// 构建半透明英灵殿图标
+///
+/// [context] 当前组件树上下文
+/// [size] 图标尺寸
+Widget _buildTradeHeaderValhallaIcon(
+  BuildContext context, {
+  required double size,
+}) {
+  final gradient = Theme.of(context).brightness == Brightness.light
+      ? const RadialGradient(
+          colors: [Color(0xFFFFFFFF), Color(0xFFFFFFFF), Color(0x00FFFFFF)],
+          stops: [0, 0.7, 1],
+        )
+      : const RadialGradient(colors: [Color(0xFFFFFFFF), Color(0x00FFFFFF)]);
+
+  return Opacity(
+    opacity: 0.7,
+    child: SizedBox.square(
+      dimension: size,
+      child: ShaderMask(
+        blendMode: BlendMode.dstIn,
+        shaderCallback: (bounds) => gradient.createShader(bounds),
+        child: ClipOval(
+          child: Image.asset(
+            'assets/images/tinygrail/tinygrail_logo.jpg',
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+/// 构建幻想乡鸟居图标
+///
+/// [size] 图标区域尺寸
+Widget _buildTradeHeaderGensokyoIcon({required double size}) {
+  // 鸟居填满 SVG 画布，缩小 2px 以接近线条图标的视觉大小
+  return SizedBox.square(
+    dimension: size,
+    child: Center(
+      child: SvgPicture.asset(
+        'assets/icons/torii.svg',
+        width: size - 2,
+        height: size - 2,
+        colorFilter: const ColorFilter.mode(
+          _tradeHeaderGensokyoAccent,
+          BlendMode.srcIn,
+        ),
+      ),
+    ),
+  );
 }

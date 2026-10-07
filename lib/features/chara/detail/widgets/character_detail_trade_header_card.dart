@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:magrail_app/features/chara/detail/controller/character_detail_circulation_controller.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -158,8 +159,9 @@ class CharacterDetailTradeHeaderSection extends StatelessWidget {
           showConfirmButton: restriction.isEmpty,
           showCancelButton: restriction.isNotEmpty,
         );
-        if (!confirmed || !context.mounted || controller.characterId != id)
+        if (!confirmed || !context.mounted || controller.characterId != id) {
           return;
+        }
         if (controller.restriction.isNotEmpty) continue;
         unawaited(controller.calculate());
         return;
