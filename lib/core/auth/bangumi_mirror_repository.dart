@@ -6,7 +6,7 @@ import 'package:magrail_app/core/storage/app_preferences.dart';
 
 import 'bangumi_mirror_config.dart';
 
-/// 默认镜像配置下载与本地缓存
+/// 镜像发布接口更新与默认域名缓存
 class BangumiMirrorRepository {
   /// 创建默认镜像配置仓库
   ///
@@ -18,8 +18,7 @@ class BangumiMirrorRepository {
   }) : _preferences = preferences,
        _cacheFile = cacheFile;
 
-  static const _configUrl =
-      'https://cdn.jsdelivr.net/gh/koorinyaa/magrail_app@main/config/bangumi_mirror.json';
+  static const _configUrl = 'https://bangumi.wiki/api/v1/mirrors';
   final AppPreferences _preferences;
   final File _cacheFile;
   // 独立客户端不携带业务 Cookie，启动配置请求最多等待短超时
@@ -33,10 +32,15 @@ class BangumiMirrorRepository {
   );
   Future<void>? _refreshTask;
 
-  /// 启动时读取有效缓存，缺失或损坏时保持内置地址
+  /// 启动时读取镜像发布接口的有效缓存，来源不符或损坏时保持内置地址
   Future<void> loadCache() async {
     try {
-      final host = _parseHost(jsonDecode(await _cacheFile.readAsString()));
+      final data = jsonDecode(await _cacheFile.readAsString());
+      // 只采用当前发布接口的缓存，避免其他来源的配置覆盖内置域名
+      if (data is! Map<String, dynamic> || data['source'] != _configUrl) {
+        return;
+      }
+      final host = _parseHost(data['defaultHost']);
       if (host != null) {
         _preferences.updateDefaultBangumiMirrorHost(host);
       }
@@ -54,14 +58,14 @@ class BangumiMirrorRepository {
   Future<void> _download() async {
     try {
       final response = await _dio.get<dynamic>(_configUrl);
-      final host = _parseHost(response.data);
+      final host = _parseRemoteHost(response.data);
       if (host == null) {
         return;
       }
       await _cacheFile.parent.create(recursive: true);
       final pending = File('${_cacheFile.path}.pending');
       await pending.writeAsString(
-        jsonEncode({'defaultHost': host}),
+        jsonEncode({'source': _configUrl, 'defaultHost': host}),
         flush: true,
       );
       // 写完后替换正式缓存，避免中断写入破坏上次可用地址
@@ -72,15 +76,72 @@ class BangumiMirrorRepository {
     }
   }
 
-  /// 解析只含合法主机名的配置字段
+  /// 优先选择推荐镜像，再按权重选择兼容当前服务域名的镜像
   ///
-  /// [data] 本地或远端 JSON 配置
-  String? _parseHost(dynamic data) {
-    if (data is! Map<String, dynamic> || data['defaultHost'] is! String) {
+  /// [data] 镜像发布接口返回的 JSON
+  String? _parseRemoteHost(dynamic data) {
+    if (data is! Map<String, dynamic> || data['mirrors'] is! List) {
       return null;
     }
-    final value = (data['defaultHost'] as String).trim().toLowerCase();
-    final host = BangumiMirrorConfig.normalizeHost(value);
-    return host == value ? host : null;
+
+    String? selectedHost;
+    var selectedRecommended = false;
+    var selectedWeight = 0;
+    for (final mirror in data['mirrors'] as List) {
+      if (mirror is! Map<String, dynamic> ||
+          mirror['recommended'] is! bool ||
+          mirror['weight'] is! int ||
+          mirror['services'] is! List) {
+        continue;
+      }
+      final host = _parseHost(mirror['base']);
+      if (host == null) {
+        continue;
+      }
+
+      // 授权、Next API 和图片共用根域名替换，必须同时提供对应主机
+      final requiredHosts = {
+        'main': host,
+        'next': 'next.$host',
+        'lain': 'lain.$host',
+      };
+      final services = mirror['services'] as List;
+      final supportsRequiredHosts = requiredHosts.entries.every(
+        (entry) => services.any(
+          (service) =>
+              service is Map<String, dynamic> &&
+              service['id'] == entry.key &&
+              service['hosts'] is List &&
+              (service['hosts'] as List).contains(entry.value),
+        ),
+      );
+      if (!supportsRequiredHosts) {
+        continue;
+      }
+
+      final recommended = mirror['recommended'] as bool;
+      final weight = mirror['weight'] as int;
+      // 推荐状态与权重相同时保留接口原有顺序
+      if (selectedHost == null ||
+          (recommended && !selectedRecommended) ||
+          (recommended == selectedRecommended && weight > selectedWeight)) {
+        selectedHost = host;
+        selectedRecommended = recommended;
+        selectedWeight = weight;
+      }
+    }
+    return selectedHost;
+  }
+
+  /// 解析只含合法主机名的配置字段
+  ///
+  /// [value] 本地缓存或镜像发布接口中的域名字段
+  String? _parseHost(dynamic value) {
+    if (value is! String) {
+      return null;
+    }
+    final normalized = value.trim().toLowerCase();
+    final host = BangumiMirrorConfig.normalizeHost(normalized);
+    return host == normalized ? host : null;
   }
 }
