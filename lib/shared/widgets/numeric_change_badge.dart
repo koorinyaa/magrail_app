@@ -33,9 +33,9 @@ class NumericChangeBadge extends StatelessWidget {
     final iconSize = compact ? 8.0 : 10.0;
     final fontSize = compact ? 8.0 : 10.0;
     return Container(
-      constraints: BoxConstraints(minHeight: compact ? 12 : 16),
+      constraints: BoxConstraints(minHeight: compact ? 15 : 16),
       margin: const EdgeInsets.only(left: 3),
-      padding: EdgeInsets.symmetric(horizontal: compact ? 3 : 4),
+      padding: EdgeInsets.symmetric(horizontal: compact ? 6 : 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(compact ? 4 : 5),
@@ -54,7 +54,7 @@ class NumericChangeBadge extends StatelessWidget {
           Flexible(
             child: Text(
               text,
-              // 紧凑徽标随外层 WidgetSpan 整体缩放，避免文字二次缩放撑高数据行
+              // 紧凑徽标保持固定字号，避免系统文字缩放额外撑高数据行
               textScaler: compact ? TextScaler.noScaling : null,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

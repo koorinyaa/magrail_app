@@ -83,6 +83,9 @@ class CharacterDetailTradeHeaderSection extends StatelessWidget {
   /// [context] 当前组件树上下文
   Widget _buildCard(BuildContext context) {
     final snapshot = circulationController.validSnapshot;
+    final progressData = _TradeHeaderCirculationProgressData.fromTotal(
+      snapshot?.total ?? header.total,
+    );
     final footerHeight = (MediaQuery.textScalerOf(context).scale(11) * 1.15)
         .clamp(13.0, double.infinity);
 
@@ -92,14 +95,15 @@ class CharacterDetailTradeHeaderSection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _TradeHeaderTitleRow(header: header),
+              _TradeHeaderTitleRow(
+                header: header,
+                actualLevel: snapshot == null ? null : progressData.level,
+              ),
               const SizedBox(height: 8),
               _TradeHeaderBadges(header: header),
               const SizedBox(height: 12),
               _TradeHeaderCirculationProgress(
-                data: _TradeHeaderCirculationProgressData.fromTotal(
-                  snapshot?.total ?? header.total,
-                ),
+                data: progressData,
                 change: snapshot == null ? null : snapshot.total - header.total,
                 level: header.level,
                 updatedAt: circulationController.updatedAtText,
@@ -217,10 +221,14 @@ class _TradeHeaderTitleRow extends StatelessWidget {
   /// 创建已上市头部标题行
   ///
   /// [header] 已上市角色头部资料
-  const _TradeHeaderTitleRow({required this.header});
+  /// [actualLevel] 有效实际流通对应的等级，无快照时为空
+  const _TradeHeaderTitleRow({required this.header, required this.actualLevel});
 
   /// 已上市角色头部资料
   final CharacterDetailTradeHeader header;
+
+  /// 有效实际流通对应的等级
+  final int? actualLevel;
 
   /// 构建已上市头部标题行
   ///
@@ -249,6 +257,16 @@ class _TradeHeaderTitleRow extends StatelessWidget {
             ),
             const SizedBox(width: 7),
             LevelBadge(level: header.level, zeroCount: header.zeroCount),
+            if (actualLevel != null && actualLevel != header.level) ...[
+              const SizedBox(width: 7),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: 15,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 7),
+              LevelBadge(level: actualLevel!),
+            ],
           ],
         ),
         const SizedBox(height: 5),

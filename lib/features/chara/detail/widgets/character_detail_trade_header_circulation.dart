@@ -5,16 +5,21 @@ final class _TradeHeaderCirculationProgressData {
   /// 创建已上市头部流通等级进度数据
   ///
   /// [total] 当前流通
+  /// [level] 当前流通对应的等级
   /// [remaining] 距离下一级所需流通
   /// [progress] 当前等级区间进度
   const _TradeHeaderCirculationProgressData({
     required this.total,
+    required this.level,
     required this.remaining,
     required this.progress,
   });
 
   /// 当前流通
   final int total;
+
+  /// 当前流通对应的等级
+  final int level;
 
   /// 距离下一级所需流通
   final int remaining;
@@ -43,6 +48,7 @@ final class _TradeHeaderCirculationProgressData {
 
     return _TradeHeaderCirculationProgressData(
       total: safeTotal,
+      level: currentLevel,
       remaining: remaining,
       progress: progress,
     );
@@ -133,20 +139,29 @@ class _TradeHeaderCirculationProgress extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(text: '还需 '),
-                    TextSpan(
-                      text: Formatters.groupedNumber(data.remaining),
-                      style: accentStyle,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  LevelBadge(level: data.level + 1, isCompact: true),
+                  const SizedBox(width: 5),
+                  Flexible(
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          const TextSpan(text: '还需 '),
+                          TextSpan(
+                            text: Formatters.groupedNumber(data.remaining),
+                            style: accentStyle,
+                          ),
+                        ],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
+                      style: textStyle,
                     ),
-                  ],
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.end,
-                style: textStyle,
+                  ),
+                ],
               ),
             ),
           ],

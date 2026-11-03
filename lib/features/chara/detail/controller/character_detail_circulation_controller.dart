@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
+import 'package:magrail_app/core/auth/tinygrail_auth_repository.dart';
 import 'package:magrail_app/core/storage/app_preferences.dart';
 import 'package:magrail_app/features/chara/detail/model/character_detail_circulation_snapshot.dart';
 import 'package:magrail_app/features/chara/detail/repository/character_detail_repository.dart';
@@ -13,10 +14,12 @@ class CharacterDetailCirculationController extends ChangeNotifier {
   ///
   /// [repository] 角色接口仓库
   /// [preferences] 本地缓存存储
+  /// [authRepository] 判断当前是否可使用身份 Cookie
   /// [onSettlement] 结算周期变化时重新读取角色资料
   CharacterDetailCirculationController({
     required this._repository,
     required this._preferences,
+    required this._authRepository,
     required this._onSettlement,
   }) {
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
@@ -24,6 +27,7 @@ class CharacterDetailCirculationController extends ChangeNotifier {
 
   final CharacterDetailRepository _repository;
   final AppPreferences _preferences;
+  final TinygrailAuthRepository _authRepository;
   final Future<void> Function() _onSettlement;
   Timer? _timer;
   CancelToken? _cancelToken;
@@ -139,7 +143,7 @@ class CharacterDetailCirculationController extends ChangeNotifier {
     _notify();
   }
 
-  /// 确认后采集完整持股与奖池，最多三个请求同时进行
+  /// 确认后采集完整持股与奖池，Cookie 最多五并发，其他情况最多三并发
   Future<void> calculate() async {
     if (_disposed || !canOpenDialog || restriction.isNotEmpty) return;
     final id = _characterId;
@@ -155,7 +159,7 @@ class CharacterDetailCirculationController extends ChangeNotifier {
     _taskCount = 0;
     _notify();
     try {
-      // 相邻请求至少间隔 200 毫秒，避免响应较快时三并发仍产生密集请求
+      // 相邻请求至少间隔 200 毫秒，避免响应较快时产生密集请求
       const requestInterval = Duration(milliseconds: 200);
       final sinceLastRequest = Stopwatch()..start();
       // 总人数为零时仍检查第一页，不能将变化后的持股用户直接遗漏
@@ -179,6 +183,8 @@ class CharacterDetailCirculationController extends ChangeNotifier {
       var nextTask = 0;
       var total = 0;
       var requestTurn = Future<void>.value();
+      var activeRequests = 0;
+      var requestFinished = Completer<void>();
 
       /// 顺序领取任务，任意失败立即取消其余在途请求
       Future<void> worker() async {
@@ -195,8 +201,17 @@ class CharacterDetailCirculationController extends ChangeNotifier {
               if (!_isCurrent(generation) || token.isCancelled) return;
               final wait = requestInterval - sinceLastRequest.elapsed;
               if (wait > Duration.zero) await Future<void>.delayed(wait);
+              while (_isCurrent(generation) && !token.isCancelled) {
+                final limit = await _authRepository.hasUsableIdentityCookie()
+                    ? 5
+                    : 3;
+                if (activeRequests < limit) break;
+                // Cookie 回退后等待已发出的请求完成，再按较低并发继续调度
+                await requestFinished.future;
+              }
               if (!_isCurrent(generation) || token.isCancelled) return;
               sinceLastRequest.reset();
+              activeRequests++;
               request = index == users.length
                   ? _repository.fetchCharacterPoolAmount(
                       id,
@@ -212,10 +227,17 @@ class CharacterDetailCirculationController extends ChangeNotifier {
                         )
                         .then((holding) => holding?.total);
             } finally {
-              // 仅串行安排发起时刻，不等待响应，仍允许最多三个请求在途
+              // 仅串行安排发起时刻和名额，响应仍可并发处理
               dispatched.complete();
             }
-            final value = await request;
+            final int? value;
+            try {
+              value = await request;
+            } finally {
+              activeRequests--;
+              requestFinished.complete();
+              requestFinished = Completer<void>();
+            }
             if (!_isCurrent(generation) || token.isCancelled) return;
             if (value == null) throw StateError('流通数据不完整');
             total += value;
@@ -228,7 +250,7 @@ class CharacterDetailCirculationController extends ChangeNotifier {
         }
       }
 
-      await Future.wait(List.generate(3, (_) => worker()));
+      await Future.wait(List.generate(5, (_) => worker()));
       if (!_isCurrent(generation)) return;
       final completedAt = DateTime.now().toUtc();
       final snapshot = CharacterDetailCirculationSnapshot(

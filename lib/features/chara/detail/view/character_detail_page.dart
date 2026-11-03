@@ -146,6 +146,7 @@ class _CharacterDetailPageState extends State<CharacterDetailPage>
     _circulationController = CharacterDetailCirculationController(
       repository: widget.repository,
       preferences: widget.preferences,
+      authRepository: widget.authRepository,
       onSettlement: () =>
           _controller.refreshCurrentCharacter(showLoading: true),
     );

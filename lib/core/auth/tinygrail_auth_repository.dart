@@ -138,6 +138,19 @@ class TinygrailAuthRepository {
     return available;
   }
 
+  /// 检查当前会话是否可优先使用身份 Cookie，仅返回可用状态
+  Future<bool> hasUsableIdentityCookie() async {
+    if (_credentialsBlocked || _cookieRejected) return false;
+    final generation = _sessionGeneration;
+    final cookies = await _cookieJar.loadForRequest(
+      TinygrailSiteConfig.apiBaseUri,
+    );
+    return generation == _sessionGeneration &&
+        !_credentialsBlocked &&
+        !_cookieRejected &&
+        cookies.any(_isIdentityCookie);
+  }
+
   /// 捕获当前 Tinygrail 会话代际，无可用会话时返回空值
   int? captureSessionGeneration() {
     return _isSessionGenerationActive ? _sessionGeneration : null;
