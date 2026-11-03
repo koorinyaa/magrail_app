@@ -68,7 +68,8 @@ class SecondaryPageRefreshView extends StatelessWidget {
             controller: scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
-              SliverToBoxAdapter(child: SizedBox(height: headerHeight)),
+              // 固定占位报告标题遮挡高度，使索引跳转定位到标题下方
+              PinnedHeaderSliver(child: SizedBox(height: headerHeight)),
               ...slivers,
             ],
           ),
