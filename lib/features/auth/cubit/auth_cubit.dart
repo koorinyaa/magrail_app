@@ -5,7 +5,7 @@ import 'package:magrail_app/core/utils/user_error_message.dart';
 
 /// Tinygrail 授权状态
 enum AuthStatus {
-  /// 正在检查本地 Cookie 会话
+  /// 正在检查本地登录凭据
   checking,
 
   /// 当前没有可用 Tinygrail 会话
@@ -98,9 +98,9 @@ class AuthCubit extends Cubit<AuthState> {
     _emitIfActive(const AuthState.checking());
 
     try {
-      final hasCookie = await _authRepository.hasTinygrailCookie();
+      final hasSession = await _authRepository.hasSession();
       _emitIfActive(
-        hasCookie
+        hasSession
             ? const AuthState.authenticated()
             : const AuthState.unauthenticated(),
       );
@@ -128,9 +128,9 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       await _authRepository.consumeCallback(callbackUri);
 
-      // CookieJar 登录状态确认：callback 完成后重新读取 Cookie
-      final hasCookie = await _authRepository.hasTinygrailCookie();
-      if (!hasCookie) {
+      // 授权回调完成后确认存在可用的 Cookie 或访问令牌
+      final hasSession = await _authRepository.hasSession();
+      if (!hasSession) {
         _emitIfActive(const AuthState.failure('授权失败'));
         return;
       }

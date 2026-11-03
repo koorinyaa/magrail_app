@@ -65,9 +65,9 @@ class UserRepository extends ChangeNotifier with _UserRepositoryPageQueries {
   // 当前用户缓存超过 7 天未更新后不再用于首屏展示
   static const Duration _currentUserCacheLifetime = Duration(days: 7);
 
-  /// 检查当前 Tinygrail 会话是否存在本地 Cookie
-  Future<bool> hasCurrentUserSessionCookie() {
-    return _authRepository.hasTinygrailCookie();
+  /// 检查当前 Tinygrail 会话是否存在可用的 Cookie 或访问令牌
+  Future<bool> hasCurrentUserSession() {
+    return _authRepository.hasSession();
   }
 
   /// 捕获当前登录用户会话代际

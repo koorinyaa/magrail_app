@@ -15,8 +15,8 @@ extension _UserRepositoryAssets on UserRepository {
         : null;
     if (isCurrentUserRequest) {
       try {
-        final hasCookie = await _authRepository.hasTinygrailCookie();
-        if (!hasCookie) {
+        final hasSession = await _authRepository.hasSession();
+        if (!hasSession) {
           return _handleCurrentUserAuthExpired('请先授权', generation: null);
         }
         final activeGeneration = _authRepository.captureSessionGeneration();
@@ -108,7 +108,7 @@ extension _UserRepositoryAssets on UserRepository {
   /// 清理当前失效会话的缓存
   ///
   /// [message] 会话失效提示
-  /// [generation] 产生失败结果的会话代际，空值表示无本地 Cookie
+  /// [generation] 产生失败结果的会话代际，空值表示无可用本地登录凭据
   Future<UserAssetsFetchResult> _handleCurrentUserAuthExpired(
     String message, {
     required int? generation,

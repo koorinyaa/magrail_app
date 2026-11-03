@@ -212,12 +212,12 @@ class _CharacterPoolPageState extends State<CharacterPoolPage>
 
   /// 确保 Tinygrail 会话可用于拍卖操作
   Future<bool> _ensureTinygrailAuthorized() async {
-    final hasCookie = await widget.authRepository.hasTinygrailCookie();
+    final hasSession = await widget.authRepository.hasSession();
     if (!mounted) {
       return false;
     }
 
-    if (!hasCookie) {
+    if (!hasSession) {
       AppToast.error(context, text: '该功能需要授权后才能使用');
       return false;
     }

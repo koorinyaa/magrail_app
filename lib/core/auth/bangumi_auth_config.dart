@@ -8,7 +8,7 @@ class BangumiAuthConfig {
 
   static const String _defaultAuthorizeHost = 'bgm.tv';
 
-  // Tinygrail OAuth client：授权后由 Tinygrail callback 下发会话 Cookie
+  // Tinygrail OAuth client：授权回调下发会话 Cookie 与访问令牌
   static const String _clientId = 'bgm2525b0e4c7d93fec';
 
   /// 创建 Bangumi OAuth 授权地址
@@ -37,6 +37,8 @@ class BangumiAuthConfig {
     final callbackPath = callbackUri.path;
     return uri.scheme == callbackUri.scheme &&
         uri.host.toLowerCase() == callbackUri.host &&
+        uri.port == callbackUri.port &&
+        uri.userInfo.isEmpty &&
         (uri.path == callbackPath || uri.path == '$callbackPath/');
   }
 }

@@ -13,7 +13,7 @@ class ApiClient {
   /// [_dio] Dio 实例
   /// [readSessionGeneration] 读取排队请求所属的当前会话代际
   ApiClient(this._dio, {required this._readSessionGeneration}) {
-    // 在 Cookie 拦截器完成读取后再次校验，避免旧请求使用后来切换的账号
+    // 在鉴权拦截器选择凭据后再次校验，避免旧请求使用后来切换的账号
     _dio.interceptors.add(
       InterceptorsWrapper(onRequest: _validateRequestSession),
     );
@@ -89,7 +89,7 @@ class ApiClient {
       try {
         final cancelError = cancelToken?.cancelError;
         if (cancelError != null) throw cancelError;
-        // 排队期间退出或切换会话后，不再携带新会话 Cookie 发送旧请求
+        // 排队期间退出或切换会话后，不再携带新会话凭据发送旧请求
         if (sessionGeneration != _readSessionGeneration()) {
           throw const ApiException(message: '登录状态已变更，请重试');
         }
@@ -106,7 +106,7 @@ class ApiClient {
     }
   }
 
-  /// 在 Cookie 加载完成后阻止会话已变更的请求发送
+  /// 在凭据选择完成后阻止会话已变更的请求发送
   ///
   /// [options] 包含共享客户端会话标记的请求配置
   /// [handler] Dio 请求拦截处理器

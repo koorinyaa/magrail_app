@@ -278,12 +278,12 @@ class _MainHomeViewState extends State<MainHomeView> {
 
   /// 确保 Tinygrail 会话可用于拍卖操作
   Future<bool> _ensureTinygrailAuthorized() async {
-    final hasCookie = await widget.authRepository.hasTinygrailCookie();
+    final hasSession = await widget.authRepository.hasSession();
     if (!mounted) {
       return false;
     }
 
-    if (!hasCookie) {
+    if (!hasSession) {
       final isAuthorized = await _openAuthPage();
       return isAuthorized == true;
     }

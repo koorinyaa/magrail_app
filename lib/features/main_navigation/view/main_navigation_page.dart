@@ -367,13 +367,13 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     _isOpeningProfile = true;
     final generation = ++_profileNavigationGeneration;
     try {
-      // 用户资产页保护正式会话边界：无 Cookie 时先授权，取消授权则保持当前标签页
-      final hasCookie = await widget.authRepository.hasTinygrailCookie();
+      // 用户资产页保护正式会话边界：无可用登录凭据时先授权，取消授权则保持当前标签页
+      final hasSession = await widget.authRepository.hasSession();
       if (!_isProfileNavigationCurrent(generation)) {
         return;
       }
 
-      if (!hasCookie) {
+      if (!hasSession) {
         final isAuthorized = await _openAuthPage(
           onAuthenticated: () => _loadProfileAndSwitchAfterAuth(generation),
         );

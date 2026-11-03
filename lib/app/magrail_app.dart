@@ -169,7 +169,7 @@ class _MagrailAppState extends State<MagrailApp> {
   }) async {
     final userRepository = widget.dependencies.repositories.user;
     try {
-      if (!await userRepository.hasCurrentUserSessionCookie()) {
+      if (!await userRepository.hasCurrentUserSession()) {
         await widget.dependencies.activityReporter.report();
         return;
       }

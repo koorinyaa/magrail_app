@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:magrail_app/core/analytics/app_activity_reporter.dart';
 import 'package:magrail_app/core/auth/bangumi_mirror_repository.dart';
@@ -230,9 +229,6 @@ Future<AppDependencies> bootstrap() async {
     ),
   );
 
-  // Tinygrail 会话边界：保存 Set-Cookie，并在后续请求自动附带 Cookie
-  dio.interceptors.add(CookieManager(cookieJar));
-
   final secureStorage = const SecureStorage(FlutterSecureStorage());
   final preferences = AppPreferences(await SharedPreferences.getInstance());
   final mirrorRepository = BangumiMirrorRepository(
@@ -266,15 +262,17 @@ Future<AppDependencies> bootstrap() async {
     mirrorHost: preferences.effectiveBangumiMirrorHost,
   );
 
+  // 认证仓库统一装配 Cookie 优先与 token 回退，避免同时发送两种凭据
   final authRepository = TinygrailAuthRepository(
     dio: dio,
     cookieJar: cookieJar,
+    secureStorage: secureStorage,
   );
   try {
-    // 首次确认本地会话，避免排队中的公开请求被无 Cookie 的初次检查作废
-    await authRepository.hasTinygrailCookie();
+    // 首次确认本地会话，避免排队中的公开请求被无凭据的初次检查作废
+    await authRepository.hasSession();
   } catch (_) {
-    // Cookie 读取失败由页面会话检查处理，保留应用启动流程
+    // 登录凭据读取失败由页面会话检查处理，保留应用启动流程
   }
   final apiClient = ApiClient(
     dio,

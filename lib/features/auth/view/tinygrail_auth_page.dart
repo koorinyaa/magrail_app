@@ -17,7 +17,7 @@ class TinygrailAuthPage extends StatefulWidget {
   /// [key] Flutter 组件标识
   /// [authRepository] Tinygrail 授权仓库
   /// [preferences] 本地偏好设置
-  /// [onAuthenticated] 授权成功并写入 Cookie 后关闭页面前执行的回调
+  /// [onAuthenticated] 授权成功并保存登录凭据后关闭页面前执行的回调
   const TinygrailAuthPage({
     super.key,
     required this.authRepository,
@@ -31,7 +31,7 @@ class TinygrailAuthPage extends StatefulWidget {
   /// 本地偏好设置
   final AppPreferences preferences;
 
-  /// 授权成功并写入 Cookie 后关闭页面前执行的回调
+  /// 授权成功并保存登录凭据后关闭页面前执行的回调
   final Future<void> Function()? onAuthenticated;
 
   /// 创建 Tinygrail 授权页面状态
@@ -228,13 +228,13 @@ class _TinygrailAuthPageState extends State<TinygrailAuthPage> {
         return;
       }
 
-      // callback 结束后必须先确认 Cookie，避免无会话时继续加载用户资产
-      final hasCookie = await widget.authRepository.hasTinygrailCookie();
+      // 授权回调结束后先确认会话凭据，避免无会话时继续加载用户资产
+      final hasSession = await widget.authRepository.hasSession();
       if (!mounted) {
         return;
       }
 
-      if (!hasCookie) {
+      if (!hasSession) {
         await _showErrorDialog('');
         return;
       }

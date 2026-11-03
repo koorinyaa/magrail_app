@@ -434,7 +434,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
     unawaited(showAppLoadingDialog(context, message: '正在退出登录'));
 
     try {
-      // 远端注销必须在本地 Cookie 清理前执行，确保请求携带当前会话
+      // 远端注销必须在本地凭据清理前执行，确保请求携带当前会话
       await widget.authRepository.logoutRemote();
     } catch (_) {
       // 远端注销失败时仍继续关闭当前登录态

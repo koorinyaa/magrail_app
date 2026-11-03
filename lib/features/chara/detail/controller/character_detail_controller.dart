@@ -241,17 +241,17 @@ class CharacterDetailController extends ChangeNotifier {
     _notifyIfActive();
 
     final previousUserId = _currentUser?.userId;
-    var hasCookie = false;
+    var hasSession = false;
     try {
-      hasCookie = await _userRepository.hasCurrentUserSessionCookie();
+      hasSession = await _userRepository.hasCurrentUserSession();
     } catch (_) {
-      hasCookie = false;
+      hasSession = false;
     }
     if (_isDisposed) {
       return;
     }
 
-    if (!hasCookie) {
+    if (!hasSession) {
       await _userRepository.clearCurrentUserAssetsCache();
       if (_isDisposed) {
         return;
