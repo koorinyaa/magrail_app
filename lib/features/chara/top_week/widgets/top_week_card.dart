@@ -33,7 +33,7 @@ class _TopWeekCard extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    final card = SizedBox(
       width: cardWidth,
       child: AspectRatio(
         aspectRatio: cardAspectRatio,
@@ -69,12 +69,18 @@ class _TopWeekCard extends StatelessWidget {
                   onCharacterPressed: onCharacterPressed,
                   onAuctionPressed: onAuctionPressed,
                 ),
+                Positioned(
+                  top: 16,
+                  right: 16,
+                  child: TempleCoverPlaybackButton(coverUrl: entry.coverUrl),
+                ),
               ],
             ),
           ),
         ),
       ),
     );
+    return TempleCoverPlayback(coverUrls: [entry.coverUrl], child: card);
   }
 
   /// 构建图片区域的查看大图水波纹层

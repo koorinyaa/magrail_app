@@ -87,6 +87,7 @@ class LatestTempleCard extends StatelessWidget {
 
     return TempleLinkedCoverStack(
       width: width,
+      coverUrls: [item.cover, linkedTemple.cover],
       frontCover: mainCard,
       linkedCover: TempleLinkedCover(
         width: coverWidth,

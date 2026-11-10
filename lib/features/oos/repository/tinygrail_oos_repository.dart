@@ -50,14 +50,17 @@ final class TinygrailOosRepository {
   /// [path] OOS 目录
   /// [hash] 文件哈希
   /// [contentType] 文件 MIME 类型
+  /// [extension] 签名使用的文件扩展名，空值沿用接口默认值
   Future<TinygrailOosSignature> fetchSignature({
     required String path,
     required String hash,
     required String contentType,
+    String? extension,
   }) async {
     final encodedType = Uri.encodeComponent(contentType);
+    final suffix = extension == null ? '' : '/$extension';
     final json = await _apiClient.postJson<Map<String, Object?>>(
-      'chara/oss/sign/$path/$hash/$encodedType',
+      'chara/oss/sign/$path/$hash/$encodedType$suffix',
     );
     final response = TinygrailResponse<TinygrailOosSignature>.fromJson(json, (
       value,

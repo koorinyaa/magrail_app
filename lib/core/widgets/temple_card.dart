@@ -109,7 +109,7 @@ class TempleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(borderRadius);
 
-    return SizedBox(
+    final card = SizedBox(
       width: width,
       child: AspectRatio(
         aspectRatio: 3 / 4,
@@ -155,27 +155,31 @@ class TempleCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (onAssetTap != null || onLinkTap != null)
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Column(
-                      children: [
-                        if (onAssetTap case final callback?)
-                          _TempleCardEntryButton(
-                            icon: LucideIcons.walletCards,
-                            onPressed: callback,
-                          ),
-                        if (onAssetTap != null && onLinkTap != null)
-                          const SizedBox(height: 8),
-                        if (onLinkTap case final callback?)
-                          _TempleCardEntryButton(
-                            icon: LucideIcons.link,
-                            onPressed: callback,
-                          ),
-                      ],
-                    ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Column(
+                    children: [
+                      if (onAssetTap case final callback?)
+                        _TempleCardEntryButton(
+                          icon: LucideIcons.walletCards,
+                          onPressed: callback,
+                        ),
+                      if (onAssetTap != null && onLinkTap != null)
+                        const SizedBox(height: 8),
+                      if (onLinkTap case final callback?)
+                        _TempleCardEntryButton(
+                          icon: LucideIcons.link,
+                          onPressed: callback,
+                        ),
+                      TempleCoverPlaybackButton(
+                        padding: EdgeInsets.only(
+                          top: onAssetTap != null || onLinkTap != null ? 8 : 0,
+                        ),
+                      ),
+                    ],
                   ),
+                ),
                 _buildRoleInfo(),
               ],
             ),
@@ -183,6 +187,7 @@ class TempleCard extends StatelessWidget {
         ),
       ),
     );
+    return TempleCoverPlayback(coverUrls: [coverUrl], child: card);
   }
 
   /// 构建图片层

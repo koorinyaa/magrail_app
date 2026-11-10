@@ -11,17 +11,22 @@ class TempleLinkedCoverStack extends StatelessWidget {
   ///
   /// [key] Flutter 组件标识
   /// [width] 堆叠区域宽度
+  /// [coverUrls] 当前 LINK 封面地址，用于重置共享播放状态
   /// [frontCover] 前层圣殿封面
   /// [linkedCover] 后层 LINK 封面
   const TempleLinkedCoverStack({
     super.key,
     required this.width,
+    required this.coverUrls,
     required this.frontCover,
     required this.linkedCover,
   });
 
   /// 堆叠区域宽度
   final double width;
+
+  /// 当前 LINK 封面地址
+  final List<String> coverUrls;
 
   /// 前层圣殿封面
   final Widget frontCover;
@@ -45,7 +50,7 @@ class TempleLinkedCoverStack extends StatelessWidget {
     final horizontalOffset = width * _horizontalOffsetRatio;
     final verticalOffset = height * _verticalOffsetRatio;
 
-    return SizedBox(
+    final stack = SizedBox(
       width: width,
       height: height,
       child: Stack(
@@ -56,6 +61,7 @@ class TempleLinkedCoverStack extends StatelessWidget {
         ],
       ),
     );
+    return TempleCoverPlayback(coverUrls: coverUrls, child: stack);
   }
 }
 

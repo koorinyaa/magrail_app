@@ -112,8 +112,9 @@ class TempleLinkCard extends StatelessWidget {
     final shapeWidth = _baseShapeWidth * scale;
     final rightShapeOffset = width - shapeWidth;
     final diagonalInset = _baseDiagonalInset * scale;
+    final entryDimension = (28 * scale).clamp(24.0, 30.0).toDouble();
 
-    return DecoratedBox(
+    final card = DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: radius,
         boxShadow: [
@@ -182,6 +183,24 @@ class TempleLinkCard extends StatelessWidget {
                 scale: scale,
               ),
               ..._buildAssetEntryButtons(scale),
+              Positioned(
+                left: 8 * scale,
+                top: 8 * scale +
+                    (onLeftAssetTap == null ? 0 : entryDimension + 8 * scale),
+                child: TempleCoverPlaybackButton(
+                  coverUrl: leftCoverUrl,
+                  dimension: entryDimension,
+                ),
+              ),
+              Positioned(
+                right: 8 * scale,
+                top: 8 * scale +
+                    (onRightAssetTap == null ? 0 : entryDimension + 8 * scale),
+                child: TempleCoverPlaybackButton(
+                  coverUrl: rightCoverUrl,
+                  dimension: entryDimension,
+                ),
+              ),
               Positioned.fill(
                 child: IgnorePointer(
                   child: DecoratedBox(
@@ -199,6 +218,10 @@ class TempleLinkCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+    return TempleCoverPlayback(
+      coverUrls: [leftCoverUrl, rightCoverUrl],
+      child: card,
     );
   }
 

@@ -54,6 +54,17 @@ Future<void> updateTempleAssetCover(
     return;
   }
 
+  // GIF 原图最多允许 10MB，上传前拒绝超限文件
+  if (contentType == 'image/gif' && bytes.length > 10 * 1024 * 1024) {
+    AppToast.error(context, text: 'GIF 图片不能超过 10MB');
+    return;
+  }
+  final extension = switch (contentType) {
+    'image/png' => 'png',
+    'image/gif' => 'gif',
+    _ => null,
+  };
+
   final rootNavigator = Navigator.of(context, rootNavigator: true);
   unawaited(showAppLoadingDialog(context, message: '正在更换封面'));
   var refreshFailed = false;
@@ -66,11 +77,13 @@ Future<void> updateTempleAssetCover(
     final coverUrl = actionContext.oosRepository.buildUrl(
       path: 'cover',
       hash: hash,
+      extension: extension ?? 'jpg',
     );
     final signature = await actionContext.oosRepository.fetchSignature(
       path: 'cover',
       hash: hash,
       contentType: contentType,
+      extension: extension,
     );
     await actionContext.oosRepository.uploadBytes(
       url: coverUrl,
@@ -114,6 +127,9 @@ Future<void> updateTempleAssetCover(
 /// [pickedFile] 选择的图片文件
 /// [bytes] 图片字节
 String? _resolveImageContentType(XFile pickedFile, List<int> bytes) {
+  // 优先按文件内容识别格式，避免选择器提供的扩展名或 MIME 丢失动画与透明度
+  final detectedType = lookupMimeType('', headerBytes: bytes)?.toLowerCase();
+  if (detectedType != null) return detectedType;
   final pickedMimeType = pickedFile.mimeType?.trim();
   if (pickedMimeType != null && pickedMimeType.isNotEmpty) {
     return pickedMimeType;

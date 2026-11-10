@@ -95,6 +95,7 @@ class UserTempleCard extends StatelessWidget {
         ? mainCard
         : TempleLinkedCoverStack(
             width: width,
+            coverUrls: [item.cover, linkedTemple.cover],
             frontCover: mainCard,
             linkedCover: TempleLinkedCover(
               width: stackedWidth,

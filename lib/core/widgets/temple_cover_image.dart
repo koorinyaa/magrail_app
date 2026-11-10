@@ -1,7 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:magrail_app/core/theme/app_blur_style.dart';
+import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+
+part 'temple_cover_playback.dart';
 
 /// 圣殿封面图片
 class TempleCoverImage extends StatelessWidget {
@@ -49,6 +53,28 @@ class TempleCoverImage extends StatelessWidget {
   Widget build(BuildContext context) {
     if (coverUrl.isEmpty) {
       return _buildFallbackImage();
+    }
+
+    final playback = _TempleCoverPlaybackScope.maybeOf(context);
+    if (playback != null && TinygrailAssetUrls.isGifCover(coverUrl)) {
+      // Image 在 TickerMode 关闭时仍加载首帧，随后冻结并保留解码流以便恢复
+      return TickerMode(
+        enabled: playback.isPlaying,
+        child: Image(
+          image: CachedNetworkImageProvider(coverUrl),
+          fit: fit,
+          alignment: alignment,
+          frameBuilder: (context, child, frame, synchronous) {
+            if (frame == null) return const _TempleCoverSkeleton();
+            playback.updateReady(coverUrl, true);
+            return child;
+          },
+          errorBuilder: (context, error, stackTrace) {
+            playback.updateReady(coverUrl, false);
+            return _buildFallbackImage();
+          },
+        ),
+      );
     }
 
     return CachedNetworkImage(

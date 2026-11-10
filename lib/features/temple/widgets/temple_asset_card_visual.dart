@@ -22,9 +22,12 @@ class _TempleAssetVisual extends StatelessWidget {
   /// [context] 当前组件树上下文
   @override
   Widget build(BuildContext context) {
-    return _TempleAssetThumbnail(
-      data: data,
-      enableCoverPreview: enableCoverPreview,
+    return TempleCoverPlayback(
+      coverUrls: [data.cover, data.linkCover],
+      child: _TempleAssetThumbnail(
+        data: data,
+        enableCoverPreview: enableCoverPreview,
+      ),
     );
   }
 }
@@ -276,6 +279,12 @@ class _TempleAssetCoverCard extends StatelessWidget {
                 right: 8,
                 bottom: 8,
                 child: _TempleAssetLineButton(line: line),
+              ),
+            if (badgeData != null)
+              const Positioned(
+                top: 8,
+                right: 8,
+                child: TempleCoverPlaybackButton(),
               ),
           ],
         ),

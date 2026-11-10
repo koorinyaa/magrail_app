@@ -27,6 +27,14 @@ class TinygrailAssetUrls {
     _bangumiMirrorHost = BangumiMirrorConfig.resolveHost(mirrorHost);
   }
 
+  /// 判断封面是否为 GIF，兼容缩略后缀、查询参数和片段
+  ///
+  /// [cover] 封面地址
+  static bool isGifCover(String cover) {
+    return RegExp(r'\.gif(?:!w\d+)?(?:[?#]|$)', caseSensitive: false)
+        .hasMatch(cover);
+  }
+
   /// 获取圣殿封面地址
   ///
   /// [cover] 原始封面地址
@@ -39,8 +47,16 @@ class TinygrailAssetUrls {
       return '';
     }
 
-    final normalizedCover = _normalizeHttps(cover);
+    var normalizedCover = _normalizeHttps(cover);
+    final isGif = isGifCover(normalizedCover);
+    if (isGif) {
+      normalizedCover = normalizedCover.replaceFirstMapped(
+        RegExp(r'(\.gif)!w\d+(?=[?#]|$)', caseSensitive: false),
+        (match) => match[1]!,
+      );
+    }
     final width = size == TinygrailCoverSize.small ? '150' : '480';
+    final suffix = isGif ? '' : '!w$width';
 
     if (normalizedCover.contains('/crt/')) {
       if (size == TinygrailCoverSize.large &&
@@ -57,11 +73,11 @@ class TinygrailAssetUrls {
     }
 
     if (normalizedCover.startsWith(_ossBaseUrl)) {
-      return '$_cdnBaseUrl${normalizedCover.substring(_ossBaseUrl.length)}!w$width';
+      return '$_cdnBaseUrl${normalizedCover.substring(_ossBaseUrl.length)}$suffix';
     }
 
     if (normalizedCover.startsWith('/cover')) {
-      return '$_cdnBaseUrl$normalizedCover!w$width';
+      return '$_cdnBaseUrl$normalizedCover$suffix';
     }
 
     return _applyBangumiMirror(normalizedCover);
