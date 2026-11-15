@@ -29,7 +29,6 @@ class _AboutPage extends StatefulWidget {
 
 /// 关于二级页面状态
 class _AboutPageState extends State<_AboutPage> {
-  late final Future<PackageInfo> _packageInfoFuture;
   bool _isCheckingUpdate = false;
   int _appIconTapCount = 0;
   double _appIconTurns = 0;
@@ -40,7 +39,8 @@ class _AboutPageState extends State<_AboutPage> {
   @override
   void initState() {
     super.initState();
-    _packageInfoFuture = PackageInfo.fromPlatform();
+    unawaited(widget.updateController.loadInstalledVersion());
+    unawaited(widget.updateController.refreshPatchState());
     _hiddenFeaturesEnabled = widget.preferences.hiddenFeaturesEnabled;
     _appIconTurns = _hiddenFeaturesEnabled ? 0.5 : 0;
   }
@@ -100,15 +100,10 @@ class _AboutPageState extends State<_AboutPage> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    FutureBuilder<PackageInfo>(
-                      future: _packageInfoFuture,
-                      builder: (context, snapshot) {
-                        final version = switch (snapshot) {
-                          AsyncSnapshot(hasError: true) => '获取失败',
-                          AsyncSnapshot(hasData: true, data: final data?) =>
-                            _formatPackageVersion(data),
-                          _ => '读取中',
-                        };
+                    AnimatedBuilder(
+                      animation: widget.updateController,
+                      builder: (context, child) {
+                        final version = widget.updateController.currentVersion;
 
                         return Material(
                           color: Colors.transparent,
@@ -141,16 +136,56 @@ class _AboutPageState extends State<_AboutPage> {
                     AnimatedBuilder(
                       animation: widget.updateController,
                       builder: (context, child) {
-                        if (!widget.updateController.hasUpdate) {
-                          return const SizedBox.shrink();
-                        }
+                        final controller = widget.updateController;
+                        final installedVersion = controller.installedVersion;
+                        final patch = controller.currentPatch;
+                        final status = controller.rollbackPending
+                            ? '更新已撤回，请完全退出后重新打开'
+                            : controller.restartRequired
+                                ? '更新已准备好，下次启动生效'
+                                : controller.isPreparingPatch
+                                    ? '正在后台准备更新'
+                                    : null;
 
+                        return Column(
+                          children: [
+                            if (installedVersion != null)
+                              Text(
+                                '基础包 $installedVersion'
+                                '${patch == null ? '' : ' · 补丁 $patch'}',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: colorScheme.onSurfaceVariant,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            if (status != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: Text(
+                                  status,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: colorScheme.onSurfaceVariant,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+                    AnimatedBuilder(
+                      animation: widget.updateController,
+                      builder: (context, child) {
                         return Padding(
                           padding: const EdgeInsets.only(top: 16),
-                          child: FilledButton.icon(
+                          child: TextButton.icon(
                             onPressed: _openLatestReleasePage,
                             icon: const Icon(Icons.download_rounded, size: 18),
-                            label: const Text('下载最新版本'),
+                            label: Text(widget.updateController.hasUpdate
+                                ? '下载最新版本'
+                                : '下载安装包'),
                           ),
                         );
                       },
@@ -233,19 +268,6 @@ class _AboutPageState extends State<_AboutPage> {
     }
   }
 
-  /// 格式化平台包版本号
-  ///
-  /// [packageInfo] 平台包信息
-  String _formatPackageVersion(PackageInfo packageInfo) {
-    final buildNumber = packageInfo.buildNumber;
-
-    if (buildNumber.isEmpty) {
-      return packageInfo.version;
-    }
-
-    return '${packageInfo.version}+$buildNumber';
-  }
-
   /// 处理版本号点击
   Future<void> _handleVersionPressed() async {
     setState(() {
@@ -260,6 +282,14 @@ class _AboutPageState extends State<_AboutPage> {
 
       if (result.hasUpdate) {
         await showAppUpdateDialog(context, controller: widget.updateController);
+      } else if (widget.updateController.restartRequired) {
+        AppToast.info(context, text: widget.updateController.rollbackPending
+            ? '更新已撤回，请完全退出后重新打开'
+            : '更新已准备好，下次启动生效');
+      } else if (result.checkFailed) {
+        AppToast.error(context, text: '检查未完成，请稍后重试或下载安装包');
+      } else if (widget.updateController.isPreparingPatch) {
+        AppToast.info(context, text: '后台更新尚未完成，请稍后再试');
       } else {
         AppToast.info(context, text: '已是最新版本');
       }

@@ -6,6 +6,7 @@ const _changedUserSessionResult = UserAssetsFetchResult.failure('登录状态已
 /// 用户资产请求与当前会话边界
 extension _UserRepositoryAssets on UserRepository {
   /// 请求用户资产并校验当前用户会话
+  /// 等待失效会话清理，使异步失败进入所在请求的异常处理流程
   ///
   /// [username] 用户名，空值表示当前用户
   Future<UserAssetsFetchResult> _fetchAssets({String? username}) async {
@@ -17,7 +18,7 @@ extension _UserRepositoryAssets on UserRepository {
       try {
         final hasSession = await _authRepository.hasSession();
         if (!hasSession) {
-          return _handleCurrentUserAuthExpired('请先授权', generation: null);
+          return await _handleCurrentUserAuthExpired('请先授权', generation: null);
         }
         final activeGeneration = _authRepository.captureSessionGeneration();
         if (activeGeneration == null ||
@@ -55,7 +56,7 @@ extension _UserRepositoryAssets on UserRepository {
       if (!response.isSuccess || profile == null) {
         final message = response.message ?? '获取用户资产失败';
         return isCurrentUserRequest
-            ? _handleCurrentUserAuthExpired(
+            ? await _handleCurrentUserAuthExpired(
                 message,
                 generation: sessionGeneration,
               )

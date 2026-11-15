@@ -15,7 +15,7 @@ Future<bool> showAppUpdateDialog(
   bool markPrompted = false,
 }) async {
   final release = controller.latestRelease;
-  if (release == null) {
+  if (release == null || !controller.hasUpdate) {
     return false;
   }
 
@@ -26,21 +26,24 @@ Future<bool> showAppUpdateDialog(
   if (markPrompted) {
     await controller.markLatestReleasePrompted();
   }
-  if (!context.mounted) {
+  if (!context.mounted || !controller.hasUpdate) {
     return false;
   }
 
   return showAppConfirmDialog(
     context,
     title: '发现新版本',
-    message: _updateMessage(
-      currentVersion: controller.currentVersion ?? '未知',
+    message: '',
+    content: _AppUpdateMessage(
+      controller: controller,
       release: release,
     ),
     confirmText: '下载最新版本',
     cancelText: '稍后',
     icon: Icons.system_update_alt_rounded,
     onConfirm: () async {
+      // 下载超时后补丁仍可能完成，不再打开已经失去必要性的整包页面
+      if (!controller.hasUpdate) return true;
       final opened = await controller.openLatestReleasePage();
       if (!opened && context.mounted) {
         AppToast.error(context, text: '无法打开下载页面，请稍后重试');
@@ -49,6 +52,76 @@ Future<bool> showAppUpdateDialog(
       return opened;
     },
   );
+}
+
+/// 在补丁晚到时关闭对应更新面板，避免继续提示下载整包
+class _AppUpdateMessage extends StatefulWidget {
+  /// 创建更新说明
+  ///
+  /// [controller] 统一更新控制器
+  /// [release] 当前面板对应的 GitHub Release
+  const _AppUpdateMessage({required this.controller, required this.release});
+
+  /// 统一更新控制器
+  final AppUpdateController controller;
+
+  /// 当前面板对应的 GitHub Release
+  final AppReleaseInfo release;
+
+  /// 创建更新说明状态
+  @override
+  State<_AppUpdateMessage> createState() => _AppUpdateMessageState();
+}
+
+/// 更新说明与当前更新面板的状态协调
+class _AppUpdateMessageState extends State<_AppUpdateMessage> {
+  /// 监听晚到的补丁状态
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_handleUpdateChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _handleUpdateChanged());
+  }
+
+  /// 只移除当前说明所属面板，不关闭用户后来打开的其他页面
+  void _handleUpdateChanged() {
+    if (!mounted ||
+        widget.controller.hasUpdate ||
+        widget.controller.isChecking) {
+      return;
+    }
+
+    final route = ModalRoute.of(context);
+    if (route != null && route.isActive) {
+      Navigator.of(context).removeRoute(route, false);
+    }
+  }
+
+  /// 释放面板更新监听
+  @override
+  void dispose() {
+    widget.controller.removeListener(_handleUpdateChanged);
+    super.dispose();
+  }
+
+  /// 构建更新说明
+  ///
+  /// [context] 当前组件树上下文
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      _updateMessage(
+        currentVersion: widget.controller.currentVersion,
+        release: widget.release,
+      ),
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
+        height: 1.45,
+      ),
+    );
+  }
 }
 
 /// 构建更新弹窗文案

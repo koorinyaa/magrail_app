@@ -37,6 +37,7 @@ extension UserTempleSnapshotPageControllerRefresh
   }
 
   /// 从已写入数据库的最新圣殿快照替换可视窗口
+  /// 等待窗口替换完成，使异步读取失败按刷新失败返回
   Future<bool> reloadLatestSnapshot() async {
     try {
       final sourceState = await _snapshotRepository.readSourceState(_username);
@@ -47,7 +48,7 @@ extension UserTempleSnapshotPageControllerRefresh
       if (revision == _windowRevision) {
         return true;
       }
-      return _replaceWithLatestTempleWindow(expectedRevision: revision);
+      return await _replaceWithLatestTempleWindow(expectedRevision: revision);
     } catch (_) {
       return false;
     }

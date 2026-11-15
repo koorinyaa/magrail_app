@@ -38,11 +38,12 @@ Magrail 是为小圣杯打造的移动端 APP，覆盖小圣杯原有全部功�
 
 ## 开发与构建环境
 
-- Flutter SDK `>=3.44.0`
+- 正式发布使用 Flutter `3.47.9`，基础源码约束以 `pubspec.yaml` 为准
 - Dart SDK `>=3.12.0 <4.0.0`
 - Android SDK
 - JDK 17
-- Xcode 15 或更新版本，仅 iOS 构建需要
+- iOS 最低版本为 15，Android 最低版本为 7.0
+- iOS 发布使用 macOS 与 Xcode，基础包和对应补丁须保持相同工具链；当前 workflow 固定 Xcode 26.3
 
 ## 本地开发
 
@@ -70,11 +71,13 @@ flutter analyze --no-pub
 flutter build apk --debug --no-pub
 ```
 
-构建 Android release APK：
+构建可热更新的 Android release APK，先完成 Shorebird 账号登录与 `shorebird init`：
 
 ```powershell
-flutter build apk --release --no-pub
+dart tool/release.dart release android
 ```
+
+版本号仅在 `pubspec.yaml` 的 `version` 中维护，统一发布入口自动生成内容版本并关闭图标裁剪。只同步版本而不构建或上传时执行 `dart tool/release.dart prepare`；本机预检查使用 `dart tool/release.dart check-release android`
 
 ## iOS 侧载构建
 
@@ -84,13 +87,14 @@ flutter build apk --release --no-pub
 .github/workflows/ios-sideload.yml
 ```
 
-在 GitHub Actions 页面手动运行 `iOS Sideload IPA` 后，构建产物会上传为：
+在 GitHub Actions 页面手动运行 `iOS Sideload IPA`，选择 `release` 后构建并上传 Shorebird 基础版本，产物名称为：
 
 ```text
 Magrail_<版本号>.ipa
 ```
 
 该 IPA 不包含 App Store 分发签名，安装时需要使用侧载工具重新签名。
+
 
 ## 项目结构
 

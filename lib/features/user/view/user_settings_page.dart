@@ -14,7 +14,6 @@ import 'package:magrail_app/core/widgets/app_confirm_dialog.dart';
 import 'package:magrail_app/core/widgets/app_loading_dialog.dart';
 import 'package:magrail_app/core/widgets/secondary_page_sliver_app_bar.dart';
 import 'package:magrail_app/features/user/repository/user_repository.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 part 'user_settings_page_about.dart';
@@ -256,7 +255,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                               return _SettingsActionTile(
                                 icon: Icons.info_outline_rounded,
                                 label: '关于',
-                                showNewBadge: widget.updateController.hasUpdate,
+                                showNewBadge: widget.updateController.hasUpdateNotice,
                                 onPressed: _openAboutPage,
                               );
                             },

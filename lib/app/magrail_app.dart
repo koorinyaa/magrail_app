@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:magrail_app/core/feedback/app_toast.dart';
 import 'package:magrail_app/core/update/app_update_dialog.dart';
 import 'package:magrail_app/features/chara/detail/character_detail_navigation.dart';
 import 'package:magrail_app/features/clipboard/controller/clipboard_detail_controller.dart';
@@ -53,6 +54,7 @@ class _MagrailAppState extends State<MagrailApp> {
   late final AppLifecycleListener _appLifecycleListener;
   late ThemeMode _themeMode;
   var _startupUpdateChecked = false;
+  var _patchReadyNotified = false;
 
   /// 初始化根组件状态
   @override
@@ -60,6 +62,7 @@ class _MagrailAppState extends State<MagrailApp> {
     super.initState();
     _themeMode = widget._themeMode ?? widget.dependencies.preferences.themeMode;
     _rootNavigatorKey = GlobalKey<NavigatorState>();
+    widget.dependencies.updateController.addListener(_handleUpdateStateChanged);
     _clipboardDetailController = ClipboardDetailController(
       characterRepository: widget.dependencies.repositories.characterDetail,
       userRepository: widget.dependencies.repositories.user,
@@ -92,6 +95,8 @@ class _MagrailAppState extends State<MagrailApp> {
     _appLifecycleListener.dispose();
     _clipboardDetailController.dispose();
     _router.dispose();
+    widget.dependencies.updateController.removeListener(_handleUpdateStateChanged);
+    widget.dependencies.updateController.dispose();
     widget.dependencies.userAssetSnapshotCoordinator.dispose();
     super.dispose();
   }
@@ -134,17 +139,20 @@ class _MagrailAppState extends State<MagrailApp> {
     try {
       final controller = widget.dependencies.updateController;
       final result = await controller.checkForUpdate();
-      if (!mounted || !result.hasUpdate) {
+      if (!mounted || !result.hasUpdate || !controller.hasUpdate) {
         return;
       }
 
       final shouldPrompt = await controller.shouldShowAutomaticPrompt();
-      if (!mounted || !shouldPrompt) {
+      if (!mounted || !shouldPrompt || !controller.hasUpdate) {
         return;
       }
 
       final context = _rootNavigatorKey.currentContext;
       if (context == null || !context.mounted) {
+        return;
+      }
+      if (WidgetsBinding.instance.lifecycleState != AppLifecycleState.resumed) {
         return;
       }
 
@@ -159,6 +167,26 @@ class _MagrailAppState extends State<MagrailApp> {
       _startupUpdateChecked = true;
       unawaited(_clipboardDetailController.presentPending());
     }
+  }
+
+  /// 每个进程仅提示一次准备完成的补丁，后台完成时延至重新进入前台
+  void _handleUpdateStateChanged() {
+    final controller = widget.dependencies.updateController;
+    final context = _rootNavigatorKey.currentContext;
+    if (!mounted ||
+        _patchReadyNotified ||
+        controller.isChecking ||
+        !controller.restartRequired ||
+        WidgetsBinding.instance.lifecycleState != AppLifecycleState.resumed ||
+        context == null ||
+        !context.mounted) {
+      return;
+    }
+
+    _patchReadyNotified = true;
+    AppToast.info(context, text: controller.rollbackPending
+        ? '更新已撤回，请完全退出后重新打开'
+        : '更新已准备好，下次启动生效');
   }
 
   /// 静默恢复当前用户并上报活跃状态
@@ -199,6 +227,8 @@ class _MagrailAppState extends State<MagrailApp> {
 
   /// 处理应用重新进入前台
   void _handleAppResumed() {
+    unawaited(widget.dependencies.updateController.refreshPatchState());
+    _handleUpdateStateChanged();
     _clipboardDetailController.resume();
     unawaited(widget.dependencies.mirrorRepository.refresh());
     unawaited(_refreshCurrentUserStateSilently(preloadAssets: false));

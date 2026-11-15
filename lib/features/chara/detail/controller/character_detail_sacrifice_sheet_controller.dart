@@ -197,6 +197,7 @@ final class CharacterDetailSacrificeSheetController extends ChangeNotifier {
   }
 
   /// 提交当前资产重组或股权融资
+  /// 等待接口完成后恢复提交状态，避免请求期间提前允许再次提交
   Future<CharacterDetailSacrificeResult> submit() async {
     final validation = validationMessage;
     if (validation != null) {
@@ -208,7 +209,7 @@ final class CharacterDetailSacrificeSheetController extends ChangeNotifier {
     _isSubmitting = true;
     _notify();
     try {
-      return _repository.sacrificeCharacter(
+      return await _repository.sacrificeCharacter(
         characterId: _characterId,
         amount: submittedAmount,
         isFinancing: submittedIsFinancing,

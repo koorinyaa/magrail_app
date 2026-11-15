@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
+import 'package:magrail_app/core/update/app_content_version.dart';
 import 'package:magrail_app/core/utils/user_error_message.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shorebird_code_push/shorebird_code_push.dart';
 
 /// 应用错误报告
 class AppErrorReport {
@@ -65,6 +67,7 @@ class AppErrorReport {
   /// 构建可复制的反馈文本
   Future<String> toClipboardText() async {
     var version = '未知';
+    int? patchNumber;
     try {
       final packageInfo = await PackageInfo.fromPlatform();
       final packageVersion = packageInfo.version.trim();
@@ -77,11 +80,26 @@ class AppErrorReport {
     } catch (_) {
       // 版本读取失败不阻止用户复制核心错误信息
     }
+    if (kReleaseMode &&
+        (defaultTargetPlatform == TargetPlatform.android ||
+            defaultTargetPlatform == TargetPlatform.iOS)) {
+      try {
+        final updater = ShorebirdUpdater();
+        if (updater.isAvailable) {
+          patchNumber = (await updater.readCurrentPatch()
+              .timeout(const Duration(seconds: 2)))?.number;
+        }
+      } catch (_) {
+        // 补丁状态异常时仍保留当前内容版本与基础包信息
+      }
+    }
 
     return [
       'Magrail 错误反馈',
       '时间: ${time.toIso8601String()}',
-      '版本: $version',
+      '版本: $appContentVersion',
+      '基础包: $version',
+      if (patchNumber != null) '补丁: $patchNumber',
       '模式: ${kReleaseMode ? 'release' : 'debug'}',
       '平台: ${defaultTargetPlatform.name}',
       '来源: $source',

@@ -27,13 +27,14 @@ Future<void> _startApp() async {
   _configureErrorHandling();
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   await _configurePreferredOrientations();
-  // 预热液态玻璃着色器，避免底部导航首次渲染白屏
+  // 预加载着色器，GPU 预热由组件在首帧后处理，避免阻塞启动
   await LiquidGlassWidgets.initialize();
   final dependencies = await bootstrap();
 
   runApp(
     LiquidGlassWidgets.wrap(
       adaptiveQuality: true,
+      brightnessResolver: Theme.maybeBrightnessOf,
       child: MagrailApp(dependencies: dependencies),
     ),
   );

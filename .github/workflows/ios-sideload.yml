@@ -2,51 +2,106 @@ name: iOS Sideload IPA
 
 on:
   workflow_dispatch:
+    inputs:
+      operation:
+        description: 操作类型，patch 仅上传测试通道
+        type: choice
+        options: [check-release, release, check-patch, patch]
+        default: check-release
+      release_version:
+        description: 补丁目标基础包版本，例如 1.3.0+6
+        type: string
+        required: false
 
 permissions:
   contents: read
 
+concurrency:
+  group: shorebird-ios
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+      OPERATION: ${{ inputs.operation }}
+      RELEASE_VERSION: ${{ inputs.release_version }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Flutter
+      - name: Check release configuration
+        shell: bash
+        run: |
+          test -f shorebird.yaml || { echo '请先运行 shorebird init 并保存配置'; exit 1; }
+          test -n "$SHOREBIRD_TOKEN" || { echo '缺少 SHOREBIRD_TOKEN'; exit 1; }
+
+      - name: Select release Xcode
+        run: sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
+
+      - name: Set up Flutter for analysis
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: '3.44.1'
+          flutter-version: '3.47.9'
           cache: true
 
-      - name: Install dependencies
-        run: flutter pub get
+      - name: Set up Shorebird
+        uses: shorebirdtech/setup-shorebird@v1
+        with:
+          cache: true
+
+      - name: Install dependencies and analyze
+        run: |
+          flutter pub get
+          dart run tool/release.dart prepare
+          flutter analyze --no-pub --no-fatal-infos
 
       - name: Use Swift Package Manager for iOS plugins
         run: |
-          rm -rf ios/Pods
-          rm -f ios/Podfile.lock
-          rm -f ios/Podfile
+          for source in ios/Podfile ios/Podfile.lock; do
+            if [ -f "$source" ]; then
+              mv "$source" "$RUNNER_TEMP/magrail-$(basename "$source")"
+            fi
+          done
 
-      - name: Build iOS app without codesign
-        run: flutter build ios --release --no-codesign --no-pub
+      - name: Build or check unsigned release and patch
+        shell: bash
+        run: |
+          args=("$OPERATION" "ios")
+          if [[ "$OPERATION" == *patch ]]; then
+            args+=("--release-version=$RELEASE_VERSION")
+          fi
+          dart run tool/release.dart "${args[@]}"
 
       - name: Package unsigned IPA
+        if: inputs.operation == 'release'
         run: |
           APP_VERSION="$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml)"
           IPA_NAME="Magrail_${APP_VERSION}.ipa"
-          rm -rf Payload
-          rm -f Magrail_*.ipa
-          test -d build/ios/iphoneos/Runner.app
-          mkdir Payload
-          cp -R build/ios/iphoneos/Runner.app Payload/
-          zip -qry "${IPA_NAME}" Payload
+          APP_PATH="build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app"
+          test -d "$APP_PATH"
+          PACKAGE_PATH="$RUNNER_TEMP/magrail-ipa"
+          mkdir -p "$PACKAGE_PATH/Payload"
+          cp -R "$APP_PATH" "$PACKAGE_PATH/Payload/"
+          (cd "$PACKAGE_PATH" && zip -qry "$GITHUB_WORKSPACE/${IPA_NAME}" Payload)
           echo "IPA_NAME=${IPA_NAME}" >> "$GITHUB_ENV"
 
       - name: Upload IPA artifact
+        if: inputs.operation == 'release'
         uses: actions/upload-artifact@v4
         with:
           name: magrail-ios-sideload-ipa
-          path: ${{ env.IPA_NAME }}
+          path: |
+            ${{ env.IPA_NAME }}
+            pubspec.lock
+          if-no-files-found: error
+
+      - name: Record build toolchain
+        if: always()
+        run: |
+          shorebird --version
+          xcodebuild -version

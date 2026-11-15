@@ -1,0 +1,124 @@
+name: Android Shorebird
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: 操作类型，patch 仅上传测试通道
+        type: choice
+        options: [check-release, release, check-patch, patch]
+        default: check-release
+      release_version:
+        description: 补丁目标基础包版本，例如 1.3.1+4006
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: shorebird-android
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+      OPERATION: ${{ inputs.operation }}
+      RELEASE_VERSION: ${{ inputs.release_version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check release configuration
+        shell: bash
+        run: |
+          test -f shorebird.yaml || { echo '请先运行 shorebird init 并保存配置'; exit 1; }
+          test -n "$SHOREBIRD_TOKEN" || { echo '缺少 SHOREBIRD_TOKEN'; exit 1; }
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter for analysis
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.9'
+          cache: true
+
+      - name: Set up Shorebird
+        uses: shorebirdtech/setup-shorebird@v1
+        with:
+          cache: true
+
+      - name: Install dependencies and analyze
+        run: |
+          flutter pub get
+          dart tool/release.dart prepare
+          flutter analyze --no-pub --no-fatal-infos
+
+      - name: Configure Android release signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          python3 - <<'PY'
+          import base64, json, os, pathlib
+          keys = ['KEYSTORE_BASE64', 'STORE_PASSWORD', 'KEY_PASSWORD', 'KEY_ALIAS']
+          if any(not os.environ.get(key) for key in keys):
+              raise SystemExit('Android 正式签名 Secrets 不完整，禁止回退到 debug 签名')
+          key = pathlib.Path(os.environ['RUNNER_TEMP']) / 'magrail-release.jks'
+          key.write_bytes(base64.b64decode(os.environ['KEYSTORE_BASE64'], validate=True))
+          def escape(value):
+              return json.dumps(value, ensure_ascii=True)[1:-1].replace('=', chr(92) + '=').replace(':', chr(92) + ':').replace(' ', chr(92) + ' ')
+          values = {'storeFile': str(key), 'storePassword': os.environ['STORE_PASSWORD'],
+                    'keyPassword': os.environ['KEY_PASSWORD'], 'keyAlias': os.environ['KEY_ALIAS']}
+          pathlib.Path('android/key.properties').write_text(
+              ''.join(f'{name}={escape(value)}' + chr(10) for name, value in values.items()), encoding='utf-8')
+          PY
+
+      - name: Build or check release and patch
+        shell: bash
+        run: |
+          args=("$OPERATION" "android")
+          if [[ "$OPERATION" == *patch ]]; then
+            args+=("--release-version=$RELEASE_VERSION")
+          fi
+          dart tool/release.dart "${args[@]}"
+
+      - name: Upload signed per-ABI APKs
+        if: inputs.operation == 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: magrail-android-shorebird-apk
+          path: |
+            build/app/outputs/flutter-apk/Magrail_*_armeabi-v7a.apk
+            build/app/outputs/flutter-apk/Magrail_*_arm64-v8a.apk
+            build/app/outputs/flutter-apk/Magrail_*_x86_64.apk
+            pubspec.lock
+          if-no-files-found: error
+
+      - name: Preserve base artifacts for packaging recovery
+        if: always() && inputs.operation == 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: magrail-android-shorebird-base
+          path: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
+            pubspec.lock
+          if-no-files-found: warn
+
+      - name: Record build toolchain
+        if: always()
+        run: |
+          shorebird --version
+          java -version
