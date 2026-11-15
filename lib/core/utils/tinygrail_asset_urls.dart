@@ -31,8 +31,10 @@ class TinygrailAssetUrls {
   ///
   /// [cover] 封面地址
   static bool isGifCover(String cover) {
-    return RegExp(r'\.gif(?:!w\d+)?(?:[?#]|$)', caseSensitive: false)
-        .hasMatch(cover);
+    return RegExp(
+      r'\.gif(?:!w\d+)?(?:[?#]|$)',
+      caseSensitive: false,
+    ).hasMatch(cover);
   }
 
   /// 获取圣殿封面地址

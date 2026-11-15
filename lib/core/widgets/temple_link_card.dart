@@ -185,7 +185,8 @@ class TempleLinkCard extends StatelessWidget {
               ..._buildAssetEntryButtons(scale),
               Positioned(
                 left: 8 * scale,
-                top: 8 * scale +
+                top:
+                    8 * scale +
                     (onLeftAssetTap == null ? 0 : entryDimension + 8 * scale),
                 child: TempleCoverPlaybackButton(
                   coverUrl: leftCoverUrl,
@@ -194,7 +195,8 @@ class TempleLinkCard extends StatelessWidget {
               ),
               Positioned(
                 right: 8 * scale,
-                top: 8 * scale +
+                top:
+                    8 * scale +
                     (onRightAssetTap == null ? 0 : entryDimension + 8 * scale),
                 child: TempleCoverPlaybackButton(
                   coverUrl: rightCoverUrl,

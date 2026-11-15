@@ -187,7 +187,7 @@ class TempleCoverPlaybackButton extends StatelessWidget {
           child: SizedBox.square(
             dimension: dimension,
             child: Icon(
-              playback.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+              playback.isPlaying ? LucideIcons.pause : LucideIcons.play,
               size: dimension / 2,
               color: Colors.white,
             ),

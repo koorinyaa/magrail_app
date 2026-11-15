@@ -83,8 +83,13 @@ class CharacterDetailTradeHeaderSection extends StatelessWidget {
   /// [context] 当前组件树上下文
   Widget _buildCard(BuildContext context) {
     final snapshot = circulationController.validSnapshot;
+    final valhallaAmount = header.valhallaAmount;
+    // 英灵殿未加载或查询失败时不生成完整基准，避免变化徽标使用缺失数据
+    final baselineTotal = valhallaAmount == null
+        ? null
+        : header.total + valhallaAmount;
     final progressData = _TradeHeaderCirculationProgressData.fromTotal(
-      snapshot?.total ?? header.total,
+      snapshot?.total ?? baselineTotal ?? header.total,
     );
     final footerHeight = (MediaQuery.textScalerOf(context).scale(11) * 1.15)
         .clamp(13.0, double.infinity);
@@ -104,7 +109,9 @@ class CharacterDetailTradeHeaderSection extends StatelessWidget {
               const SizedBox(height: 12),
               _TradeHeaderCirculationProgress(
                 data: progressData,
-                change: snapshot == null ? null : snapshot.total - header.total,
+                change: snapshot == null || baselineTotal == null
+                    ? null
+                    : snapshot.total - baselineTotal,
                 level: header.level,
                 updatedAt: circulationController.updatedAtText,
                 statusText: circulationController.statusText,

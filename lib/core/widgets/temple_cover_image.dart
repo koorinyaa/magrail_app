@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:magrail_app/core/theme/app_blur_style.dart';
 import 'package:magrail_app/core/utils/tinygrail_asset_urls.dart';
 import 'package:skeletonizer/skeletonizer.dart';

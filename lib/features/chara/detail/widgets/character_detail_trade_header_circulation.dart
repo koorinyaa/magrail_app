@@ -64,7 +64,7 @@ class _TradeHeaderCirculationProgress extends StatelessWidget {
   /// [updatedAt] 当前数据的设备本地更新时间
   /// [statusText] 采集进度或失败说明
   /// [hasError] 是否以错误色显示状态
-  /// [change] 有效实际流通相对结算流通的变化，无有效快照时为空
+  /// [change] 实际流通减去接口流通与英灵殿数量之和，无有效快照或英灵殿数据时为空
   const _TradeHeaderCirculationProgress({
     required this.data,
     required this.level,
@@ -74,7 +74,7 @@ class _TradeHeaderCirculationProgress extends StatelessWidget {
     required this.change,
   });
 
-  /// 有效实际流通相对结算流通的变化
+  /// 实际流通相对接口流通与英灵殿数量之和的变化
   final int? change;
 
   /// 当前数据的设备本地更新时间
