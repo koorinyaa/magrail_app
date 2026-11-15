@@ -71,13 +71,13 @@ flutter analyze --no-pub
 flutter build apk --debug --no-pub
 ```
 
-构建可热更新的 Android release APK，先完成 Shorebird 账号登录与 `shorebird init`：
+构建支持热更新的 Android release APK 前，需配置 Shorebird 和 Android 正式签名：
 
 ```powershell
 dart tool/release.dart release android
 ```
 
-版本号仅在 `pubspec.yaml` 的 `version` 中维护，统一发布入口自动生成内容版本并关闭图标裁剪。只同步版本而不构建或上传时执行 `dart tool/release.dart prepare`；本机预检查使用 `dart tool/release.dart check-release android`
+发布脚本根据 `pubspec.yaml` 的 `version` 自动生成内容版本，并关闭图标裁剪
 
 ## iOS 侧载构建
 
